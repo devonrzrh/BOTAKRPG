@@ -2,9 +2,64 @@ import { it, expect } from "vitest";
 import { parseMarkdown } from "../scripts/compile-content";
 import { validateContent } from "../src/content/schema";
 import raw from "../src/generated/content.json";
+it("rejects missing dialogue targets and ambiguous choices", () => {
+  const dialogue = {
+    type: "dialogue",
+    id: "test-dialogue",
+    title: "Test",
+    start: "start",
+    nodes: [
+      {
+        id: "start",
+        speaker: "Dispatch",
+        text: "Ready?",
+        choices: [{ label: "Continue", next: "missing" }],
+      },
+    ],
+  };
+  expect(() => validateContent({ version: 1, entities: [dialogue] })).toThrow(
+    /missing dialogue node/,
+  );
+  dialogue.nodes[0].choices[0].next = "start";
+  expect(() =>
+    validateContent({
+      version: 1,
+      entities: [{ ...dialogue, start: "missing" }],
+    }),
+  ).toThrow(/missing dialogue start/);
+  expect(() =>
+    validateContent({
+      version: 1,
+      entities: [
+        {
+          ...dialogue,
+          nodes: [
+            {
+              ...dialogue.nodes[0],
+              choices: [
+                { label: "Take case", next: "start", action: "accept-case" },
+              ],
+            },
+          ],
+        },
+      ],
+    }),
+  ).toThrow(/exactly one/);
+});
+it("supports reusable cutscenes with different frame counts and pursuit steps", () => {
+  const c = validateContent(raw);
+  const intro = c.entities.find(
+    (e) => e.type === "story" && e.id === "rogue-signal",
+  );
+  const connection = c.entities.find(
+    (e) => e.type === "story" && e.id === "first-connection",
+  );
+  expect(intro?.type === "story" && intro.frames[1].steps).toBe(6);
+  expect(connection?.type === "story" && connection.frames.length).toBe(2);
+});
 it("compiles sample curriculum with all public record types", () => {
   const c = validateContent(raw);
-  expect(new Set(c.entities.map((x) => x.type)).size).toBe(8);
+  expect(new Set(c.entities.map((x) => x.type)).size).toBe(9);
 });
 it("parses Markdown frontmatter and removes executable-looking entity blocks from lesson body", () => {
   const result = parseMarkdown(

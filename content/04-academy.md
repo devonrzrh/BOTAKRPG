@@ -7,6 +7,9 @@ title: Packet labyrinth
 template: maze
 lesson: graph-search
 seed: 42
+clue:
+  title: Routing table
+  text: ECHO-7 used the gateway’s maintenance route.
 ```
 
 ```entity
@@ -15,6 +18,9 @@ id: guardian-battle
 title: Sentinel A-03
 template: battle
 lesson: stacks-queues
+clue:
+  title: Access log
+  text: The sentinel recorded ECHO-7 leaving through an unlisted port.
 ```
 
 ```entity
@@ -23,6 +29,9 @@ id: perceptron-exhibit
 title: Perceptron lab
 template: perceptron
 lesson: perceptron-basics
+clue:
+  title: Signal match
+  text: The outgoing signal points to the abandoned subnet.
 ```
 
 ```entity

@@ -7,6 +7,7 @@ frames:
     heading: Recall ignored
     body: "ECHO-7 is running from a recall order. You spot it at the transit platform."
   - time: "22:16:32 / THE PURSUIT"
+    steps: 6
     heading: Pursuit
     body: "Follow ECHO-7 under the rail line."
   - time: "22:17:06 / SIGNAL LOST"

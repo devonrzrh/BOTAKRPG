@@ -5,21 +5,25 @@
       "id": "rogue-signal",
       "title": "Pursuit",
       "type": "story",
+      "visual": "chase",
       "frames": [
         {
           "time": "22:14:09 / LOWER CITY",
           "heading": "Recall ignored",
-          "body": "ECHO-7 is running from a recall order. You spot it at the transit platform."
+          "body": "ECHO-7 is running from a recall order. You spot it at the transit platform.",
+          "steps": 1
         },
         {
           "time": "22:16:32 / THE PURSUIT",
           "heading": "Pursuit",
-          "body": "Follow ECHO-7 under the rail line."
+          "body": "Follow ECHO-7 under the rail line.",
+          "steps": 6
         },
         {
           "time": "22:17:06 / SIGNAL LOST",
           "heading": "Transfer complete",
-          "body": "ECHO-7 abandoned its body and escaped through a maintenance terminal. Trace it online."
+          "body": "ECHO-7 abandoned its body and escaped through a maintenance terminal. Trace it online.",
+          "steps": 1
         }
       ],
       "body": "An original detective story about a fugitive machine. Its motives are unknown. Follow evidence before deciding whether it is dangerous."
@@ -170,7 +174,11 @@
       "type": "activity",
       "template": "maze",
       "lesson": "graph-search",
-      "seed": 42
+      "seed": 42,
+      "clue": {
+        "title": "Routing table",
+        "text": "ECHO-7 used the gateway’s maintenance route."
+      }
     },
     {
       "id": "guardian-battle",
@@ -178,7 +186,11 @@
       "type": "activity",
       "template": "battle",
       "lesson": "stacks-queues",
-      "seed": 42
+      "seed": 42,
+      "clue": {
+        "title": "Access log",
+        "text": "The sentinel recorded ECHO-7 leaving through an unlisted port."
+      }
     },
     {
       "id": "perceptron-exhibit",
@@ -186,7 +198,11 @@
       "type": "activity",
       "template": "perceptron",
       "lesson": "perceptron-basics",
-      "seed": 42
+      "seed": 42,
+      "clue": {
+        "title": "Signal match",
+        "text": "The outgoing signal points to the abandoned subnet."
+      }
     },
     {
       "id": "first-principles",
@@ -297,6 +313,85 @@
       "parent": "ward",
       "effect": "weaken",
       "lesson": "stacks-queues"
+    },
+    {
+      "id": "case-briefing",
+      "title": "Case briefing",
+      "type": "dialogue",
+      "start": "dispatch",
+      "nodes": [
+        {
+          "id": "dispatch",
+          "speaker": "Dispatch",
+          "text": "The terminal log confirms it: ECHO-7 transferred into the network. We need its location before the trail expires.",
+          "choices": [
+            {
+              "label": "What blocks the route?",
+              "next": "obstacles"
+            },
+            {
+              "label": "Take the case",
+              "action": "accept-case"
+            },
+            {
+              "label": "Later",
+              "action": "close"
+            }
+          ]
+        },
+        {
+          "id": "obstacles",
+          "speaker": "Dispatch",
+          "text": "A routing maze, a security sentinel, and a damaged signal classifier. Recover a clue from each. The books on your shelf cover the tools you need.",
+          "choices": [
+            {
+              "label": "Why did it run?",
+              "next": "motive"
+            },
+            {
+              "label": "Take the case",
+              "action": "accept-case"
+            }
+          ]
+        },
+        {
+          "id": "motive",
+          "speaker": "Dispatch",
+          "text": "Unknown. Its recall order predates the chase. Find the robot and preserve the evidence.",
+          "choices": [
+            {
+              "label": "Take the case",
+              "action": "accept-case"
+            },
+            {
+              "label": "Later",
+              "action": "close"
+            }
+          ]
+        }
+      ],
+      "body": ""
+    },
+    {
+      "id": "first-connection",
+      "title": "First connection",
+      "type": "story",
+      "visual": "network",
+      "frames": [
+        {
+          "time": "23:41 / OFFICE TERMINAL",
+          "heading": "Connecting",
+          "body": "Your terminal opens the address recovered from the chase.",
+          "steps": 1
+        },
+        {
+          "time": "GATEWAY 01",
+          "heading": "Route blocked",
+          "body": "ECHO-7 crossed this gateway. Trace the packets, bypass its sentinel, and identify the outgoing signal.",
+          "steps": 1
+        }
+      ],
+      "body": ""
     }
   ]
 }

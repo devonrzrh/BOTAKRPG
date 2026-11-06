@@ -23,6 +23,7 @@ import type {
   SceneId,
 } from "../game/contracts";
 import type { Maze } from "../game/maze";
+import { buildOffice, type HomeWall } from "./Office";
 export interface WorldMetrics {
   backend: string;
   fps: number;
@@ -34,6 +35,8 @@ export interface WorldMetrics {
 interface Props {
   scene: SceneId;
   encounter?: boolean;
+  homeWall?: HomeWall;
+  homeLookLocked?: boolean;
   maze: Maze;
   renderer: RendererPreference;
   reducedMotion: boolean;
@@ -198,6 +201,24 @@ function WorldCanvas(props: Props) {
     if (!engine) return;
     const scene = new Scene(engine);
     sceneRef.current = scene;
+    if (props.scene === "desk") {
+      actorRef.current = null;
+      const disposeOffice = buildOffice(
+        scene,
+        canvas.current!.parentElement!,
+        () => ({
+          wall: latest.current.homeWall ?? "investigation",
+          reducedMotion: latest.current.reducedMotion,
+          locked: latest.current.homeLookLocked ?? false,
+        }),
+        (id) => latest.current.onInteract(id),
+      );
+      return () => {
+        disposeOffice();
+        if (sceneRef.current === scene) sceneRef.current = null;
+        scene.dispose();
+      };
+    }
     scene.clearColor = new Color4(0.043, 0.082, 0.114, 1);
     scene.ambientColor = new Color3(0.3, 0.3, 0.25);
     const camera = new ArcRotateCamera(
@@ -209,23 +230,12 @@ function WorldCanvas(props: Props) {
       scene,
     );
     camera.mode = ArcRotateCamera.ORTHOGRAPHIC_CAMERA;
-    if (props.scene === "desk") {
-      camera.alpha = -Math.PI / 2.2;
-      camera.beta = 0.98;
-      camera.target.set(0, 1.7, 0.6);
-    }
     if (props.encounter) {
       camera.alpha = -Math.PI / 2;
       camera.beta = 1.18;
       camera.target.set(5, 1.55, 4);
     }
-    const view = props.encounter
-      ? 2.9
-      : props.scene === "desk"
-        ? 5.4
-        : props.scene === "maze"
-          ? 9
-          : 12;
+    const view = props.encounter ? 2.9 : props.scene === "maze" ? 9 : 12;
     const resize = () => {
       const aspect = engine.getRenderWidth() / engine.getRenderHeight();
       const vertical = view / Math.min(1, aspect);
@@ -379,230 +389,7 @@ function WorldCanvas(props: Props) {
       cylinder("column", x, height / 2 + 0.3, z, 0.27, height, light);
       box("capital", x, height + 0.35, z, 0.85, 0.25, 0.85, light);
     };
-    if (props.scene === "desk") {
-      const wall = mat("office walls", "#253139"),
-        paper = mat("case paper", "#c9b895"),
-        black = mat("terminal black", "#101d25"),
-        glass = mat("night glass", "#193d53", true);
-      box("office floor", 0, -0.3, 0.5, 15, 0.5, 12, dark);
-      box("office back wall", 0, 2.7, 3.8, 15, 6, 0.3, wall);
-      for (let x = -7; x <= 7; x += 1.2)
-        box("wall panel", x, 2.5, 3.61, 0.025, 5.4, 0.04, stone);
-      box("rain window frame", 4.5, 3.2, 3.5, 3.9, 4.1, 0.2, black);
-      box("city beyond glass", 4.5, 3.2, 3.35, 3.6, 3.8, 0.08, glass);
-      for (let i = 0; i < 8; i++) {
-        const h = 0.6 + ((i * 31) % 15) / 10;
-        box(
-          "distant building",
-          3 + i * 0.42,
-          1.6 + h / 2,
-          3.28,
-          0.32,
-          h,
-          0.03,
-          dark,
-        );
-        for (let j = 0; j < 3; j++)
-          box(
-            "city window",
-            3 + i * 0.42,
-            1.9 + j * 0.36,
-            3.23,
-            0.06,
-            0.1,
-            0.02,
-            i % 2 ? teal : gold,
-          );
-      }
-      box("window crossbar", 4.5, 3.2, 3.15, 3.8, 0.1, 0.12, black);
-      box("window mullion", 4.5, 3.2, 3.15, 0.1, 4, 0.12, black);
-      for (let i = 0; i < 10; i++)
-        box(
-          "rain on window",
-          2.9 + i * 0.35,
-          3 + (i % 3) * 0.45,
-          3.12,
-          0.012,
-          1.4,
-          0.012,
-          teal,
-        );
-      // The menu is composed of physical, selectable objects.
-      const board = box("caseboard", -2.3, 3.2, 3.42, 5.4, 2.9, 0.22, wood);
-      board.metadata = { interaction: "quest" };
-      box("board upper frame", -2.3, 4.68, 3.25, 5.65, 0.14, 0.16, gold);
-      box("board lower frame", -2.3, 1.72, 3.25, 5.65, 0.14, 0.16, wood);
-      const pins: [number, number][] = [
-        [-4.1, 3.85],
-        [-2.6, 3.7],
-        [-0.8, 3.9],
-        [-3.4, 2.55],
-        [-1.3, 2.5],
-      ];
-      pins.forEach(([x, y], i) => {
-        const p = box(
-          "pinned evidence",
-          x,
-          y,
-          3.22,
-          0.85,
-          0.85,
-          0.035,
-          i === 1 ? black : paper,
-        );
-        p.rotation.z = i % 2 ? 0.08 : -0.07;
-        p.metadata = { interaction: "quest" };
-        const pin = MeshBuilder.CreateSphere(
-          "evidence pin",
-          { diameter: 0.07, segments: 6 },
-          scene,
-        );
-        pin.position.set(x, y + 0.32, 3.16);
-        pin.material = red;
-      });
-      for (const [a, b] of [
-        [0, 1],
-        [1, 2],
-        [1, 3],
-        [3, 4],
-        [4, 2],
-      ]) {
-        const thread = MeshBuilder.CreateLines(
-          "evidence thread",
-          {
-            points: [
-              new Vector3(...pins[a], 3.12),
-              new Vector3(...pins[b], 3.12),
-            ],
-          },
-          scene,
-        );
-        thread.color = Color3.FromHexString("#a26458");
-      }
-      label("CASE 007 / ECHO-7", -2.3, 5.05, 3.1, "quest");
-      box("detective desk", 0, 1.15, 0, 10, 0.3, 4.2, wood);
-      box("desk leather", 0.4, 1.32, -0.15, 5.8, 0.025, 2.8, black);
-      for (const x of [-4.2, 4.2])
-        for (const z of [-1.4, 1.4])
-          box("desk leg", x, 0.4, z, 0.22, 1.5, 0.22, stone);
-      const monitor = box(
-        "network terminal",
-        1.1,
-        2.4,
-        0.7,
-        2.7,
-        1.8,
-        0.24,
-        black,
-      );
-      monitor.metadata = { interaction: "network" };
-      const screen = box(
-        "terminal screen",
-        1.1,
-        2.4,
-        0.56,
-        2.42,
-        1.5,
-        0.025,
-        glass,
-      );
-      screen.metadata = { interaction: "network" };
-      box("screen glow", 1.1, 2.4, 0.53, 1.9, 0.025, 0.02, teal);
-      label("GO ONLINE", 1.1, 2.55, 0.35, "network");
-      box("monitor stand", 1.1, 1.5, 0.7, 0.18, 0.5, 0.2, stone);
-      box("monitor foot", 1.1, 1.35, 0.5, 1.3, 0.07, 0.6, stone);
-      const keyboard = box(
-        "terminal keyboard",
-        1,
-        1.39,
-        -0.75,
-        2.4,
-        0.1,
-        0.8,
-        stone,
-      );
-      keyboard.metadata = { interaction: "network" };
-      for (let i = 0; i < 10; i++)
-        for (let row = 0; row < 3; row++)
-          box(
-            "keyboard key",
-            -0.02 + i * 0.22,
-            1.46,
-            -0.52 - row * 0.18,
-            0.16,
-            0.025,
-            0.13,
-            black,
-          );
-      for (let i = 0; i < 4; i++) {
-        const book = box(
-          "reference volume",
-          -2.9 + i * 0.1,
-          1.43 + i * 0.18,
-          -0.4,
-          1.25,
-          0.16,
-          1.4,
-          i % 2 ? stone : red,
-        );
-        book.rotation.y = 0.1 * i;
-        book.metadata = { interaction: "library" };
-      }
-      label("REFERENCE LIBRARY", -3.1, 2.5, -0.5, "library");
-      const file = box(
-        "evidence folder",
-        -1.4,
-        1.37,
-        -1.1,
-        1.3,
-        0.04,
-        0.9,
-        paper,
-      );
-      file.rotation.y = -0.14;
-      file.metadata = { interaction: "quest" };
-      const badge = cylinder(
-        "detective badge",
-        3.5,
-        1.4,
-        -1.1,
-        0.36,
-        0.08,
-        gold,
-        6,
-      );
-      badge.metadata = { interaction: "inventory" };
-      cylinder("lamp base", -4, 1.4, 0.8, 0.4, 0.12, black);
-      box("lamp arm", -4, 2.1, 0.8, 0.08, 1.5, 0.08, stone);
-      const shade = MeshBuilder.CreateCylinder(
-        "desk lamp",
-        {
-          diameterTop: 0.25,
-          diameterBottom: 0.95,
-          height: 0.5,
-          tessellation: 14,
-        },
-        scene,
-      );
-      shade.position.set(-3.8, 2.9, 0.65);
-      shade.material = dark;
-      const lamp = new PointLight(
-        "desk light",
-        new Vector3(-3.8, 2.65, 0.65),
-        scene,
-      );
-      lamp.diffuse = new Color3(1, 0.64, 0.3);
-      lamp.intensity = 1.1;
-      lamp.range = 7;
-      const connectionLight = new PointLight(
-        "terminal light",
-        new Vector3(1.1, 2.2, -0.1),
-        scene,
-      );
-      connectionLight.diffuse = new Color3(0.2, 0.7, 1);
-      connectionLight.intensity = 0.5;
-      connectionLight.range = 4;
-    } else if (props.scene === "maze") {
+    if (props.scene === "maze") {
       const m = props.maze;
       box(
         "maze foundation",
@@ -809,7 +596,7 @@ function WorldCanvas(props: Props) {
     }
     const actor = cylinder("wanderer", 0, 0.5, 0, 0.24, 0.75, red, 8);
     actorRef.current = actor;
-    if (props.scene === "desk" || props.encounter) actor.setEnabled(false);
+    if (props.encounter) actor.setEnabled(false);
     const head = MeshBuilder.CreateSphere(
       "wanderer head",
       { diameter: 0.4, segments: 8 },
@@ -908,7 +695,7 @@ function WorldCanvas(props: Props) {
         className={`world-canvas ${props.scene === "maze" ? "maze-world" : ""} ${props.encounter ? "boss-world" : ""}`}
         aria-label={
           props.scene === "desk"
-            ? "Detective’s desk. Select the caseboard, reference books, or network terminal."
+            ? "Detective office. Investigation wall, bookshelf, quest board, and inventory desk."
             : "Interactive network world. WASD to move, E to interact. Use destination buttons for keyboard navigation."
         }
         tabIndex={0}

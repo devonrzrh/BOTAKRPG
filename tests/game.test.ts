@@ -246,9 +246,16 @@ describe("Progression and saves", () => {
   it("loads foundation saves that predate the prologue", () => {
     const { story: _story, ...legacy } = initialSave();
     expect(parseSave(legacy, content).story.prologueSeen).toBe(false);
+    const previous = { ...legacy, story: { prologueSeen: true } };
+    expect(parseSave(previous, content).story.caseAccepted).toBe(false);
+    expect(parseSave(previous, content).story.briefingSeen).toBe(false);
     const save = initialSave();
     save.story.prologueSeen = true;
+    save.story.caseAccepted = true;
+    save.story.networkIntroSeen = true;
     expect(parseSave(save, content).story.prologueSeen).toBe(true);
+    expect(parseSave(save, content).story.caseAccepted).toBe(true);
+    expect(parseSave(save, content).story.networkIntroSeen).toBe(true);
   });
   it("rejects incompatible, unknown and inconsistent saves", () => {
     const save = initialSave();

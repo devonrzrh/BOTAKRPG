@@ -1,5 +1,17 @@
 # Validation · 2026-11-06
 
+## Home room update
+
+34 tests pass, including new dialogue validation, story-save migration, configurable cutscene frames, and camera turns across the angle boundary.
+
+Browser checks covered all four room walls, top-menu dropdowns, library search, the branching briefing and case acceptance, the first-connection cutscene continuing into a selected quest battle, intro replay, and clue display. The menu bar stayed visible during dialogue and both cutscenes. The first-person room rendered with WebGPU and forced WebGL2. Reduced motion switched walls without blur or camera interpolation.
+
+The room and characters use procedural placeholder art. Blur is a screen filter during the camera turn. Existing maze, combat, and progression behavior remains covered by the tests below.
+
+![Investigation wall](screenshots/home.jpg)
+
+## Foundation checks
+
 `npm test`: 31 tests passed. `npm run build`: content validation, TypeScript, and production bundling passed.
 
 Automated coverage includes 200 solvable maze seeds, deterministic generation, alternate routes, shared movement rules, command budgets, combat turn order and effects, item consumption, defeat, unique rewards, mastery, progression, content references and cycles, save validation, IndexedDB, and worker cancellation/stale messages/deadlines. Legacy saves without prologue progress load successfully.

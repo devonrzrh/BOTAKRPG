@@ -51,8 +51,13 @@ import {
   type Skill,
   type Item,
   type Story,
+  type Dialogue as DialogueContent,
 } from "./content/schema";
-import { Prologue } from "./ui/Prologue";
+import { Cutscene } from "./ui/Cutscene";
+import { Dialogue } from "./ui/Dialogue";
+import { MenuBar } from "./ui/MenuBar";
+import { HomeBoard } from "./ui/HomeBoard";
+import type { HomeWall } from "./world/Office";
 import { atGoal, move, shortestPath, type Maze } from "./game/maze";
 import {
   addXp,
@@ -106,7 +111,12 @@ const questions = content.entities.filter(
 const skills = content.entities.filter((e): e is Skill => e.type === "skill");
 const items = content.entities.filter((e): e is Item => e.type === "item");
 const quest = content.entities.find((e): e is Quest => e.type === "quest")!;
-const story = content.entities.find((e): e is Story => e.type === "story")!;
+const story = content.entities.find(
+  (e): e is Story => e.id === "rogue-signal" && e.type === "story",
+)!;
+const dialogueContent = content.entities.filter(
+  (e): e is DialogueContent => e.type === "dialogue",
+);
 const topicNames = {
   algorithms: "Algorithms",
   structures: "Data structures",
@@ -143,12 +153,6 @@ const destinations = [
     icon: Sprout,
   },
 ];
-const deskDestinations = [
-  { id: "quest", name: "Caseboard", icon: FolderSearch },
-  { id: "library", name: "Library", icon: BookOpen },
-  { id: "network", name: "Go online", icon: Monitor },
-  { id: "inventory", name: "Equipment", icon: Backpack },
-];
 export default function App() {
   const [save, setSave] = useState<Save>(defaultSave),
     saveRef = useRef(save),
@@ -157,6 +161,35 @@ export default function App() {
     [saveStatus, setSaveStatus] = useState("Loading journal…");
   const [realm, setRealm] = useState<"desk" | "hub">("desk");
   const [prologueReplay, setPrologueReplay] = useState(false);
+  const [homeWall, setHomeWall] = useState<HomeWall>("investigation");
+  const [homeMoving, setHomeMoving] = useState(false);
+  const [dialogueId, setDialogueId] = useState<string | null>(null);
+  const [cutsceneId, setCutsceneId] = useState<string | null>(null);
+  const [pendingActivity, setPendingActivity] = useState<string | null>(null);
+  useEffect(() => {
+    setHomeMoving(true);
+    const timer = setTimeout(
+      () => setHomeMoving(false),
+      save.settings.reducedMotion ? 0 : 420,
+    );
+    return () => clearTimeout(timer);
+  }, [homeWall, save.settings.reducedMotion]);
+  useEffect(() => {
+    if (
+      booted &&
+      save.story.prologueSeen &&
+      !save.story.briefingSeen &&
+      !prologueReplay &&
+      !cutsceneId
+    )
+      setDialogueId("case-briefing");
+  }, [
+    booted,
+    save.story.prologueSeen,
+    save.story.briefingSeen,
+    prologueReplay,
+    cutsceneId,
+  ]);
   const [scene, setScene] = useState<SceneId>("desk"),
     [panel, setPanel] = useState<Panel>(null),
     [toast, setToast] = useState(""),
@@ -363,18 +396,62 @@ export default function App() {
       generation.current++;
       runner.current?.reset();
       setLine(0);
-      if (id === "network" || id === "desk") {
-        const destination = id === "desk" ? "desk" : "hub";
-        setRealm(destination);
-        setScene(destination);
+      if (id === "briefing") {
+        setDialogueId("case-briefing");
+        return;
+      }
+      if (id === "intro") {
+        setPrologueReplay(true);
+        return;
+      }
+      if (id === "network") {
+        if (!saveRef.current.story.caseAccepted) {
+          setDialogueId("case-briefing");
+          return;
+        }
+        if (!saveRef.current.story.networkIntroSeen) {
+          setCutsceneId("first-connection");
+          return;
+        }
+        setRealm("hub");
+        setScene("hub");
         setPanel(null);
         setTrial(false);
         trialRef.current = false;
         return;
       }
-      if (id === "quest") {
-        setPanel("journal");
-        setScene(realm);
+      if (["desk", "library", "quest", "journal", "inventory"].includes(id)) {
+        const wall: HomeWall =
+          id === "library"
+            ? "bookshelf"
+            : id === "quest" || id === "journal"
+              ? "quests"
+              : id === "inventory"
+                ? "desk"
+                : "investigation";
+        setHomeWall(wall);
+        setRealm("desk");
+        setScene("desk");
+        setPanel(
+          id === "desk" ? null : id === "quest" ? "journal" : (id as Panel),
+        );
+        setTrial(false);
+        trialRef.current = false;
+        return;
+      }
+      if (
+        ["battle", "maze", "garden"].includes(id) &&
+        !saveRef.current.story.caseAccepted
+      ) {
+        setDialogueId("case-briefing");
+        return;
+      }
+      if (
+        ["battle", "maze", "garden"].includes(id) &&
+        !saveRef.current.story.networkIntroSeen
+      ) {
+        setPendingActivity(id);
+        setCutsceneId("first-connection");
         return;
       }
       if (id === "maze") {
@@ -402,6 +479,7 @@ export default function App() {
     stop();
     setPanel(null);
     setScene(realm);
+    if (realm === "desk") setHomeWall("investigation");
     setTrial(false);
     trialRef.current = false;
   };
@@ -442,7 +520,7 @@ export default function App() {
   };
   const openLesson = (id: string) => {
     setLessonId(id);
-    setPanel("library");
+    open("library");
   };
   const applyBattle = (nextBattle: Battle, nextSave: Save) => {
     if (nextBattle.phase === "won") {
@@ -535,17 +613,9 @@ export default function App() {
   const done = quest.objectives.filter((id) =>
     save.completed.includes(id),
   ).length;
-  if (!booted)
-    return (
-      <div className="boot">
-        <GraduationCap size={40} />
-        <h1>Opening case 007</h1>
-        <p>Preparing your local journal…</p>
-      </div>
-    );
   return (
     <div
-      className={`app ${save.settings.reducedMotion ? "reduced-motion" : ""}`}
+      className={`app ${realm === "desk" ? "home-view" : "network-view"} ${homeMoving && realm === "desk" ? "home-panning" : ""} ${save.settings.reducedMotion ? "reduced-motion" : ""}`}
     >
       <header className="topbar">
         <a
@@ -561,6 +631,7 @@ export default function App() {
           </span>
           <span>NULL / TRACE</span>
         </a>
+        <MenuBar onSelect={open} />
         <div className="chapter">
           <span className="chapter-dot" />
           CASE 007 <span className="top-divider">/</span> ECHO-7
@@ -588,6 +659,11 @@ export default function App() {
           </button>
         </div>
       </header>
+      {!booted && (
+        <div className="boot-screen" role="status">
+          Loading journal…
+        </div>
+      )}
       <aside className="rail" aria-label="Investigation navigation">
         <button
           className={!panel ? "active" : ""}
@@ -605,17 +681,19 @@ export default function App() {
         >
           <Monitor size={21} />
         </button>
-        {destinations.map((d) => (
-          <button
-            key={d.id}
-            className={panel === d.id ? "active" : ""}
-            title={d.name}
-            aria-label={`Open ${d.name}`}
-            onClick={() => open(d.id)}
-          >
-            <d.icon size={21} />
-          </button>
-        ))}
+        {destinations
+          .filter((d) => d.id !== "battle")
+          .map((d) => (
+            <button
+              key={d.id}
+              className={panel === d.id ? "active" : ""}
+              title={d.name}
+              aria-label={`Open ${d.name}`}
+              onClick={() => open(d.id)}
+            >
+              <d.icon size={21} />
+            </button>
+          ))}
         <div className="rail-spacer" />
         <button
           aria-label="Open inventory and skills"
@@ -632,12 +710,37 @@ export default function App() {
           <ScrollText size={21} />
         </button>
       </aside>
-      <main className="world-shell">
+      <main
+        className="world-shell"
+        onPointerMove={(e) => {
+          const r = e.currentTarget.getBoundingClientRect();
+          const factor = save.settings.reducedMotion || homeMoving ? 0 : 1;
+          e.currentTarget.style.setProperty(
+            "--look-x",
+            String(((e.clientX - r.left) / r.width - 0.5) * factor),
+          );
+          e.currentTarget.style.setProperty(
+            "--look-y",
+            String(((e.clientY - r.top) / r.height - 0.5) * factor),
+          );
+        }}
+        onPointerLeave={(e) => {
+          e.currentTarget.style.setProperty("--look-x", "0");
+          e.currentTarget.style.setProperty("--look-y", "0");
+        }}
+      >
         <Suspense
           fallback={<div className="world-notice">Establishing the scene…</div>}
         >
           <World
             scene={scene}
+            homeWall={homeWall}
+            homeLookLocked={
+              !save.story.prologueSeen ||
+              prologueReplay ||
+              Boolean(dialogueId) ||
+              Boolean(cutsceneId)
+            }
             encounter={panel === "battle"}
             maze={maze}
             renderer={save.settings.renderer}
@@ -648,34 +751,43 @@ export default function App() {
               (scene === "maze" && mode !== "manual") ||
               trialExpired ||
               !save.story.prologueSeen ||
-              prologueReplay
+              prologueReplay ||
+              Boolean(dialogueId) ||
+              Boolean(cutsceneId)
             }
             onInteract={open}
             onMove={manualMove}
             onMetrics={onMetrics}
           />
         </Suspense>
-        {!panel && (
+        {realm === "desk" && !panel && !homeMoving && (
+          <HomeBoard
+            onSelect={open}
+            accepted={save.story.caseAccepted}
+            completed={save.completed.filter((id) =>
+              quest.objectives.includes(id),
+            )}
+          />
+        )}
+        {homeMoving && realm === "desk" && (
+          <span className="pan-status" role="status">
+            Turning…
+          </span>
+        )}
+        {!panel && realm !== "desk" && (
           <>
             <div className="scene-heading">
-              <h1>
-                {realm === "desk" ? "Detective’s desk" : "Network gateway"}
-              </h1>
+              <h1>Network gateway</h1>
             </div>
             <div className="world-caption">
-              <span className="live-dot" />{" "}
-              {realm === "desk"
-                ? "OFFLINE / THE DETECTIVE’S DESK"
-                : "ONLINE / THE TRANSIT NETWORK"}{" "}
-              <span>
-                {realm === "desk" ? "CASE FILE 007" : "01 / THE GATEWAY"}
-              </span>
+              <span className="live-dot" /> ONLINE / THE TRANSIT NETWORK{" "}
+              <span>01 / THE GATEWAY</span>
             </div>
           </>
         )}
-        {panel && (
+        {panel && !(realm === "desk" && homeMoving) && (
           <section
-            className={`activity-panel ${panel === "maze" ? "maze-panel" : ""} ${panel === "battle" ? "battle-panel" : ""}`}
+            className={`activity-panel ${realm === "desk" ? `home-panel home-${homeWall}` : ""} ${panel === "maze" ? "maze-panel" : ""} ${panel === "battle" ? "battle-panel" : ""}`}
             aria-label={`${panel} activity`}
           >
             <header className="panel-header">
@@ -688,7 +800,7 @@ export default function App() {
                       battle: "Sentinel A-03",
                       garden: "Perceptron lab",
                       inventory: "Equipment & skills",
-                      journal: "Caseboard",
+                      journal: "Quest board",
                       settings: "Settings",
                     }[panel]
                   }
@@ -1381,11 +1493,20 @@ export default function App() {
                   </div>
                 </div>
                 <h2>{quest.title}</h2>
+                {!save.story.caseAccepted && (
+                  <button
+                    className="primary"
+                    onClick={() => setDialogueId("case-briefing")}
+                  >
+                    Accept case
+                  </button>
+                )}
                 <p>{quest.description}</p>
                 <div className="quest-objectives">
                   {quest.objectives.map((id) => (
                     <button
                       key={id}
+                      disabled={!save.story.caseAccepted}
                       onClick={() =>
                         open(
                           id === "maze-chamber"
@@ -1443,6 +1564,36 @@ export default function App() {
                     <h3>Next lead: abandoned subnet</h3>
                     <p>End of the playable chapter.</p>
                   </div>
+                )}
+                {content.entities.some(
+                  (e) =>
+                    e.type === "activity" &&
+                    e.clue &&
+                    save.completed.includes(e.id),
+                ) && (
+                  <section
+                    className="recovered-clues"
+                    aria-label="Recovered clues"
+                  >
+                    <h3>Clues</h3>
+                    {content.entities
+                      .filter(
+                        (e) =>
+                          e.type === "activity" &&
+                          e.clue &&
+                          save.completed.includes(e.id),
+                      )
+                      .map(
+                        (e) =>
+                          e.type === "activity" &&
+                          e.clue && (
+                            <article key={e.id}>
+                              <strong>{e.clue.title}</strong>
+                              <p>{e.clue.text}</p>
+                            </article>
+                          ),
+                      )}
+                  </section>
                 )}
                 <h3>Topic mastery</h3>
                 <div className="knowledge-map">
@@ -1740,10 +1891,11 @@ export default function App() {
             )}
           </section>
         )}
-        {!panel && (
+        {!panel && realm !== "desk" && (
           <div className="travel-dock">
-            {(realm === "desk" ? deskDestinations : destinations).map(
-              (d, index) => (
+            {destinations
+              .filter((d) => d.id !== "battle")
+              .map((d, index) => (
                 <button key={d.id} onClick={() => open(d.id)}>
                   <span className="destination-number">0{index + 1}</span>
                   <d.icon size={23} />
@@ -1752,15 +1904,36 @@ export default function App() {
                   </span>
                   <ArrowUpRight size={16} />
                 </button>
-              ),
-            )}
+              ))}
           </div>
         )}
+        {realm === "desk" && (
+          <nav className="room-nav" aria-label="Room walls">
+            {[
+              ["investigation", "Investigation wall", "desk"],
+              ["bookshelf", "Bookshelf", "library"],
+              ["quests", "Quest board", "quest"],
+              ["desk", "Inventory desk", "inventory"],
+            ].map(([wall, label, id]) => (
+              <button
+                key={wall}
+                aria-current={homeWall === wall ? "page" : undefined}
+                onClick={() => open(id)}
+              >
+                {label}
+              </button>
+            ))}
+          </nav>
+        )}
         <footer className="world-footer">
-          <span>
-            <kbd>W A S D</kbd> Move <i /> <kbd>E</kbd> Interact <i /> Drag to
-            orbit
-          </span>
+          {realm === "desk" ? (
+            <span>Move cursor to look · Select a wall from Home</span>
+          ) : (
+            <span>
+              <kbd>W A S D</kbd> Move <i /> <kbd>E</kbd> Interact <i /> Drag to
+              orbit
+            </span>
+          )}
           <span className="renderer-badge">
             <span />
             {metrics?.backend ?? "Starting renderer"}
@@ -1872,15 +2045,69 @@ export default function App() {
           </button>
         </div>
       </aside>
-      {(!save.story.prologueSeen || prologueReplay) && (
-        <Prologue
-          story={story}
+      {booted && (!save.story.prologueSeen || prologueReplay || cutsceneId) && (
+        <Cutscene
+          key={cutsceneId ?? "intro"}
+          story={
+            cutsceneId
+              ? content.entities.find(
+                  (e): e is Story => e.type === "story" && e.id === cutsceneId,
+                )!
+              : story
+          }
           onFinish={() => {
-            updateSave((s) => ({ ...s, story: { prologueSeen: true } }));
-            setPrologueReplay(false);
+            if (cutsceneId) {
+              updateSave((s) => ({
+                ...s,
+                story: { ...s.story, networkIntroSeen: true },
+              }));
+              setCutsceneId(null);
+              setRealm("hub");
+              setScene("hub");
+              setPanel(null);
+              if (pendingActivity) {
+                const id = pendingActivity;
+                setPendingActivity(null);
+                open(id);
+              }
+            } else {
+              updateSave((s) => ({
+                ...s,
+                story: { ...s.story, prologueSeen: true },
+              }));
+              setPrologueReplay(false);
+              setRealm("desk");
+              setScene("desk");
+              setPanel(null);
+              setHomeWall("investigation");
+              if (!saveRef.current.story.briefingSeen)
+                setDialogueId("case-briefing");
+            }
           }}
         />
       )}
+      {dialogueId &&
+        save.story.prologueSeen &&
+        !prologueReplay &&
+        !cutsceneId && (
+          <Dialogue
+            key={dialogueId}
+            dialogue={dialogueContent.find((d) => d.id === dialogueId)!}
+            onAction={(action) => {
+              updateSave((s) => ({
+                ...s,
+                story: {
+                  ...s.story,
+                  briefingSeen: true,
+                  caseAccepted:
+                    s.story.caseAccepted || action === "accept-case",
+                },
+              }));
+              setDialogueId(null);
+              if (action === "accept-case") open("quest");
+            }}
+          />
+        )}
       {toast && (
         <div className="toast" role="status">
           <Sparkles size={18} />

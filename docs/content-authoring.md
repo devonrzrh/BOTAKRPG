@@ -40,7 +40,7 @@ Use `format: ordering` with `answer` containing every option index exactly once 
 
 Use fenced blocks with language `entity`. Each requires `type`, `id`, and `title`, followed by the fields below. See `content/04-academy.md` for complete examples. The Zod schemas in `src/content/schema.ts` are the executable contract.
 
-Story files use frontmatter with `type: story`, `id`, `title`, and exactly three `frames`. Each frame has `time`, `heading`, and `body`. See `content/00-prologue.md`. The prologue uses these frames for the pursuit and saves completion separately from quest rewards. Existing saves without story progress start with the prologue unseen.
+Story files use frontmatter with `type: story`, `id`, `title`, optional `visual: chase | network`, and one to twenty `frames`. Each frame has `time`, `heading`, and `body`. Optional `steps` sets the number of advance inputs before the next frame (default 1). See `content/00-prologue.md`. The prologue uses these frames for the pursuit and saves completion separately from quest rewards. Existing saves without story progress start with the prologue unseen.
 
 | Type       | Fields                                                                                                               |
 | ---------- | -------------------------------------------------------------------------------------------------------------------- |
@@ -59,3 +59,9 @@ Quest rewards can be claimed once after all objectives. Character levels increas
 ## Validation and future LLM conversion
 
 The compiler rejects malformed fields, duplicate IDs, unresolved references, invalid answer indices, and lesson/skill prerequisite cycles. Ask the future conversion model to preserve this contract, quote option text, cite concepts in explanations, and produce reviewable Markdown. Review question accuracy before adding generated material. Run the compiler and tests before shipping.
+
+## Dialogues and clues
+
+A `type: dialogue` record has `id`, `title`, `start`, and `nodes`. Each node has a unique `id`, a `speaker`, `text`, and `choices`. Each choice has a `label` and exactly one of `next` (an existing node ID) or `action` (`accept-case` or `close`). See `content/05-case-dialogue.md`. Missing targets and ambiguous choices fail validation. Dialogue loops are allowed.
+
+Activities may supply `clue: { title, text }`. Completed quest objectives expose those clues on the quest board. Clues derive from saved completion IDs; no separate duplicate reward can be claimed. Briefing, quest acceptance, and connection cutscene flags persist with story progress.

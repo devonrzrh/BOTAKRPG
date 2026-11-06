@@ -51,6 +51,9 @@ export const activitySchema = z.object({
   template: z.enum(["maze", "battle", "perceptron"]),
   lesson: id,
   seed: z.number().int().default(42),
+  clue: z
+    .object({ title: z.string().min(1), text: z.string().min(1) })
+    .optional(),
 });
 export const questSchema = z.object({
   ...base,
@@ -63,12 +66,47 @@ export const questSchema = z.object({
 export const storySchema = z.object({
   ...base,
   type: z.literal("story"),
+  visual: z.enum(["chase", "network"]).default("chase"),
   frames: z
     .array(
-      z.object({ time: z.string(), heading: z.string(), body: z.string() }),
+      z.object({
+        time: z.string(),
+        heading: z.string(),
+        body: z.string(),
+        steps: z.number().int().min(1).max(20).default(1),
+      }),
     )
-    .min(3)
-    .max(3),
+    .min(1)
+    .max(20),
+  body: z.string().default(""),
+});
+export const dialogueSchema = z.object({
+  ...base,
+  type: z.literal("dialogue"),
+  start: id,
+  nodes: z
+    .array(
+      z.object({
+        id,
+        speaker: z.string().min(1),
+        text: z.string().min(1),
+        choices: z
+          .array(
+            z
+              .object({
+                label: z.string().min(1),
+                next: id.optional(),
+                action: z.enum(["accept-case", "close"]).optional(),
+              })
+              .refine(
+                (c) => Boolean(c.next) !== Boolean(c.action),
+                "Choose exactly one next node or action",
+              ),
+          )
+          .min(1),
+      }),
+    )
+    .min(1),
   body: z.string().default(""),
 });
 export const entitySchema = z.discriminatedUnion("type", [
@@ -80,6 +118,7 @@ export const entitySchema = z.discriminatedUnion("type", [
   activitySchema,
   questSchema,
   storySchema,
+  dialogueSchema,
 ]);
 export const contentSchema = z.object({
   version: z.literal(1),
@@ -94,11 +133,27 @@ export type Effect = z.infer<typeof effectSchema>;
 export type Quest = z.infer<typeof questSchema>;
 export type Content = z.infer<typeof contentSchema>;
 export type Story = z.infer<typeof storySchema>;
+export type Dialogue = z.infer<typeof dialogueSchema>;
 
 export function validateContent(input: unknown): Content {
   const content = contentSchema.parse(input);
   const map = new Map<string, Entity>();
   for (const entity of content.entities) {
+    if (entity.type === "dialogue") {
+      const nodes = new Set(entity.nodes.map((n) => n.id));
+      if (nodes.size !== entity.nodes.length)
+        throw new Error(`${entity.id}: duplicate dialogue node`);
+      if (!nodes.has(entity.start))
+        throw new Error(
+          `${entity.id}: missing dialogue start '${entity.start}'`,
+        );
+      for (const node of entity.nodes)
+        for (const choice of node.choices)
+          if (choice.next && !nodes.has(choice.next))
+            throw new Error(
+              `${entity.id}: missing dialogue node '${choice.next}'`,
+            );
+    }
     if (map.has(entity.id))
       throw new Error(`Duplicate content ID: ${entity.id}`);
     map.set(entity.id, entity);

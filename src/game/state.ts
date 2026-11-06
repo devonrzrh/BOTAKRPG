@@ -11,8 +11,18 @@ export const saveSchema = z
   .object({
     version: z.literal(1),
     story: z
-      .object({ prologueSeen: z.boolean() })
-      .default({ prologueSeen: false }),
+      .object({
+        prologueSeen: z.boolean(),
+        briefingSeen: z.boolean().default(false),
+        caseAccepted: z.boolean().default(false),
+        networkIntroSeen: z.boolean().default(false),
+      })
+      .default({
+        prologueSeen: false,
+        briefingSeen: false,
+        caseAccepted: false,
+        networkIntroSeen: false,
+      }),
     character: z.object({
       name: z.string().min(1).max(40),
       level: z.number().int().min(1).max(100),
@@ -42,7 +52,12 @@ export type Save = z.infer<typeof saveSchema>;
 export function initialSave(): Save {
   return {
     version: 1,
-    story: { prologueSeen: false },
+    story: {
+      prologueSeen: false,
+      briefingSeen: false,
+      caseAccepted: false,
+      networkIntroSeen: false,
+    },
     character: {
       name: "Detective Vale",
       level: 1,
