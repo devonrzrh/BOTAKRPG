@@ -2,6 +2,12 @@ import type { Content, Quest, Lesson, Skill, Item } from "../content/schema";
 import { finaleAvailable, questComplete } from "./investigation";
 import { stats, type Save } from "./state";
 import type { HomeWall } from "../world/Office";
+import {
+  createQuestGraph,
+  graphButtons,
+  type QuestGraph,
+  type GraphView,
+} from "./questGraph";
 
 export type OfficeAction = {
   kind:
@@ -17,9 +23,12 @@ export type OfficeAction = {
     | "note"
     | "save-note"
     | "cancel-note"
-    | "close-book";
+    | "close-book"
+    | "graph-select"
+    | "graph-view";
   // Book interaction is kept separate from travelling to the shelf.
   id: string;
+  view?: GraphView;
 };
 export interface SurfaceButton {
   id: string;
@@ -41,6 +50,7 @@ export interface SurfaceText {
   bold?: boolean;
 }
 export interface SurfaceModel {
+  graph?: QuestGraph;
   books?: { id: string; title: string; topic: string }[];
   bookOpen?: boolean;
   selectedLesson?: string;
@@ -51,6 +61,8 @@ export interface SurfaceModel {
   buttons: SurfaceButton[];
 }
 export interface OfficeUiInput {
+  questSelection?: string;
+  questView?: GraphView;
   bookOpen?: boolean;
   save: Save;
   content: Content;
@@ -740,5 +752,12 @@ export function createOfficeUi(input: OfficeUiInput): SurfaceModel[] {
       "",
     );
   }
+  quests.graph = createQuestGraph(
+    save,
+    content,
+    input.questSelection,
+    input.questView,
+  );
+  quests.buttons.push(...graphButtons(quests.graph));
   return [investigation, library, quests, inventory];
 }

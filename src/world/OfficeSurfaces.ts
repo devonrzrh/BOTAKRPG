@@ -17,6 +17,13 @@ import {
   type OfficeAction,
 } from "../game/officeUi";
 import { bookPose, bookReadingScale } from "../game/bookAnimation";
+import { drawQuestGraph } from "./QuestGraphSurface";
+import {
+  GRAPH_AREA,
+  panGraph,
+  zoomGraph,
+  type GraphView,
+} from "../game/questGraph";
 import { wallYaw, type HomeWall } from "./Office";
 export interface OfficeSurfaceState {
   models: SurfaceModel[];
@@ -438,73 +445,8 @@ export function attachOfficeSurfaces(
     7.45,
     4.1,
     0,
-    (c, m) => {
-      c.fillStyle = "#0b1b23";
-      c.fillRect(0, 0, 1024, 576);
-      c.strokeStyle = "#294750";
-      c.lineWidth = 1;
-      for (const x of [358, 688]) {
-        c.beginPath();
-        c.moveTo(x, 78);
-        c.lineTo(x, 430);
-        c.stroke();
-      }
-      ink(
-        c,
-        m.title.includes("CASE CLOSED") ? "CASE 007 / CLOSED" : "CASE 007",
-        28,
-        24,
-        26,
-        650,
-        "#dceeed",
-      );
-      for (const t of m.texts.filter((t) => t.y < 169))
-        ink(
-          c,
-          t.text,
-          t.x,
-          t.y,
-          Math.max(20, t.size ?? 20),
-          t.maxWidth ?? 295,
-          t.y === 85 ? "#76d4bc" : "#dceeed",
-        );
-      for (let i = 0; i < 3; i++) {
-        const x = 40 + i * 330;
-        const description = m.texts
-          .filter((t) => t.x === x && t.y >= 169 && t.y < 270)
-          .map((t) => t.text)
-          .join(" ");
-        ink(c, description, x, 169, 20, 295, "#dceeed");
-      }
-      const selected = state().focused ?? hoverControl;
-      for (const b of m.buttons) {
-        c.fillStyle = b.disabled
-          ? "#112730"
-          : selected === b.id
-            ? "#285260"
-            : "#173d49";
-        c.fillRect(b.x, b.y, b.w, b.h);
-        c.strokeStyle = selected === b.id ? "#f0c986" : "#426a75";
-        c.lineWidth = selected === b.id ? 3 : 1;
-        c.strokeRect(b.x, b.y, b.w, b.h);
-        ink(
-          c,
-          b.label.replace("Materials / tutorial", "Reference book"),
-          b.x + 10,
-          b.y + 11,
-          20,
-          b.w - 20,
-          b.disabled ? "#8da5ac" : "#ecf7f5",
-        );
-      }
-      return m.buttons.map((control) => ({
-        x: control.x,
-        y: control.y,
-        w: control.w,
-        h: control.h,
-        control,
-      }));
-    },
+    (c, m) =>
+      drawQuestGraph(c, m.graph!, m.buttons, state().focused ?? hoverControl),
     false,
     1024,
     576,
@@ -896,10 +838,25 @@ export function attachOfficeSurfaces(
       w.texture.update();
     }
   });
+  let graphDrag: {
+    x: number;
+    y: number;
+    clientX: number;
+    clientY: number;
+    view: GraphView;
+    moved: boolean;
+    pointerId: number;
+  } | null = null;
+  const insideGraph = (x: number, y: number) =>
+    x >= GRAPH_AREA.x &&
+    x <= GRAPH_AREA.x + GRAPH_AREA.w &&
+    y >= GRAPH_AREA.y &&
+    y <= GRAPH_AREA.y + GRAPH_AREA.h;
   const pointer = scene.onPointerObservable.add((info) => {
     if (
       info.type !== PointerEventTypes.POINTERMOVE &&
-      info.type !== PointerEventTypes.POINTERUP
+      info.type !== PointerEventTypes.POINTERUP &&
+      info.type !== PointerEventTypes.POINTERDOWN
     )
       return;
     const s = state(),
@@ -907,6 +864,62 @@ export function attachOfficeSurfaces(
       uv = pick?.getTextureCoordinates();
     let selected: SurfaceButton | undefined,
       nextWidget: typeof hovered = null;
+    const event = info.event as PointerEvent;
+    const widget = pick?.pickedMesh?.metadata?.propPage as
+      (typeof widgets)[number] | undefined;
+    const graphPoint =
+      uv && widget?.wall === "quests"
+        ? { x: uv.x * 1024, y: (1 - uv.y) * 576 }
+        : null;
+    if (graphDrag && info.type === PointerEventTypes.POINTERMOVE) {
+      const dx = graphPoint
+        ? graphPoint.x - graphDrag.x
+        : (event.clientX - graphDrag.clientX) * 1.1;
+      const dy = graphPoint
+        ? graphPoint.y - graphDrag.y
+        : (event.clientY - graphDrag.clientY) * 1.1;
+      if (Math.hypot(dx, dy) > 6) graphDrag.moved = true;
+      if (graphDrag.moved && !s.locked && s.wall === "quests")
+        action({
+          kind: "graph-view",
+          id: "pan",
+          view: panGraph(graphDrag.view, dx, dy),
+        });
+      surface.style.cursor = "grabbing";
+      return;
+    }
+    if (info.type === PointerEventTypes.POINTERUP && graphDrag) {
+      const moved = graphDrag.moved;
+      const canvas = scene.getEngine().getRenderingCanvas();
+      if (canvas?.hasPointerCapture(graphDrag.pointerId))
+        canvas.releasePointerCapture(graphDrag.pointerId);
+      graphDrag = null;
+      if (moved) {
+        surface.style.cursor = "grab";
+        return;
+      }
+    }
+    if (
+      info.type === PointerEventTypes.POINTERDOWN &&
+      event.button === 0 &&
+      !s.locked &&
+      s.wall === "quests" &&
+      graphPoint &&
+      insideGraph(graphPoint.x, graphPoint.y)
+    ) {
+      graphDrag = {
+        ...graphPoint,
+        clientX: event.clientX,
+        clientY: event.clientY,
+        view: modelFor("quests").graph!.view,
+        moved: false,
+        pointerId: event.pointerId,
+      };
+      scene
+        .getEngine()
+        .getRenderingCanvas()
+        ?.setPointerCapture(event.pointerId);
+    }
     if (!s.locked && uv && pick?.pickedMesh) {
       const w = pick.pickedMesh.metadata?.propPage as
         (typeof widgets)[number] | undefined;
@@ -938,7 +951,11 @@ export function attachOfficeSurfaces(
     if (info.type === PointerEventTypes.POINTERMOVE) {
       hovered = nextWidget;
       hoverControl = selected?.id ?? null;
-      surface.style.cursor = selected ? "pointer" : "";
+      surface.style.cursor = selected
+        ? "pointer"
+        : graphPoint && insideGraph(graphPoint.x, graphPoint.y)
+          ? "grab"
+          : "";
     }
     if (
       info.type === PointerEventTypes.POINTERUP &&
@@ -950,6 +967,36 @@ export function attachOfficeSurfaces(
   function libraryIsReady() {
     return progress > 0.97 && Boolean(modelFor("bookshelf").bookOpen);
   }
+  const wheel = (event: WheelEvent) => {
+    const s = state();
+    if (s.locked || s.wall !== "quests") return;
+    const canvas = scene.getEngine().getRenderingCanvas()!,
+      rect = canvas.getBoundingClientRect();
+    const pick = scene.pick(
+        event.clientX - rect.left,
+        event.clientY - rect.top,
+      ),
+      uv = pick?.getTextureCoordinates();
+    if (!uv || pick?.pickedMesh?.metadata?.propPage?.wall !== "quests") return;
+    const x = uv.x * 1024,
+      y = (1 - uv.y) * 576;
+    if (!insideGraph(x, y)) return;
+    event.preventDefault();
+    action({
+      kind: "graph-view",
+      id: "zoom",
+      view: zoomGraph(
+        modelFor("quests").graph!.view,
+        Math.exp(-Math.max(-200, Math.min(200, event.deltaY)) * 0.002),
+        { x: x - GRAPH_AREA.x, y: y - GRAPH_AREA.y },
+      ),
+    });
+  };
+  const cancelDrag = () => {
+    graphDrag = null;
+  };
+  surface.addEventListener("wheel", wheel, { passive: false });
+  surface.addEventListener("pointercancel", cancelDrag);
   const clearHover = () => {
     hovered = null;
     hoverControl = null;
@@ -957,6 +1004,8 @@ export function attachOfficeSurfaces(
   };
   surface.addEventListener("pointerleave", clearHover);
   return () => {
+    surface.removeEventListener("wheel", wheel);
+    surface.removeEventListener("pointercancel", cancelDrag);
     surface.removeEventListener("pointerleave", clearHover);
     scene.onBeforeRenderObservable.remove(render);
     scene.onPointerObservable.remove(pointer);

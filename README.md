@@ -68,6 +68,8 @@ Controls render into Babylon DynamicTextures. Pointer releases ray-pick mesh UV 
 
 Opened books expand into a full-screen reading view below the menu bar. The spread fits the viewport without cropping; a dark backdrop hides the room. Camera parallax and room-edge turns stay off while reading. Close book returns the volume to the shelf.
 
+The quest screen displays a graph of the current playable investigations, evidence, and ECHO-7 finale. Drag its map to pan and scroll to zoom around the pointer. Select a node for its briefing, activity, book, or reward actions. Overview resets the map; Center finds the selected node. Keyboard users can Tab to nodes, press Enter to inspect them, pan with arrow keys, zoom with plus/minus, and center with Home. Locked evidence is revealed only after its activity is complete. The five expanded story questlines in the design document remain planned content, rather than playable graph entries.
+
 Left/right screen edges turn after 90 ms of cursor entry. Click, A/D, and arrow keys also turn. Hover advances once per entry; leave the edge before another turn. Typing does not trigger keyboard turns.
 
 Turn blur uses a short, bounded shutter and GLSL/WGSL post-processing. It detaches once the camera settles, stays off during small cursor movements, and is disabled by reduced motion.

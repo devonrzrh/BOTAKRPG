@@ -1,5 +1,13 @@
 # Validation · 2026-11-07
 
+## Interactive quest graph
+
+54 tests pass; production build passes. New coverage checks node/edge references, hidden evidence, activity completion unlocking the finale independently of reward claims, cursor-anchored zoom, navigation bounds, and centering.
+
+Browser checks covered dragging without activating a node, wheel zoom, actual ray-picked node selection, keyboard panning without turning the room, off-screen boss selection and centering, Overview reset, and a reference action opening the correct full-screen book. No browser warnings or errors were recorded. The graph uses the three currently implemented branches; additional story questlines remain design work.
+
+![Interactive quest graph](screenshots/quest-graph.jpg)
+
 ## Digital quest screen
 
 Replaced the quest folders with one illuminated world-space display and dark bezel. Existing quest gates, rewards, hover outlines, and keyboard controls remain shared with the gameplay models. Browser checks verified readable text and a ray-picked reference button opening its full-screen book. 51 tests pass; production build passes.

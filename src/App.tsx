@@ -61,6 +61,12 @@ import { HomeBoard } from "./ui/HomeBoard";
 import { WorldUiControls } from "./ui/WorldUiControls";
 import { RoomTurns } from "./ui/RoomTurns";
 import { createOfficeUi, type OfficeAction } from "./game/officeUi";
+import {
+  centerGraph,
+  zoomGraph,
+  GRAPH_AREA,
+  type GraphView,
+} from "./game/questGraph";
 import { QuestBranches, FinaleCard } from "./ui/QuestBranches";
 import { finaleAvailable } from "./game/investigation";
 import type { HomeWall } from "./world/Office";
@@ -182,6 +188,12 @@ export default function App() {
   const [officeFallback, setOfficeFallback] = useState(false);
   const [officePage, setOfficePage] = useState(0);
   const [bookOpen, setBookOpen] = useState(false);
+  const [questSelection, setQuestSelection] = useState<string>();
+  const [questView, setQuestView] = useState<GraphView>({
+    x: 0,
+    y: 0,
+    zoom: 1,
+  });
   const [officeFocused, setOfficeFocused] = useState<string | null>(null);
   const [noteEditing, setNoteEditing] = useState<string | null>(null);
   const [noteDraft, setNoteDraft] = useState("");
@@ -666,6 +678,8 @@ export default function App() {
         lessonId,
         page: officePage,
         bookOpen,
+        questSelection,
+        questView,
         search,
         topic,
         noteEditing,
@@ -680,11 +694,39 @@ export default function App() {
       noteEditing,
       noteDraft,
       bookOpen,
+      questSelection,
+      questView,
     ],
   );
   const useWorldUi = realm === "desk" && !officeFallback;
   const handleOfficeAction = (action: OfficeAction) => {
     const id = action.id;
+    if (action.kind === "graph-select") {
+      setQuestSelection(id);
+      const graph = officeUi.find((m) => m.id === "quests")!.graph!;
+      const node = graph.nodes.find((n) => n.id === id);
+      if (
+        node &&
+        (node.x * questView.zoom + questView.x < 100 ||
+          node.x * questView.zoom + questView.x > GRAPH_AREA.w - 100 ||
+          node.y * questView.zoom + questView.y < 44 ||
+          node.y * questView.zoom + questView.y > GRAPH_AREA.h - 44)
+      )
+        setQuestView(centerGraph(node, questView.zoom));
+    }
+    if (action.kind === "graph-view") {
+      const graph = officeUi.find((m) => m.id === "quests")!.graph!;
+      if (action.view) setQuestView(action.view);
+      else if (id === "overview") setQuestView({ x: 0, y: 0, zoom: 1 });
+      else if (id === "center")
+        setQuestView(
+          centerGraph(
+            graph.nodes.find((n) => n.id === graph.selected)!,
+            questView.zoom,
+          ),
+        );
+      else setQuestView(zoomGraph(questView, id === "zoom-in" ? 1.2 : 1 / 1.2));
+    }
     if (action.kind === "close-book") {
       setBookOpen(false);
       setNoteEditing(null);

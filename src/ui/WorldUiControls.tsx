@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import type { SurfaceModel, OfficeAction } from "../game/officeUi";
+import { visibleGraphButtons, panGraph } from "../game/questGraph";
 export function WorldUiControls({
   model,
   blocked,
@@ -38,17 +39,69 @@ export function WorldUiControls({
       className="world-keyboard-ui"
       aria-label={`${model.title} world controls`}
       inert={blocked}
+      onKeyDown={(e) => {
+        if (!model.graph) return;
+        const delta: Record<string, [number, number]> = {
+          ArrowLeft: [60, 0],
+          ArrowRight: [-60, 0],
+          ArrowUp: [0, 60],
+          ArrowDown: [0, -60],
+        };
+        const d = delta[e.key];
+        if (d || ["+", "-", "=", "Home"].includes(e.key)) {
+          e.preventDefault();
+          e.stopPropagation();
+          onAction(
+            d
+              ? {
+                  kind: "graph-view",
+                  id: "pan",
+                  view: panGraph(model.graph.view, ...d),
+                }
+              : {
+                  kind: "graph-view",
+                  id:
+                    e.key === "Home"
+                      ? "center"
+                      : e.key === "-"
+                        ? "zoom-out"
+                        : "zoom-in",
+                },
+          );
+        }
+      }}
     >
       <h2>{model.title}</h2>
-      <div>
-        {model.texts.map((text, index) => (
-          <p key={index}>{text.text}</p>
-        ))}
-      </div>
-      {model.buttons.map((b) => (
+      {!model.graph && (
+        <div>
+          {model.texts.map((text, index) => (
+            <p key={index}>{text.text}</p>
+          ))}
+        </div>
+      )}
+      {model.graph && (
+        <p>
+          {
+            model.graph.nodes.find((n) => n.id === model.graph!.selected)
+              ?.description
+          }
+        </p>
+      )}
+      {model.graph && (
+        <p>
+          Tab to a node and press Enter to inspect it. Arrow keys pan;
+          plus/minus zoom; Home centers the selection.
+        </p>
+      )}
+      {visibleGraphButtons(model).map((b) => (
         <button
           key={b.id}
           disabled={b.disabled}
+          aria-pressed={
+            b.id.startsWith("node-")
+              ? b.id === `node-${model.graph?.selected}`
+              : undefined
+          }
           onClick={() => onAction(b.action)}
           onFocus={() => onFocus(b.id)}
           onBlur={() => {

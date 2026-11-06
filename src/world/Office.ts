@@ -291,7 +291,10 @@ export function buildOffice(
       turning = true;
     }
     const steady =
-      s.reducedMotion || s.locked || (s.wall === "bookshelf" && s.reading);
+      s.reducedMotion ||
+      s.locked ||
+      (s.wall === "bookshelf" && s.reading) ||
+      s.wall === "quests";
     const target = wallYaw[s.wall] + (steady ? 0 : px * 0.025);
     const turn = shortestTurn(camera.rotation.y, target);
     const blend = s.reducedMotion ? 1 : 1 - Math.exp(-dt * 19);
