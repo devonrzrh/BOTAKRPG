@@ -1,5 +1,13 @@
 # Validation · 2026-11-06
 
+## Mesh interface and edge turns
+
+44 tests pass. The new ray-picking test imports the production surface module, hits an actual Babylon plane, reads its UVs, and verifies a foreground mesh blocks it. Other checks cover control bounds, disabled actions, quest gates, lesson pagination/search, Python operator preservation, note drafts, and cyclic left/right turns.
+
+Browser checks covered textured home surfaces in WebGPU and forced WebGL2; ray-picked navigation, lesson selection, page turning, search, notes, equipment, and skill unlocks; and keyboard activation with mesh focus. Click, hover, and arrow-key room turns were exercised. Hover turns once per edge entry. Props were moved so they do not cover the terminal controls. Global settings retain the readable screen interface.
+
+![World-space interface](screenshots/world-ui.jpg)
+
 ## Branches and robot finale
 
 38 tests pass. New coverage exercises all six branch completion orders, optional reward claiming for unlocks, prerequisite validation/cycles, duplicate rewards, premature finale-save rejection, and a complete final battle across all material topics.

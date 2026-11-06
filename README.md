@@ -59,3 +59,11 @@ The prologue is a short interactive chase. Three parallel clue quests can be pur
 The room camera follows the cursor slightly. Switching walls adds a brief blur; Settings → Reduce movement animation disables camera movement and transition blur. Dialogues use validated node graphs in Markdown, and cutscenes support configurable frames and pursuit steps. The first network connection plays once per save.
 
 Text uses local regular-weight UI fonts and typewriter headings. No web-font download is required.
+
+## World-space home interface
+
+The investigation wall, quest board, reading stand, and desk terminal render their controls into Babylon DynamicTextures on world meshes. Pointer releases ray-pick mesh UV coordinates, including normal geometry occlusion. They remain attached to the room during camera movement and work in both renderer backends. The top menu bar, global settings, dialogue/cutscenes, and network activity screens remain screen controls.
+
+Tab focuses the corresponding button on the mesh; Enter activates it. The library supports search, topic filters, lesson prerequisites, pagination, bookmarks, and notes on the reading stand. Notes use native keyboard text input with the draft rendered on the mesh; Ctrl+Enter saves and Escape cancels. Renderer failures restore readable HTML home controls.
+
+Left/right screen-edge zones show the neighboring wall. Click to turn immediately or hover briefly for a FNAF-style turn. A/D and the left/right arrow keys also turn. Hover advances one wall per entry; leave the edge before another automatic turn. Typing into a field does not trigger keyboard turns.

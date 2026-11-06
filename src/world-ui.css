@@ -1,0 +1,67 @@
+.world-ui-view > .world-shell {
+  perspective: none;
+}
+.world-ui-view .world-footer {
+  display: none;
+}
+/* Keyboard and assistive-technology controls share the ray-picked actions.
+   Their focus is painted onto the actual mesh, never overlaid on the canvas. */
+.world-keyboard-ui {
+  position: fixed;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  top: 0;
+  left: 0;
+  white-space: nowrap;
+  pointer-events: none;
+}
+.room-turns {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 6;
+}
+.room-turns > button {
+  position: absolute;
+  top: 24%;
+  bottom: 24%;
+  width: clamp(72px, 9vw, 130px);
+  border: 0;
+  border-radius: 0;
+  pointer-events: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  justify-content: center;
+  padding: 12px 8px;
+  color: #c6d5d5;
+  font:
+    13px/1.5 Consolas,
+    monospace;
+  opacity: 0.58;
+  transition:
+    opacity 0.16s,
+    background 0.16s;
+}
+.room-turns .turn-left {
+  left: 0;
+  background: linear-gradient(90deg, #050b12b0, transparent);
+}
+.room-turns .turn-right {
+  right: 0;
+  background: linear-gradient(-90deg, #050b12b0, transparent);
+}
+.room-turns > button:hover:not(:disabled),
+.room-turns > button:focus-visible {
+  opacity: 1;
+  background-color: #172e3e55;
+}
+.room-turns > button:disabled {
+  opacity: 0.15;
+  pointer-events: none;
+}
+.room-turns > button > span {
+  max-width: 110px;
+}

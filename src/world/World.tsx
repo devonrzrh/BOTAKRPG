@@ -24,6 +24,8 @@ import type {
 } from "../game/contracts";
 import type { Maze } from "../game/maze";
 import { buildOffice, type HomeWall } from "./Office";
+import { attachOfficeSurfaces } from "./OfficeSurfaces";
+import type { SurfaceModel, OfficeAction } from "../game/officeUi";
 export interface WorldMetrics {
   backend: string;
   fps: number;
@@ -33,6 +35,11 @@ export interface WorldMetrics {
   frameTimes: number[];
 }
 interface Props {
+  officeUi?: SurfaceModel[];
+  officeFocused?: string | null;
+  onOfficeAction?: (action: OfficeAction) => void;
+  onRenderFailure?: () => void;
+  onRendererReady?: () => void;
   scene: SceneId;
   encounter?: boolean;
   finalBoss?: boolean;
@@ -54,12 +61,15 @@ const locations = [
   { id: "quest", label: "Caseboard", x: 0, z: -5 },
 ];
 class WorldBoundary extends Component<
-  { children: ReactNode },
+  { children: ReactNode; onFailure?: () => void },
   { error: string }
 > {
   state = { error: "" };
   static getDerivedStateFromError(error: Error) {
     return { error: error.message };
+  }
+  componentDidCatch() {
+    this.props.onFailure?.();
   }
   render() {
     return this.state.error ? (
@@ -78,7 +88,7 @@ class WorldBoundary extends Component<
 }
 export function World(props: Props) {
   return (
-    <WorldBoundary key={props.renderer}>
+    <WorldBoundary key={props.renderer} onFailure={props.onRenderFailure}>
       <WorldCanvas {...props} />
     </WorldBoundary>
   );
@@ -133,6 +143,7 @@ function WorldCanvas(props: Props) {
           return;
         }
         engineRef.current = engine;
+        latest.current.onRendererReady?.();
         setReady((n) => n + 1);
         let ticks: number[] = [],
           lastReport = performance.now();
@@ -178,6 +189,7 @@ function WorldCanvas(props: Props) {
           }
         });
       } catch (e) {
+        latest.current.onRenderFailure?.();
         setError(String(e));
         engine?.dispose();
       }
@@ -214,7 +226,19 @@ function WorldCanvas(props: Props) {
         }),
         (id) => latest.current.onInteract(id),
       );
+      const disposeUi = attachOfficeSurfaces(
+        scene,
+        canvas.current!.parentElement!,
+        () => ({
+          models: latest.current.officeUi ?? [],
+          wall: latest.current.homeWall ?? "investigation",
+          locked: latest.current.homeLookLocked ?? false,
+          focused: latest.current.officeFocused ?? null,
+        }),
+        (action) => latest.current.onOfficeAction?.(action),
+      );
       return () => {
+        disposeUi();
         disposeOffice();
         if (sceneRef.current === scene) sceneRef.current = null;
         scene.dispose();

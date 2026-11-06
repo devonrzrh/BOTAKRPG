@@ -5,6 +5,7 @@ import {
   useEffect,
   useRef,
   useState,
+  useMemo,
 } from "react";
 import {
   BookOpen,
@@ -57,6 +58,9 @@ import { Cutscene } from "./ui/Cutscene";
 import { Dialogue } from "./ui/Dialogue";
 import { MenuBar } from "./ui/MenuBar";
 import { HomeBoard } from "./ui/HomeBoard";
+import { WorldUiControls } from "./ui/WorldUiControls";
+import { RoomTurns } from "./ui/RoomTurns";
+import { createOfficeUi, type OfficeAction } from "./game/officeUi";
 import { QuestBranches, FinaleCard } from "./ui/QuestBranches";
 import { finaleAvailable } from "./game/investigation";
 import type { HomeWall } from "./world/Office";
@@ -175,6 +179,12 @@ export default function App() {
     [saveStatus, setSaveStatus] = useState("Loading journal…");
   const [realm, setRealm] = useState<"desk" | "hub">("desk");
   const [prologueReplay, setPrologueReplay] = useState(false);
+  const [officeFallback, setOfficeFallback] = useState(false);
+  const [officePage, setOfficePage] = useState(0);
+  const [officeFocused, setOfficeFocused] = useState<string | null>(null);
+  const [noteEditing, setNoteEditing] = useState<string | null>(null);
+  const [noteDraft, setNoteDraft] = useState("");
+  const [searchEditing, setSearchEditing] = useState(false);
   const [homeWall, setHomeWall] = useState<HomeWall>("investigation");
   const [homeMoving, setHomeMoving] = useState(false);
   const [dialogueId, setDialogueId] = useState<string | null>(null);
@@ -407,6 +417,9 @@ export default function App() {
   const open = useCallback(
     (id: string) => {
       if (id === "exit") return;
+      setNoteEditing(null);
+      setSearchEditing(false);
+      setOfficeFocused(null);
       if (id === "echo" && !finaleAvailable(saveRef.current, content)) {
         setToast("Recover all three clues first.");
         return;
@@ -641,6 +654,72 @@ export default function App() {
       }
     }
   }, []);
+  const officeUi = useMemo(
+    () =>
+      createOfficeUi({
+        save,
+        content,
+        lessonId,
+        page: officePage,
+        search,
+        topic,
+        noteEditing,
+        noteDraft,
+      }),
+    [save, lessonId, officePage, search, topic, noteEditing, noteDraft],
+  );
+  const useWorldUi = realm === "desk" && !officeFallback;
+  const handleOfficeAction = (action: OfficeAction) => {
+    const id = action.id;
+    if (action.kind === "open") open(id);
+    if (action.kind === "lesson") {
+      setOfficePage(0);
+      setNoteEditing(null);
+      setSearchEditing(false);
+      openLesson(id);
+    }
+    if (action.kind === "page") setOfficePage(Math.max(0, Number(id)));
+    if (action.kind === "topic") setTopic(id);
+    if (action.kind === "search") setSearchEditing(true);
+    if (action.kind === "note") {
+      setNoteDraft(saveRef.current.notes[id] ?? "");
+      setNoteEditing(id);
+      setSearchEditing(false);
+    }
+    if (action.kind === "save-note" && noteEditing) {
+      updateSave((s) => ({
+        ...s,
+        notes: { ...s.notes, [noteEditing]: noteDraft },
+      }));
+      setNoteEditing(null);
+    }
+    if (action.kind === "cancel-note") setNoteEditing(null);
+    if (action.kind === "bookmark")
+      updateSave((s) => ({
+        ...s,
+        bookmarks: s.bookmarks.includes(id)
+          ? s.bookmarks.filter((x) => x !== id)
+          : [...s.bookmarks, id],
+      }));
+    if (action.kind === "claim") {
+      const q = content.entities.find(
+        (e): e is Quest => e.type === "quest" && e.id === id,
+      );
+      if (q) updateSave((s) => claimQuest(s, q, content));
+    }
+    if (action.kind === "equip" && saveRef.current.inventory[id])
+      updateSave((s) => ({
+        ...s,
+        character: {
+          ...s.character,
+          equipment: s.character.equipment === id ? null : id,
+        },
+      }));
+    if (action.kind === "learn") {
+      const skill = skills.find((s) => s.id === id);
+      if (skill) updateSave((s) => unlockSkill(s, skill));
+    }
+  };
   const characterStats = stats(save, content),
     currentLesson = lessons.find((l) => l.id === lessonId)!,
     currentQuestion = questions.find((q) => q.id === battle.question);
@@ -649,7 +728,7 @@ export default function App() {
   ).length;
   return (
     <div
-      className={`app ${realm === "desk" ? "home-view" : "network-view"} ${homeMoving && realm === "desk" ? "home-panning" : ""} ${save.settings.reducedMotion ? "reduced-motion" : ""}`}
+      className={`app ${useWorldUi ? "world-ui-view" : ""} ${realm === "desk" ? "home-view" : "network-view"} ${homeMoving && realm === "desk" ? "home-panning" : ""} ${save.settings.reducedMotion ? "reduced-motion" : ""}`}
     >
       <header className="topbar">
         <a
@@ -768,8 +847,14 @@ export default function App() {
         >
           <World
             scene={scene}
+            officeUi={officeUi}
+            officeFocused={officeFocused}
+            onOfficeAction={handleOfficeAction}
+            onRenderFailure={() => setOfficeFallback(true)}
+            onRendererReady={() => setOfficeFallback(false)}
             homeWall={homeWall}
             homeLookLocked={
+              panel === "settings" ||
               !save.story.prologueSeen ||
               prologueReplay ||
               Boolean(dialogueId) ||
@@ -795,7 +880,7 @@ export default function App() {
             onMetrics={onMetrics}
           />
         </Suspense>
-        {realm === "desk" && !panel && !homeMoving && (
+        {realm === "desk" && officeFallback && !panel && !homeMoving && (
           <HomeBoard
             onSelect={open}
             accepted={save.story.caseAccepted}
@@ -806,7 +891,7 @@ export default function App() {
             )}
           />
         )}
-        {homeMoving && realm === "desk" && (
+        {homeMoving && realm === "desk" && officeFallback && (
           <span className="pan-status" role="status">
             Turning…
           </span>
@@ -822,1082 +907,1101 @@ export default function App() {
             </div>
           </>
         )}
-        {panel && !(realm === "desk" && homeMoving) && (
-          <section
-            className={`activity-panel ${realm === "desk" ? `home-panel home-${homeWall}` : ""} ${panel === "maze" ? "maze-panel" : ""} ${panel === "battle" ? "battle-panel" : ""}`}
-            aria-label={`${panel} activity`}
-          >
-            <header className="panel-header">
-              <div>
-                <h2>
-                  {
+        {panel &&
+          (!useWorldUi || panel === "settings") &&
+          !(realm === "desk" && homeMoving) && (
+            <section
+              className={`activity-panel ${realm === "desk" ? `home-panel home-${homeWall}` : ""} ${panel === "maze" ? "maze-panel" : ""} ${panel === "battle" ? "battle-panel" : ""}`}
+              aria-label={`${panel} activity`}
+            >
+              <header className="panel-header">
+                <div>
+                  <h2>
                     {
-                      library: "Library",
-                      maze: "Packet labyrinth",
-                      battle: battle.enemyName,
-                      garden: "Perceptron lab",
-                      inventory: "Equipment & skills",
-                      journal: "Quest board",
-                      settings: "Settings",
-                    }[panel]
-                  }
-                </h2>
-              </div>
-              <button
-                className="icon-button"
-                aria-label={
-                  realm === "desk" ? "Return to desk" : "Return to network"
-                }
-                onClick={close}
-              >
-                <X size={21} />
-              </button>
-            </header>
-            {panel === "library" && (
-              <div className="library-layout">
-                <nav className="library-nav" aria-label="Library lessons">
-                  <label className="search">
-                    <Search size={17} />
-                    <input
-                      placeholder="Search the archive…"
-                      aria-label="Search lessons"
-                      value={search}
-                      onChange={(e) => setSearch(e.target.value)}
-                    />
-                  </label>
-                  <select
-                    aria-label="Filter by topic"
-                    value={topic}
-                    onChange={(e) => setTopic(e.target.value)}
-                  >
-                    <option value="all">All disciplines</option>
-                    {Object.entries(topicNames).map(([key, name]) => (
-                      <option key={key} value={key}>
-                        {name}
-                      </option>
-                    ))}
-                  </select>
-                  {lessons
-                    .filter(
-                      (l) =>
-                        (topic === "all" || l.topic === topic) &&
-                        `${l.title} ${l.summary} ${l.body}`
-                          .toLowerCase()
-                          .includes(search.toLowerCase()),
-                    )
-                    .map((lesson, index) => (
-                      <button
-                        key={lesson.id}
-                        className={`lesson-link ${lessonId === lesson.id ? "selected" : ""}`}
-                        onClick={() => setLessonId(lesson.id)}
-                      >
-                        <span>
-                          0{index + 1} · {topicNames[lesson.topic]}
-                        </span>
-                        <strong>{lesson.title}</strong>
-                        <small>{lesson.summary}</small>
-                        {save.bookmarks.includes(lesson.id) && (
-                          <Bookmark size={13} />
-                        )}
-                      </button>
-                    ))}
-                </nav>
-                <article className="lesson-body">
-                  <div className="lesson-top">
-                    <span className="pill">
-                      {topicNames[currentLesson.topic]}
-                    </span>
-                    <button
-                      className="text-button"
-                      onClick={() =>
-                        updateSave((s) => ({
-                          ...s,
-                          bookmarks: s.bookmarks.includes(lessonId)
-                            ? s.bookmarks.filter((id) => id !== lessonId)
-                            : [...s.bookmarks, lessonId],
-                        }))
-                      }
-                    >
-                      <Bookmark
-                        size={15}
-                        fill={
-                          save.bookmarks.includes(lessonId)
-                            ? "currentColor"
-                            : "none"
-                        }
-                      />
-                      {save.bookmarks.includes(lessonId)
-                        ? "Bookmarked"
-                        : "Bookmark"}
-                    </button>
-                  </div>
-                  {currentLesson.prerequisites.length > 0 && (
-                    <p className="prerequisite">
-                      Builds on{" "}
-                      {currentLesson.prerequisites.map((id) => (
-                        <button key={id} onClick={() => setLessonId(id)}>
-                          {lessons.find((l) => l.id === id)?.title}
-                        </button>
-                      ))}
-                    </p>
-                  )}
-                  <div
-                    className="markdown"
-                    dangerouslySetInnerHTML={{
-                      __html: DOMPurify.sanitize(
-                        marked.parse(currentLesson.body, {
-                          async: false,
-                        }) as string,
-                      ),
-                    }}
-                  />
-                  <label className="notes-label">
-                    NOTES
-                    <textarea
-                      placeholder="Add a note…"
-                      value={save.notes[lessonId] ?? ""}
-                      onChange={(e) =>
-                        updateSave((s) => ({
-                          ...s,
-                          notes: { ...s.notes, [lessonId]: e.target.value },
-                        }))
-                      }
-                    />
-                  </label>
-                  <button
-                    className="primary"
-                    onClick={() =>
-                      open(
-                        currentLesson.topic === "ai"
-                          ? "garden"
-                          : currentLesson.topic === "structures"
-                            ? "battle"
-                            : "maze",
-                      )
+                      {
+                        library: "Library",
+                        maze: "Packet labyrinth",
+                        battle: battle.enemyName,
+                        garden: "Perceptron lab",
+                        inventory: "Equipment & skills",
+                        journal: "Quest board",
+                        settings: "Settings",
+                      }[panel]
                     }
-                  >
-                    Open activity <ArrowUpRight size={16} />
-                  </button>
-                </article>
-              </div>
-            )}
-            {panel === "maze" && (
-              <div className="maze-content">
-                <div className="maze-summary">
-                  <span className="pill">SEED {maze.seed}</span>
-                  <span>
-                    {maze.steps} steps · {maze.commands} commands
-                  </span>
-                  {trial && (
-                    <strong className={trialExpired ? "danger" : ""}>
-                      {Math.max(0, 90 - elapsed).toFixed(1)}s
-                    </strong>
-                  )}
-                  {atGoal(maze) && (
-                    <span className="success">
-                      <Check size={15} /> Exit reached
-                    </span>
-                  )}
+                  </h2>
                 </div>
-                <div className="segmented">
-                  <button
-                    className={mode === "manual" ? "selected" : ""}
-                    disabled={busy}
-                    onClick={() => setMode("manual")}
-                  >
-                    Explore manually
-                  </button>
-                  <button
-                    className={mode === "blocks" ? "selected" : ""}
-                    disabled={busy}
-                    onClick={() => setMode("blocks")}
-                  >
-                    Visual blocks
-                  </button>
-                  <button
-                    className={mode === "python" ? "selected" : ""}
-                    disabled={busy}
-                    onClick={() => setMode("python")}
-                  >
-                    Python
-                  </button>
-                </div>
-                {mode === "manual" ? (
-                  <>
-                    <div
-                      className="maze-map"
-                      role="img"
-                      aria-label={`Maze map. Player at ${maze.position.join(",")}, exit at ${maze.goal.join(",")}.`}
-                      style={{
-                        gridTemplateColumns: `repeat(${maze.size},1fr)`,
-                      }}
-                    >
-                      {maze.grid.flatMap((row, y) =>
-                        row.map((wall, x) => (
-                          <span
-                            key={`${x}-${y}`}
-                            className={`${wall ? "wall" : "path"} ${maze.position[0] === x && maze.position[1] === y ? "player" : ""} ${maze.goal[0] === x && maze.goal[1] === y ? "exit" : ""}`}
-                          >
-                            {maze.position[0] === x && maze.position[1] === y
-                              ? "●"
-                              : maze.goal[0] === x && maze.goal[1] === y
-                                ? "◇"
-                                : ""}
-                          </span>
-                        )),
-                      )}
-                    </div>
-                    <p className="muted small">
-                      Find the amber seal. WASD / arrows or the controls below.
-                    </p>
-                    <div className="dpad">
-                      {(
-                        [
-                          ["north", ArrowUp],
-                          ["west", ArrowLeft],
-                          ["south", ArrowDown],
-                          ["east", ArrowRight],
-                        ] as const
-                      ).map(([d, Icon]) => (
-                        <button
-                          key={d}
-                          disabled={trialExpired}
-                          aria-label={`Move ${d}`}
-                          onClick={() => manualMove(d)}
-                        >
-                          <Icon size={18} />
-                        </button>
-                      ))}
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    <div className="program-workspace">
-                      <Suspense fallback={<p>Opening the programming desk…</p>}>
-                        {mode === "blocks" ? (
-                          <Blocks
-                            initial={save.blocks}
-                            onChange={(blocks) =>
-                              updateSave((s) => ({ ...s, blocks }))
-                            }
-                            onCode={setGenerated}
-                          />
-                        ) : (
-                          <CodeEditor
-                            value={save.code}
-                            onChange={(code) =>
-                              updateSave((s) => ({ ...s, code }))
-                            }
-                            line={line}
-                            onRun={run}
-                          />
-                        )}
-                      </Suspense>
-                    </div>
-                    {mode === "blocks" && (
-                      <details className="generated-code">
-                        <summary>Inspect generated Python</summary>
-                        <pre>
-                          {generated || "# Add blocks to make a program."}
-                        </pre>
-                        <button
-                          onClick={() => {
-                            updateSave((s) => ({ ...s, code: generated }));
-                            setMode("python");
-                          }}
-                        >
-                          Copy to Python editor
-                        </button>
-                      </details>
-                    )}
-                    <div className="run-controls">
-                      <button
-                        className="primary"
-                        disabled={busy || trialExpired}
-                        onClick={run}
-                      >
-                        <Play size={15} />
-                        Run
-                      </button>
-                      <button
-                        disabled={phase !== "running" && phase !== "paused"}
-                        onClick={() =>
-                          phase === "paused"
-                            ? runner.current?.resume()
-                            : runner.current?.pause()
-                        }
-                      >
-                        <Pause size={15} />
-                        {phase === "paused" ? "Resume" : "Pause"}
-                      </button>
-                      <button
-                        disabled={phase !== "paused"}
-                        onClick={() => runner.current?.step()}
-                        title="Execute one Python line"
-                      >
-                        <SkipForward size={15} />
-                        Step
-                      </button>
-                      <button
-                        disabled={!busy}
-                        onClick={() => {
-                          generation.current++;
-                          runner.current?.stop();
-                        }}
-                      >
-                        <Square size={13} />
-                        Stop
-                      </button>
-                      <span className="runner-status">
-                        {phase}
-                        {line > 0 ? ` · line ${line}` : ""}
-                      </span>
-                    </div>
-                    <pre
-                      className="terminal"
-                      aria-label="Python output"
-                      aria-live="polite"
-                    >
-                      {output.join("\n") ||
-                        "Your observations will appear here. Ctrl+Enter to run."}
-                    </pre>
-                  </>
-                )}
-                <div className="maze-footer">
-                  <button disabled={busy} onClick={() => resetMaze()}>
-                    <RotateCcw size={14} />
-                    Reset maze
-                  </button>
-                  <button
-                    disabled={busy}
-                    onClick={() => {
-                      const seed = (maze.seed + 7919) % 2147483647;
-                      updateSave((s) => ({ ...s, seed }));
-                      resetMaze(seed);
-                    }}
-                  >
-                    New seed
-                  </button>
-                  <button
-                    className="text-button"
-                    onClick={() => setHint((n) => Math.min(3, n + 1))}
-                  >
-                    Hint
-                  </button>
-                </div>
-                {hint > 0 && (
-                  <p className="hint">
-                    {
-                      [
-                        "",
-                        "Start by looking at your neighbors. Keep track of cells you have already visited.",
-                        "BFS uses a queue. Store each cell together with the route that reached it.",
-                        "The graph-search library entry includes a complete BFS example. Run it, trace it, then try adapting it to a stack.",
-                      ][hint]
-                    }
-                  </p>
-                )}
                 <button
-                  className="text-button"
-                  onClick={() => openLesson("graph-search")}
+                  className="icon-button"
+                  aria-label={
+                    realm === "desk" ? "Return to desk" : "Return to network"
+                  }
+                  onClick={close}
                 >
-                  Graph-search lesson ↗
+                  <X size={21} />
                 </button>
-                {save.completed.includes("maze-chamber") && (
-                  <button
-                    className="trial-button"
-                    onClick={() =>
-                      resetMaze((maze.seed + 31) % 2147483647, !trial)
-                    }
-                  >
-                    {trial
-                      ? "Return to untimed exploration"
-                      : "Try a fresh 90-second trial"}
-                    {save.trialBest !== null &&
-                      ` · best ${save.trialBest.toFixed(1)}s`}
-                  </button>
-                )}
-              </div>
-            )}
-            {panel === "battle" && (
-              <div className="combat-layout">
-                <div className="enemy-card">
-                  <span className="pill">
-                    {battle.enemyId === "echo-7"
-                      ? "FINAL ENCOUNTER · ECHO-7"
-                      : "GATEWAY SECURITY · LV. 1"}
-                  </span>
-                  <div className="guardian-portrait">
-                    <div className="guardian-head">
-                      <i />
-                    </div>
-                    <div className="guardian-body" />
-                    <span>✦</span>
-                  </div>
-                  <div className="bar enemy">
-                    <i
-                      style={{ width: `${(battle.hp / battle.maxHp) * 100}%` }}
-                    />
-                  </div>
-                  <small>
-                    {battle.hp} / {battle.maxHp} HP
-                  </small>
-                  <div className="effect-list">
-                    {battle.effects.map((effect) => (
-                      <span className="pill" key={effect.id}>
-                        {effect.id} · {effect.remaining}
-                      </span>
-                    ))}
-                  </div>
-                  <div className="combat-log" aria-live="polite">
-                    {battle.log.slice(-5).map((message, i) => (
-                      <p key={`${battle.turn}-${i}`}>{message}</p>
-                    ))}
-                  </div>
-                </div>
-                <div className="combat-actions">
-                  <div className="section-eyebrow">
-                    TURN {battle.turn} · YOUR MOVE
-                  </div>
-                  {battle.phase === "choose" && (
-                    <>
-                      <h2>Choose a skill</h2>
-                      <div className="skill-list">
-                        {skills
-                          .filter((skill) =>
-                            save.character.skills.includes(skill.id),
-                          )
-                          .map((skill) => (
-                            <button
-                              key={skill.id}
-                              disabled={
-                                save.character.focus < skill.cost ||
-                                save.character.hp === 0
-                              }
-                              onClick={() => {
-                                try {
-                                  setBattle(
-                                    selectSkill(
-                                      battle,
-                                      saveRef.current,
-                                      skill,
-                                      questions,
-                                    ),
-                                  );
-                                  setAnswer([]);
-                                  setBattleNotice("");
-                                } catch (e) {
-                                  notify(String(e));
-                                }
-                              }}
-                            >
-                              <span className="skill-icon">
-                                {skill.effect === "shield" ? (
-                                  <Shield size={20} />
-                                ) : (
-                                  <Sparkles size={20} />
-                                )}
-                              </span>
-                              <span>
-                                <strong>{skill.title}</strong>
-                                <small>{skill.description}</small>
-                              </span>
-                              <b>{skill.cost} FP</b>
-                            </button>
-                          ))}
-                      </div>
-                      <h4>ITEMS · USES ONE TURN</h4>
-                      <div className="consumables">
-                        {items
-                          .filter((item) => item.kind !== "equipment")
-                          .map((item) => (
-                            <button
-                              key={item.id}
-                              disabled={!save.inventory[item.id]}
-                              onClick={() => {
-                                try {
-                                  const result = useItem(
-                                    battle,
-                                    saveRef.current,
-                                    item,
-                                    content,
-                                  );
-                                  applyBattle(result.battle, result.save);
-                                } catch (e) {
-                                  notify(String(e));
-                                }
-                              }}
-                            >
-                              {item.title}{" "}
-                              <span>×{save.inventory[item.id] ?? 0}</span>
-                            </button>
-                          ))}
-                      </div>
-                      {save.character.hp === 0 && (
-                        <button className="primary" onClick={close}>
-                          Return & recover
+              </header>
+              {panel === "library" && (
+                <div className="library-layout">
+                  <nav className="library-nav" aria-label="Library lessons">
+                    <label className="search">
+                      <Search size={17} />
+                      <input
+                        placeholder="Search the archive…"
+                        aria-label="Search lessons"
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                      />
+                    </label>
+                    <select
+                      aria-label="Filter by topic"
+                      value={topic}
+                      onChange={(e) => setTopic(e.target.value)}
+                    >
+                      <option value="all">All disciplines</option>
+                      {Object.entries(topicNames).map(([key, name]) => (
+                        <option key={key} value={key}>
+                          {name}
+                        </option>
+                      ))}
+                    </select>
+                    {lessons
+                      .filter(
+                        (l) =>
+                          (topic === "all" || l.topic === topic) &&
+                          `${l.title} ${l.summary} ${l.body}`
+                            .toLowerCase()
+                            .includes(search.toLowerCase()),
+                      )
+                      .map((lesson, index) => (
+                        <button
+                          key={lesson.id}
+                          className={`lesson-link ${lessonId === lesson.id ? "selected" : ""}`}
+                          onClick={() => setLessonId(lesson.id)}
+                        >
+                          <span>
+                            0{index + 1} · {topicNames[lesson.topic]}
+                          </span>
+                          <strong>{lesson.title}</strong>
+                          <small>{lesson.summary}</small>
+                          {save.bookmarks.includes(lesson.id) && (
+                            <Bookmark size={13} />
+                          )}
                         </button>
-                      )}
-                    </>
-                  )}
-                  {battle.phase === "question" && currentQuestion && (
-                    <>
+                      ))}
+                  </nav>
+                  <article className="lesson-body">
+                    <div className="lesson-top">
                       <span className="pill">
-                        {
-                          topicNames[
-                            lessons.find(
-                              (l) => l.id === currentQuestion.lesson,
-                            )!.topic
-                          ]
-                        }
+                        {topicNames[currentLesson.topic]}
                       </span>
-                      <h2>{currentQuestion.prompt}</h2>
-                      <p className="muted">
-                        {currentQuestion.format === "ordering"
-                          ? "Select each step in the correct order."
-                          : "Choose one answer."}
-                      </p>
-                      <div className="answer-options">
-                        {currentQuestion.options
-                          .map((text, index) => ({ text, index }))
-                          .sort((a, b) =>
-                            currentQuestion.format === "ordering"
-                              ? ((a.index + 2) %
-                                  currentQuestion.options.length) -
-                                ((b.index + 2) % currentQuestion.options.length)
-                              : a.index - b.index,
-                          )
-                          .map(({ text, index }) => (
-                            <button
-                              key={index}
-                              className={
-                                answer.includes(index) ? "selected" : ""
-                              }
-                              onClick={() =>
-                                setAnswer(
-                                  currentQuestion.format === "choice"
-                                    ? [index]
-                                    : answer.includes(index)
-                                      ? answer.filter((x) => x !== index)
-                                      : [...answer, index],
-                                )
-                              }
-                            >
-                              <span>
-                                {currentQuestion.format === "ordering"
-                                  ? answer.includes(index)
-                                    ? answer.indexOf(index) + 1
-                                    : "·"
-                                  : String.fromCharCode(65 + index)}
-                              </span>
-                              {text}
-                            </button>
-                          ))}
-                      </div>
-                      <button
-                        className="primary"
-                        disabled={
-                          currentQuestion.format === "choice"
-                            ? answer.length !== 1
-                            : answer.length !== currentQuestion.options.length
-                        }
-                        onClick={submitAnswer}
-                      >
-                        Submit <ArrowRight size={16} />
-                      </button>
                       <button
                         className="text-button"
-                        onClick={() => {
-                          setBattle((b) => ({ ...b, assisted: true }));
-                          setBattleNotice(currentQuestion.explanation);
-                        }}
-                      >
-                        Hint · no mastery credit
-                      </button>
-                      {battleNotice && (
-                        <p className="feedback">{battleNotice}</p>
-                      )}
-                    </>
-                  )}
-                  {battle.phase === "feedback" && (
-                    <>
-                      <span className="result-mark">
-                        <Sparkles />
-                      </span>
-                      <h2>{battleNotice}</h2>
-                      <p className="feedback">{currentQuestion?.explanation}</p>
-                      <button
-                        className="text-button"
-                        onClick={() => {
-                          setLessonId(currentQuestion!.lesson);
-                          notify("Lesson saved for review after battle.");
-                        }}
-                      >
-                        Review lesson later
-                      </button>
-                      <button
-                        className="primary"
-                        onClick={() => {
-                          const result = enemyTurn(
-                            battle,
-                            saveRef.current,
-                            content,
-                          );
-                          applyBattle(result.battle, result.save);
-                          setAnswer([]);
-                        }}
-                      >
-                        Enemy turn <ArrowRight size={16} />
-                      </button>
-                    </>
-                  )}
-                  {battle.phase === "won" && (
-                    <div className="result-screen">
-                      <span className="result-mark">
-                        <Check size={30} />
-                      </span>
-                      <h2>
-                        {battle.enemyId === "echo-7"
-                          ? "ECHO-7 contained"
-                          : "Sentinel defeated"}
-                      </h2>
-                      <p>
-                        {battle.enemyId === "echo-7"
-                          ? "Case closed. Your investigation is complete."
-                          : "ECHO-7’s route fragment recovered."}
-                      </p>
-                      <button
-                        className="primary"
-                        onClick={() => open("journal")}
-                      >
-                        Caseboard
-                      </button>
-                      <button onClick={close}>Return to network</button>
-                    </div>
-                  )}
-                  {battle.phase === "lost" && (
-                    <div className="result-screen">
-                      <h2>Connection lost</h2>
-                      <p>Progress saved. Recover before retrying.</p>
-                      <button
-                        className="primary"
-                        onClick={() => {
+                        onClick={() =>
                           updateSave((s) => ({
                             ...s,
-                            character: {
-                              ...s.character,
-                              hp: stats(s).maxHp,
-                              focus: stats(s).maxFocus,
-                            },
-                          }));
-                          close();
-                          notify("Health and focus restored.");
-                        }}
+                            bookmarks: s.bookmarks.includes(lessonId)
+                              ? s.bookmarks.filter((id) => id !== lessonId)
+                              : [...s.bookmarks, lessonId],
+                          }))
+                        }
                       >
-                        Return & recover
+                        <Bookmark
+                          size={15}
+                          fill={
+                            save.bookmarks.includes(lessonId)
+                              ? "currentColor"
+                              : "none"
+                          }
+                        />
+                        {save.bookmarks.includes(lessonId)
+                          ? "Bookmarked"
+                          : "Bookmark"}
                       </button>
                     </div>
+                    {currentLesson.prerequisites.length > 0 && (
+                      <p className="prerequisite">
+                        Builds on{" "}
+                        {currentLesson.prerequisites.map((id) => (
+                          <button key={id} onClick={() => setLessonId(id)}>
+                            {lessons.find((l) => l.id === id)?.title}
+                          </button>
+                        ))}
+                      </p>
+                    )}
+                    <div
+                      className="markdown"
+                      dangerouslySetInnerHTML={{
+                        __html: DOMPurify.sanitize(
+                          marked.parse(currentLesson.body, {
+                            async: false,
+                          }) as string,
+                        ),
+                      }}
+                    />
+                    <label className="notes-label">
+                      NOTES
+                      <textarea
+                        placeholder="Add a note…"
+                        value={save.notes[lessonId] ?? ""}
+                        onChange={(e) =>
+                          updateSave((s) => ({
+                            ...s,
+                            notes: { ...s.notes, [lessonId]: e.target.value },
+                          }))
+                        }
+                      />
+                    </label>
+                    <button
+                      className="primary"
+                      onClick={() =>
+                        open(
+                          currentLesson.topic === "ai"
+                            ? "garden"
+                            : currentLesson.topic === "structures"
+                              ? "battle"
+                              : "maze",
+                        )
+                      }
+                    >
+                      Open activity <ArrowUpRight size={16} />
+                    </button>
+                  </article>
+                </div>
+              )}
+              {panel === "maze" && (
+                <div className="maze-content">
+                  <div className="maze-summary">
+                    <span className="pill">SEED {maze.seed}</span>
+                    <span>
+                      {maze.steps} steps · {maze.commands} commands
+                    </span>
+                    {trial && (
+                      <strong className={trialExpired ? "danger" : ""}>
+                        {Math.max(0, 90 - elapsed).toFixed(1)}s
+                      </strong>
+                    )}
+                    {atGoal(maze) && (
+                      <span className="success">
+                        <Check size={15} /> Exit reached
+                      </span>
+                    )}
+                  </div>
+                  <div className="segmented">
+                    <button
+                      className={mode === "manual" ? "selected" : ""}
+                      disabled={busy}
+                      onClick={() => setMode("manual")}
+                    >
+                      Explore manually
+                    </button>
+                    <button
+                      className={mode === "blocks" ? "selected" : ""}
+                      disabled={busy}
+                      onClick={() => setMode("blocks")}
+                    >
+                      Visual blocks
+                    </button>
+                    <button
+                      className={mode === "python" ? "selected" : ""}
+                      disabled={busy}
+                      onClick={() => setMode("python")}
+                    >
+                      Python
+                    </button>
+                  </div>
+                  {mode === "manual" ? (
+                    <>
+                      <div
+                        className="maze-map"
+                        role="img"
+                        aria-label={`Maze map. Player at ${maze.position.join(",")}, exit at ${maze.goal.join(",")}.`}
+                        style={{
+                          gridTemplateColumns: `repeat(${maze.size},1fr)`,
+                        }}
+                      >
+                        {maze.grid.flatMap((row, y) =>
+                          row.map((wall, x) => (
+                            <span
+                              key={`${x}-${y}`}
+                              className={`${wall ? "wall" : "path"} ${maze.position[0] === x && maze.position[1] === y ? "player" : ""} ${maze.goal[0] === x && maze.goal[1] === y ? "exit" : ""}`}
+                            >
+                              {maze.position[0] === x && maze.position[1] === y
+                                ? "●"
+                                : maze.goal[0] === x && maze.goal[1] === y
+                                  ? "◇"
+                                  : ""}
+                            </span>
+                          )),
+                        )}
+                      </div>
+                      <p className="muted small">
+                        Find the amber seal. WASD / arrows or the controls
+                        below.
+                      </p>
+                      <div className="dpad">
+                        {(
+                          [
+                            ["north", ArrowUp],
+                            ["west", ArrowLeft],
+                            ["south", ArrowDown],
+                            ["east", ArrowRight],
+                          ] as const
+                        ).map(([d, Icon]) => (
+                          <button
+                            key={d}
+                            disabled={trialExpired}
+                            aria-label={`Move ${d}`}
+                            onClick={() => manualMove(d)}
+                          >
+                            <Icon size={18} />
+                          </button>
+                        ))}
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div className="program-workspace">
+                        <Suspense
+                          fallback={<p>Opening the programming desk…</p>}
+                        >
+                          {mode === "blocks" ? (
+                            <Blocks
+                              initial={save.blocks}
+                              onChange={(blocks) =>
+                                updateSave((s) => ({ ...s, blocks }))
+                              }
+                              onCode={setGenerated}
+                            />
+                          ) : (
+                            <CodeEditor
+                              value={save.code}
+                              onChange={(code) =>
+                                updateSave((s) => ({ ...s, code }))
+                              }
+                              line={line}
+                              onRun={run}
+                            />
+                          )}
+                        </Suspense>
+                      </div>
+                      {mode === "blocks" && (
+                        <details className="generated-code">
+                          <summary>Inspect generated Python</summary>
+                          <pre>
+                            {generated || "# Add blocks to make a program."}
+                          </pre>
+                          <button
+                            onClick={() => {
+                              updateSave((s) => ({ ...s, code: generated }));
+                              setMode("python");
+                            }}
+                          >
+                            Copy to Python editor
+                          </button>
+                        </details>
+                      )}
+                      <div className="run-controls">
+                        <button
+                          className="primary"
+                          disabled={busy || trialExpired}
+                          onClick={run}
+                        >
+                          <Play size={15} />
+                          Run
+                        </button>
+                        <button
+                          disabled={phase !== "running" && phase !== "paused"}
+                          onClick={() =>
+                            phase === "paused"
+                              ? runner.current?.resume()
+                              : runner.current?.pause()
+                          }
+                        >
+                          <Pause size={15} />
+                          {phase === "paused" ? "Resume" : "Pause"}
+                        </button>
+                        <button
+                          disabled={phase !== "paused"}
+                          onClick={() => runner.current?.step()}
+                          title="Execute one Python line"
+                        >
+                          <SkipForward size={15} />
+                          Step
+                        </button>
+                        <button
+                          disabled={!busy}
+                          onClick={() => {
+                            generation.current++;
+                            runner.current?.stop();
+                          }}
+                        >
+                          <Square size={13} />
+                          Stop
+                        </button>
+                        <span className="runner-status">
+                          {phase}
+                          {line > 0 ? ` · line ${line}` : ""}
+                        </span>
+                      </div>
+                      <pre
+                        className="terminal"
+                        aria-label="Python output"
+                        aria-live="polite"
+                      >
+                        {output.join("\n") ||
+                          "Your observations will appear here. Ctrl+Enter to run."}
+                      </pre>
+                    </>
+                  )}
+                  <div className="maze-footer">
+                    <button disabled={busy} onClick={() => resetMaze()}>
+                      <RotateCcw size={14} />
+                      Reset maze
+                    </button>
+                    <button
+                      disabled={busy}
+                      onClick={() => {
+                        const seed = (maze.seed + 7919) % 2147483647;
+                        updateSave((s) => ({ ...s, seed }));
+                        resetMaze(seed);
+                      }}
+                    >
+                      New seed
+                    </button>
+                    <button
+                      className="text-button"
+                      onClick={() => setHint((n) => Math.min(3, n + 1))}
+                    >
+                      Hint
+                    </button>
+                  </div>
+                  {hint > 0 && (
+                    <p className="hint">
+                      {
+                        [
+                          "",
+                          "Start by looking at your neighbors. Keep track of cells you have already visited.",
+                          "BFS uses a queue. Store each cell together with the route that reached it.",
+                          "The graph-search library entry includes a complete BFS example. Run it, trace it, then try adapting it to a stack.",
+                        ][hint]
+                      }
+                    </p>
+                  )}
+                  <button
+                    className="text-button"
+                    onClick={() => openLesson("graph-search")}
+                  >
+                    Graph-search lesson ↗
+                  </button>
+                  {save.completed.includes("maze-chamber") && (
+                    <button
+                      className="trial-button"
+                      onClick={() =>
+                        resetMaze((maze.seed + 31) % 2147483647, !trial)
+                      }
+                    >
+                      {trial
+                        ? "Return to untimed exploration"
+                        : "Try a fresh 90-second trial"}
+                      {save.trialBest !== null &&
+                        ` · best ${save.trialBest.toFixed(1)}s`}
+                    </button>
                   )}
                 </div>
-              </div>
-            )}
-            {panel === "garden" && (
-              <Suspense fallback={<p>Opening the exhibit…</p>}>
-                <Garden
-                  onComplete={() => {
-                    updateSave((s) =>
-                      evidence(
-                        completeActivity(s, "perceptron-exhibit"),
-                        "perceptron-basics",
-                        "held-out-boundary",
-                      ),
-                    );
-                    notify("Perceptron objective complete.");
-                  }}
-                  onLesson={() => openLesson("perceptron-basics")}
-                />
-              </Suspense>
-            )}
-            {panel === "journal" && (
-              <div className="journal-content">
-                <span className="pill">
-                  CASE 007 ·{" "}
-                  {save.completed.includes("echo-battle")
-                    ? "CLOSED"
-                    : "ACTIVE INVESTIGATION"}
-                </span>
-                <h2>{quest.title}</h2>
-                {!save.story.caseAccepted && (
-                  <button
-                    className="primary"
-                    onClick={() => setDialogueId("case-briefing")}
-                  >
-                    Accept case
-                  </button>
-                )}
-                <p>{quest.description}</p>
-                <QuestBranches
-                  save={save}
-                  content={content}
-                  onActivity={(id) => open(activityDestination(id))}
-                  onLesson={openLesson}
-                  onClaim={(q) => updateSave((s) => claimQuest(s, q, content))}
-                />
-                <div className="quest-reward">
-                  <Sparkles />
-                  <span>
-                    <strong>{quest.xp} XP · Trace amplifier</strong>
-                    <small>Level 2 unlocks more skills.</small>
-                  </span>
-                </div>
-                <button
-                  className="primary"
-                  disabled={done !== 3 || save.claimed.includes(quest.id)}
-                  onClick={() => {
-                    updateSave((s) => claimQuest(s, quest, content));
-                    notify(
-                      "Case reward claimed. Equipment and skills updated.",
-                    );
-                  }}
-                >
-                  {save.claimed.includes(quest.id)
-                    ? "Reward claimed"
-                    : done === 3
-                      ? "Claim reward"
-                      : `${done} / 3 objectives complete`}
-                </button>
-                <FinaleCard
-                  save={save}
-                  content={content}
-                  onStart={() => open("echo")}
-                  onClaim={(q) => updateSave((s) => claimQuest(s, q, content))}
-                />
-                {content.entities.some(
-                  (e) =>
-                    e.type === "activity" &&
-                    e.clue &&
-                    save.completed.includes(e.id),
-                ) && (
-                  <section
-                    className="recovered-clues"
-                    aria-label="Recovered clues"
-                  >
-                    <h3>Clues</h3>
-                    {content.entities
-                      .filter(
-                        (e) =>
-                          e.type === "activity" &&
-                          e.clue &&
-                          save.completed.includes(e.id),
-                      )
-                      .map(
-                        (e) =>
-                          e.type === "activity" &&
-                          e.clue && (
-                            <article key={e.id}>
-                              <strong>{e.clue.title}</strong>
-                              <p>{e.clue.text}</p>
-                            </article>
-                          ),
-                      )}
-                  </section>
-                )}
-                <h3>Topic mastery</h3>
-                <div className="knowledge-map">
-                  {lessons.map((l) => (
-                    <button key={l.id} onClick={() => openLesson(l.id)}>
-                      <span className="pill">{topicNames[l.topic]}</span>
-                      <strong>{l.title}</strong>
-                      <small>
-                        {save.mastery[l.id]?.correct ?? 0} unique unaided
-                        answers · {save.mastery[l.id]?.evidence.length ?? 0}{" "}
-                        practical proofs
-                      </small>
-                      {l.prerequisites.length > 0 && (
-                        <small>
-                          Builds on{" "}
-                          {l.prerequisites
-                            .map(
-                              (id) => lessons.find((x) => x.id === id)?.title,
-                            )
-                            .join(", ")}
-                        </small>
-                      )}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-            {panel === "inventory" && (
-              <div className="inventory-content">
-                <div className="character-banner">
-                  <span className="character-sigil">
-                    <GraduationCap size={42} />
-                  </span>
-                  <div>
-                    <span className="section-eyebrow">
-                      LEVEL {save.character.level} · NETWORK INVESTIGATOR
+              )}
+              {panel === "battle" && (
+                <div className="combat-layout">
+                  <div className="enemy-card">
+                    <span className="pill">
+                      {battle.enemyId === "echo-7"
+                        ? "FINAL ENCOUNTER · ECHO-7"
+                        : "GATEWAY SECURITY · LV. 1"}
                     </span>
-                    <h2>{save.character.name}</h2>
-                    <p>
-                      {save.character.xp} total XP ·{" "}
-                      {100 - (save.character.xp % 100)} XP to next level
-                    </p>
+                    <div className="guardian-portrait">
+                      <div className="guardian-head">
+                        <i />
+                      </div>
+                      <div className="guardian-body" />
+                      <span>✦</span>
+                    </div>
+                    <div className="bar enemy">
+                      <i
+                        style={{
+                          width: `${(battle.hp / battle.maxHp) * 100}%`,
+                        }}
+                      />
+                    </div>
+                    <small>
+                      {battle.hp} / {battle.maxHp} HP
+                    </small>
+                    <div className="effect-list">
+                      {battle.effects.map((effect) => (
+                        <span className="pill" key={effect.id}>
+                          {effect.id} · {effect.remaining}
+                        </span>
+                      ))}
+                    </div>
+                    <div className="combat-log" aria-live="polite">
+                      {battle.log.slice(-5).map((message, i) => (
+                        <p key={`${battle.turn}-${i}`}>{message}</p>
+                      ))}
+                    </div>
                   </div>
-                </div>
-                <div className="stat-grid">
-                  <div>
-                    <Heart />{" "}
-                    <strong>
-                      {save.character.hp}/{characterStats.maxHp}
-                    </strong>
-                    <span>Health</span>
-                  </div>
-                  <div>
-                    <Zap />
-                    <strong>
-                      {save.character.focus}/{characterStats.maxFocus}
-                    </strong>
-                    <span>Focus</span>
-                  </div>
-                  <div>
-                    <Swords />
-                    <strong>{characterStats.attack}</strong>
-                    <span>Attack</span>
-                  </div>
-                  <div>
-                    <Shield />
-                    <strong>{characterStats.defense}</strong>
-                    <span>Defense</span>
-                  </div>
-                </div>
-                <h3>Field equipment</h3>
-                <div className="item-grid">
-                  {items.map((item) => (
-                    <div className="item-card" key={item.id}>
-                      <span className="pill">
-                        {item.kind === "equipment"
-                          ? "EQUIPMENT"
-                          : `× ${save.inventory[item.id] ?? 0}`}
-                      </span>
-                      <h4>{item.title}</h4>
-                      <p>{item.description}</p>
-                      {item.kind === "equipment" ? (
+                  <div className="combat-actions">
+                    <div className="section-eyebrow">
+                      TURN {battle.turn} · YOUR MOVE
+                    </div>
+                    {battle.phase === "choose" && (
+                      <>
+                        <h2>Choose a skill</h2>
+                        <div className="skill-list">
+                          {skills
+                            .filter((skill) =>
+                              save.character.skills.includes(skill.id),
+                            )
+                            .map((skill) => (
+                              <button
+                                key={skill.id}
+                                disabled={
+                                  save.character.focus < skill.cost ||
+                                  save.character.hp === 0
+                                }
+                                onClick={() => {
+                                  try {
+                                    setBattle(
+                                      selectSkill(
+                                        battle,
+                                        saveRef.current,
+                                        skill,
+                                        questions,
+                                      ),
+                                    );
+                                    setAnswer([]);
+                                    setBattleNotice("");
+                                  } catch (e) {
+                                    notify(String(e));
+                                  }
+                                }}
+                              >
+                                <span className="skill-icon">
+                                  {skill.effect === "shield" ? (
+                                    <Shield size={20} />
+                                  ) : (
+                                    <Sparkles size={20} />
+                                  )}
+                                </span>
+                                <span>
+                                  <strong>{skill.title}</strong>
+                                  <small>{skill.description}</small>
+                                </span>
+                                <b>{skill.cost} FP</b>
+                              </button>
+                            ))}
+                        </div>
+                        <h4>ITEMS · USES ONE TURN</h4>
+                        <div className="consumables">
+                          {items
+                            .filter((item) => item.kind !== "equipment")
+                            .map((item) => (
+                              <button
+                                key={item.id}
+                                disabled={!save.inventory[item.id]}
+                                onClick={() => {
+                                  try {
+                                    const result = useItem(
+                                      battle,
+                                      saveRef.current,
+                                      item,
+                                      content,
+                                    );
+                                    applyBattle(result.battle, result.save);
+                                  } catch (e) {
+                                    notify(String(e));
+                                  }
+                                }}
+                              >
+                                {item.title}{" "}
+                                <span>×{save.inventory[item.id] ?? 0}</span>
+                              </button>
+                            ))}
+                        </div>
+                        {save.character.hp === 0 && (
+                          <button className="primary" onClick={close}>
+                            Return & recover
+                          </button>
+                        )}
+                      </>
+                    )}
+                    {battle.phase === "question" && currentQuestion && (
+                      <>
+                        <span className="pill">
+                          {
+                            topicNames[
+                              lessons.find(
+                                (l) => l.id === currentQuestion.lesson,
+                              )!.topic
+                            ]
+                          }
+                        </span>
+                        <h2>{currentQuestion.prompt}</h2>
+                        <p className="muted">
+                          {currentQuestion.format === "ordering"
+                            ? "Select each step in the correct order."
+                            : "Choose one answer."}
+                        </p>
+                        <div className="answer-options">
+                          {currentQuestion.options
+                            .map((text, index) => ({ text, index }))
+                            .sort((a, b) =>
+                              currentQuestion.format === "ordering"
+                                ? ((a.index + 2) %
+                                    currentQuestion.options.length) -
+                                  ((b.index + 2) %
+                                    currentQuestion.options.length)
+                                : a.index - b.index,
+                            )
+                            .map(({ text, index }) => (
+                              <button
+                                key={index}
+                                className={
+                                  answer.includes(index) ? "selected" : ""
+                                }
+                                onClick={() =>
+                                  setAnswer(
+                                    currentQuestion.format === "choice"
+                                      ? [index]
+                                      : answer.includes(index)
+                                        ? answer.filter((x) => x !== index)
+                                        : [...answer, index],
+                                  )
+                                }
+                              >
+                                <span>
+                                  {currentQuestion.format === "ordering"
+                                    ? answer.includes(index)
+                                      ? answer.indexOf(index) + 1
+                                      : "·"
+                                    : String.fromCharCode(65 + index)}
+                                </span>
+                                {text}
+                              </button>
+                            ))}
+                        </div>
                         <button
-                          disabled={!save.inventory[item.id]}
-                          onClick={() =>
+                          className="primary"
+                          disabled={
+                            currentQuestion.format === "choice"
+                              ? answer.length !== 1
+                              : answer.length !== currentQuestion.options.length
+                          }
+                          onClick={submitAnswer}
+                        >
+                          Submit <ArrowRight size={16} />
+                        </button>
+                        <button
+                          className="text-button"
+                          onClick={() => {
+                            setBattle((b) => ({ ...b, assisted: true }));
+                            setBattleNotice(currentQuestion.explanation);
+                          }}
+                        >
+                          Hint · no mastery credit
+                        </button>
+                        {battleNotice && (
+                          <p className="feedback">{battleNotice}</p>
+                        )}
+                      </>
+                    )}
+                    {battle.phase === "feedback" && (
+                      <>
+                        <span className="result-mark">
+                          <Sparkles />
+                        </span>
+                        <h2>{battleNotice}</h2>
+                        <p className="feedback">
+                          {currentQuestion?.explanation}
+                        </p>
+                        <button
+                          className="text-button"
+                          onClick={() => {
+                            setLessonId(currentQuestion!.lesson);
+                            notify("Lesson saved for review after battle.");
+                          }}
+                        >
+                          Review lesson later
+                        </button>
+                        <button
+                          className="primary"
+                          onClick={() => {
+                            const result = enemyTurn(
+                              battle,
+                              saveRef.current,
+                              content,
+                            );
+                            applyBattle(result.battle, result.save);
+                            setAnswer([]);
+                          }}
+                        >
+                          Enemy turn <ArrowRight size={16} />
+                        </button>
+                      </>
+                    )}
+                    {battle.phase === "won" && (
+                      <div className="result-screen">
+                        <span className="result-mark">
+                          <Check size={30} />
+                        </span>
+                        <h2>
+                          {battle.enemyId === "echo-7"
+                            ? "ECHO-7 contained"
+                            : "Sentinel defeated"}
+                        </h2>
+                        <p>
+                          {battle.enemyId === "echo-7"
+                            ? "Case closed. Your investigation is complete."
+                            : "ECHO-7’s route fragment recovered."}
+                        </p>
+                        <button
+                          className="primary"
+                          onClick={() => open("journal")}
+                        >
+                          Caseboard
+                        </button>
+                        <button onClick={close}>Return to network</button>
+                      </div>
+                    )}
+                    {battle.phase === "lost" && (
+                      <div className="result-screen">
+                        <h2>Connection lost</h2>
+                        <p>Progress saved. Recover before retrying.</p>
+                        <button
+                          className="primary"
+                          onClick={() => {
                             updateSave((s) => ({
                               ...s,
                               character: {
                                 ...s.character,
-                                equipment:
-                                  s.character.equipment === item.id
-                                    ? null
-                                    : item.id,
+                                hp: stats(s).maxHp,
+                                focus: stats(s).maxFocus,
                               },
-                            }))
-                          }
+                            }));
+                            close();
+                            notify("Health and focus restored.");
+                          }}
                         >
-                          {save.character.equipment === item.id
-                            ? "Unequip"
-                            : save.inventory[item.id]
-                              ? "Equip module"
-                              : "Earn from the main quest"}
+                          Return & recover
                         </button>
-                      ) : (
-                        <small>Use during battle</small>
-                      )}
-                    </div>
-                  ))}
-                </div>
-                <h3>Skills</h3>
-                <div className="skill-tree">
-                  {skills.map((skill) => (
-                    <div className="skill-node" key={skill.id}>
-                      <span className="skill-icon">
-                        <Sparkles size={20} />
-                      </span>
-                      <div>
-                        <strong>{skill.title}</strong>
-                        <p>{skill.description}</p>
-                        <small>
-                          Level {skill.level}
-                          {skill.parent
-                            ? ` · requires ${skills.find((s) => s.id === skill.parent)?.title}`
-                            : ""}
-                        </small>
                       </div>
-                      <button
-                        disabled={
-                          save.character.skills.includes(skill.id) ||
-                          save.character.level < skill.level ||
-                          (!!skill.parent &&
-                            !save.character.skills.includes(skill.parent))
-                        }
-                        onClick={() => updateSave((s) => unlockSkill(s, skill))}
-                      >
-                        {save.character.skills.includes(skill.id)
-                          ? "Learned"
-                          : "Learn skill"}
-                      </button>
-                    </div>
-                  ))}
+                    )}
+                  </div>
                 </div>
-              </div>
-            )}
-            {panel === "settings" && (
-              <div className="settings-content">
-                <h3>Renderer</h3>
-                <label>
-                  Rendering backend
-                  <select
-                    value={save.settings.renderer}
-                    onChange={(e) => {
-                      stop();
-                      setMetrics(null);
-                      benchUntil.current = 0;
-                      setBenchmarkState("");
-                      updateSave((s) => ({
-                        ...s,
-                        settings: {
-                          ...s.settings,
-                          renderer: e.target
-                            .value as Save["settings"]["renderer"],
-                        },
-                      }));
+              )}
+              {panel === "garden" && (
+                <Suspense fallback={<p>Opening the exhibit…</p>}>
+                  <Garden
+                    onComplete={() => {
+                      updateSave((s) =>
+                        evidence(
+                          completeActivity(s, "perceptron-exhibit"),
+                          "perceptron-basics",
+                          "held-out-boundary",
+                        ),
+                      );
+                      notify("Perceptron objective complete.");
                     }}
-                  >
-                    <option value="auto">Automatic · prefer WebGPU</option>
-                    <option value="webgpu">
-                      Prefer WebGPU · fall back if unavailable
-                    </option>
-                    <option value="webgl">Force WebGL2</option>
-                  </select>
-                </label>
-                <p className="muted">
-                  Both backends use the same world and rules. Compare on this
-                  device; the fastest option depends on your hardware.
-                </p>
-                <label className="checkbox-label">
-                  <input
-                    type="checkbox"
-                    checked={save.settings.reducedMotion}
-                    onChange={(e) =>
-                      updateSave((s) => ({
-                        ...s,
-                        settings: {
-                          ...s.settings,
-                          reducedMotion: e.target.checked,
-                        },
-                      }))
+                    onLesson={() => openLesson("perceptron-basics")}
+                  />
+                </Suspense>
+              )}
+              {panel === "journal" && (
+                <div className="journal-content">
+                  <span className="pill">
+                    CASE 007 ·{" "}
+                    {save.completed.includes("echo-battle")
+                      ? "CLOSED"
+                      : "ACTIVE INVESTIGATION"}
+                  </span>
+                  <h2>{quest.title}</h2>
+                  {!save.story.caseAccepted && (
+                    <button
+                      className="primary"
+                      onClick={() => setDialogueId("case-briefing")}
+                    >
+                      Accept case
+                    </button>
+                  )}
+                  <p>{quest.description}</p>
+                  <QuestBranches
+                    save={save}
+                    content={content}
+                    onActivity={(id) => open(activityDestination(id))}
+                    onLesson={openLesson}
+                    onClaim={(q) =>
+                      updateSave((s) => claimQuest(s, q, content))
                     }
-                  />{" "}
-                  Reduce movement animation
-                </label>
-                <div className="performance-card">
-                  <span className="section-eyebrow">LIVE RENDERING</span>
-                  <h3>
-                    {metrics?.backend ?? "Initializing"} · {metrics?.fps ?? "—"}{" "}
-                    FPS
-                  </h3>
-                  <p>
-                    {metrics?.frameMs ?? "—"} ms average · {metrics?.p95 ?? "—"}{" "}
-                    ms p95 frame time
-                  </p>
+                  />
+                  <div className="quest-reward">
+                    <Sparkles />
+                    <span>
+                      <strong>{quest.xp} XP · Trace amplifier</strong>
+                      <small>Level 2 unlocks more skills.</small>
+                    </span>
+                  </div>
                   <button
+                    className="primary"
+                    disabled={done !== 3 || save.claimed.includes(quest.id)}
                     onClick={() => {
-                      benchUntil.current = performance.now() + 10000;
-                      benchSamples.current = [];
-                      setBenchmarkState(
-                        "Measuring for 10 seconds… You can close this panel and run Python during capture.",
+                      updateSave((s) => claimQuest(s, quest, content));
+                      notify(
+                        "Case reward claimed. Equipment and skills updated.",
                       );
                     }}
                   >
-                    Measure this renderer
+                    {save.claimed.includes(quest.id)
+                      ? "Reward claimed"
+                      : done === 3
+                        ? "Claim reward"
+                        : `${done} / 3 objectives complete`}
                   </button>
-                  <p role="status">{benchmarkState}</p>
-                  {benchmark.map((m, i) => (
-                    <p key={i}>
-                      {m.backend}: {m.fps} FPS · {m.frameMs} ms avg · {m.p95} ms
-                      p95 · {m.samples} frames
-                    </p>
-                  ))}
+                  <FinaleCard
+                    save={save}
+                    content={content}
+                    onStart={() => open("echo")}
+                    onClaim={(q) =>
+                      updateSave((s) => claimQuest(s, q, content))
+                    }
+                  />
+                  {content.entities.some(
+                    (e) =>
+                      e.type === "activity" &&
+                      e.clue &&
+                      save.completed.includes(e.id),
+                  ) && (
+                    <section
+                      className="recovered-clues"
+                      aria-label="Recovered clues"
+                    >
+                      <h3>Clues</h3>
+                      {content.entities
+                        .filter(
+                          (e) =>
+                            e.type === "activity" &&
+                            e.clue &&
+                            save.completed.includes(e.id),
+                        )
+                        .map(
+                          (e) =>
+                            e.type === "activity" &&
+                            e.clue && (
+                              <article key={e.id}>
+                                <strong>{e.clue.title}</strong>
+                                <p>{e.clue.text}</p>
+                              </article>
+                            ),
+                        )}
+                    </section>
+                  )}
+                  <h3>Topic mastery</h3>
+                  <div className="knowledge-map">
+                    {lessons.map((l) => (
+                      <button key={l.id} onClick={() => openLesson(l.id)}>
+                        <span className="pill">{topicNames[l.topic]}</span>
+                        <strong>{l.title}</strong>
+                        <small>
+                          {save.mastery[l.id]?.correct ?? 0} unique unaided
+                          answers · {save.mastery[l.id]?.evidence.length ?? 0}{" "}
+                          practical proofs
+                        </small>
+                        {l.prerequisites.length > 0 && (
+                          <small>
+                            Builds on{" "}
+                            {l.prerequisites
+                              .map(
+                                (id) => lessons.find((x) => x.id === id)?.title,
+                              )
+                              .join(", ")}
+                          </small>
+                        )}
+                      </button>
+                    ))}
+                  </div>
                 </div>
-                <h3>Local saves</h3>
-                <p className="muted">
-                  Progress lives in this browser. Export a copy before clearing
-                  browser data or moving devices.
-                </p>
-                <div className="save-buttons">
-                  <button onClick={exportSave}>
-                    <Download size={16} />
-                    Export journal
-                  </button>
-                  <label className="file-button">
-                    <Upload size={16} />
-                    Import journal
-                    <input
-                      type="file"
-                      accept="application/json,.json"
+              )}
+              {panel === "inventory" && (
+                <div className="inventory-content">
+                  <div className="character-banner">
+                    <span className="character-sigil">
+                      <GraduationCap size={42} />
+                    </span>
+                    <div>
+                      <span className="section-eyebrow">
+                        LEVEL {save.character.level} · NETWORK INVESTIGATOR
+                      </span>
+                      <h2>{save.character.name}</h2>
+                      <p>
+                        {save.character.xp} total XP ·{" "}
+                        {100 - (save.character.xp % 100)} XP to next level
+                      </p>
+                    </div>
+                  </div>
+                  <div className="stat-grid">
+                    <div>
+                      <Heart />{" "}
+                      <strong>
+                        {save.character.hp}/{characterStats.maxHp}
+                      </strong>
+                      <span>Health</span>
+                    </div>
+                    <div>
+                      <Zap />
+                      <strong>
+                        {save.character.focus}/{characterStats.maxFocus}
+                      </strong>
+                      <span>Focus</span>
+                    </div>
+                    <div>
+                      <Swords />
+                      <strong>{characterStats.attack}</strong>
+                      <span>Attack</span>
+                    </div>
+                    <div>
+                      <Shield />
+                      <strong>{characterStats.defense}</strong>
+                      <span>Defense</span>
+                    </div>
+                  </div>
+                  <h3>Field equipment</h3>
+                  <div className="item-grid">
+                    {items.map((item) => (
+                      <div className="item-card" key={item.id}>
+                        <span className="pill">
+                          {item.kind === "equipment"
+                            ? "EQUIPMENT"
+                            : `× ${save.inventory[item.id] ?? 0}`}
+                        </span>
+                        <h4>{item.title}</h4>
+                        <p>{item.description}</p>
+                        {item.kind === "equipment" ? (
+                          <button
+                            disabled={!save.inventory[item.id]}
+                            onClick={() =>
+                              updateSave((s) => ({
+                                ...s,
+                                character: {
+                                  ...s.character,
+                                  equipment:
+                                    s.character.equipment === item.id
+                                      ? null
+                                      : item.id,
+                                },
+                              }))
+                            }
+                          >
+                            {save.character.equipment === item.id
+                              ? "Unequip"
+                              : save.inventory[item.id]
+                                ? "Equip module"
+                                : "Earn from the main quest"}
+                          </button>
+                        ) : (
+                          <small>Use during battle</small>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                  <h3>Skills</h3>
+                  <div className="skill-tree">
+                    {skills.map((skill) => (
+                      <div className="skill-node" key={skill.id}>
+                        <span className="skill-icon">
+                          <Sparkles size={20} />
+                        </span>
+                        <div>
+                          <strong>{skill.title}</strong>
+                          <p>{skill.description}</p>
+                          <small>
+                            Level {skill.level}
+                            {skill.parent
+                              ? ` · requires ${skills.find((s) => s.id === skill.parent)?.title}`
+                              : ""}
+                          </small>
+                        </div>
+                        <button
+                          disabled={
+                            save.character.skills.includes(skill.id) ||
+                            save.character.level < skill.level ||
+                            (!!skill.parent &&
+                              !save.character.skills.includes(skill.parent))
+                          }
+                          onClick={() =>
+                            updateSave((s) => unlockSkill(s, skill))
+                          }
+                        >
+                          {save.character.skills.includes(skill.id)
+                            ? "Learned"
+                            : "Learn skill"}
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {panel === "settings" && (
+                <div className="settings-content">
+                  <h3>Renderer</h3>
+                  <label>
+                    Rendering backend
+                    <select
+                      value={save.settings.renderer}
                       onChange={(e) => {
-                        const file = e.target.files?.[0];
-                        if (file) void importSave(file);
-                        e.target.value = "";
-                      }}
-                    />
-                  </label>
-                </div>
-                <p className="small" role="status">
-                  {saveStatus}
-                </p>
-                {!storageReady && (
-                  <>
-                    <button
-                      onClick={async () => {
-                        const raw = await loadSave().catch(() => null);
-                        if (raw) {
-                          const url = URL.createObjectURL(
-                            new Blob([JSON.stringify(raw)], {
-                              type: "application/json",
-                            }),
-                          );
-                          const a = document.createElement("a");
-                          a.href = url;
-                          a.download = "botak-recovery.json";
-                          a.click();
-                          setTimeout(() => URL.revokeObjectURL(url), 1000);
-                        }
+                        stop();
+                        setMetrics(null);
+                        benchUntil.current = 0;
+                        setBenchmarkState("");
+                        updateSave((s) => ({
+                          ...s,
+                          settings: {
+                            ...s.settings,
+                            renderer: e.target
+                              .value as Save["settings"]["renderer"],
+                          },
+                        }));
                       }}
                     >
-                      Download stored recovery data
-                    </button>
+                      <option value="auto">Automatic · prefer WebGPU</option>
+                      <option value="webgpu">
+                        Prefer WebGPU · fall back if unavailable
+                      </option>
+                      <option value="webgl">Force WebGL2</option>
+                    </select>
+                  </label>
+                  <p className="muted">
+                    Both backends use the same world and rules. Compare on this
+                    device; the fastest option depends on your hardware.
+                  </p>
+                  <label className="checkbox-label">
+                    <input
+                      type="checkbox"
+                      checked={save.settings.reducedMotion}
+                      onChange={(e) =>
+                        updateSave((s) => ({
+                          ...s,
+                          settings: {
+                            ...s.settings,
+                            reducedMotion: e.target.checked,
+                          },
+                        }))
+                      }
+                    />{" "}
+                    Reduce movement animation
+                  </label>
+                  <div className="performance-card">
+                    <span className="section-eyebrow">LIVE RENDERING</span>
+                    <h3>
+                      {metrics?.backend ?? "Initializing"} ·{" "}
+                      {metrics?.fps ?? "—"} FPS
+                    </h3>
+                    <p>
+                      {metrics?.frameMs ?? "—"} ms average ·{" "}
+                      {metrics?.p95 ?? "—"} ms p95 frame time
+                    </p>
                     <button
                       onClick={() => {
-                        setStorageReady(true);
-                        notify("New progress will replace the stored journal.");
+                        benchUntil.current = performance.now() + 10000;
+                        benchSamples.current = [];
+                        setBenchmarkState(
+                          "Measuring for 10 seconds… You can close this panel and run Python during capture.",
+                        );
                       }}
                     >
-                      Use this new journal for local saves
+                      Measure this renderer
                     </button>
-                  </>
-                )}
-                <h3>Controls & runtime</h3>
-                <p className="muted">
-                  WASD / arrows: move · E: interact nearby · Escape: close panel
-                  · Ctrl+Enter: run Python. Drag the world to orbit the camera.
-                  Use the destination buttons to travel with a keyboard.
-                </p>
-                <p className="small">
-                  Python status:{" "}
-                  {crossOriginIsolated
-                    ? "cross-origin isolation is ready"
-                    : "required hosting headers are missing; Python execution is unavailable"}
-                  . Block programs run through the same Python worker.
-                </p>
-              </div>
-            )}
-          </section>
-        )}
+                    <p role="status">{benchmarkState}</p>
+                    {benchmark.map((m, i) => (
+                      <p key={i}>
+                        {m.backend}: {m.fps} FPS · {m.frameMs} ms avg · {m.p95}{" "}
+                        ms p95 · {m.samples} frames
+                      </p>
+                    ))}
+                  </div>
+                  <h3>Local saves</h3>
+                  <p className="muted">
+                    Progress lives in this browser. Export a copy before
+                    clearing browser data or moving devices.
+                  </p>
+                  <div className="save-buttons">
+                    <button onClick={exportSave}>
+                      <Download size={16} />
+                      Export journal
+                    </button>
+                    <label className="file-button">
+                      <Upload size={16} />
+                      Import journal
+                      <input
+                        type="file"
+                        accept="application/json,.json"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) void importSave(file);
+                          e.target.value = "";
+                        }}
+                      />
+                    </label>
+                  </div>
+                  <p className="small" role="status">
+                    {saveStatus}
+                  </p>
+                  {!storageReady && (
+                    <>
+                      <button
+                        onClick={async () => {
+                          const raw = await loadSave().catch(() => null);
+                          if (raw) {
+                            const url = URL.createObjectURL(
+                              new Blob([JSON.stringify(raw)], {
+                                type: "application/json",
+                              }),
+                            );
+                            const a = document.createElement("a");
+                            a.href = url;
+                            a.download = "botak-recovery.json";
+                            a.click();
+                            setTimeout(() => URL.revokeObjectURL(url), 1000);
+                          }
+                        }}
+                      >
+                        Download stored recovery data
+                      </button>
+                      <button
+                        onClick={() => {
+                          setStorageReady(true);
+                          notify(
+                            "New progress will replace the stored journal.",
+                          );
+                        }}
+                      >
+                        Use this new journal for local saves
+                      </button>
+                    </>
+                  )}
+                  <h3>Controls & runtime</h3>
+                  <p className="muted">
+                    WASD / arrows: move · E: interact nearby · Escape: close
+                    panel · Ctrl+Enter: run Python. Drag the world to orbit the
+                    camera. Use the destination buttons to travel with a
+                    keyboard.
+                  </p>
+                  <p className="small">
+                    Python status:{" "}
+                    {crossOriginIsolated
+                      ? "cross-origin isolation is ready"
+                      : "required hosting headers are missing; Python execution is unavailable"}
+                    . Block programs run through the same Python worker.
+                  </p>
+                </div>
+              )}
+            </section>
+          )}
         {!panel && realm !== "desk" && (
           <div className="travel-dock">
             {destinations
@@ -1914,7 +2018,7 @@ export default function App() {
               ))}
           </div>
         )}
-        {realm === "desk" && (
+        {realm === "desk" && officeFallback && (
           <nav className="room-nav" aria-label="Room walls">
             {[
               ["investigation", "Investigation wall", "desk"],
@@ -1931,6 +2035,43 @@ export default function App() {
               </button>
             ))}
           </nav>
+        )}
+        {useWorldUi && (
+          <RoomTurns
+            wall={homeWall}
+            disabled={
+              !booted ||
+              panel === "settings" ||
+              !save.story.prologueSeen ||
+              prologueReplay ||
+              Boolean(dialogueId) ||
+              Boolean(cutsceneId)
+            }
+              allowHover={!noteEditing}
+            onTurn={open}
+          />
+        )}
+        {useWorldUi && (
+          <WorldUiControls
+            model={officeUi.find((m) => m.id === homeWall)!}
+            blocked={
+              !booted ||
+              panel === "settings" ||
+              !save.story.prologueSeen ||
+              prologueReplay ||
+              Boolean(dialogueId) ||
+              Boolean(cutsceneId)
+            }
+            focused={officeFocused}
+            onAction={handleOfficeAction}
+            onFocus={setOfficeFocused}
+            noteEditing={Boolean(noteEditing)}
+            noteDraft={noteDraft}
+            onNoteDraft={setNoteDraft}
+            searchEditing={searchEditing}
+            search={search}
+            onSearch={setSearch}
+          />
         )}
         <footer className="world-footer">
           {realm === "desk" ? (

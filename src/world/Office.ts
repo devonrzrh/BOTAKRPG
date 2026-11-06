@@ -105,42 +105,16 @@ export function buildOffice(
         2.5,
         4.82,
         7.5,
-        3.6,
+        4.1,
         0.18,
         i === 0 ? "#443a2d" : "#303d3d",
         wall,
         i === 0 ? "desk" : "quest",
       );
-      for (const y of [0.65, 4.35])
+      for (const y of [0.4, 4.6])
         box("board frame", 0, y, 4.66, 7.7, 0.12, 0.22, "#74614a", wall);
       for (const x of [-3.8, 3.8])
-        box("board frame", x, 2.5, 4.66, 0.12, 3.8, 0.22, "#74614a", wall);
-      // Loose papers and red string remain visible around the HTML controls.
-      for (let n = 0; n < 9; n++) {
-        const paper = box(
-          "case evidence",
-          -3.2 + (n % 3) * 3.2,
-          1.15 + Math.floor(n / 3) * 1.15,
-          4.68,
-          0.65,
-          0.85,
-          0.015,
-          n % 2 ? "#b9ac8c" : "#71858a",
-          wall,
-        );
-        paper.rotation.z = (n % 2 ? 1 : -1) * 0.11;
-        box(
-          "pin",
-          paper.position.x,
-          paper.position.y + 0.31,
-          4.65,
-          0.04,
-          0.04,
-          0.03,
-          "#ad5d4a",
-          wall,
-        );
-      }
+        box("board frame", x, 2.5, 4.66, 0.12, 4.3, 0.22, "#74614a", wall);
     } else if (i === 1) {
       box(
         "bookshelf back",
@@ -187,8 +161,20 @@ export function buildOffice(
           book.rotation.z = n % 9 === 0 ? 0.08 : 0;
         }
       }
+      box(
+        "reading stand frame",
+        0,
+        2.5,
+        4.0,
+        6.65,
+        3.85,
+        0.17,
+        "#69533c",
+        wall,
+      );
+      box("reading stand stem", 0, 0.45, 4.2, 0.22, 0.9, 0.25, "#69533c", wall);
     } else {
-      box("desk top", 0, 1, 3.4, 7, 0.18, 2.7, "#64503e", wall, "inventory");
+      box("desk top", 0, 1, 3.4, 6.2, 0.18, 2.7, "#64503e", wall, "inventory");
       for (const x of [-2.8, 2.8])
         box("drawers", x, 0.45, 3.6, 0.9, 0.9, 2, "#3a342f", wall, "inventory");
       box(
@@ -203,22 +189,22 @@ export function buildOffice(
         wall,
         "inventory",
       );
-      box("terminal", 2, 1.8, 4.1, 1.7, 1.2, 0.16, "#101b23", wall, "network");
-      box("screen", 2, 1.8, 4, 1.5, 1, 0.03, "#35616a", wall, "network");
+      box("terminal", 0, 2.75, 4.02, 5.95, 3.4, 0.2, "#101b23", wall);
+      box("terminal keyboard", 0, 1.15, 2.4, 3.6, 0.12, 0.8, "#303e48", wall);
       box(
         "equipment case",
-        -2,
+        -2.7,
         1.27,
-        3.7,
-        1.4,
+        2.6,
+        0.65,
         0.35,
-        1.2,
+        0.8,
         "#303e48",
         wall,
         "inventory",
       );
-      box("lamp stem", -3, 1.9, 4, 0.05, 1.6, 0.05, "#b09566", wall);
-      box("lamp shade", -3, 2.65, 4, 0.8, 0.25, 0.5, "#957953", wall);
+      box("lamp stem", -3, 1.9, 4.4, 0.05, 1.6, 0.05, "#b09566", wall);
+      box("lamp shade", -3, 2.65, 4.4, 0.8, 0.25, 0.5, "#957953", wall);
     }
   }
   let px = 0,
