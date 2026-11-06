@@ -1,0 +1,279 @@
+{
+  "version": 1,
+  "entities": [
+    {
+      "id": "graph-search",
+      "title": "Finding a way through",
+      "type": "lesson",
+      "topic": "algorithms",
+      "prerequisites": [],
+      "summary": "Explore a graph with breadth-first and depth-first search.",
+      "body": "# Finding a way through\n\nA maze is a **graph**. Each walkable cell is a vertex; a possible move is an edge. An algorithm is a repeatable way to decide which edge to explore next.\n\n## Breadth-first search\n\nBFS explores in layers with a **queue**. On an unweighted graph it finds a shortest path. Mark cells visited when you enqueue them to avoid duplicate work.\n\n```python\nfrom collections import deque\n\nstart = position()\nqueue = deque([(start, [])])\nseen = {tuple(start)}\nwhile queue:\n    cell, path = queue.popleft()\n    if cell == goal():\n        for direction in path:\n            move(direction)\n        break\n    for direction, neighbor in neighbors(cell):\n        key = tuple(neighbor)\n        if key not in seen:\n            seen.add(key)\n            queue.append((neighbor, path + [direction]))\n```\n\n## Depth-first search\n\nDFS explores a branch deeply before backtracking. It uses a **stack**, explicitly or through recursion. It finds a path, but does not generally guarantee the shortest path.\n\nBoth traversals run in **O(V + E)** time with an adjacency-list representation. Try both in the maze; compare the resulting paths rather than memorizing one route.\n\n## Maze API\n\n`position()` and `goal()` return `[x, y]`. `neighbors([x, y])` returns traversable `[direction, cell]` pairs. `move(direction)` accepts `north`, `east`, `south`, or `west` and returns whether movement succeeded. `can_move(direction)` senses from your current position. `at_goal()` checks completion."
+    },
+    {
+      "id": "bfs-shortest",
+      "title": "The shortest way",
+      "type": "question",
+      "lesson": "graph-search",
+      "format": "choice",
+      "prompt": "Which search guarantees a shortest path in an unweighted maze?",
+      "options": [
+        "Breadth-first search",
+        "Depth-first search",
+        "A random walk",
+        "Always turn left"
+      ],
+      "answer": [
+        0
+      ],
+      "explanation": "BFS visits cells in nondecreasing distance from the start, so its first route to the goal is shortest."
+    },
+    {
+      "id": "bfs-order",
+      "title": "Search in order",
+      "type": "question",
+      "lesson": "graph-search",
+      "format": "ordering",
+      "prompt": "Arrange the steps for processing a cell in BFS.",
+      "options": [
+        "Remove the oldest cell from the queue",
+        "Inspect its neighbors",
+        "Mark unseen neighbors visited",
+        "Add those neighbors to the queue"
+      ],
+      "answer": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "explanation": "Remove from the front, discover neighbors, mark them once, then append them to the back."
+    },
+    {
+      "id": "stacks-queues",
+      "title": "What comes next?",
+      "type": "lesson",
+      "topic": "structures",
+      "prerequisites": [
+        "graph-search"
+      ],
+      "summary": "Stacks remember the newest thing; queues remember the oldest.",
+      "body": "# What comes next?\n\nA **stack** follows last in, first out (LIFO). A **queue** follows first in, first out (FIFO).\n\n| Structure | Insert  | Remove         | A useful example  |\n| --------- | ------- | -------------- | ----------------- |\n| Stack     | Push    | Pop newest     | DFS, undo history |\n| Queue     | Enqueue | Dequeue oldest | BFS, scheduling   |\n\nIn Python, a list's `append()` and `pop()` make a stack. Use `collections.deque` with `append()` and `popleft()` for an efficient queue. Removing the first element of a Python list shifts remaining elements.\n\n## Trace before you answer\n\nPush A, then B, then C. A stack removes **C** first. A queue removes **A** first. Trace a few small examples when the names feel abstract."
+    },
+    {
+      "id": "stack-pop",
+      "title": "Last in",
+      "type": "question",
+      "lesson": "stacks-queues",
+      "format": "choice",
+      "prompt": "Push A, B, then C onto a stack. What does pop return?",
+      "options": [
+        "A",
+        "B",
+        "C",
+        "Nothing"
+      ],
+      "answer": [
+        2
+      ],
+      "explanation": "A stack removes the most recently inserted element. C was inserted last."
+    },
+    {
+      "id": "queue-pop",
+      "title": "First in",
+      "type": "question",
+      "lesson": "stacks-queues",
+      "format": "choice",
+      "prompt": "Enqueue A, B, then C. What does the first dequeue return?",
+      "options": [
+        "C",
+        "B",
+        "Nothing",
+        "A"
+      ],
+      "answer": [
+        3
+      ],
+      "explanation": "A queue preserves insertion order. A arrived first and leaves first."
+    },
+    {
+      "id": "perceptron-basics",
+      "title": "A machine that learns a boundary",
+      "type": "lesson",
+      "topic": "ai",
+      "prerequisites": [],
+      "summary": "Train a perceptron from examples and inspect its decision boundary.",
+      "body": "# A machine that learns a boundary\n\nA perceptron computes **z = w₁x₁ + w₂x₂ + b**. It predicts class 1 when z ≥ 0, otherwise class 0.\n\nFor each labeled example, the update is:\n\n```text\nerror = label − prediction\nwᵢ ← wᵢ + learning_rate × error × xᵢ\nb  ← b  + learning_rate × error\n```\n\n## Your experiment\n\nAdd points to both sides of a diagonal and assign two classes. Train for several epochs, inspect the weights, then evaluate **held-out points** that were not used for updates.\n\nA perfect score on training examples does not establish generalization. A single perceptron can represent a linear boundary, but cannot solve XOR. Contradictory labels may prevent convergence."
+    },
+    {
+      "id": "held-out",
+      "title": "An honest test",
+      "type": "question",
+      "lesson": "perceptron-basics",
+      "format": "choice",
+      "prompt": "Which examples should estimate how well a trained model generalizes?",
+      "options": [
+        "Only examples used for training",
+        "Unseen held-out examples",
+        "Only its easiest examples",
+        "Its weights"
+      ],
+      "answer": [
+        1
+      ],
+      "explanation": "Held-out examples are not used in weight updates and give a more honest estimate of generalization."
+    },
+    {
+      "id": "perceptron-error",
+      "title": "A useful mistake",
+      "type": "question",
+      "lesson": "perceptron-basics",
+      "format": "choice",
+      "prompt": "The true label is 1 and the prediction is 0. What is label minus prediction?",
+      "options": [
+        "-1",
+        "0",
+        "1",
+        "2"
+      ],
+      "answer": [
+        2
+      ],
+      "explanation": "The error is 1. A positive update shifts the boundary toward correctly recognizing this example."
+    },
+    {
+      "id": "maze-chamber",
+      "title": "The wandering paths",
+      "type": "activity",
+      "template": "maze",
+      "lesson": "graph-search",
+      "seed": 42
+    },
+    {
+      "id": "guardian-battle",
+      "title": "The archive guardian",
+      "type": "activity",
+      "template": "battle",
+      "lesson": "stacks-queues",
+      "seed": 42
+    },
+    {
+      "id": "perceptron-exhibit",
+      "title": "The learning garden",
+      "type": "activity",
+      "template": "perceptron",
+      "lesson": "perceptron-basics",
+      "seed": 42
+    },
+    {
+      "id": "first-principles",
+      "title": "A curious beginning",
+      "type": "quest",
+      "description": "Find a path, meet the guardian, and teach a machine. Return to the academy seal to claim your reward.",
+      "objectives": [
+        "maze-chamber",
+        "guardian-battle",
+        "perceptron-exhibit"
+      ],
+      "xp": 120,
+      "rewards": [
+        "scholar-charm",
+        "healing-draught"
+      ]
+    },
+    {
+      "id": "healing-draught",
+      "title": "Meadow draught",
+      "type": "item",
+      "description": "Restore 24 HP. Using it in battle takes a turn.",
+      "kind": "healing",
+      "amount": 24
+    },
+    {
+      "id": "focus-tea",
+      "title": "Clarity tea",
+      "type": "item",
+      "description": "Restore 8 focus. Using it in battle takes a turn.",
+      "kind": "focus",
+      "amount": 8
+    },
+    {
+      "id": "scholar-charm",
+      "title": "Scholar’s charm",
+      "type": "item",
+      "description": "A small reminder to stay curious. Equip for +3 attack.",
+      "kind": "equipment",
+      "amount": 3
+    },
+    {
+      "id": "shield",
+      "title": "Shield",
+      "type": "effect",
+      "description": "Reduce damage from the next two enemy attacks.",
+      "duration": 2,
+      "magnitude": 5
+    },
+    {
+      "id": "poison",
+      "title": "Poison",
+      "type": "effect",
+      "description": "Deal damage at the start of three enemy turns.",
+      "duration": 3,
+      "magnitude": 4
+    },
+    {
+      "id": "weaken",
+      "title": "Weaken",
+      "type": "effect",
+      "description": "Reduce the next two enemy attacks.",
+      "duration": 2,
+      "magnitude": 3
+    },
+    {
+      "id": "insight",
+      "title": "Insight",
+      "type": "skill",
+      "description": "Turn an answer into a precise strike.",
+      "cost": 0,
+      "power": 5,
+      "level": 1,
+      "lesson": "stacks-queues"
+    },
+    {
+      "id": "ward",
+      "title": "Invariant ward",
+      "type": "skill",
+      "description": "Strike and protect yourself for two enemy attacks.",
+      "cost": 3,
+      "power": 3,
+      "level": 1,
+      "parent": "insight",
+      "effect": "shield",
+      "lesson": "graph-search"
+    },
+    {
+      "id": "trace",
+      "title": "Venom trace",
+      "type": "skill",
+      "description": "Leave a lingering thought. Poison the guardian for three turns.",
+      "cost": 4,
+      "power": 4,
+      "level": 2,
+      "parent": "insight",
+      "effect": "poison",
+      "lesson": "perceptron-basics"
+    },
+    {
+      "id": "simplify",
+      "title": "Simplify",
+      "type": "skill",
+      "description": "Find the weak point and soften two enemy attacks.",
+      "cost": 3,
+      "power": 4,
+      "level": 2,
+      "parent": "ward",
+      "effect": "weaken",
+      "lesson": "stacks-queues"
+    }
+  ]
+}

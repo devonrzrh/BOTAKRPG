@@ -1,0 +1,7 @@
+References/
+node_modules/
+dist/
+public/pyodide/
+src/generated/
+package-lock.json
+test-results/

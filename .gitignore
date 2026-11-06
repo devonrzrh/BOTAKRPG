@@ -1,0 +1,7 @@
+node_modules/
+dist/
+public/pyodide/
+*.tsbuildinfo
+.vite/
+test-results/
+References/
