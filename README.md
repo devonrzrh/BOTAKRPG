@@ -62,7 +62,7 @@ Text uses local regular-weight UI fonts and typewriter headings. No web-font dow
 
 ## World-space home interface
 
-The investigation board uses pinned photographs, reports, a route map, and red string. Quest files sit in manila folders. Select a labeled book to pull it clear of the shelf and open its hinged cover toward you; closing reverses the sequence. Equipment and skills are printed in a ledger lying on a real desk. The desk camera looks down over the tabletop. Hover outlines mark clickable props, with matching keyboard focus feedback.
+The investigation board uses pinned photographs, reports, a route map, and red string. Quests appear on a wall-mounted digital screen with a dark bezel, luminous text, and clickable controls. Select a labeled book to pull it clear of the shelf and open its hinged cover toward you; closing reverses the sequence. Equipment and skills are printed in a ledger lying on a real desk. The desk camera looks down over the tabletop. Hover outlines mark clickable props, with matching keyboard focus feedback.
 
 Controls render into Babylon DynamicTextures. Pointer releases ray-pick mesh UV coordinates with normal geometry occlusion. Tab focuses the corresponding control on the mesh; Enter activates it. Books support search, topic filters, prerequisites, pagination, bookmarks, and notes. Ctrl+Enter saves notes; Escape cancels editing. Renderer failures restore readable HTML controls. The top menu bar remains visible.
 

@@ -118,13 +118,33 @@ export function buildOffice(
         7.5,
         4.1,
         0.18,
-        i === 0 ? "#443a2d" : "#303d3d",
+        i === 0 ? "#443a2d" : "#10181d",
         wall,
       );
       for (const y of [0.4, 4.6])
-        box("board frame", 0, y, 4.66, 7.7, 0.12, 0.22, "#74614a", wall);
+        box(
+          "board frame",
+          0,
+          y,
+          4.66,
+          7.7,
+          0.12,
+          0.22,
+          i === 0 ? "#74614a" : "#10181d",
+          wall,
+        );
       for (const x of [-3.8, 3.8])
-        box("board frame", x, 2.5, 4.66, 0.12, 4.3, 0.22, "#74614a", wall);
+        box(
+          "board frame",
+          x,
+          2.5,
+          4.66,
+          0.12,
+          4.3,
+          0.22,
+          i === 0 ? "#74614a" : "#10181d",
+          wall,
+        );
     } else if (i === 1) {
       box("bookshelf back", 0, 2.25, 4.86, 8, 4.3, 0.2, "#272b2c", wall);
       for (const x of [-4, 4])

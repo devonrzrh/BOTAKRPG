@@ -179,6 +179,8 @@ export function attachOfficeSurfaces(
     roll: number,
     draw: (c: Ctx, m: SurfaceModel) => Zone[],
     pinIt = true,
+    logicalWidth = 600,
+    logicalHeight = 800,
   ) => {
     const root = new TransformNode(name, scene);
     root.parent = anchors.get(wall)!;
@@ -202,9 +204,9 @@ export function attachOfficeSurfaces(
       texture: t,
       draw,
       zones: [] as Zone[],
-      width: 600,
-      height: 800,
-      aspect: w / h / (600 / 800),
+      width: logicalWidth,
+      height: logicalHeight,
+      aspect: w / h / (logicalWidth / logicalHeight),
       key: "",
       model: null as SurfaceModel | null,
       selection: null as string | null,
@@ -230,7 +232,7 @@ export function attachOfficeSurfaces(
     c.stroke();
   };
   // Cork texture and real string geometry, with no screen-sized menu plane.
-  for (const id of ["investigation", "quests"] as const) {
+  for (const id of ["investigation"] as const) {
     const board = scene.getMeshByName(
       id === "investigation" ? "investigation board" : "quest board",
     );
@@ -426,146 +428,94 @@ export function attachOfficeSurfaces(
       return [];
     },
   );
-  // Three manila case folders on the separate quest wall.
-  const branchIds = [
-    "routing-trace",
-    "access-records",
-    "signal-identification",
-  ];
-  branchIds.forEach((id, index) => {
-    const x = -2.45 + index * 2.45;
-    const folder = MeshBuilder.CreateBox(
-      "manila folder",
-      { width: 2.23, height: 2.73, depth: 0.045 },
-      scene,
-    );
-    folder.parent = anchors.get("quests")!;
-    folder.position.set(x, 2.9, 4.59);
-    folder.rotation.z = [-0.04, 0.025, -0.055][index];
-    folder.material = material("folder " + id, "#a18a60");
-    folder.isPickable = false;
-    sheet(
-      "case file " + id,
-      "quests",
-      x,
-      2.95,
-      4.54,
-      2.08,
-      2.5,
-      [-0.04, 0.025, -0.055][index],
-      (c, m) => {
-        paper(c);
-        ink(
-          c,
-          ["ROUTING RECORDS", "SECURITY ARCHIVE", "SIGNAL ANALYSIS"][index],
-          35,
-          50,
-          36,
-        );
-        rule(c, 110);
-        const title =
-          m.texts.find(
-            (t) => t.y === 122 && Math.abs(t.x - (40 + index * 330)) < 2,
-          )?.text ?? id;
-        ink(c, title, 35, 145, 41);
-        const status =
-          m.texts.find(
-            (t) => t.y === 85 && Math.abs(t.x - (40 + index * 330)) < 2,
-          )?.text ?? "";
-        ink(
-          c,
-          status.includes("FOUND") ? "EVIDENCE RECOVERED" : "LEAD OPEN",
-          35,
-          285,
-          36,
-          530,
-          status.includes("FOUND") ? "#617452" : "#974e39",
-        );
-        const lines = m.texts
-          .filter(
-            (t) =>
-              t.y >= 169 && t.y < 270 && Math.abs(t.x - (40 + index * 330)) < 2,
-          )
-          .map((t) => t.text)
-          .join(" ");
-        ink(c, lines, 35, 345, 38, 520);
-        const b = control(m, "branch-" + id),
-          mat = control(m, "material-" + id),
-          claim = control(m, "claim-" + id);
-        ink(c, b?.label ?? "Open file", 35, 540, 40, 530, "#714632");
-        ink(c, "Reference book", 35, 625, 40, 530, "#714632");
-        ink(
-          c,
-          claim?.label ?? "Claim evidence reward",
-          35,
-          710,
-          38,
-          530,
-          claim?.disabled ? "#565d4b" : "#714632",
-        );
-        return [
-          ...zone(m, "material-" + id, 20, 605, 560, 70),
-          ...zone(m, "claim-" + id, 20, 690, 560, 85),
-          ...(b ? [{ x: 0, y: 0, w: 600, h: 590, control: b }] : []),
-        ];
-      },
-    );
-  });
-  sheet(
-    "clue reward envelope",
-    "quests",
-    -2.45,
-    0.94,
-    4.54,
-    2.1,
-    0.64,
-    0.025,
-    (c, m) => {
-      paper(c, "#bdab83");
-      ink(c, "RECOVERED PROPERTY", 30, 90, 43);
-      ink(c, control(m, "claim-case")?.label ?? "Claim equipment", 30, 400, 38);
-      return zone(m, "claim-case");
-    },
-  );
-  sheet(
-    "destination address",
+  // A single luminous display mounted in the room; the same quest actions remain ray-picked.
+  const display = sheet(
+    "quest display",
     "quests",
     0,
-    0.94,
+    2.5,
     4.54,
-    2.1,
-    0.64,
-    -0.035,
+    7.45,
+    4.1,
+    0,
     (c, m) => {
-      paper(c, "#b6bda6");
-      ink(c, "ABANDONED SUBNET", 30, 90, 43);
-      const b = control(m, "finale");
+      c.fillStyle = "#0b1b23";
+      c.fillRect(0, 0, 1024, 576);
+      c.strokeStyle = "#294750";
+      c.lineWidth = 1;
+      for (const x of [358, 688]) {
+        c.beginPath();
+        c.moveTo(x, 78);
+        c.lineTo(x, 430);
+        c.stroke();
+      }
       ink(
         c,
-        b?.disabled ? "ADDRESS INCOMPLETE" : "ADDRESS VERIFIED",
-        30,
-        405,
-        38,
+        m.title.includes("CASE CLOSED") ? "CASE 007 / CLOSED" : "CASE 007",
+        28,
+        24,
+        26,
+        650,
+        "#dceeed",
       );
-      return zone(m, "finale");
+      for (const t of m.texts.filter((t) => t.y < 169))
+        ink(
+          c,
+          t.text,
+          t.x,
+          t.y,
+          Math.max(20, t.size ?? 20),
+          t.maxWidth ?? 295,
+          t.y === 85 ? "#76d4bc" : "#dceeed",
+        );
+      for (let i = 0; i < 3; i++) {
+        const x = 40 + i * 330;
+        const description = m.texts
+          .filter((t) => t.x === x && t.y >= 169 && t.y < 270)
+          .map((t) => t.text)
+          .join(" ");
+        ink(c, description, x, 169, 20, 295, "#dceeed");
+      }
+      const selected = state().focused ?? hoverControl;
+      for (const b of m.buttons) {
+        c.fillStyle = b.disabled
+          ? "#112730"
+          : selected === b.id
+            ? "#285260"
+            : "#173d49";
+        c.fillRect(b.x, b.y, b.w, b.h);
+        c.strokeStyle = selected === b.id ? "#f0c986" : "#426a75";
+        c.lineWidth = selected === b.id ? 3 : 1;
+        c.strokeRect(b.x, b.y, b.w, b.h);
+        ink(
+          c,
+          b.label.replace("Materials / tutorial", "Reference book"),
+          b.x + 10,
+          b.y + 11,
+          20,
+          b.w - 20,
+          b.disabled ? "#8da5ac" : "#ecf7f5",
+        );
+      }
+      return m.buttons.map((control) => ({
+        x: control.x,
+        y: control.y,
+        w: control.w,
+        h: control.h,
+        control,
+      }));
     },
+    false,
+    1024,
+    576,
   );
-  sheet(
-    "case closure",
-    "quests",
-    2.45,
-    0.94,
-    4.54,
-    2.1,
-    0.64,
-    0.035,
-    (c, m) => {
-      paper(c);
-      ink(c, "CASE CLOSURE", 30, 90, 47);
-      ink(c, control(m, "finale-reward")?.label ?? "Case reward", 30, 420, 40);
-      return zone(m, "finale-reward");
-    },
-  );
+  for (const mesh of display.getChildMeshes()) {
+    const mat = mesh.material as StandardMaterial;
+    if (mat.diffuseTexture) {
+      mat.disableLighting = true;
+      mat.emissiveColor = Color3.White();
+    } else mesh.isVisible = false;
+  }
 
   const books = modelFor("bookshelf")?.books ?? [];
   const volumes = books.map((book, index) => {

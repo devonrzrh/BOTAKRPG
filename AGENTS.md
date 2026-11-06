@@ -16,7 +16,7 @@
 
 ## Interface and room
 
-- Home interfaces belong to physical 3D props: pinned evidence and string, real books, quest folders, and a desk ledger.
+- Home interfaces belong to physical 3D props: pinned evidence and string, real books, a wall-mounted digital quest screen, and a desk ledger.
 - Clickable world objects and controls need clear hover outlines and matching keyboard focus feedback.
 - Books must pull clear of the shelf before opening toward the reader; close before returning. Respect reduced motion.
 - Open library books fill a distraction-free reading view below the top bar. Hide room turn controls and stop cursor camera movement while reading.

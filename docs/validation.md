@@ -1,5 +1,11 @@
 # Validation · 2026-11-07
 
+## Digital quest screen
+
+Replaced the quest folders with one illuminated world-space display and dark bezel. Existing quest gates, rewards, hover outlines, and keyboard controls remain shared with the gameplay models. Browser checks verified readable text and a ray-picked reference button opening its full-screen book. 51 tests pass; production build passes.
+
+![Digital quest screen](screenshots/digital-quests.jpg)
+
 ## Full-screen library books
 
 51 tests pass; production build passes. Viewport-fit coverage checks standard, tall, and ultrawide aspect ratios without clipping either cover. Browser checks confirmed full-screen framing, the hidden room, a steady camera, accessible page controls, and room navigation returning after closing. The opening/closing animation and top menu bar remain intact. No browser warnings or errors were recorded.
