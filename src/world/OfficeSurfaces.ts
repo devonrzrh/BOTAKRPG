@@ -16,7 +16,7 @@ import {
   type SurfaceButton,
   type OfficeAction,
 } from "../game/officeUi";
-import { bookPose } from "../game/bookAnimation";
+import { bookPose, bookReadingScale } from "../game/bookAnimation";
 import { wallYaw, type HomeWall } from "./Office";
 export interface OfficeSurfaceState {
   models: SurfaceModel[];
@@ -835,6 +835,20 @@ export function attachOfficeSurfaces(
   };
   const reading = makeBook("selected reference book", "bookshelf"),
     ledger = makeBook("equipment ledger", "desk");
+  const readingBackdrop = MeshBuilder.CreatePlane(
+    "full-screen reading backdrop",
+    { size: 2 },
+    scene,
+  );
+  const backdropMat = material("reading background", "#17110e");
+  backdropMat.disableLighting = true;
+  backdropMat.emissiveColor = Color3.FromHexString("#17110e");
+  backdropMat.disableDepthWrite = true;
+  readingBackdrop.material = backdropMat;
+  readingBackdrop.parent = scene.activeCamera;
+  readingBackdrop.position.z = 3.8;
+  // Also block clicks through the margins onto books behind the reader.
+  readingBackdrop.setEnabled(false);
   ledger.root.position.set(0, 1.14, 3.35);
   ledger.root.rotation.x = Math.PI / 2;
   ledger.root.scaling.setAll(0.8);
@@ -867,18 +881,26 @@ export function attachOfficeSurfaces(
     progress = s.reducedMotion
       ? target
       : Math.max(0, Math.min(1, progress + ((target ? 1 : -1) * dt) / 0.85));
-    const pose = bookPose(progress),
+    const camera = scene.activeCamera!,
+      aspect =
+        scene.getEngine().getRenderWidth() /
+        scene.getEngine().getRenderHeight(),
+      pose = bookPose(progress, bookReadingScale(aspect, camera.fov)),
       volume = volumes.find((v) => v.id === activeBook) ?? volumes[0],
       x = volume ? -2.2 + volume.index * 2.2 : 0;
     reading.root.setEnabled(progress > 0.001);
     reading.root.position = Vector3.Lerp(
       new Vector3(x - 0.435, 2.12, 4.38),
-      new Vector3(0, 2.3, 2.9),
+      new Vector3(0, 2.2, 2.9),
       pose.travel,
     );
     reading.root.scaling.setAll(pose.scale);
-    reading.root.rotation.x = 0.04 * pose.travel;
+    reading.root.rotation.x = 0;
     reading.hinge.rotation.y = pose.coverYaw;
+    const backdropHeight = 3.8 * Math.tan(camera.fov / 2);
+    readingBackdrop.scaling.set(backdropHeight * aspect, backdropHeight, 1);
+    backdropMat.alpha = pose.opening;
+    readingBackdrop.setEnabled(s.wall === "bookshelf" && pose.opening > 0.001);
     for (const v of volumes)
       v.root.setEnabled(v.id !== activeBook || progress < 0.01);
     if (library.bookOpen) lastReadingModel = library;

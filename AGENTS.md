@@ -19,6 +19,7 @@
 - Home interfaces belong to physical 3D props: pinned evidence and string, real books, quest folders, and a desk ledger.
 - Clickable world objects and controls need clear hover outlines and matching keyboard focus feedback.
 - Books must pull clear of the shelf before opening toward the reader; close before returning. Respect reduced motion.
+- Open library books fill a distraction-free reading view below the top bar. Hide room turn controls and stop cursor camera movement while reading.
 - Desk camera should look down enough to show the tabletop clearly.
 - Moving the cursor to a screen edge turns quickly. Prevent repeated turns until the cursor leaves the edge. Keep click and keyboard alternatives.
 - Use regular-weight readable text or a typewriter font. Primary screen text: at least 18px; secondary controls: at least 16px. Check actual projected text size in the 3D view; texture font size alone is insufficient.

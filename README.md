@@ -66,6 +66,8 @@ The investigation board uses pinned photographs, reports, a route map, and red s
 
 Controls render into Babylon DynamicTextures. Pointer releases ray-pick mesh UV coordinates with normal geometry occlusion. Tab focuses the corresponding control on the mesh; Enter activates it. Books support search, topic filters, prerequisites, pagination, bookmarks, and notes. Ctrl+Enter saves notes; Escape cancels editing. Renderer failures restore readable HTML controls. The top menu bar remains visible.
 
+Opened books expand into a full-screen reading view below the menu bar. The spread fits the viewport without cropping; a dark backdrop hides the room. Camera parallax and room-edge turns stay off while reading. Close book returns the volume to the shelf.
+
 Left/right screen edges turn after 90 ms of cursor entry. Click, A/D, and arrow keys also turn. Hover advances once per entry; leave the edge before another turn. Typing does not trigger keyboard turns.
 
 Turn blur uses a short, bounded shutter and GLSL/WGSL post-processing. It detaches once the camera settles, stays off during small cursor movements, and is disabled by reduced motion.

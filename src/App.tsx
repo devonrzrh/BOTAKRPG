@@ -2046,7 +2046,7 @@ export default function App() {
             ))}
           </nav>
         )}
-        {useWorldUi && (
+        {useWorldUi && !bookOpen && (
           <RoomTurns
             wall={homeWall}
             disabled={

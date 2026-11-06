@@ -24,7 +24,12 @@ export function shortestTurn(from: number, to: number) {
 export function buildOffice(
   scene: Scene,
   surface: HTMLElement,
-  state: () => { wall: HomeWall; reducedMotion: boolean; locked: boolean },
+  state: () => {
+    wall: HomeWall;
+    reducedMotion: boolean;
+    locked: boolean;
+    reading?: boolean;
+  },
 ) {
   scene.clearColor = new Color4(0.025, 0.035, 0.045, 1);
   const camera = new UniversalCamera(
@@ -265,8 +270,9 @@ export function buildOffice(
       previousWall = s.wall;
       turning = true;
     }
-    const target =
-      wallYaw[s.wall] + (s.reducedMotion || s.locked ? 0 : px * 0.025);
+    const steady =
+      s.reducedMotion || s.locked || (s.wall === "bookshelf" && s.reading);
+    const target = wallYaw[s.wall] + (steady ? 0 : px * 0.025);
     const turn = shortestTurn(camera.rotation.y, target);
     const blend = s.reducedMotion ? 1 : 1 - Math.exp(-dt * 19);
     const eye =
@@ -281,7 +287,7 @@ export function buildOffice(
     camera.rotation.y += turn * blend;
     camera.rotation.x +=
       ((s.wall === "desk" ? 0.98 : 0) +
-        (s.reducedMotion || s.locked ? 0 : py * 0.018) -
+        (steady ? 0 : py * 0.018) -
         camera.rotation.x) *
       blend;
     if (

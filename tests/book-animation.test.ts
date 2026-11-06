@@ -1,5 +1,5 @@
 import { expect, it } from "vitest";
-import { bookPose } from "../src/game/bookAnimation";
+import { bookPose, bookReadingScale } from "../src/game/bookAnimation";
 
 it("pulls the closed book clear before opening, then closes before returning", () => {
   expect(bookPose(0).travel).toBe(0);
@@ -9,6 +9,20 @@ it("pulls the closed book clear before opening, then closes before returning", (
   expect(bookPose(0.45).opening).toBe(0);
   expect(bookPose(1).travel).toBe(1);
   expect(bookPose(1).coverYaw).toBeCloseTo(0);
+});
+
+it("fits the full reading spread after resizing without cropping either page", () => {
+  for (const aspect of [1280 / 664, 1920 / 1024, 2560 / 1024, 1024 / 712]) {
+    const height = 2 * 2.76 * Math.tan(1.03 / 2);
+    const scale = bookReadingScale(aspect, 1.03);
+    const widthFill = (5.96 * scale) / (height * aspect);
+    const heightFill = (3.34 * scale) / height;
+    expect(widthFill).toBeLessThanOrEqual(0.99001);
+    expect(heightFill).toBeLessThanOrEqual(0.99001);
+    expect(Math.max(widthFill, heightFill)).toBeCloseTo(0.99);
+    expect(bookPose(1, scale).scale).toBeCloseTo(scale);
+    expect(bookPose(0, scale).scale).toBe(0.3);
+  }
 });
 
 it("swings the cover toward the reader instead of through the back pages", () => {

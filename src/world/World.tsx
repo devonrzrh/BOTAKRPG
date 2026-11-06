@@ -228,6 +228,8 @@ function WorldCanvas(props: Props) {
           wall: latest.current.homeWall ?? "investigation",
           reducedMotion: latest.current.reducedMotion,
           locked: latest.current.homeLookLocked ?? false,
+          reading: latest.current.officeUi?.find((m) => m.id === "bookshelf")
+            ?.bookOpen,
         }),
       );
       const disposeUi = attachOfficeSurfaces(

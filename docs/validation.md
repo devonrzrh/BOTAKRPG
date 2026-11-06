@@ -1,5 +1,11 @@
 # Validation · 2026-11-07
 
+## Full-screen library books
+
+51 tests pass; production build passes. Viewport-fit coverage checks standard, tall, and ultrawide aspect ratios without clipping either cover. Browser checks confirmed full-screen framing, the hidden room, a steady camera, accessible page controls, and room navigation returning after closing. The opening/closing animation and top menu bar remain intact. No browser warnings or errors were recorded.
+
+![Full-screen library book](screenshots/fullscreen-book.jpg)
+
 ## Physical office and activity interfaces
 
 50 tests pass; production build passes. New tests cover pull-before-open sequencing, the cover swinging toward the reader, bounded animation poses, separate shelf/book controls, and page bounds.
