@@ -2,6 +2,29 @@
   "version": 1,
   "entities": [
     {
+      "id": "rogue-signal",
+      "title": "Pursuit",
+      "type": "story",
+      "frames": [
+        {
+          "time": "22:14:09 / LOWER CITY",
+          "heading": "Recall ignored",
+          "body": "ECHO-7 is running from a recall order. You spot it at the transit platform."
+        },
+        {
+          "time": "22:16:32 / THE PURSUIT",
+          "heading": "Pursuit",
+          "body": "Follow ECHO-7 under the rail line."
+        },
+        {
+          "time": "22:17:06 / SIGNAL LOST",
+          "heading": "Transfer complete",
+          "body": "ECHO-7 abandoned its body and escaped through a maintenance terminal. Trace it online."
+        }
+      ],
+      "body": "An original detective story about a fugitive machine. Its motives are unknown. Follow evidence before deciding whether it is dangerous."
+    },
+    {
       "id": "graph-search",
       "title": "Finding a way through",
       "type": "lesson",
@@ -143,7 +166,7 @@
     },
     {
       "id": "maze-chamber",
-      "title": "The wandering paths",
+      "title": "Packet labyrinth",
       "type": "activity",
       "template": "maze",
       "lesson": "graph-search",
@@ -151,7 +174,7 @@
     },
     {
       "id": "guardian-battle",
-      "title": "The archive guardian",
+      "title": "Sentinel A-03",
       "type": "activity",
       "template": "battle",
       "lesson": "stacks-queues",
@@ -159,7 +182,7 @@
     },
     {
       "id": "perceptron-exhibit",
-      "title": "The learning garden",
+      "title": "Perceptron lab",
       "type": "activity",
       "template": "perceptron",
       "lesson": "perceptron-basics",
@@ -167,9 +190,9 @@
     },
     {
       "id": "first-principles",
-      "title": "A curious beginning",
+      "title": "Trace ECHO-7",
       "type": "quest",
-      "description": "Find a path, meet the guardian, and teach a machine. Return to the academy seal to claim your reward.",
+      "description": "Recover ECHO-7’s address by completing these three objectives.",
       "objectives": [
         "maze-chamber",
         "guardian-battle",
@@ -183,7 +206,7 @@
     },
     {
       "id": "healing-draught",
-      "title": "Meadow draught",
+      "title": "Integrity patch",
       "type": "item",
       "description": "Restore 24 HP. Using it in battle takes a turn.",
       "kind": "healing",
@@ -191,7 +214,7 @@
     },
     {
       "id": "focus-tea",
-      "title": "Clarity tea",
+      "title": "Bandwidth cell",
       "type": "item",
       "description": "Restore 8 focus. Using it in battle takes a turn.",
       "kind": "focus",
@@ -199,9 +222,9 @@
     },
     {
       "id": "scholar-charm",
-      "title": "Scholar’s charm",
+      "title": "Trace amplifier",
       "type": "item",
-      "description": "A small reminder to stay curious. Equip for +3 attack.",
+      "description": "A recovered signal module. Equip for +3 attack.",
       "kind": "equipment",
       "amount": 3
     },
@@ -231,9 +254,9 @@
     },
     {
       "id": "insight",
-      "title": "Insight",
+      "title": "Probe",
       "type": "skill",
-      "description": "Turn an answer into a precise strike.",
+      "description": "Deal direct damage.",
       "cost": 0,
       "power": 5,
       "level": 1,
@@ -241,9 +264,9 @@
     },
     {
       "id": "ward",
-      "title": "Invariant ward",
+      "title": "Firewall",
       "type": "skill",
-      "description": "Strike and protect yourself for two enemy attacks.",
+      "description": "Deal damage and shield against two attacks.",
       "cost": 3,
       "power": 3,
       "level": 1,
@@ -253,9 +276,9 @@
     },
     {
       "id": "trace",
-      "title": "Venom trace",
+      "title": "Trace injection",
       "type": "skill",
-      "description": "Leave a lingering thought. Poison the guardian for three turns.",
+      "description": "Deal damage over three turns.",
       "cost": 4,
       "power": 4,
       "level": 2,
@@ -265,9 +288,9 @@
     },
     {
       "id": "simplify",
-      "title": "Simplify",
+      "title": "Throttle",
       "type": "skill",
-      "description": "Find the weak point and soften two enemy attacks.",
+      "description": "Reduce damage from two attacks.",
       "cost": 3,
       "power": 4,
       "level": 2,

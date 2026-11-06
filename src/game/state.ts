@@ -10,6 +10,9 @@ const masterySchema = z.object({
 export const saveSchema = z
   .object({
     version: z.literal(1),
+    story: z
+      .object({ prologueSeen: z.boolean() })
+      .default({ prologueSeen: false }),
     character: z.object({
       name: z.string().min(1).max(40),
       level: z.number().int().min(1).max(100),
@@ -39,8 +42,9 @@ export type Save = z.infer<typeof saveSchema>;
 export function initialSave(): Save {
   return {
     version: 1,
+    story: { prologueSeen: false },
     character: {
-      name: "Wanderer",
+      name: "Detective Vale",
       level: 1,
       xp: 0,
       hp: 60,

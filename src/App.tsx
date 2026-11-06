@@ -36,6 +36,9 @@ import {
   Zap,
   Shield,
   GraduationCap,
+  Monitor,
+  ScanLine,
+  FolderSearch,
 } from "lucide-react";
 import DOMPurify from "dompurify";
 import { marked } from "marked";
@@ -47,13 +50,10 @@ import {
   type Quest,
   type Skill,
   type Item,
+  type Story,
 } from "./content/schema";
-import {
-  atGoal,
-  move,
-  shortestPath,
-  type Maze,
-} from "./game/maze";
+import { Prologue } from "./ui/Prologue";
+import { atGoal, move, shortestPath, type Maze } from "./game/maze";
 import {
   addXp,
   claimQuest,
@@ -90,8 +90,13 @@ const content = validateContent(rawContent);
 const createMaze = activityTemplates.maze.create;
 const mazeCommand = activityTemplates.maze.command;
 const createBattle = activityTemplates.battle.create;
-const initialSeed = content.entities.find(e => e.type === 'activity' && e.template === 'maze');
-const defaultSave = () => ({ ...initialSave(), seed: initialSeed?.type === 'activity' ? initialSeed.seed : 42 });
+const initialSeed = content.entities.find(
+  (e) => e.type === "activity" && e.template === "maze",
+);
+const defaultSave = () => ({
+  ...initialSave(),
+  seed: initialSeed?.type === "activity" ? initialSeed.seed : 42,
+});
 const lessons = content.entities.filter(
   (e): e is Lesson => e.type === "lesson",
 );
@@ -101,6 +106,7 @@ const questions = content.entities.filter(
 const skills = content.entities.filter((e): e is Skill => e.type === "skill");
 const items = content.entities.filter((e): e is Item => e.type === "item");
 const quest = content.entities.find((e): e is Quest => e.type === "quest")!;
+const story = content.entities.find((e): e is Story => e.type === "story")!;
 const topicNames = {
   algorithms: "Algorithms",
   structures: "Data structures",
@@ -120,26 +126,28 @@ const destinations = [
     id: "library" as const,
     name: "Library",
     icon: BookOpen,
-    description: "Read & discover",
   },
   {
     id: "maze" as const,
-    name: "Maze chamber",
+    name: "Packet labyrinth",
     icon: Compass,
-    description: "Find your own way",
   },
   {
     id: "battle" as const,
-    name: "Guardian",
+    name: "Sentinel A-03",
     icon: Swords,
-    description: "Put ideas to the test",
   },
   {
     id: "garden" as const,
-    name: "Learning garden",
+    name: "Perceptron lab",
     icon: Sprout,
-    description: "Teach a machine",
   },
+];
+const deskDestinations = [
+  { id: "quest", name: "Caseboard", icon: FolderSearch },
+  { id: "library", name: "Library", icon: BookOpen },
+  { id: "network", name: "Go online", icon: Monitor },
+  { id: "inventory", name: "Equipment", icon: Backpack },
 ];
 export default function App() {
   const [save, setSave] = useState<Save>(defaultSave),
@@ -147,7 +155,9 @@ export default function App() {
     [booted, setBooted] = useState(false),
     [storageReady, setStorageReady] = useState(true),
     [saveStatus, setSaveStatus] = useState("Loading journal…");
-  const [scene, setScene] = useState<SceneId>("hub"),
+  const [realm, setRealm] = useState<"desk" | "hub">("desk");
+  const [prologueReplay, setPrologueReplay] = useState(false);
+  const [scene, setScene] = useState<SceneId>("desk"),
     [panel, setPanel] = useState<Panel>(null),
     [toast, setToast] = useState(""),
     [metrics, setMetrics] = useState<WorldMetrics | null>(null);
@@ -221,7 +231,7 @@ export default function App() {
       setToast(
         timed
           ? `Trial complete in ${seconds.toFixed(1)} seconds.`
-          : "A way through! Maze objective complete.",
+          : "Maze complete.",
       );
     },
     [updateSave],
@@ -347,37 +357,51 @@ export default function App() {
     updateMaze(createMaze(seed));
     setOutput([]);
   };
-  const open = useCallback((id: string) => {
-    if (id === "exit") return;
-    generation.current++;
-    runner.current?.reset();
-    setLine(0);
-    if (id === "quest") {
-      setPanel("journal");
-      setScene("hub");
-      return;
-    }
-    if (id === "maze") {
-      setScene("maze");
-      setPanel("maze");
-    } else {
-      setScene("hub");
-      setPanel(id as Panel);
-      if (id === "battle") {
-        setBattle(createBattle());
-        setAnswer([]);
-        setBattleNotice("");
+  const open = useCallback(
+    (id: string) => {
+      if (id === "exit") return;
+      generation.current++;
+      runner.current?.reset();
+      setLine(0);
+      if (id === "network" || id === "desk") {
+        const destination = id === "desk" ? "desk" : "hub";
+        setRealm(destination);
+        setScene(destination);
+        setPanel(null);
+        setTrial(false);
+        trialRef.current = false;
+        return;
       }
-    }
-    if (id !== "maze") {
-      setTrial(false);
-      trialRef.current = false;
-    }
-  }, []);
+      if (id === "quest") {
+        setPanel("journal");
+        setScene(realm);
+        return;
+      }
+      if (id === "maze") {
+        setRealm("hub");
+        setScene("maze");
+        setPanel("maze");
+      } else {
+        if (id === "battle" || id === "garden") setRealm("hub");
+        setScene(id === "battle" || id === "garden" ? "hub" : realm);
+        setPanel(id as Panel);
+        if (id === "battle") {
+          setBattle(createBattle());
+          setAnswer([]);
+          setBattleNotice("");
+        }
+      }
+      if (id !== "maze") {
+        setTrial(false);
+        trialRef.current = false;
+      }
+    },
+    [realm],
+  );
   const close = () => {
     stop();
     setPanel(null);
-    setScene("hub");
+    setScene(realm);
     setTrial(false);
     trialRef.current = false;
   };
@@ -388,7 +412,7 @@ export default function App() {
     };
     window.addEventListener("keydown", escape);
     return () => window.removeEventListener("keydown", escape);
-  }, []);
+  }, [realm]);
   const manualMove = useCallback(
     (direction: Direction) => {
       if (
@@ -441,11 +465,7 @@ export default function App() {
         battle.assisted,
       );
       applyBattle(result.battle, next);
-      setBattleNotice(
-        result.correct
-          ? "Correct. Your idea lands."
-          : "Not quite. Review the explanation and try again.",
-      );
+      setBattleNotice(result.correct ? "Correct" : "Incorrect · turn spent");
     } catch (e) {
       notify(String(e));
     }
@@ -471,7 +491,8 @@ export default function App() {
       updateMaze(createMaze(parsed.seed));
       setStorageReady(true);
       setPanel("settings");
-      setScene("hub");
+      setRealm("desk");
+      setScene("desk");
       setTrial(false);
       trialRef.current = false;
       notify("Journal imported and saved.");
@@ -485,15 +506,20 @@ export default function App() {
       benchSamples.current.push(value);
       if (performance.now() >= benchUntil.current) {
         const list = benchSamples.current;
+        const frames = list
+          .flatMap((sample) => sample.frameTimes)
+          .sort((a, b) => a - b);
+        const average =
+          frames.reduce((sum, frame) => sum + frame, 0) / frames.length;
         const result = {
           ...value,
-          fps: Math.round(list.reduce((a, b) => a + b.fps, 0) / list.length),
-          frameMs:
-            Math.round(
-              (list.reduce((a, b) => a + b.frameMs, 0) / list.length) * 10,
-            ) / 10,
-          p95: Math.max(...list.map((x) => x.p95)),
-          samples: list.reduce((a, b) => a + b.samples, 0),
+          fps: Math.round(1000 / average),
+          frameMs: Math.round(average * 10) / 10,
+          p95:
+            Math.round((frames[Math.floor(frames.length * 0.95)] ?? 0) * 10) /
+            10,
+          samples: frames.length,
+          frameTimes: [],
         };
         setBenchmark((old) => [...old, result]);
         setBenchmarkState(
@@ -513,7 +539,7 @@ export default function App() {
     return (
       <div className="boot">
         <GraduationCap size={40} />
-        <h1>Opening the academy</h1>
+        <h1>Opening case 007</h1>
         <p>Preparing your local journal…</p>
       </div>
     );
@@ -527,19 +553,17 @@ export default function App() {
           href="#"
           onClick={(event) => {
             event.preventDefault();
-            close();
+            open("desk");
           }}
         >
           <span className="brand-mark">
-            <GraduationCap size={25} />
+            <ScanLine size={25} />
           </span>
-          <span>
-            BOTAK<span className="brand-sub">ACADEMY OF THE CURIOUS</span>
-          </span>
+          <span>NULL / TRACE</span>
         </a>
         <div className="chapter">
           <span className="chapter-dot" />
-          CHAPTER I <span className="top-divider">/</span> FIRST PRINCIPLES
+          CASE 007 <span className="top-divider">/</span> ECHO-7
         </div>
         <div className="top-actions">
           <span className="save-status">
@@ -560,20 +584,27 @@ export default function App() {
             aria-label="Open character"
             onClick={() => open("inventory")}
           >
-            W
+            V
           </button>
         </div>
       </header>
-      <aside className="rail" aria-label="Academy navigation">
+      <aside className="rail" aria-label="Investigation navigation">
         <button
           className={!panel ? "active" : ""}
-          title="Academy courtyard"
-          aria-label="Academy courtyard"
-          onClick={close}
+          title="Detective's desk"
+          aria-label="Detective's desk"
+          onClick={() => open("desk")}
         >
           <Compass />
         </button>
         <div className="rail-divider" />
+        <button
+          aria-label="Enter the network"
+          title="Enter the network"
+          onClick={() => open("network")}
+        >
+          <Monitor size={21} />
+        </button>
         {destinations.map((d) => (
           <button
             key={d.id}
@@ -603,10 +634,11 @@ export default function App() {
       </aside>
       <main className="world-shell">
         <Suspense
-          fallback={<div className="world-notice">Building the academy…</div>}
+          fallback={<div className="world-notice">Establishing the scene…</div>}
         >
           <World
             scene={scene}
+            encounter={panel === "battle"}
             maze={maze}
             renderer={save.settings.renderer}
             reducedMotion={save.settings.reducedMotion}
@@ -614,7 +646,9 @@ export default function App() {
               (panel !== null && panel !== "maze") ||
               busy ||
               (scene === "maze" && mode !== "manual") ||
-              trialExpired
+              trialExpired ||
+              !save.story.prologueSeen ||
+              prologueReplay
             }
             onInteract={open}
             onMove={manualMove}
@@ -624,23 +658,18 @@ export default function App() {
         {!panel && (
           <>
             <div className="scene-heading">
-              <div className="section-eyebrow">
-                <span className="tiny-line" /> YOUR ADVENTURE BEGINS
-              </div>
               <h1>
-                A place for
-                <br />
-                <em>curious minds.</em>
+                {realm === "desk" ? "Detective’s desk" : "Network gateway"}
               </h1>
-              <p>
-                Every path is a question.
-                <br />
-                Every discovery, a new possibility.
-              </p>
             </div>
             <div className="world-caption">
-              <span className="live-dot" /> THE ACADEMY COURTYARD{" "}
-              <span>01 / THE COMMONS</span>
+              <span className="live-dot" />{" "}
+              {realm === "desk"
+                ? "OFFLINE / THE DETECTIVE’S DESK"
+                : "ONLINE / THE TRANSIT NETWORK"}{" "}
+              <span>
+                {realm === "desk" ? "CASE FILE 007" : "01 / THE GATEWAY"}
+              </span>
             </div>
           </>
         )}
@@ -651,34 +680,25 @@ export default function App() {
           >
             <header className="panel-header">
               <div>
-                <span className="section-eyebrow">
-                  {panel === "maze"
-                    ? "ALGORITHM CHAMBER"
-                    : panel === "library"
-                      ? "THE ACADEMY ARCHIVE"
-                      : panel === "battle"
-                        ? "KNOWLEDGE ENCOUNTER"
-                        : panel === "garden"
-                          ? "THE LEARNING GARDEN"
-                          : "YOUR ADVENTURE"}
-                </span>
                 <h2>
                   {
                     {
-                      library: "The living library",
-                      maze: "The wandering paths",
-                      battle: "The archive guardian",
-                      garden: "Where ideas take root",
-                      inventory: "The curious wanderer",
-                      journal: "Your field journal",
-                      settings: "Make yourself at home",
+                      library: "Library",
+                      maze: "Packet labyrinth",
+                      battle: "Sentinel A-03",
+                      garden: "Perceptron lab",
+                      inventory: "Equipment & skills",
+                      journal: "Caseboard",
+                      settings: "Settings",
                     }[panel]
                   }
                 </h2>
               </div>
               <button
                 className="icon-button"
-                aria-label="Return to courtyard"
+                aria-label={
+                  realm === "desk" ? "Return to desk" : "Return to network"
+                }
                 onClick={close}
               >
                 <X size={21} />
@@ -732,14 +752,6 @@ export default function App() {
                         )}
                       </button>
                     ))}
-                  <div className="library-note">
-                    <BookOpen size={21} />
-                    <p>
-                      Ideas are tools.
-                      <br />
-                      Take them into the world.
-                    </p>
-                  </div>
                 </nav>
                 <article className="lesson-body">
                   <div className="lesson-top">
@@ -791,9 +803,9 @@ export default function App() {
                     }}
                   />
                   <label className="notes-label">
-                    YOUR MARGIN NOTES
+                    NOTES
                     <textarea
-                      placeholder="What clicked? What would you like to try?"
+                      placeholder="Add a note…"
                       value={save.notes[lessonId] ?? ""}
                       onChange={(e) =>
                         updateSave((s) => ({
@@ -815,7 +827,7 @@ export default function App() {
                       )
                     }
                   >
-                    Put this idea to work <ArrowUpRight size={16} />
+                    Open activity <ArrowUpRight size={16} />
                   </button>
                 </article>
               </div>
@@ -1021,7 +1033,7 @@ export default function App() {
                     className="text-button"
                     onClick={() => setHint((n) => Math.min(3, n + 1))}
                   >
-                    Need a nudge?
+                    Hint
                   </button>
                 </div>
                 {hint > 0 && (
@@ -1040,7 +1052,7 @@ export default function App() {
                   className="text-button"
                   onClick={() => openLesson("graph-search")}
                 >
-                  Read the graph-search field guide ↗
+                  Graph-search lesson ↗
                 </button>
                 {save.completed.includes("maze-chamber") && (
                   <button
@@ -1061,7 +1073,7 @@ export default function App() {
             {panel === "battle" && (
               <div className="combat-layout">
                 <div className="enemy-card">
-                  <span className="pill">ARCHIVE CONSTRUCT · LV. 1</span>
+                  <span className="pill">GATEWAY SECURITY · LV. 1</span>
                   <div className="guardian-portrait">
                     <div className="guardian-head">
                       <i />
@@ -1069,15 +1081,13 @@ export default function App() {
                     <div className="guardian-body" />
                     <span>✦</span>
                   </div>
-                  <h3>The archive guardian</h3>
-                  <p>“Show me how you think.”</p>
                   <div className="bar enemy">
                     <i
                       style={{ width: `${(battle.hp / battle.maxHp) * 100}%` }}
                     />
                   </div>
                   <small>
-                    {battle.hp} / {battle.maxHp} HP · Target selected
+                    {battle.hp} / {battle.maxHp} HP
                   </small>
                   <div className="effect-list">
                     {battle.effects.map((effect) => (
@@ -1098,10 +1108,7 @@ export default function App() {
                   </div>
                   {battle.phase === "choose" && (
                     <>
-                      <h2>Knowledge is your strongest skill.</h2>
-                      <p className="muted">
-                        Choose a skill. Answer its question to bring it to life.
-                      </p>
+                      <h2>Choose a skill</h2>
                       <div className="skill-list">
                         {skills
                           .filter((skill) =>
@@ -1146,7 +1153,7 @@ export default function App() {
                             </button>
                           ))}
                       </div>
-                      <h4>YOUR SATCHEL</h4>
+                      <h4>ITEMS · USES ONE TURN</h4>
                       <div className="consumables">
                         {items
                           .filter((item) => item.kind !== "equipment")
@@ -1175,7 +1182,7 @@ export default function App() {
                       </div>
                       {save.character.hp === 0 && (
                         <button className="primary" onClick={close}>
-                          Return to the courtyard to rest
+                          Return & recover
                         </button>
                       )}
                     </>
@@ -1195,7 +1202,7 @@ export default function App() {
                       <p className="muted">
                         {currentQuestion.format === "ordering"
                           ? "Select each step in the correct order."
-                          : "Choose one answer. Take your time."}
+                          : "Choose one answer."}
                       </p>
                       <div className="answer-options">
                         {currentQuestion.options
@@ -1243,7 +1250,7 @@ export default function App() {
                         }
                         onClick={submitAnswer}
                       >
-                        Commit answer <ArrowRight size={16} />
+                        Submit <ArrowRight size={16} />
                       </button>
                       <button
                         className="text-button"
@@ -1252,7 +1259,7 @@ export default function App() {
                           setBattleNotice(currentQuestion.explanation);
                         }}
                       >
-                        Reveal a study hint · no mastery credit
+                        Hint · no mastery credit
                       </button>
                       {battleNotice && (
                         <p className="feedback">{battleNotice}</p>
@@ -1270,12 +1277,10 @@ export default function App() {
                         className="text-button"
                         onClick={() => {
                           setLessonId(currentQuestion!.lesson);
-                          notify(
-                            "Lesson selected. Open the library after this encounter to review it.",
-                          );
+                          notify("Lesson saved for review after battle.");
                         }}
                       >
-                        Mark the related lesson for review
+                        Review lesson later
                       </button>
                       <button
                         className="primary"
@@ -1289,7 +1294,7 @@ export default function App() {
                           setAnswer([]);
                         }}
                       >
-                        Continue to guardian turn <ArrowRight size={16} />
+                        Enemy turn <ArrowRight size={16} />
                       </button>
                     </>
                   )}
@@ -1298,27 +1303,21 @@ export default function App() {
                       <span className="result-mark">
                         <Check size={30} />
                       </span>
-                      <h2>A worthy exchange.</h2>
-                      <p>
-                        The guardian makes way. Your journal records the
-                        encounter.
-                      </p>
+                      <h2>Sentinel defeated</h2>
+                      <p>ECHO-7’s route fragment recovered.</p>
                       <button
                         className="primary"
                         onClick={() => open("journal")}
                       >
-                        View your quest
+                        Caseboard
                       </button>
-                      <button onClick={close}>Return to courtyard</button>
+                      <button onClick={close}>Return to network</button>
                     </div>
                   )}
                   {battle.phase === "lost" && (
                     <div className="result-screen">
-                      <h2>Every attempt teaches.</h2>
-                      <p>
-                        Your notes and completed objectives are safe. Rest at
-                        the courtyard, then try again.
-                      </p>
+                      <h2>Connection lost</h2>
+                      <p>Progress saved. Recover before retrying.</p>
                       <button
                         className="primary"
                         onClick={() => {
@@ -1331,12 +1330,10 @@ export default function App() {
                             },
                           }));
                           close();
-                          notify(
-                            "Restored at the academy. The guardian is ready for a rematch.",
-                          );
+                          notify("Health and focus restored.");
                         }}
                       >
-                        Return to hub & recover
+                        Return & recover
                       </button>
                     </div>
                   )}
@@ -1354,9 +1351,7 @@ export default function App() {
                         "held-out-boundary",
                       ),
                     );
-                    notify(
-                      "A machine learned something. Garden objective complete.",
-                    );
+                    notify("Perceptron objective complete.");
                   }}
                   onLesson={() => openLesson("perceptron-basics")}
                 />
@@ -1364,7 +1359,27 @@ export default function App() {
             )}
             {panel === "journal" && (
               <div className="journal-content">
-                <span className="pill">MAIN QUEST · CHAPTER I</span>
+                <span className="pill">CASE 007 · ACTIVE INVESTIGATION</span>
+                <div className="case-summary">
+                  <div className="suspect-file">
+                    <ScanLine size={34} />
+                    <strong>ECHO-7</strong>
+                    <small>MISSING</small>
+                  </div>
+                  <div>
+                    <h3>Suspect: ECHO-7</h3>
+                    <p>
+                      Escaped through a maintenance terminal. Trace its network
+                      route.
+                    </p>
+                    <button
+                      className="text-button"
+                      onClick={() => setPrologueReplay(true)}
+                    >
+                      Replay prologue ↗
+                    </button>
+                  </div>
+                </div>
                 <h2>{quest.title}</h2>
                 <p>{quest.description}</p>
                 <div className="quest-objectives">
@@ -1392,8 +1407,8 @@ export default function App() {
                         </strong>
                         <small>
                           {save.completed.includes(id)
-                            ? "Discovery recorded"
-                            : "A new idea awaits"}
+                            ? "Complete"
+                            : "Incomplete"}
                         </small>
                       </span>
                       <ArrowUpRight size={17} />
@@ -1403,10 +1418,8 @@ export default function App() {
                 <div className="quest-reward">
                   <Sparkles />
                   <span>
-                    <strong>{quest.xp} experience · Scholar’s charm</strong>
-                    <small>
-                      Reach level 2 and unlock new skills in your satchel.
-                    </small>
+                    <strong>{quest.xp} XP · Trace amplifier</strong>
+                    <small>Level 2 unlocks more skills.</small>
                   </span>
                 </div>
                 <button
@@ -1415,17 +1428,23 @@ export default function App() {
                   onClick={() => {
                     updateSave((s) => claimQuest(s, quest));
                     notify(
-                      "Quest complete. Level 2 reached! Open your satchel to equip the charm and learn a skill.",
+                      "Level 2. Trace amplifier and new skills available.",
                     );
                   }}
                 >
                   {save.claimed.includes(quest.id)
                     ? "Reward claimed"
                     : done === 3
-                      ? "Claim at the academy seal"
-                      : `${done} / 3 discoveries made`}
+                      ? "Claim reward"
+                      : `${done} / 3 objectives complete`}
                 </button>
-                <h3>Your knowledge map</h3>
+                {save.claimed.includes(quest.id) && (
+                  <div className="case-next-lead">
+                    <h3>Next lead: abandoned subnet</h3>
+                    <p>End of the playable chapter.</p>
+                  </div>
+                )}
+                <h3>Topic mastery</h3>
                 <div className="knowledge-map">
                   {lessons.map((l) => (
                     <button key={l.id} onClick={() => openLesson(l.id)}>
@@ -1459,7 +1478,7 @@ export default function App() {
                   </span>
                   <div>
                     <span className="section-eyebrow">
-                      LEVEL {save.character.level} · SCHOLAR IN THE MAKING
+                      LEVEL {save.character.level} · NETWORK INVESTIGATOR
                     </span>
                     <h2>{save.character.name}</h2>
                     <p>
@@ -1494,7 +1513,7 @@ export default function App() {
                     <span>Defense</span>
                   </div>
                 </div>
-                <h3>Your satchel</h3>
+                <h3>Field equipment</h3>
                 <div className="item-grid">
                   {items.map((item) => (
                     <div className="item-card" key={item.id}>
@@ -1524,7 +1543,7 @@ export default function App() {
                           {save.character.equipment === item.id
                             ? "Unequip"
                             : save.inventory[item.id]
-                              ? "Equip charm"
+                              ? "Equip module"
                               : "Earn from the main quest"}
                         </button>
                       ) : (
@@ -1533,7 +1552,7 @@ export default function App() {
                     </div>
                   ))}
                 </div>
-                <h3>A growing skill tree</h3>
+                <h3>Skills</h3>
                 <div className="skill-tree">
                   {skills.map((skill) => (
                     <div className="skill-node" key={skill.id}>
@@ -1570,13 +1589,16 @@ export default function App() {
             )}
             {panel === "settings" && (
               <div className="settings-content">
-                <h3>A world that runs your way</h3>
+                <h3>Renderer</h3>
                 <label>
                   Rendering backend
                   <select
                     value={save.settings.renderer}
                     onChange={(e) => {
                       stop();
+                      setMetrics(null);
+                      benchUntil.current = 0;
+                      setBenchmarkState("");
                       updateSave((s) => ({
                         ...s,
                         settings: {
@@ -1643,7 +1665,7 @@ export default function App() {
                     </p>
                   ))}
                 </div>
-                <h3>Your journal belongs to you</h3>
+                <h3>Local saves</h3>
                 <p className="muted">
                   Progress lives in this browser. Export a copy before clearing
                   browser data or moving devices.
@@ -1703,8 +1725,8 @@ export default function App() {
                 )}
                 <h3>Controls & runtime</h3>
                 <p className="muted">
-                  WASD / arrows: move · E: interact nearby · Escape: courtyard ·
-                  Ctrl+Enter: run Python. Drag the world to orbit the camera.
+                  WASD / arrows: move · E: interact nearby · Escape: close panel
+                  · Ctrl+Enter: run Python. Drag the world to orbit the camera.
                   Use the destination buttons to travel with a keyboard.
                 </p>
                 <p className="small">
@@ -1720,17 +1742,18 @@ export default function App() {
         )}
         {!panel && (
           <div className="travel-dock">
-            {destinations.map((d, index) => (
-              <button key={d.id} onClick={() => open(d.id)}>
-                <span className="destination-number">0{index + 1}</span>
-                <d.icon size={23} />
-                <span>
-                  <strong>{d.name}</strong>
-                  <small>{d.description}</small>
-                </span>
-                <ArrowUpRight size={16} />
-              </button>
-            ))}
+            {(realm === "desk" ? deskDestinations : destinations).map(
+              (d, index) => (
+                <button key={d.id} onClick={() => open(d.id)}>
+                  <span className="destination-number">0{index + 1}</span>
+                  <d.icon size={23} />
+                  <span>
+                    <strong>{d.name}</strong>
+                  </span>
+                  <ArrowUpRight size={16} />
+                </button>
+              ),
+            )}
           </div>
         )}
         <footer className="world-footer">
@@ -1747,10 +1770,10 @@ export default function App() {
       </main>
       <aside className="journey-sidebar">
         <div className="profile-mini">
-          <span className="profile-avatar">W</span>
+          <span className="profile-avatar">V</span>
           <div>
             <strong>{save.character.name}</strong>
-            <span>LEVEL {save.character.level} · WANDERER</span>
+            <span>LEVEL {save.character.level} · DETECTIVE</span>
           </div>
           <button
             className="icon-button"
@@ -1803,14 +1826,10 @@ export default function App() {
         </div>
         <div className="sidebar-divider" />
         <div className="sidebar-section-title">
-          YOUR NEXT DISCOVERY <ScrollText size={15} />
+          CASE 007 <ScrollText size={15} />
         </div>
         <div className="active-quest">
-          <span className="quest-label">
-            MAIN QUEST <span>01</span>
-          </span>
           <h3>{quest.title}</h3>
-          <p>A path, a question, a small spark of understanding.</p>
           {quest.objectives.map((id, index) => (
             <button
               className="mini-objective"
@@ -1822,34 +1841,18 @@ export default function App() {
               </span>
               {
                 [
-                  "Find a way through the maze",
-                  "Meet the archive guardian",
-                  "Teach a little machine",
+                  "Trace the packet labyrinth",
+                  "Bypass Sentinel A-03",
+                  "Reconstruct the signal",
                 ][index]
               }
             </button>
           ))}
           <button className="quest-link" onClick={() => open("journal")}>
-            Open field journal <ChevronRight size={16} />
+            Caseboard <ChevronRight size={16} />
           </button>
         </div>
-        <div className="sidebar-divider" />
-        <div className="sidebar-section-title">
-          A THOUGHT TO CARRY <Sparkles size={15} />
-        </div>
-        <blockquote>
-          “What I cannot create,
-          <br />I do not understand.”<cite>— RICHARD FEYNMAN</cite>
-        </blockquote>
         <div className="sidebar-bottom">
-          <div className="leaf-seal">
-            <Sprout size={24} />
-          </div>
-          <p>
-            Progress is a practice.
-            <br />
-            <strong>Stay curious.</strong>
-          </p>
           <button
             className="rest-button"
             disabled={panel === "battle"}
@@ -1862,13 +1865,22 @@ export default function App() {
                   focus: stats(s).maxFocus,
                 },
               }));
-              notify("A quiet moment. Health and focus restored.");
+              notify("Health and focus restored.");
             }}
           >
-            Rest at the academy
+            Restore health & focus
           </button>
         </div>
       </aside>
+      {(!save.story.prologueSeen || prologueReplay) && (
+        <Prologue
+          story={story}
+          onFinish={() => {
+            updateSave((s) => ({ ...s, story: { prologueSeen: true } }));
+            setPrologueReplay(false);
+          }}
+        />
+      )}
       {toast && (
         <div className="toast" role="status">
           <Sparkles size={18} />

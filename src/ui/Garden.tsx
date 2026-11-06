@@ -37,11 +37,8 @@ export function Garden({
   return (
     <div className="garden-layout">
       <div>
-        <div className="section-eyebrow">EXPERIMENT 03 · CONNECTIONIST AI</div>
-        <h2>Teach a little machine.</h2>
         <p className="muted">
-          Place amber points below the diagonal and teal points above it. Can
-          one neuron learn the distinction?
+          Label class 0 where x₁ + x₂ &lt; 0, and class 1 where x₁ + x₂ ≥ 0.
         </p>
         <div className="segmented">
           <button
@@ -165,8 +162,7 @@ export function Garden({
         </div>
       </div>
       <div className="experiment-controls">
-        <span className="pill">A SINGLE PERCEPTRON</span>
-        <h3>From examples to a boundary</h3>
+        <h3>Training</h3>
         <p>
           Predict class 1 when <code>w₁x₁ + w₂x₂ + b ≥ 0</code>. Training
           changes the weights after each mistake.
@@ -252,7 +248,7 @@ export function Garden({
           {message || "Start by adding examples of both classes."}
         </p>
         <button className="text-button" onClick={onLesson}>
-          Read the perceptron field guide ↗
+          Perceptron lesson ↗
         </button>
         <button
           className="text-button"

@@ -1,4 +1,4 @@
-export type SceneId = "hub" | "maze" | "garden";
+export type SceneId = "desk" | "hub" | "maze" | "garden";
 export type Direction = "north" | "east" | "south" | "west";
 export type Cell = [number, number];
 export interface Interaction {

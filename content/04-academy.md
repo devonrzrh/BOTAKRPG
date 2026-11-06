@@ -1,9 +1,9 @@
-# Academy configuration
+# Case 007 · ECHO-7
 
 ```entity
 type: activity
 id: maze-chamber
-title: The wandering paths
+title: Packet labyrinth
 template: maze
 lesson: graph-search
 seed: 42
@@ -12,7 +12,7 @@ seed: 42
 ```entity
 type: activity
 id: guardian-battle
-title: The archive guardian
+title: Sentinel A-03
 template: battle
 lesson: stacks-queues
 ```
@@ -20,7 +20,7 @@ lesson: stacks-queues
 ```entity
 type: activity
 id: perceptron-exhibit
-title: The learning garden
+title: Perceptron lab
 template: perceptron
 lesson: perceptron-basics
 ```
@@ -28,8 +28,8 @@ lesson: perceptron-basics
 ```entity
 type: quest
 id: first-principles
-title: A curious beginning
-description: Find a path, meet the guardian, and teach a machine. Return to the academy seal to claim your reward.
+title: Trace ECHO-7
+description: Recover ECHO-7’s address by completing these three objectives.
 objectives: [maze-chamber, guardian-battle, perceptron-exhibit]
 xp: 120
 rewards: [scholar-charm, healing-draught]
@@ -38,7 +38,7 @@ rewards: [scholar-charm, healing-draught]
 ```entity
 type: item
 id: healing-draught
-title: Meadow draught
+title: Integrity patch
 description: Restore 24 HP. Using it in battle takes a turn.
 kind: healing
 amount: 24
@@ -47,7 +47,7 @@ amount: 24
 ```entity
 type: item
 id: focus-tea
-title: Clarity tea
+title: Bandwidth cell
 description: Restore 8 focus. Using it in battle takes a turn.
 kind: focus
 amount: 8
@@ -56,8 +56,8 @@ amount: 8
 ```entity
 type: item
 id: scholar-charm
-title: Scholar’s charm
-description: A small reminder to stay curious. Equip for +3 attack.
+title: Trace amplifier
+description: A recovered signal module. Equip for +3 attack.
 kind: equipment
 amount: 3
 ```
@@ -92,8 +92,8 @@ magnitude: 3
 ```entity
 type: skill
 id: insight
-title: Insight
-description: Turn an answer into a precise strike.
+title: Probe
+description: Deal direct damage.
 cost: 0
 power: 5
 level: 1
@@ -103,8 +103,8 @@ lesson: stacks-queues
 ```entity
 type: skill
 id: ward
-title: Invariant ward
-description: Strike and protect yourself for two enemy attacks.
+title: Firewall
+description: Deal damage and shield against two attacks.
 cost: 3
 power: 3
 level: 1
@@ -116,8 +116,8 @@ lesson: graph-search
 ```entity
 type: skill
 id: trace
-title: Venom trace
-description: Leave a lingering thought. Poison the guardian for three turns.
+title: Trace injection
+description: Deal damage over three turns.
 cost: 4
 power: 4
 level: 2
@@ -129,8 +129,8 @@ lesson: perceptron-basics
 ```entity
 type: skill
 id: simplify
-title: Simplify
-description: Find the weak point and soften two enemy attacks.
+title: Throttle
+description: Reduce damage from two attacks.
 cost: 3
 power: 4
 level: 2

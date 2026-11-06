@@ -40,6 +40,8 @@ Use `format: ordering` with `answer` containing every option index exactly once 
 
 Use fenced blocks with language `entity`. Each requires `type`, `id`, and `title`, followed by the fields below. See `content/04-academy.md` for complete examples. The Zod schemas in `src/content/schema.ts` are the executable contract.
 
+Story files use frontmatter with `type: story`, `id`, `title`, and exactly three `frames`. Each frame has `time`, `heading`, and `body`. See `content/00-prologue.md`. The prologue uses these frames for the pursuit and saves completion separately from quest rewards. Existing saves without story progress start with the prologue unseen.
+
 | Type       | Fields                                                                                                               |
 | ---------- | -------------------------------------------------------------------------------------------------------------------- |
 | `activity` | `template`: maze / battle / perceptron; `lesson`; optional integer `seed` (default 42)                               |

@@ -4,7 +4,7 @@ import { validateContent } from "../src/content/schema";
 import raw from "../src/generated/content.json";
 it("compiles sample curriculum with all public record types", () => {
   const c = validateContent(raw);
-  expect(new Set(c.entities.map((x) => x.type)).size).toBe(7);
+  expect(new Set(c.entities.map((x) => x.type)).size).toBe(8);
 });
 it("parses Markdown frontmatter and removes executable-looking entity blocks from lesson body", () => {
   const result = parseMarkdown(

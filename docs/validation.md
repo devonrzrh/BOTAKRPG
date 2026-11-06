@@ -1,0 +1,29 @@
+# Validation · 2026-11-06
+
+`npm test`: 31 tests passed. `npm run build`: content validation, TypeScript, and production bundling passed.
+
+Automated coverage includes 200 solvable maze seeds, deterministic generation, alternate routes, shared movement rules, command budgets, combat turn order and effects, item consumption, defeat, unique rewards, mastery, progression, content references and cycles, save validation, IndexedDB, and worker cancellation/stale messages/deadlines. Legacy saves without prologue progress load successfully.
+
+## Browser checks
+
+Tested in the desktop app browser at 1280 × 720:
+
+- Prologue pursuit, replay, keyboard skip, and focus return.
+- Selectable detective desk, network transitions, library search, notes, bookmarks, and save restore.
+- Seed 42 completed manually, through Blockly-generated Python, and through handwritten BFS. Each reached the exit in 24 movement steps.
+- Quiz combat, perceptron objective, quest reward, level 2, equipment, and skill unlock. Full progression was checked on the foundation before the detective presentation changes; a correct quiz turn was rechecked afterward.
+- Real Python pause, one-line step, stop, and successful execution after worker replacement. An infinite loop hit the 30-second execution limit and returned control. Missing headers, stale responses, and the unresponsive-worker watchdog are covered by runner tests.
+- Automatic WebGPU and forced WebGL2 both rendered successfully. Forced renderer initialization failure and complete GPU context loss were not injected in the browser.
+
+## Frame captures during Python
+
+Ten-second captures began in Settings and continued through maze opening, Python loading, and an infinite loop. Frame times include scene changes, UI work, and scheduling. These are development-browser measurements, not isolated GPU timings or a hardware-wide comparison.
+
+| Backend | Average | p95 | FPS | Frames |
+| --- | ---: | ---: | ---: | ---: |
+| WebGPU | 8.6 ms | 16.7 ms | 117 | 1262 |
+| WebGL2 | 8.5 ms | 17.0 ms | 118 | 1279 |
+
+The measured difference is too small to establish a performance advantage. Capture statistics aggregate individual frame intervals. Rendering stayed responsive while Python executed in its worker.
+
+![Battle layout](screenshots/battle.jpg)

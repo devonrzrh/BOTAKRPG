@@ -243,6 +243,13 @@ describe("Progression and saves", () => {
     save.blocks = { blocks: { languageVersion: 0, blocks: [] } };
     expect(parseSave(JSON.parse(JSON.stringify(save)), content)).toEqual(save);
   });
+  it("loads foundation saves that predate the prologue", () => {
+    const { story: _story, ...legacy } = initialSave();
+    expect(parseSave(legacy, content).story.prologueSeen).toBe(false);
+    const save = initialSave();
+    save.story.prologueSeen = true;
+    expect(parseSave(save, content).story.prologueSeen).toBe(true);
+  });
   it("rejects incompatible, unknown and inconsistent saves", () => {
     const save = initialSave();
     expect(() => parseSave({ ...save, version: 2 }, content)).toThrow();

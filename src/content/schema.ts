@@ -60,6 +60,17 @@ export const questSchema = z.object({
   xp: z.number().int().positive(),
   rewards: z.array(id),
 });
+export const storySchema = z.object({
+  ...base,
+  type: z.literal("story"),
+  frames: z
+    .array(
+      z.object({ time: z.string(), heading: z.string(), body: z.string() }),
+    )
+    .min(3)
+    .max(3),
+  body: z.string().default(""),
+});
 export const entitySchema = z.discriminatedUnion("type", [
   lessonSchema,
   questionSchema,
@@ -68,6 +79,7 @@ export const entitySchema = z.discriminatedUnion("type", [
   effectSchema,
   activitySchema,
   questSchema,
+  storySchema,
 ]);
 export const contentSchema = z.object({
   version: z.literal(1),
@@ -81,6 +93,7 @@ export type Skill = z.infer<typeof skillSchema>;
 export type Effect = z.infer<typeof effectSchema>;
 export type Quest = z.infer<typeof questSchema>;
 export type Content = z.infer<typeof contentSchema>;
+export type Story = z.infer<typeof storySchema>;
 
 export function validateContent(input: unknown): Content {
   const content = contentSchema.parse(input);

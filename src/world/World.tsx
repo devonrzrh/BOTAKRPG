@@ -7,6 +7,7 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 import { DirectionalLight } from "@babylonjs/core/Lights/directionalLight";
+import { PointLight } from "@babylonjs/core/Lights/pointLight";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { Color3, Color4 } from "@babylonjs/core/Maths/math.color";
 import { DynamicTexture } from "@babylonjs/core/Materials/Textures/dynamicTexture";
@@ -28,9 +29,11 @@ export interface WorldMetrics {
   frameMs: number;
   p95: number;
   samples: number;
+  frameTimes: number[];
 }
 interface Props {
   scene: SceneId;
+  encounter?: boolean;
   maze: Maze;
   renderer: RendererPreference;
   reducedMotion: boolean;
@@ -40,11 +43,11 @@ interface Props {
   onMetrics: (metrics: WorldMetrics) => void;
 }
 const locations = [
-  { id: "library", label: "The library", x: -5, z: -3 },
-  { id: "maze", label: "Wandering paths", x: 5, z: -3 },
-  { id: "battle", label: "Archive guardian", x: 5, z: 4 },
-  { id: "garden", label: "Learning garden", x: -5, z: 4 },
-  { id: "quest", label: "Academy seal", x: 0, z: -5 },
+  { id: "library", label: "Library", x: -5, z: -3 },
+  { id: "maze", label: "Packet labyrinth", x: 5, z: -3 },
+  { id: "battle", label: "Sentinel A-03", x: 5, z: 4 },
+  { id: "garden", label: "Perceptron lab", x: -5, z: 4 },
+  { id: "quest", label: "Caseboard", x: 0, z: -5 },
 ];
 class WorldBoundary extends Component<
   { children: ReactNode },
@@ -85,7 +88,7 @@ function WorldCanvas(props: Props) {
     actorRef = useRef<Mesh | null>(null);
   const [ready, setReady] = useState(0),
     [error, setError] = useState(""),
-    [notice, setNotice] = useState("Preparing the academy…");
+    [notice, setNotice] = useState("Establishing the scene…");
   const hubPosition = useRef(new Vector3(0, 0.5, 1));
   useEffect(() => {
     let disposed = false;
@@ -117,8 +120,9 @@ function WorldCanvas(props: Props) {
           });
           engine = gl;
           if (gl.webGLVersion < 2)
-            throw new Error("This academy requires WebGL2 or WebGPU.");
-          if (props.renderer === 'webgl' || props.renderer === 'auto') setNotice('');
+            throw new Error("WebGL2 or WebGPU is required.");
+          if (props.renderer === "webgl" || props.renderer === "auto")
+            setNotice("");
         }
         if (disposed) {
           engine.dispose();
@@ -163,6 +167,7 @@ function WorldCanvas(props: Props) {
                   (sorted[Math.floor(sorted.length * 0.95)] ?? 0) * 10,
                 ) / 10,
               samples: ticks.length,
+              frameTimes: ticks,
             });
             ticks = [];
             lastReport = performance.now();
@@ -193,7 +198,7 @@ function WorldCanvas(props: Props) {
     if (!engine) return;
     const scene = new Scene(engine);
     sceneRef.current = scene;
-    scene.clearColor = new Color4(0.073, 0.128, 0.12, 1);
+    scene.clearColor = new Color4(0.043, 0.082, 0.114, 1);
     scene.ambientColor = new Color3(0.3, 0.3, 0.25);
     const camera = new ArcRotateCamera(
       "camera",
@@ -204,7 +209,23 @@ function WorldCanvas(props: Props) {
       scene,
     );
     camera.mode = ArcRotateCamera.ORTHOGRAPHIC_CAMERA;
-    const view = props.scene === "maze" ? 9 : 12;
+    if (props.scene === "desk") {
+      camera.alpha = -Math.PI / 2.2;
+      camera.beta = 0.98;
+      camera.target.set(0, 1.7, 0.6);
+    }
+    if (props.encounter) {
+      camera.alpha = -Math.PI / 2;
+      camera.beta = 1.18;
+      camera.target.set(5, 1.55, 4);
+    }
+    const view = props.encounter
+      ? 2.9
+      : props.scene === "desk"
+        ? 5.4
+        : props.scene === "maze"
+          ? 9
+          : 12;
     const resize = () => {
       const aspect = engine.getRenderWidth() / engine.getRenderHeight();
       const vertical = view / Math.min(1, aspect);
@@ -234,15 +255,15 @@ function WorldCanvas(props: Props) {
       if (emissive) m.emissiveColor = m.diffuseColor.scale(0.35);
       return m;
     };
-    const stone = mat("sandstone", "#b5b69a"),
-      light = mat("limestone", "#d0cdb0"),
-      edge = mat("edges", "#6c8271"),
-      grass = mat("moss", "#5c8160"),
-      dark = mat("deep pine", "#244b40"),
-      gold = mat("brass", "#dfb768", true),
-      teal = mat("water", "#459a91", true),
-      wood = mat("walnut", "#71523c"),
-      red = mat("terracotta", "#ae6956");
+    const stone = mat("steel", "#344854"),
+      light = mat("alloy", "#728c94"),
+      edge = mat("carbon", "#142630"),
+      grass = mat("circuit floor", "#172d35"),
+      dark = mat("deep carbon", "#14242d"),
+      gold = mat("amber", "#d6a25f", true),
+      teal = mat("signal cyan", "#4fb6c2", true),
+      wood = mat("walnut", "#655044"),
+      red = mat("oxblood", "#a15c58");
     const box = (
       name: string,
       x: number,
@@ -321,28 +342,267 @@ function WorldCanvas(props: Props) {
       plane.metadata = { interaction: id };
     };
     const tree = (x: number, z: number, scale = 1) => {
-      cylinder("trunk", x, 0.7 * scale, z, 0.16 * scale, 1.4 * scale, wood, 7);
-      for (let n = 0; n < 3; n++) {
-        const crown = MeshBuilder.CreateCylinder(
-          "cypress",
-          {
-            diameterTop: 0.05,
-            diameterBottom: (1.5 - n * 0.23) * scale,
-            height: 1.5 * scale,
-            tessellation: 7,
-          },
-          scene,
+      box(
+        "data tower",
+        x,
+        1.2 * scale,
+        z,
+        0.7 * scale,
+        2.4 * scale,
+        0.7 * scale,
+        dark,
+      );
+      for (let n = 0; n < 5; n++)
+        box(
+          "data indicator",
+          x,
+          (0.4 + n * 0.4) * scale,
+          z - 0.36 * scale,
+          0.45 * scale,
+          0.06 * scale,
+          0.04,
+          n % 2 ? teal : gold,
         );
-        crown.position.set(x, (1.4 + n * 0.55) * scale, z);
-        crown.material = n === 1 ? grass : dark;
-      }
+      box(
+        "tower cap",
+        x,
+        2.45 * scale,
+        z,
+        0.85 * scale,
+        0.12,
+        0.85 * scale,
+        stone,
+      );
     };
     const pillar = (x: number, z: number, height = 2.4) => {
       box("plinth", x, 0.15, z, 0.85, 0.3, 0.85, edge);
       cylinder("column", x, height / 2 + 0.3, z, 0.27, height, light);
       box("capital", x, height + 0.35, z, 0.85, 0.25, 0.85, light);
     };
-    if (props.scene === "maze") {
+    if (props.scene === "desk") {
+      const wall = mat("office walls", "#253139"),
+        paper = mat("case paper", "#c9b895"),
+        black = mat("terminal black", "#101d25"),
+        glass = mat("night glass", "#193d53", true);
+      box("office floor", 0, -0.3, 0.5, 15, 0.5, 12, dark);
+      box("office back wall", 0, 2.7, 3.8, 15, 6, 0.3, wall);
+      for (let x = -7; x <= 7; x += 1.2)
+        box("wall panel", x, 2.5, 3.61, 0.025, 5.4, 0.04, stone);
+      box("rain window frame", 4.5, 3.2, 3.5, 3.9, 4.1, 0.2, black);
+      box("city beyond glass", 4.5, 3.2, 3.35, 3.6, 3.8, 0.08, glass);
+      for (let i = 0; i < 8; i++) {
+        const h = 0.6 + ((i * 31) % 15) / 10;
+        box(
+          "distant building",
+          3 + i * 0.42,
+          1.6 + h / 2,
+          3.28,
+          0.32,
+          h,
+          0.03,
+          dark,
+        );
+        for (let j = 0; j < 3; j++)
+          box(
+            "city window",
+            3 + i * 0.42,
+            1.9 + j * 0.36,
+            3.23,
+            0.06,
+            0.1,
+            0.02,
+            i % 2 ? teal : gold,
+          );
+      }
+      box("window crossbar", 4.5, 3.2, 3.15, 3.8, 0.1, 0.12, black);
+      box("window mullion", 4.5, 3.2, 3.15, 0.1, 4, 0.12, black);
+      for (let i = 0; i < 10; i++)
+        box(
+          "rain on window",
+          2.9 + i * 0.35,
+          3 + (i % 3) * 0.45,
+          3.12,
+          0.012,
+          1.4,
+          0.012,
+          teal,
+        );
+      // The menu is composed of physical, selectable objects.
+      const board = box("caseboard", -2.3, 3.2, 3.42, 5.4, 2.9, 0.22, wood);
+      board.metadata = { interaction: "quest" };
+      box("board upper frame", -2.3, 4.68, 3.25, 5.65, 0.14, 0.16, gold);
+      box("board lower frame", -2.3, 1.72, 3.25, 5.65, 0.14, 0.16, wood);
+      const pins: [number, number][] = [
+        [-4.1, 3.85],
+        [-2.6, 3.7],
+        [-0.8, 3.9],
+        [-3.4, 2.55],
+        [-1.3, 2.5],
+      ];
+      pins.forEach(([x, y], i) => {
+        const p = box(
+          "pinned evidence",
+          x,
+          y,
+          3.22,
+          0.85,
+          0.85,
+          0.035,
+          i === 1 ? black : paper,
+        );
+        p.rotation.z = i % 2 ? 0.08 : -0.07;
+        p.metadata = { interaction: "quest" };
+        const pin = MeshBuilder.CreateSphere(
+          "evidence pin",
+          { diameter: 0.07, segments: 6 },
+          scene,
+        );
+        pin.position.set(x, y + 0.32, 3.16);
+        pin.material = red;
+      });
+      for (const [a, b] of [
+        [0, 1],
+        [1, 2],
+        [1, 3],
+        [3, 4],
+        [4, 2],
+      ]) {
+        const thread = MeshBuilder.CreateLines(
+          "evidence thread",
+          {
+            points: [
+              new Vector3(...pins[a], 3.12),
+              new Vector3(...pins[b], 3.12),
+            ],
+          },
+          scene,
+        );
+        thread.color = Color3.FromHexString("#a26458");
+      }
+      label("CASE 007 / ECHO-7", -2.3, 5.05, 3.1, "quest");
+      box("detective desk", 0, 1.15, 0, 10, 0.3, 4.2, wood);
+      box("desk leather", 0.4, 1.32, -0.15, 5.8, 0.025, 2.8, black);
+      for (const x of [-4.2, 4.2])
+        for (const z of [-1.4, 1.4])
+          box("desk leg", x, 0.4, z, 0.22, 1.5, 0.22, stone);
+      const monitor = box(
+        "network terminal",
+        1.1,
+        2.4,
+        0.7,
+        2.7,
+        1.8,
+        0.24,
+        black,
+      );
+      monitor.metadata = { interaction: "network" };
+      const screen = box(
+        "terminal screen",
+        1.1,
+        2.4,
+        0.56,
+        2.42,
+        1.5,
+        0.025,
+        glass,
+      );
+      screen.metadata = { interaction: "network" };
+      box("screen glow", 1.1, 2.4, 0.53, 1.9, 0.025, 0.02, teal);
+      label("GO ONLINE", 1.1, 2.55, 0.35, "network");
+      box("monitor stand", 1.1, 1.5, 0.7, 0.18, 0.5, 0.2, stone);
+      box("monitor foot", 1.1, 1.35, 0.5, 1.3, 0.07, 0.6, stone);
+      const keyboard = box(
+        "terminal keyboard",
+        1,
+        1.39,
+        -0.75,
+        2.4,
+        0.1,
+        0.8,
+        stone,
+      );
+      keyboard.metadata = { interaction: "network" };
+      for (let i = 0; i < 10; i++)
+        for (let row = 0; row < 3; row++)
+          box(
+            "keyboard key",
+            -0.02 + i * 0.22,
+            1.46,
+            -0.52 - row * 0.18,
+            0.16,
+            0.025,
+            0.13,
+            black,
+          );
+      for (let i = 0; i < 4; i++) {
+        const book = box(
+          "reference volume",
+          -2.9 + i * 0.1,
+          1.43 + i * 0.18,
+          -0.4,
+          1.25,
+          0.16,
+          1.4,
+          i % 2 ? stone : red,
+        );
+        book.rotation.y = 0.1 * i;
+        book.metadata = { interaction: "library" };
+      }
+      label("REFERENCE LIBRARY", -3.1, 2.5, -0.5, "library");
+      const file = box(
+        "evidence folder",
+        -1.4,
+        1.37,
+        -1.1,
+        1.3,
+        0.04,
+        0.9,
+        paper,
+      );
+      file.rotation.y = -0.14;
+      file.metadata = { interaction: "quest" };
+      const badge = cylinder(
+        "detective badge",
+        3.5,
+        1.4,
+        -1.1,
+        0.36,
+        0.08,
+        gold,
+        6,
+      );
+      badge.metadata = { interaction: "inventory" };
+      cylinder("lamp base", -4, 1.4, 0.8, 0.4, 0.12, black);
+      box("lamp arm", -4, 2.1, 0.8, 0.08, 1.5, 0.08, stone);
+      const shade = MeshBuilder.CreateCylinder(
+        "desk lamp",
+        {
+          diameterTop: 0.25,
+          diameterBottom: 0.95,
+          height: 0.5,
+          tessellation: 14,
+        },
+        scene,
+      );
+      shade.position.set(-3.8, 2.9, 0.65);
+      shade.material = dark;
+      const lamp = new PointLight(
+        "desk light",
+        new Vector3(-3.8, 2.65, 0.65),
+        scene,
+      );
+      lamp.diffuse = new Color3(1, 0.64, 0.3);
+      lamp.intensity = 1.1;
+      lamp.range = 7;
+      const connectionLight = new PointLight(
+        "terminal light",
+        new Vector3(1.1, 2.2, -0.1),
+        scene,
+      );
+      connectionLight.diffuse = new Color3(0.2, 0.7, 1);
+      connectionLight.intensity = 0.5;
+      connectionLight.range = 4;
+    } else if (props.scene === "maze") {
       const m = props.maze;
       box(
         "maze foundation",
@@ -391,6 +651,47 @@ function WorldCanvas(props: Props) {
         [5, -6],
       ])
         tree(x, z, 0.85);
+    } else if (props.encounter) {
+      box("arena floor", 5, -0.2, 4, 24, 0.3, 18, dark);
+      box("arena wall", 5, 3, 8, 24, 7, 0.3, edge);
+      for (let i = 0; i < 9; i++) {
+        const x = -3 + i * 2;
+        box("server rack", x, 2, 7, 1.2, 4, 0.7, stone);
+        for (let j = 0; j < 7; j++)
+          box(
+            "server light",
+            x,
+            0.6 + j * 0.45,
+            6.62,
+            0.7,
+            0.04,
+            0.03,
+            j % 3 ? teal : gold,
+          );
+      }
+      cylinder("sentinel platform", 5, 0.05, 4, 3, 0.2, stone, 32);
+      cylinder("platform ring", 5, 0.17, 4, 2.4, 0.04, teal, 32);
+      cylinder("platform inset", 5, 0.2, 4, 2.25, 0.04, edge, 32);
+      box("sentinel torso", 5, 1.55, 4, 1.45, 1.65, 0.85, light);
+      box("chest plate", 5, 1.55, 3.53, 1.14, 1.1, 0.13, stone);
+      box("chest indicator", 5, 1.7, 3.44, 0.42, 0.13, 0.05, teal);
+      box("sentinel head", 5, 2.75, 4, 1.05, 0.7, 0.8, stone);
+      box("optical visor", 5, 2.8, 3.57, 0.84, 0.16, 0.06, gold);
+      for (const side of [-1, 1]) {
+        box("shoulder", 5 + side * 1.03, 2.12, 4, 0.55, 0.5, 0.85, stone);
+        box("arm", 5 + side * 1.03, 1.43, 4, 0.4, 1.05, 0.55, light);
+        box("hand", 5 + side * 1.03, 0.82, 4, 0.44, 0.32, 0.55, stone);
+        box("leg", 5 + side * 0.43, 0.52, 4, 0.47, 0.6, 0.6, light);
+        box("foot", 5 + side * 0.43, 0.28, 3.86, 0.57, 0.2, 0.9, stone);
+      }
+      const spotlight = new PointLight(
+        "sentinel light",
+        new Vector3(5, 3, 1),
+        scene,
+      );
+      spotlight.diffuse = new Color3(0.45, 0.78, 1);
+      spotlight.intensity = 1;
+      spotlight.range = 9;
     } else {
       box("floating foundation", 0, -1.1, 0, 20, 2, 17, edge);
       box("academy grounds", 0, -0.1, 0, 20, 0.25, 17, grass);
@@ -436,7 +737,7 @@ function WorldCanvas(props: Props) {
       box("arch", 5, 3.7, -3, 3.5, 0.7, 1, light);
       const door = box("maze portal", 5, 1.6, -3, 1.8, 2.8, 0.18, teal);
       door.metadata = { interaction: "maze" };
-      label("WANDERING PATHS", 5, 4.8, -3, "maze");
+      label("PACKET LABYRINTH", 5, 4.8, -3, "maze");
       for (let i = 0; i < 3; i++)
         box(
           "gate steps",
@@ -458,7 +759,7 @@ function WorldCanvas(props: Props) {
       box("guardian eye", 5, 2.25, 3.58, 0.55, 0.12, 0.08, gold);
       for (const x of [4.15, 5.85])
         box("guardian arm", x, 1.25, 4, 0.4, 1.1, 0.55, stone);
-      label("ARCHIVE GUARDIAN", 5, 3.6, 4, "battle");
+      if (!props.encounter) label("SENTINEL A-03", 5, 3.6, 4, "battle");
       // The learning garden.
       cylinder("garden pool", -5, 0.1, 4, 2.4, 0.3, stone, 24);
       cylinder("garden water", -5, 0.28, 4, 2, 0.1, teal, 32);
@@ -486,9 +787,9 @@ function WorldCanvas(props: Props) {
           wood,
         );
       }
-      label("LEARNING GARDEN", -5, 3.6, 4, "garden");
+      label("INFERENCE LAB", -5, 3.6, 4, "garden");
       cylinder("academy seal", 0, 0.2, -5, 1.1, 0.35, gold);
-      label("ACADEMY SEAL", 0, 2, -5, "quest");
+      label("TRACE RELAY", 0, 2, -5, "quest");
       for (const [x, z, s] of [
         [-9, -6, 1],
         [-8, 6, 1.2],
@@ -508,6 +809,7 @@ function WorldCanvas(props: Props) {
     }
     const actor = cylinder("wanderer", 0, 0.5, 0, 0.24, 0.75, red, 8);
     actorRef.current = actor;
+    if (props.scene === "desk" || props.encounter) actor.setEnabled(false);
     const head = MeshBuilder.CreateSphere(
       "wanderer head",
       { diameter: 0.4, segments: 8 },
@@ -539,6 +841,7 @@ function WorldCanvas(props: Props) {
     });
     const down = (event: KeyboardEvent) => {
       const target = event.target as HTMLElement;
+      if (latest.current.scene === "desk" || latest.current.encounter) return;
       if (
         target.closest(
           'input,textarea,select,[contenteditable="true"],.blocklyDiv',
@@ -597,13 +900,17 @@ function WorldCanvas(props: Props) {
       actorRef.current = null;
       scene.dispose();
     };
-  }, [ready, props.scene, props.maze.seed, props.renderer]);
+  }, [ready, props.scene, props.maze.seed, props.renderer, props.encounter]);
   return (
     <>
       <canvas
         ref={canvas}
-        className={`world-canvas ${props.scene === 'maze' ? 'maze-world' : ''}`}
-        aria-label="Interactive academy world. WASD to move, E to interact. Use the destination buttons for keyboard navigation."
+        className={`world-canvas ${props.scene === "maze" ? "maze-world" : ""} ${props.encounter ? "boss-world" : ""}`}
+        aria-label={
+          props.scene === "desk"
+            ? "Detective’s desk. Select the caseboard, reference books, or network terminal."
+            : "Interactive network world. WASD to move, E to interact. Use destination buttons for keyboard navigation."
+        }
         tabIndex={0}
       />
       {error ? (

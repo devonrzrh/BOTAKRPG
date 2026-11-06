@@ -25,7 +25,7 @@ export function createBattle(): Battle {
     skill: null,
     question: null,
     effects: [],
-    log: ["The archive guardian awaits your answer."],
+    log: ["Sentinel encounter started."],
     assisted: false,
   };
 }
@@ -89,7 +89,7 @@ export function answerBattle(
         magnitude: def.magnitude,
       });
     }
-  } else next.log.push("The answer slips away. Your turn is spent.");
+  } else next.log.push("Incorrect answer. Turn spent.");
   next.log.push(question.explanation);
   next.phase = next.hp === 0 ? "won" : "feedback";
   return { battle: next, save: player, correct };
@@ -116,7 +116,7 @@ export function enemyTurn(
     .reduce((sum, e) => sum + e.magnitude, 0);
   const damage = Math.max(1, 10 - stats(save, content).defense - reduction);
   player.character.hp = Math.max(0, player.character.hp - damage);
-  next.log.push(`Guardian strikes for ${damage}.`);
+  next.log.push(`Sentinel deals ${damage} damage.`);
   next.effects = next.effects
     .map((e) => ({ ...e, remaining: e.remaining - 1 }))
     .filter((e) => e.remaining > 0);
