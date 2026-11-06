@@ -38,7 +38,7 @@ clue:
 type: quest
 id: first-principles
 title: Trace ECHO-7
-description: Recover ECHO-7’s address by completing these three objectives.
+description: Pursue three clue branches in any order. Combine their evidence to locate ECHO-7.
 objectives: [maze-chamber, guardian-battle, perceptron-exhibit]
 xp: 120
 rewards: [scholar-charm, healing-draught]

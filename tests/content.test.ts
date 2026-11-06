@@ -61,6 +61,17 @@ it("compiles sample curriculum with all public record types", () => {
   const c = validateContent(raw);
   expect(new Set(c.entities.map((x) => x.type)).size).toBe(9);
 });
+it("validates quest prerequisites and rejects dependency cycles", () => {
+  const missing = structuredClone(raw);
+  missing.entities.find((e) => e.type === "quest")!.prerequisites = [
+    "missing-quest",
+  ];
+  expect(() => validateContent(missing)).toThrow(/missing quest reference/);
+  const cycle = structuredClone(raw);
+  const q = cycle.entities.find((e) => e.type === "quest")!;
+  q.prerequisites = [q.id];
+  expect(() => validateContent(cycle)).toThrow(/cycle/);
+});
 it("parses Markdown frontmatter and removes executable-looking entity blocks from lesson body", () => {
   const result = parseMarkdown(
     "---\ntype: lesson\nid: example\ntitle: Example\ntopic: ai\nsummary: A lesson\n---\n# Hello\n```question\nid: q\ntitle: A question\nlesson: example\nformat: choice\nprompt: A prompt\noptions: [one, two]\nanswer: [0]\nexplanation: Because one\n```",

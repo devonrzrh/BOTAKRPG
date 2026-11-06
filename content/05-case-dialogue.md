@@ -16,7 +16,7 @@ nodes:
         action: close
   - id: obstacles
     speaker: Dispatch
-    text: 'A routing maze, a security sentinel, and a damaged signal classifier. Recover a clue from each. The books on your shelf cover the tools you need.'
+    text: 'Three leads: a routing maze, a security archive, and a signal classifier. Follow them in any order. Their materials are on your bookshelf. Once all three clues are recovered, we can reach ECHO-7.'
     choices:
       - label: Why did it run?
         next: motive

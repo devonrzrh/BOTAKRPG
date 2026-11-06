@@ -54,6 +54,8 @@ Saves contain character stats, inventory, completion and reward claims, mastery 
 
 This slice is single-player, desktop-first, and uses placeholder art. It has no accounts, cloud synchronization, telemetry, LLM generation, or multiplayer. Python is for trusted self-study code: a worker keeps execution off the UI thread, but is not a security boundary against deliberately hostile Python/JS interop. Content cannot define arbitrary executable templates.
 
-The prologue is a short interactive chase. The playable chapter ends when all three case objectives are complete. The abandoned subnet is a later chapter.
+The prologue is a short interactive chase. Three parallel clue quests can be pursued in any order. Each links its materials, activity, clue, and reward. Recovering all three clues unlocks ECHO-7 in the abandoned subnet. The final battle draws questions from all three material topics and closes the case on victory. Branch and finale rewards can each be claimed once.
 
 The room camera follows the cursor slightly. Switching walls adds a brief blur; Settings → Reduce movement animation disables camera movement and transition blur. Dialogues use validated node graphs in Markdown, and cutscenes support configurable frames and pursuit steps. The first network connection plays once per save.
+
+Text uses local regular-weight UI fonts and typewriter headings. No web-font download is required.

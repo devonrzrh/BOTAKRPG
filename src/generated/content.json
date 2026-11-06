@@ -208,7 +208,7 @@
       "id": "first-principles",
       "title": "Trace ECHO-7",
       "type": "quest",
-      "description": "Recover ECHO-7’s address by completing these three objectives.",
+      "description": "Pursue three clue branches in any order. Combine their evidence to locate ECHO-7.",
       "objectives": [
         "maze-chamber",
         "guardian-battle",
@@ -218,7 +218,9 @@
       "rewards": [
         "scholar-charm",
         "healing-draught"
-      ]
+      ],
+      "kind": "case",
+      "prerequisites": []
     },
     {
       "id": "healing-draught",
@@ -342,7 +344,7 @@
         {
           "id": "obstacles",
           "speaker": "Dispatch",
-          "text": "A routing maze, a security sentinel, and a damaged signal classifier. Recover a clue from each. The books on your shelf cover the tools you need.",
+          "text": "Three leads: a routing maze, a security archive, and a signal classifier. Follow them in any order. Their materials are on your bookshelf. Once all three clues are recovered, we can reach ECHO-7.",
           "choices": [
             {
               "label": "Why did it run?",
@@ -392,6 +394,92 @@
         }
       ],
       "body": ""
+    },
+    {
+      "id": "routing-trace",
+      "title": "Routing trace",
+      "type": "quest",
+      "description": "Follow the packet route to recover a routing table.",
+      "objectives": [
+        "maze-chamber"
+      ],
+      "xp": 20,
+      "rewards": [
+        "focus-tea"
+      ],
+      "kind": "branch",
+      "prerequisites": [],
+      "lesson": "graph-search"
+    },
+    {
+      "id": "access-records",
+      "title": "Access records",
+      "type": "quest",
+      "description": "Get past the sentinel and retrieve the gateway log.",
+      "objectives": [
+        "guardian-battle"
+      ],
+      "xp": 20,
+      "rewards": [
+        "healing-draught"
+      ],
+      "kind": "branch",
+      "prerequisites": [],
+      "lesson": "stacks-queues"
+    },
+    {
+      "id": "signal-identification",
+      "title": "Signal identification",
+      "type": "quest",
+      "description": "Train a classifier to identify ECHO-7’s outgoing signal.",
+      "objectives": [
+        "perceptron-exhibit"
+      ],
+      "xp": 20,
+      "rewards": [
+        "focus-tea"
+      ],
+      "kind": "branch",
+      "prerequisites": [],
+      "lesson": "perceptron-basics"
+    },
+    {
+      "id": "echo-battle",
+      "title": "ECHO-7",
+      "type": "activity",
+      "template": "battle",
+      "lesson": "perceptron-basics",
+      "seed": 42,
+      "enemy": {
+        "id": "echo-7",
+        "title": "ECHO-7",
+        "hp": 105,
+        "attack": 10,
+        "mixedQuestions": true
+      },
+      "clue": {
+        "title": "ECHO-7 located",
+        "text": "The robot has been contained in the abandoned subnet. Case closed."
+      }
+    },
+    {
+      "id": "confront-echo",
+      "title": "Confront ECHO-7",
+      "type": "quest",
+      "description": "Combine the three clues to reach the robot in the abandoned subnet.",
+      "objectives": [
+        "echo-battle"
+      ],
+      "xp": 100,
+      "rewards": [
+        "healing-draught"
+      ],
+      "kind": "finale",
+      "prerequisites": [
+        "routing-trace",
+        "access-records",
+        "signal-identification"
+      ]
     }
   ]
 }

@@ -1,0 +1,177 @@
+:root {
+  --ui-font: "Segoe UI", Arial, sans-serif;
+  --typewriter: Consolas, "Courier New", monospace;
+  --serif: var(--typewriter);
+  font-family: var(--ui-font);
+  font-weight: 400;
+}
+body,
+button,
+input,
+textarea,
+select {
+  font-family: var(--ui-font);
+  font-weight: 400;
+}
+h1,
+h2,
+h3,
+.brand,
+.scene-heading h1,
+.active-quest h3,
+.prologue-copy h1,
+.character-banner h2,
+.markdown h1,
+.markdown h2 {
+  font-family: var(--typewriter);
+  font-weight: 400;
+  letter-spacing: 0;
+}
+button,
+strong,
+h4 {
+  font-weight: 600;
+}
+p,
+.markdown,
+.markdown p {
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.7;
+}
+.markdown h1 {
+  font-size: 27px;
+}
+.markdown h2 {
+  font-size: 23px;
+}
+.scene-heading h1 {
+  font-size: 34px;
+}
+.active-quest h3 {
+  font-size: 23px;
+}
+.combat-actions h2 {
+  font-family: var(--ui-font);
+  font-size: 25px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+.answer-options button {
+  font-size: 14px;
+  font-weight: 400;
+}
+.mini-objective {
+  display: flex;
+  width: 100%;
+  text-align: left;
+  font-size: 12px;
+  line-height: 1.5;
+}
+.section-eyebrow,
+.sidebar-section-title,
+.chapter,
+.pill {
+  font-size: 10px;
+  letter-spacing: 1px;
+  font-weight: 400;
+}
+.board-file strong {
+  font-weight: 600;
+  font-size: 15px;
+}
+.board-file small,
+.suspect-note small,
+.suspect-note > span:not(.paper-pin) {
+  font-size: 12px;
+  line-height: 1.5;
+  color: #414b46;
+}
+.profile-mini div > span,
+.vitals span,
+.xp-row,
+.skill-list small,
+.item-card p,
+.skill-node p {
+  font-size: 12px;
+}
+.branch-quests {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 15px;
+  margin: 24px 0;
+}
+.home-quests {
+  width: min(1100px, 92vw);
+}
+.home-quests .case-summary .suspect-file {
+  display: none;
+}
+.branch-card .branch-actions {
+  flex-direction: column;
+  align-items: stretch;
+}
+.branch-card .branch-actions button {
+  justify-content: flex-start;
+  text-align: left;
+}
+.branch-card p {
+  min-height: 75px;
+  font-size: 13px;
+}
+@media (max-width: 900px) {
+  .branch-quests {
+    grid-template-columns: 1fr;
+  }
+  .branch-card p {
+    min-height: 0;
+  }
+  .branch-card .branch-actions {
+    flex-direction: row;
+  }
+}
+.branch-card {
+  padding: 20px;
+  background: #172923;
+  border: 1px solid #546259;
+  position: relative;
+}
+.branch-card h3 {
+  font: 600 18px var(--typewriter);
+  margin: 10px 0;
+}
+.branch-card p {
+  margin-bottom: 15px;
+  color: #b2c4be;
+}
+.branch-card .branch-status {
+  font: 12px var(--typewriter);
+  color: #d2be91;
+}
+.branch-card .branch-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.branch-card button {
+  font-size: 12px;
+}
+.finale-card {
+  margin: 28px 0;
+  padding: 22px;
+  border: 1px solid #ac8662;
+  background: #2b302b;
+}
+.finale-card h3 {
+  font: 600 22px var(--typewriter);
+}
+.finale-card p {
+  color: #c1c5b7;
+}
+.finale-card button {
+  font-size: 13px;
+}
+.finale-card .case-closed {
+  color: #9ccbb5;
+  font: 600 18px var(--typewriter);
+}

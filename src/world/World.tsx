@@ -35,6 +35,7 @@ export interface WorldMetrics {
 interface Props {
   scene: SceneId;
   encounter?: boolean;
+  finalBoss?: boolean;
   homeWall?: HomeWall;
   homeLookLocked?: boolean;
   maze: Maze;
@@ -463,7 +464,16 @@ function WorldCanvas(props: Props) {
       box("chest plate", 5, 1.55, 3.53, 1.14, 1.1, 0.13, stone);
       box("chest indicator", 5, 1.7, 3.44, 0.42, 0.13, 0.05, teal);
       box("sentinel head", 5, 2.75, 4, 1.05, 0.7, 0.8, stone);
-      box("optical visor", 5, 2.8, 3.57, 0.84, 0.16, 0.06, gold);
+      box(
+        "optical visor",
+        5,
+        2.8,
+        3.57,
+        0.84,
+        0.16,
+        0.06,
+        props.finalBoss ? red : gold,
+      );
       for (const side of [-1, 1]) {
         box("shoulder", 5 + side * 1.03, 2.12, 4, 0.55, 0.5, 0.85, stone);
         box("arm", 5 + side * 1.03, 1.43, 4, 0.4, 1.05, 0.55, light);
@@ -687,7 +697,14 @@ function WorldCanvas(props: Props) {
       actorRef.current = null;
       scene.dispose();
     };
-  }, [ready, props.scene, props.maze.seed, props.renderer, props.encounter]);
+  }, [
+    ready,
+    props.scene,
+    props.maze.seed,
+    props.renderer,
+    props.encounter,
+    props.finalBoss,
+  ]);
   return (
     <>
       <canvas

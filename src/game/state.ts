@@ -1,6 +1,7 @@
 import { z } from "zod";
 import type { Content, Item, Quest, Skill } from "../content/schema";
 import { STARTER_CODE } from "./maze";
+import { questUnlocked } from "./investigation";
 const masterySchema = z.object({
   correct: z.number().int().nonnegative(),
   attempted: z.number().int().nonnegative(),
@@ -150,8 +151,10 @@ export function evidence(save: Save, lesson: string, proof: string): Save {
     },
   };
 }
-export function claimQuest(save: Save, quest: Quest): Save {
+export function claimQuest(save: Save, quest: Quest, content?: Content): Save {
   if (
+    (quest.prerequisites.length > 0 &&
+      (!content || !questUnlocked(save, quest, content))) ||
     save.claimed.includes(quest.id) ||
     !quest.objectives.every((id) => save.completed.includes(id))
   )
@@ -193,6 +196,15 @@ export function parseSave(input: unknown, content: Content): Save {
   check(Object.keys(save.mastery), "lesson");
   check(save.character.skills, "skill");
   check(Object.keys(save.inventory), "item");
+  for (const quest of content.entities.filter(
+    (e): e is Quest => e.type === "quest" && e.kind === "finale",
+  )) {
+    if (
+      quest.objectives.some((id) => save.completed.includes(id)) &&
+      !questUnlocked(save, quest, content)
+    )
+      throw new Error("Final encounter requires all clue branches");
+  }
   if (save.character.equipment) check([save.character.equipment], "item");
   const s = stats(save, content);
   if (

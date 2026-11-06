@@ -51,6 +51,15 @@ export const activitySchema = z.object({
   template: z.enum(["maze", "battle", "perceptron"]),
   lesson: id,
   seed: z.number().int().default(42),
+  enemy: z
+    .object({
+      id,
+      title: z.string().min(1),
+      hp: z.number().int().positive(),
+      attack: z.number().int().positive(),
+      mixedQuestions: z.boolean().default(false),
+    })
+    .optional(),
   clue: z
     .object({ title: z.string().min(1), text: z.string().min(1) })
     .optional(),
@@ -62,6 +71,9 @@ export const questSchema = z.object({
   objectives: z.array(id).min(1),
   xp: z.number().int().positive(),
   rewards: z.array(id),
+  kind: z.enum(["case", "branch", "finale"]).default("case"),
+  prerequisites: z.array(id).default([]),
+  lesson: id.optional(),
 });
 export const storySchema = z.object({
   ...base,
@@ -165,7 +177,8 @@ export function validateContent(input: unknown): Content {
       );
   };
   for (const entity of content.entities) {
-    if ("lesson" in entity) ref(entity.id, entity.lesson, "lesson");
+    if ("lesson" in entity && entity.lesson)
+      ref(entity.id, entity.lesson, "lesson");
     if (entity.type === "lesson")
       for (const prerequisite of entity.prerequisites)
         ref(entity.id, prerequisite, "lesson");
@@ -174,6 +187,7 @@ export function validateContent(input: unknown): Content {
       if (entity.effect) ref(entity.id, entity.effect, "effect");
     }
     if (entity.type === "quest") {
+      entity.prerequisites.forEach((x) => ref(entity.id, x, "quest"));
       entity.objectives.forEach((x) => ref(entity.id, x, "activity"));
       entity.rewards.forEach((x) => ref(entity.id, x, "item"));
     }
@@ -203,6 +217,7 @@ export function validateContent(input: unknown): Content {
     const entity = map.get(key)!;
     if (entity.type === "lesson") entity.prerequisites.forEach(walk);
     if (entity.type === "skill" && entity.parent) walk(entity.parent);
+    if (entity.type === "quest") entity.prerequisites.forEach(walk);
     visiting.delete(key);
     visited.add(key);
   }

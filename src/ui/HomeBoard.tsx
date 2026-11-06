@@ -9,10 +9,14 @@ export function HomeBoard({
   onSelect,
   accepted,
   completed,
+  finaleReady,
+  caseClosed,
 }: {
   onSelect: (id: string) => void;
   accepted: boolean;
   completed: string[];
+  finaleReady: boolean;
+  caseClosed: boolean;
 }) {
   return (
     <section className="investigation-board" aria-label="Investigation wall">
@@ -80,16 +84,30 @@ export function HomeBoard({
         </button>
         <button
           className="pinned-paper board-file terminal-note"
-          onClick={() => onSelect("network")}
+          onClick={() => onSelect(finaleReady ? "echo" : "network")}
         >
           <span className="paper-pin" />
           <Monitor />
-          <strong>Go online</strong>
-          <small>Track ECHO-7</small>
+          <strong>
+            {caseClosed
+              ? "Replay ECHO-7"
+              : finaleReady
+                ? "Confront ECHO-7"
+                : "Go online"}
+          </strong>
+          <small>
+            {caseClosed
+              ? "Case closed"
+              : finaleReady
+                ? "All clues recovered"
+                : "Track ECHO-7"}
+          </small>
           <ArrowUpRight size={17} />
         </button>
       </div>
-      <span className="board-stamp">{accepted ? "ACTIVE" : "UNASSIGNED"}</span>
+      <span className="board-stamp">
+        {caseClosed ? "CLOSED" : accepted ? "ACTIVE" : "UNASSIGNED"}
+      </span>
     </section>
   );
 }

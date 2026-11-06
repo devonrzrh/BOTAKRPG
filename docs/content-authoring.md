@@ -65,3 +65,9 @@ The compiler rejects malformed fields, duplicate IDs, unresolved references, inv
 A `type: dialogue` record has `id`, `title`, `start`, and `nodes`. Each node has a unique `id`, a `speaker`, `text`, and `choices`. Each choice has a `label` and exactly one of `next` (an existing node ID) or `action` (`accept-case` or `close`). See `content/05-case-dialogue.md`. Missing targets and ambiguous choices fail validation. Dialogue loops are allowed.
 
 Activities may supply `clue: { title, text }`. Completed quest objectives expose those clues on the quest board. Clues derive from saved completion IDs; no separate duplicate reward can be claimed. Briefing, quest acceptance, and connection cutscene flags persist with story progress.
+
+## Quest branches and finale
+
+Quest `kind` is `case` (default), `branch`, or `finale`. Each branch may link a `lesson`. Quest `prerequisites` reference other quests; the compiler rejects missing references and cycles. A prerequisite is satisfied when its objectives are complete; reward claiming is optional for unlocks. See `content/07-quest-branches.md`.
+
+Battle activities may configure an `enemy` with `id`, `title`, positive integer `hp` and `attack`, and `mixedQuestions` (default false). Mixed encounters select from the full question bank; ordinary encounters select by skill lesson. The finale uses this shared battle implementation.

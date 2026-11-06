@@ -6,6 +6,10 @@ export interface ActiveEffect {
   magnitude: number;
 }
 export interface Battle {
+  enemyId: string;
+  enemyName: string;
+  attack: number;
+  mixedQuestions: boolean;
   hp: number;
   maxHp: number;
   turn: number;
@@ -16,16 +20,28 @@ export interface Battle {
   log: string[];
   assisted: boolean;
 }
-export function createBattle(): Battle {
-  return {
+export function createBattle(
+  enemy = {
+    id: "sentinel",
+    title: "Sentinel A-03",
     hp: 76,
-    maxHp: 76,
+    attack: 10,
+    mixedQuestions: false,
+  },
+): Battle {
+  return {
+    enemyId: enemy.id,
+    enemyName: enemy.title,
+    attack: enemy.attack,
+    mixedQuestions: enemy.mixedQuestions,
+    hp: enemy.hp,
+    maxHp: enemy.hp,
     turn: 1,
     phase: "choose",
     skill: null,
     question: null,
     effects: [],
-    log: ["Sentinel encounter started."],
+    log: [`${enemy.title} encounter started.`],
     assisted: false,
   };
 }
@@ -41,7 +57,9 @@ export function selectSkill(
     save.character.focus < skill.cost
   )
     throw new Error("Skill unavailable");
-  const pool = questions.filter((q) => q.lesson === skill.lesson);
+  const pool = battle.mixedQuestions
+    ? questions
+    : questions.filter((q) => q.lesson === skill.lesson);
   if (!pool.length) throw new Error("No questions for this skill");
   return {
     ...battle,
@@ -114,9 +132,12 @@ export function enemyTurn(
   const reduction = next.effects
     .filter((e) => e.id === "shield" || e.id === "weaken")
     .reduce((sum, e) => sum + e.magnitude, 0);
-  const damage = Math.max(1, 10 - stats(save, content).defense - reduction);
+  const damage = Math.max(
+    1,
+    battle.attack - stats(save, content).defense - reduction,
+  );
   player.character.hp = Math.max(0, player.character.hp - damage);
-  next.log.push(`Sentinel deals ${damage} damage.`);
+  next.log.push(`${battle.enemyName} deals ${damage} damage.`);
   next.effects = next.effects
     .map((e) => ({ ...e, remaining: e.remaining - 1 }))
     .filter((e) => e.remaining > 0);

@@ -57,6 +57,8 @@ import { Cutscene } from "./ui/Cutscene";
 import { Dialogue } from "./ui/Dialogue";
 import { MenuBar } from "./ui/MenuBar";
 import { HomeBoard } from "./ui/HomeBoard";
+import { QuestBranches, FinaleCard } from "./ui/QuestBranches";
+import { finaleAvailable } from "./game/investigation";
 import type { HomeWall } from "./world/Office";
 import { atGoal, move, shortestPath, type Maze } from "./game/maze";
 import {
@@ -110,7 +112,19 @@ const questions = content.entities.filter(
 );
 const skills = content.entities.filter((e): e is Skill => e.type === "skill");
 const items = content.entities.filter((e): e is Item => e.type === "item");
-const quest = content.entities.find((e): e is Quest => e.type === "quest")!;
+const quest = content.entities.find(
+  (e): e is Quest => e.type === "quest" && e.id === "first-principles",
+)!;
+const echoActivity = content.entities.find(
+  (e) => e.type === "activity" && e.id === "echo-battle",
+)!;
+const activityDestination = (id: string) =>
+  ({
+    "maze-chamber": "maze",
+    "guardian-battle": "battle",
+    "perceptron-exhibit": "garden",
+    "echo-battle": "echo",
+  })[id] ?? "quest";
 const story = content.entities.find(
   (e): e is Story => e.id === "rogue-signal" && e.type === "story",
 )!;
@@ -393,6 +407,10 @@ export default function App() {
   const open = useCallback(
     (id: string) => {
       if (id === "exit") return;
+      if (id === "echo" && !finaleAvailable(saveRef.current, content)) {
+        setToast("Recover all three clues first.");
+        return;
+      }
       generation.current++;
       runner.current?.reset();
       setLine(0);
@@ -440,18 +458,31 @@ export default function App() {
         return;
       }
       if (
-        ["battle", "maze", "garden"].includes(id) &&
+        ["battle", "maze", "garden", "echo"].includes(id) &&
         !saveRef.current.story.caseAccepted
       ) {
         setDialogueId("case-briefing");
         return;
       }
       if (
-        ["battle", "maze", "garden"].includes(id) &&
+        ["battle", "maze", "garden", "echo"].includes(id) &&
         !saveRef.current.story.networkIntroSeen
       ) {
         setPendingActivity(id);
         setCutsceneId("first-connection");
+        return;
+      }
+      if (id === "echo") {
+        setRealm("hub");
+        setScene("hub");
+        setPanel("battle");
+        setBattle(
+          createBattle(
+            echoActivity.type === "activity" ? echoActivity.enemy : undefined,
+          ),
+        );
+        setAnswer([]);
+        setBattleNotice("");
         return;
       }
       if (id === "maze") {
@@ -524,9 +555,12 @@ export default function App() {
   };
   const applyBattle = (nextBattle: Battle, nextSave: Save) => {
     if (nextBattle.phase === "won") {
-      const first = !nextSave.completed.includes("guardian-battle");
-      nextSave = completeActivity(nextSave, "guardian-battle");
-      if (first) nextSave = addXp(nextSave, 20);
+      const activity =
+        nextBattle.enemyId === "echo-7" ? "echo-battle" : "guardian-battle";
+      const first = !nextSave.completed.includes(activity);
+      nextSave = completeActivity(nextSave, activity);
+      if (first)
+        nextSave = addXp(nextSave, activity === "echo-battle" ? 60 : 20);
     }
     setBattle(nextBattle);
     updateSave(() => nextSave);
@@ -742,6 +776,7 @@ export default function App() {
               Boolean(cutsceneId)
             }
             encounter={panel === "battle"}
+            finalBoss={battle.enemyId === "echo-7"}
             maze={maze}
             renderer={save.settings.renderer}
             reducedMotion={save.settings.reducedMotion}
@@ -764,6 +799,8 @@ export default function App() {
           <HomeBoard
             onSelect={open}
             accepted={save.story.caseAccepted}
+            finaleReady={finaleAvailable(save, content)}
+            caseClosed={save.completed.includes("echo-battle")}
             completed={save.completed.filter((id) =>
               quest.objectives.includes(id),
             )}
@@ -797,7 +834,7 @@ export default function App() {
                     {
                       library: "Library",
                       maze: "Packet labyrinth",
-                      battle: "Sentinel A-03",
+                      battle: battle.enemyName,
                       garden: "Perceptron lab",
                       inventory: "Equipment & skills",
                       journal: "Quest board",
@@ -1185,7 +1222,11 @@ export default function App() {
             {panel === "battle" && (
               <div className="combat-layout">
                 <div className="enemy-card">
-                  <span className="pill">GATEWAY SECURITY · LV. 1</span>
+                  <span className="pill">
+                    {battle.enemyId === "echo-7"
+                      ? "FINAL ENCOUNTER · ECHO-7"
+                      : "GATEWAY SECURITY · LV. 1"}
+                  </span>
                   <div className="guardian-portrait">
                     <div className="guardian-head">
                       <i />
@@ -1415,8 +1456,16 @@ export default function App() {
                       <span className="result-mark">
                         <Check size={30} />
                       </span>
-                      <h2>Sentinel defeated</h2>
-                      <p>ECHO-7’s route fragment recovered.</p>
+                      <h2>
+                        {battle.enemyId === "echo-7"
+                          ? "ECHO-7 contained"
+                          : "Sentinel defeated"}
+                      </h2>
+                      <p>
+                        {battle.enemyId === "echo-7"
+                          ? "Case closed. Your investigation is complete."
+                          : "ECHO-7’s route fragment recovered."}
+                      </p>
                       <button
                         className="primary"
                         onClick={() => open("journal")}
@@ -1471,27 +1520,12 @@ export default function App() {
             )}
             {panel === "journal" && (
               <div className="journal-content">
-                <span className="pill">CASE 007 · ACTIVE INVESTIGATION</span>
-                <div className="case-summary">
-                  <div className="suspect-file">
-                    <ScanLine size={34} />
-                    <strong>ECHO-7</strong>
-                    <small>MISSING</small>
-                  </div>
-                  <div>
-                    <h3>Suspect: ECHO-7</h3>
-                    <p>
-                      Escaped through a maintenance terminal. Trace its network
-                      route.
-                    </p>
-                    <button
-                      className="text-button"
-                      onClick={() => setPrologueReplay(true)}
-                    >
-                      Replay prologue ↗
-                    </button>
-                  </div>
-                </div>
+                <span className="pill">
+                  CASE 007 ·{" "}
+                  {save.completed.includes("echo-battle")
+                    ? "CLOSED"
+                    : "ACTIVE INVESTIGATION"}
+                </span>
                 <h2>{quest.title}</h2>
                 {!save.story.caseAccepted && (
                   <button
@@ -1502,40 +1536,13 @@ export default function App() {
                   </button>
                 )}
                 <p>{quest.description}</p>
-                <div className="quest-objectives">
-                  {quest.objectives.map((id) => (
-                    <button
-                      key={id}
-                      disabled={!save.story.caseAccepted}
-                      onClick={() =>
-                        open(
-                          id === "maze-chamber"
-                            ? "maze"
-                            : id === "guardian-battle"
-                              ? "battle"
-                              : "garden",
-                        )
-                      }
-                    >
-                      <span
-                        className={`objective-check ${save.completed.includes(id) ? "done" : ""}`}
-                      >
-                        {save.completed.includes(id) ? <Check size={15} /> : ""}
-                      </span>
-                      <span>
-                        <strong>
-                          {content.entities.find((e) => e.id === id)?.title}
-                        </strong>
-                        <small>
-                          {save.completed.includes(id)
-                            ? "Complete"
-                            : "Incomplete"}
-                        </small>
-                      </span>
-                      <ArrowUpRight size={17} />
-                    </button>
-                  ))}
-                </div>
+                <QuestBranches
+                  save={save}
+                  content={content}
+                  onActivity={(id) => open(activityDestination(id))}
+                  onLesson={openLesson}
+                  onClaim={(q) => updateSave((s) => claimQuest(s, q, content))}
+                />
                 <div className="quest-reward">
                   <Sparkles />
                   <span>
@@ -1547,9 +1554,9 @@ export default function App() {
                   className="primary"
                   disabled={done !== 3 || save.claimed.includes(quest.id)}
                   onClick={() => {
-                    updateSave((s) => claimQuest(s, quest));
+                    updateSave((s) => claimQuest(s, quest, content));
                     notify(
-                      "Level 2. Trace amplifier and new skills available.",
+                      "Case reward claimed. Equipment and skills updated.",
                     );
                   }}
                 >
@@ -1559,12 +1566,12 @@ export default function App() {
                       ? "Claim reward"
                       : `${done} / 3 objectives complete`}
                 </button>
-                {save.claimed.includes(quest.id) && (
-                  <div className="case-next-lead">
-                    <h3>Next lead: abandoned subnet</h3>
-                    <p>End of the playable chapter.</p>
-                  </div>
-                )}
+                <FinaleCard
+                  save={save}
+                  content={content}
+                  onStart={() => open("echo")}
+                  onClaim={(q) => updateSave((s) => claimQuest(s, q, content))}
+                />
                 {content.entities.some(
                   (e) =>
                     e.type === "activity" &&

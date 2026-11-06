@@ -1,6 +1,5 @@
-@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;450;500;550;600;650;700&family=Libre+Caslon+Display&display=swap");
 :root {
-  font-family: "DM Sans", system-ui, sans-serif;
+  font-family: "Segoe UI", Arial, sans-serif;
   color: #283e34;
   background: #f2f1e8;
   font-synthesis: none;
@@ -10,7 +9,7 @@
   --line: #dfe3d6;
   --green: #315e4e;
   --gold: #c09b57;
-  --serif: "Libre Caslon Display", Georgia, serif;
+  --serif: Consolas, "Courier New", monospace;
 }
 * {
   box-sizing: border-box;

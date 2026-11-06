@@ -1,5 +1,13 @@
 # Validation · 2026-11-06
 
+## Branches and robot finale
+
+38 tests pass. New coverage exercises all six branch completion orders, optional reward claiming for unlocks, prerequisite validation/cycles, duplicate rewards, premature finale-save rejection, and a complete final battle across all material topics.
+
+Browser checks confirmed the boss was locked at one clue, unlocked at three clues, and completed successfully. Branch rewards and the case reward were claimed once; reloading restored the closed case and disabled reward buttons. Text now uses local regular-weight UI fonts and typewriter headings.
+
+![Quest branches](screenshots/branches.jpg)
+
 ## Home room update
 
 34 tests pass, including new dialogue validation, story-save migration, configurable cutscene frames, and camera turns across the angle boundary.
