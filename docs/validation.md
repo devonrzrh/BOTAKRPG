@@ -1,5 +1,13 @@
 # Validation · 2026-11-06
 
+## Velocity-driven turn blur
+
+47 tests pass. Added checks for speed/direction, equal velocity at different frame rates, bounded streak length, stationary/reduced-motion clearing, and delayed-frame recovery. Production build passes.
+
+Browser checks confirmed horizontal turn streaks in both WebGPU and WebGL2 without shader errors, sharp text at rest, and immediate sharp turns with reduced motion. The old CSS blur pulse was removed; the render pass is detached while idle.
+
+![Camera turn blur](screenshots/turn-blur.jpg)
+
 ## Mesh interface and edge turns
 
 44 tests pass. The new ray-picking test imports the production surface module, hits an actual Babylon plane, reads its UVs, and verifies a foreground mesh blocks it. Other checks cover control bounds, disabled actions, quest gates, lesson pagination/search, Python operator preservation, note drafts, and cyclic left/right turns.

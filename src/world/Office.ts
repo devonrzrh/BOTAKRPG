@@ -7,6 +7,8 @@ import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 import { PointLight } from "@babylonjs/core/Lights/pointLight";
+import { attachTurnMotionBlur } from "./TurnMotionBlur";
+import { turnBlur } from "../game/turnBlur";
 
 export type HomeWall = "investigation" | "bookshelf" | "quests" | "desk";
 export const wallYaw: Record<HomeWall, number> = {
@@ -34,6 +36,9 @@ export function buildOffice(
   camera.fov = 1.03;
   camera.minZ = 0.05;
   camera.rotation.y = wallYaw[state().wall];
+  const motionBlur = attachTurnMotionBlur(camera);
+  let previousWall = state().wall,
+    turning = false;
   const ambient = new HemisphericLight(
     "office ambient",
     new Vector3(0, 1, 0),
@@ -222,15 +227,40 @@ export function buildOffice(
   surface.addEventListener("pointerleave", leave);
   const observer = scene.onBeforeRenderObservable.add(() => {
     const s = state(),
-      dt = Math.min(0.05, scene.getEngine().getDeltaTime() / 1000);
+      frameTime = scene.getEngine().getDeltaTime() / 1000,
+      dt = Math.min(0.05, frameTime);
+    if (s.wall !== previousWall) {
+      previousWall = s.wall;
+      turning = true;
+    }
     const target =
       wallYaw[s.wall] + (s.reducedMotion || s.locked ? 0 : px * 0.025);
     const turn = shortestTurn(camera.rotation.y, target);
     const blend = s.reducedMotion ? 1 : 1 - Math.exp(-dt * 19);
+    const beforeYaw = camera.rotation.y,
+      beforePitch = camera.rotation.x;
     camera.rotation.y += turn * blend;
     camera.rotation.x +=
       ((s.reducedMotion || s.locked ? 0 : py * 0.018) - camera.rotation.x) *
       blend;
+    if (
+      s.reducedMotion ||
+      Math.abs(shortestTurn(camera.rotation.y, target)) < 0.0015
+    ) {
+      camera.rotation.y = target;
+      turning = false;
+    }
+    motionBlur.update(
+      turnBlur(
+        camera.rotation.y - beforeYaw,
+        camera.rotation.x - beforePitch,
+        frameTime,
+        scene.getEngine().getRenderWidth(),
+        scene.getEngine().getRenderHeight(),
+        camera.fov,
+        turning && !s.reducedMotion && !s.locked,
+      ),
+    );
   });
   const click = scene.onPointerObservable.add((info) => {
     if (info.type === 1 && !state().locked) {
@@ -240,6 +270,7 @@ export function buildOffice(
     }
   });
   return () => {
+    motionBlur.dispose();
     surface.removeEventListener("pointermove", pointer);
     surface.removeEventListener("pointerleave", leave);
     scene.onBeforeRenderObservable.remove(observer);
