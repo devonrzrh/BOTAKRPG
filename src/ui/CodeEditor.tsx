@@ -88,7 +88,7 @@ export default function CodeEditor({
           EditorView.theme({
             "&": {
               height: "100%",
-              fontSize: "13px",
+              fontSize: "18px",
               backgroundColor: "#142622",
               color: "#e3e4d7",
             },

@@ -38,20 +38,20 @@ export function Garden({
     <div className="garden-layout">
       <div>
         <p className="muted">
-          Label class 0 where x₁ + x₂ &lt; 0, and class 1 where x₁ + x₂ ≥ 0.
+          Mark signals: amber if x₁ + x₂ &lt; 0; teal otherwise.
         </p>
         <div className="segmented">
           <button
             className={label === 0 ? "selected" : ""}
             onClick={() => setLabel(0)}
           >
-            ● Class 0 · amber
+            ● Amber / 0
           </button>
           <button
             className={label === 1 ? "selected" : ""}
             onClick={() => setLabel(1)}
           >
-            ● Class 1 · teal
+            ● Teal / 1
           </button>
         </div>
         <svg
@@ -124,48 +124,50 @@ export function Garden({
                 ×
               </text>
             ))}
-          <text x="380" y="192" fill="#7b9181" fontSize="13">
+          <text x="370" y="188" fill="#b5c3b9" fontSize="20">
             x₁
           </text>
-          <text x="208" y="20" fill="#7b9181" fontSize="13">
+          <text x="208" y="25" fill="#b5c3b9" fontSize="20">
             x₂
           </text>
         </svg>
-        <div className="inline-fields">
-          <label>
-            x₁
-            <input
-              type="number"
-              min="-1"
-              max="1"
-              step=".1"
-              value={x}
-              onChange={(e) =>
-                setX(Math.max(-1, Math.min(1, Number(e.target.value))))
-              }
-            />
-          </label>
-          <label>
-            x₂
-            <input
-              type="number"
-              min="-1"
-              max="1"
-              step=".1"
-              value={y}
-              onChange={(e) =>
-                setY(Math.max(-1, Math.min(1, Number(e.target.value))))
-              }
-            />
-          </label>
-          <button onClick={() => add(x, y)}>Add example</button>
-        </div>
+        <details className="activity-tools">
+          <summary>Add by coordinates</summary>
+          <div className="inline-fields">
+            <label>
+              x₁
+              <input
+                type="number"
+                min="-1"
+                max="1"
+                step=".1"
+                value={x}
+                onChange={(e) =>
+                  setX(Math.max(-1, Math.min(1, Number(e.target.value))))
+                }
+              />
+            </label>
+            <label>
+              x₂
+              <input
+                type="number"
+                min="-1"
+                max="1"
+                step=".1"
+                value={y}
+                onChange={(e) =>
+                  setY(Math.max(-1, Math.min(1, Number(e.target.value))))
+                }
+              />
+            </label>
+            <button onClick={() => add(x, y)}>Add example</button>
+          </div>
+        </details>
       </div>
       <div className="experiment-controls">
-        <h3>Training</h3>
+        <h3>Decode the signal</h3>
         <p>
-          Predict class 1 when <code>w₁x₁ + w₂x₂ + b ≥ 0</code>. Training
-          changes the weights after each mistake.
+          Add examples of both colors. Train, then test the unknown signals.
         </p>
         <div className="metric-grid">
           <div>
@@ -181,27 +183,45 @@ export function Garden({
             <span>held-out accuracy</span>
           </div>
         </div>
-        <label>
-          Learning rate{" "}
-          <input
-            type="number"
-            min=".01"
-            max="1"
-            step=".05"
-            value={rate}
-            onChange={(e) => setRate(Number(e.target.value))}
-          />
-        </label>
-        <label>
-          Epochs per run{" "}
-          <input
-            type="number"
-            min="1"
-            max="100"
-            value={epochs}
-            onChange={(e) => setEpochs(Number(e.target.value))}
-          />
-        </label>
+        <details className="activity-tools network-settings">
+          <summary>Tune network</summary>
+          <p>
+            Class 1 when <code>w₁x₁ + w₂x₂ + b ≥ 0</code>. Mistakes adjust the
+            weights.
+          </p>
+          <label>
+            Learning rate{" "}
+            <input
+              type="number"
+              min=".01"
+              max="1"
+              step=".05"
+              value={rate}
+              onChange={(e) => setRate(Number(e.target.value))}
+            />
+          </label>
+          <div className="weights">
+            <span>
+              w₁ <b>{network.weights[0].toFixed(3)}</b>
+            </span>
+            <span>
+              w₂ <b>{network.weights[1].toFixed(3)}</b>
+            </span>
+            <span>
+              bias <b>{network.bias.toFixed(3)}</b>
+            </span>
+          </div>
+          <label>
+            Epochs per run{" "}
+            <input
+              type="number"
+              min="1"
+              max="100"
+              value={epochs}
+              onChange={(e) => setEpochs(Number(e.target.value))}
+            />
+          </label>
+        </details>
         <button
           className="primary"
           onClick={() => {
@@ -214,7 +234,7 @@ export function Garden({
             }
           }}
         >
-          Train the perceptron
+          Train
         </button>
         <button
           disabled={!network.epochs}
@@ -231,24 +251,13 @@ export function Garden({
               );
           }}
         >
-          Test held-out examples
+          Test signals
         </button>
-        <div className="weights">
-          <span>
-            w₁ <b>{network.weights[0].toFixed(3)}</b>
-          </span>
-          <span>
-            w₂ <b>{network.weights[1].toFixed(3)}</b>
-          </span>
-          <span>
-            bias <b>{network.bias.toFixed(3)}</b>
-          </span>
-        </div>
         <p className="feedback" role="status">
           {message || "Start by adding examples of both classes."}
         </p>
         <button className="text-button" onClick={onLesson}>
-          Perceptron lesson ↗
+          Reference book
         </button>
         <button
           className="text-button"
@@ -259,7 +268,7 @@ export function Garden({
             setMessage("Exhibit reset.");
           }}
         >
-          Reset experiment
+          Clear signals
         </button>
       </div>
     </div>

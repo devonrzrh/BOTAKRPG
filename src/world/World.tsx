@@ -12,6 +12,7 @@ import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { Color3, Color4 } from "@babylonjs/core/Maths/math.color";
 import { DynamicTexture } from "@babylonjs/core/Materials/Textures/dynamicTexture";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
+import "@babylonjs/core/Rendering/edgesRenderer";
 import { PointerEventTypes } from "@babylonjs/core/Events/pointerEvents";
 import "@babylonjs/core/Engines/Extensions/engine.dynamicTexture";
 import "@babylonjs/core/Engines/WebGPU/Extensions/engine.dynamicTexture";
@@ -213,6 +214,10 @@ function WorldCanvas(props: Props) {
     const engine = engineRef.current;
     if (!engine) return;
     const scene = new Scene(engine);
+    // Babylon otherwise skips move picking on meshes without ActionManagers.
+    // Include foreground geometry so hover keeps the same occlusion as clicks.
+    scene.constantlyUpdateMeshUnderPointer = true;
+    scene.doNotHandleCursors = true;
     sceneRef.current = scene;
     if (props.scene === "desk") {
       actorRef.current = null;
@@ -224,7 +229,6 @@ function WorldCanvas(props: Props) {
           reducedMotion: latest.current.reducedMotion,
           locked: latest.current.homeLookLocked ?? false,
         }),
-        (id) => latest.current.onInteract(id),
       );
       const disposeUi = attachOfficeSurfaces(
         scene,
@@ -234,6 +238,7 @@ function WorldCanvas(props: Props) {
           wall: latest.current.homeWall ?? "investigation",
           locked: latest.current.homeLookLocked ?? false,
           focused: latest.current.officeFocused ?? null,
+          reducedMotion: latest.current.reducedMotion,
         }),
         (action) => latest.current.onOfficeAction?.(action),
       );
@@ -455,7 +460,6 @@ function WorldCanvas(props: Props) {
         0.12,
         gold,
       );
-      label("THE EXIT", gx - m.size / 2, 1.6, gy - m.size / 2, "exit");
       for (const [x, z] of [
         [-7, -5],
         [-7, 4],
@@ -654,9 +658,33 @@ function WorldCanvas(props: Props) {
         props.maze.position[1] - props.maze.size / 2,
       );
     else actor.position.copyFrom(hubPosition.current);
+    const targets = scene.meshes.filter((mesh) => mesh.metadata?.interaction);
+    for (const mesh of targets) {
+      mesh.enableEdgesRendering();
+      mesh.edgesColor = new Color4(1, 0.79, 0.45, 1);
+      mesh.edgesWidth = 4;
+      if (mesh.edgesRenderer) mesh.edgesRenderer.isEnabled = false;
+    }
+    const clearHover = () => {
+      for (const mesh of targets)
+        if (mesh.edgesRenderer) mesh.edgesRenderer.isEnabled = false;
+      if (canvas.current) canvas.current.style.cursor = "";
+    };
+    const activeCanvas = canvas.current!;
+    activeCanvas.addEventListener("pointerleave", clearHover);
     const interactions = scene.onPointerObservable.add((info) => {
+      const id = latest.current.locked
+        ? undefined
+        : info.pickInfo?.pickedMesh?.metadata?.interaction;
+      if (info.type === PointerEventTypes.POINTERMOVE) {
+        for (const mesh of targets)
+          if (mesh.edgesRenderer)
+            mesh.edgesRenderer.isEnabled = Boolean(
+              id && mesh.metadata.interaction === id,
+            );
+        if (canvas.current) canvas.current.style.cursor = id ? "pointer" : "";
+      }
       if (info.type === PointerEventTypes.POINTERPICK) {
-        const id = info.pickInfo?.pickedMesh?.metadata?.interaction;
         if (id) latest.current.onInteract(id);
       }
     });
@@ -717,6 +745,8 @@ function WorldCanvas(props: Props) {
       window.removeEventListener("keydown", down);
       engine.onResizeObservable.remove(obs);
       scene.onPointerObservable.remove(interactions);
+      activeCanvas.removeEventListener("pointerleave", clearHover);
+      if (canvas.current) canvas.current.style.cursor = "";
       if (sceneRef.current === scene) sceneRef.current = null;
       actorRef.current = null;
       scene.dispose();

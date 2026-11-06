@@ -62,10 +62,12 @@ Text uses local regular-weight UI fonts and typewriter headings. No web-font dow
 
 ## World-space home interface
 
-The investigation wall, quest board, reading stand, and desk terminal render their controls into Babylon DynamicTextures on world meshes. Pointer releases ray-pick mesh UV coordinates, including normal geometry occlusion. They remain attached to the room during camera movement and work in both renderer backends. The top menu bar, global settings, dialogue/cutscenes, and network activity screens remain screen controls.
+The investigation board uses pinned photographs, reports, a route map, and red string. Quest files sit in manila folders. Select a labeled book to pull it clear of the shelf and open its hinged cover toward you; closing reverses the sequence. Equipment and skills are printed in a ledger lying on a real desk. The desk camera looks down over the tabletop. Hover outlines mark clickable props, with matching keyboard focus feedback.
 
-Tab focuses the corresponding button on the mesh; Enter activates it. The library supports search, topic filters, lesson prerequisites, pagination, bookmarks, and notes on the reading stand. Notes use native keyboard text input with the draft rendered on the mesh; Ctrl+Enter saves and Escape cancels. Renderer failures restore readable HTML home controls.
+Controls render into Babylon DynamicTextures. Pointer releases ray-pick mesh UV coordinates with normal geometry occlusion. Tab focuses the corresponding control on the mesh; Enter activates it. Books support search, topic filters, prerequisites, pagination, bookmarks, and notes. Ctrl+Enter saves notes; Escape cancels editing. Renderer failures restore readable HTML controls. The top menu bar remains visible.
 
-Left/right screen-edge zones show the neighboring wall. Click to turn immediately or hover briefly for a FNAF-style turn. A/D and the left/right arrow keys also turn. Hover advances one wall per entry; leave the edge before another automatic turn. Typing into a field does not trigger keyboard turns.
+Left/right screen edges turn after 90 ms of cursor entry. Click, A/D, and arrow keys also turn. Hover advances once per entry; leave the edge before another turn. Typing does not trigger keyboard turns.
 
 Turn blur uses a short, bounded shutter and GLSL/WGSL post-processing. It detaches once the camera settles, stays off during small cursor movements, and is disabled by reduced motion.
+
+Activity screens favor the game world and large text. The maze opens a programming dock only when Blocks or Python is selected. Layout controls and hints live under Tools & hints. Battle choices and questions sit below the 3D opponent; consumables expand from Items. The signal activity keeps labeling, Train, and Test visible, with network settings and coordinate entry expandable. Project design and delivery rules live in [AGENTS.md](AGENTS.md).

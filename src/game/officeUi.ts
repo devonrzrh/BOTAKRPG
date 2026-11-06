@@ -16,7 +16,9 @@ export type OfficeAction = {
     | "topic"
     | "note"
     | "save-note"
-    | "cancel-note";
+    | "cancel-note"
+    | "close-book";
+  // Book interaction is kept separate from travelling to the shelf.
   id: string;
 };
 export interface SurfaceButton {
@@ -39,6 +41,9 @@ export interface SurfaceText {
   bold?: boolean;
 }
 export interface SurfaceModel {
+  books?: { id: string; title: string; topic: string }[];
+  bookOpen?: boolean;
+  selectedLesson?: string;
   id: HomeWall;
   title: string;
   theme: "cork" | "paper" | "terminal";
@@ -46,6 +51,7 @@ export interface SurfaceModel {
   buttons: SurfaceButton[];
 }
 export interface OfficeUiInput {
+  bookOpen?: boolean;
   save: Save;
   content: Content;
   lessonId: string;
@@ -524,7 +530,7 @@ export function createOfficeUi(input: OfficeUiInput): SurfaceModel[] {
     !closed || save.claimed.includes(finale.id),
   );
 
-  const inventory = panel("desk", "DESK TERMINAL / INVENTORY", "terminal");
+  const inventory = panel("desk", "FIELD EQUIPMENT", "paper");
   const character = stats(save, content);
   text(
     inventory,
@@ -537,17 +543,25 @@ export function createOfficeUi(input: OfficeUiInput): SurfaceModel[] {
     inventory,
     30,
     124,
-    `HP ${save.character.hp}/${character.maxHp}   FOCUS ${save.character.focus}/${character.maxFocus}   ATK ${character.attack}   DEF ${character.defense}`,
-    19,
+    `HP ${save.character.hp}/${character.maxHp}  FOCUS ${save.character.focus}/${character.maxFocus}`,
+    25,
+  );
+  text(
+    inventory,
+    30,
+    163,
+    `ATK ${character.attack}  DEF ${character.defense}`,
+    25,
+    430,
   );
   const items = content.entities.filter((e): e is Item => e.type === "item");
   items.forEach((item, index) => {
     text(
       inventory,
       30,
-      190 + index * 73,
+      220 + index * 85,
       `${item.title} ×${save.inventory[item.id] ?? 0}`,
-      20,
+      26,
       420,
     );
     if (item.kind === "equipment")
@@ -555,9 +569,9 @@ export function createOfficeUi(input: OfficeUiInput): SurfaceModel[] {
         inventory,
         `equip-${item.id}`,
         30,
-        224 + index * 73,
+        255 + index * 85,
         420,
-        36,
+        44,
         save.character.equipment === item.id
           ? "Unequip module"
           : "Equip module",
@@ -569,9 +583,9 @@ export function createOfficeUi(input: OfficeUiInput): SurfaceModel[] {
       text(
         inventory,
         30,
-        221 + index * 73,
-        `Restores ${item.amount} ${item.kind === "healing" ? "HP" : "focus"} / use in battle`,
-        16,
+        255 + index * 85,
+        `+${item.amount} ${item.kind === "healing" ? "HP" : "focus"} / in battle`,
+        24,
         420,
       );
   });
@@ -597,5 +611,134 @@ export function createOfficeUi(input: OfficeUiInput): SurfaceModel[] {
         learned || locked,
       );
     });
+  library.books = lessons.map((l) => ({
+    id: l.id,
+    title: l.title,
+    topic: l.topic,
+  }));
+  library.bookOpen = input.bookOpen;
+  library.selectedLesson = lesson.id;
+  if (input.bookOpen === false) {
+    library.title = "REFERENCE BOOKSHELF";
+    library.texts = [{ x: 30, y: 85, text: "Select a volume to open it." }];
+    library.buttons = library.buttons.filter(
+      (b) =>
+        b.id.startsWith("lesson-") || b.id === "search" || b.id === "topic",
+    );
+  }
+  if (input.bookOpen === true) {
+    library.title = lesson.title;
+    library.texts = [];
+    library.buttons = [];
+    text(
+      library,
+      35,
+      78,
+      input.noteEditing ? "Personal notes" : lesson.topic.toUpperCase(),
+      20,
+      445,
+    );
+    const prerequisites = lesson.prerequisites
+      .map((id) => lessons.find((l) => l.id === id)?.title ?? id)
+      .join(", ");
+    const lines = wrapLines(
+      input.noteEditing
+        ? input.noteDraft + " │"
+        : (prerequisites ? `Read first: ${prerequisites}\n\n` : "") +
+            plainLesson(lesson.body),
+      34,
+    );
+    const pages = Math.max(1, Math.ceil(lines.length / 28)),
+      page = Math.max(0, Math.min(input.page, pages - 1));
+    lines
+      .slice(page * 28, (page + 1) * 28)
+      .forEach((line, i) =>
+        text(library, i < 14 ? 35 : 548, 125 + (i % 14) * 23, line, 20, 440),
+      );
+    if (input.noteEditing) {
+      button(
+        library,
+        "save-note",
+        35,
+        476,
+        410,
+        40,
+        "Save notes / Ctrl+Enter",
+        "save-note",
+        lesson.id,
+      );
+      button(
+        library,
+        "cancel-note",
+        548,
+        476,
+        410,
+        40,
+        "Cancel notes",
+        "cancel-note",
+        lesson.id,
+      );
+    } else {
+      button(
+        library,
+        "previous-page",
+        35,
+        476,
+        170,
+        40,
+        "Previous",
+        "page",
+        String(page - 1),
+        page === 0,
+      );
+      text(library, 245, 484, String(page * 2 + 1), 17, 80);
+      text(library, 725, 484, String(page * 2 + 2), 17, 80);
+      button(
+        library,
+        "next-page",
+        805,
+        476,
+        170,
+        40,
+        "Next",
+        "page",
+        String(page + 1),
+        page === pages - 1,
+      );
+      button(
+        library,
+        "bookmark",
+        35,
+        530,
+        200,
+        32,
+        save.bookmarks.includes(lesson.id) ? "Bookmarked" : "Bookmark",
+        "bookmark",
+        lesson.id,
+      );
+      button(
+        library,
+        "notes",
+        795,
+        530,
+        180,
+        32,
+        "Write notes",
+        "note",
+        lesson.id,
+      );
+    }
+    button(
+      library,
+      "close-book",
+      795,
+      20,
+      180,
+      34,
+      "Close book",
+      "close-book",
+      "",
+    );
+  }
   return [investigation, library, quests, inventory];
 }

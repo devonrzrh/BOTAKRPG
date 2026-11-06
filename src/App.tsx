@@ -181,6 +181,7 @@ export default function App() {
   const [prologueReplay, setPrologueReplay] = useState(false);
   const [officeFallback, setOfficeFallback] = useState(false);
   const [officePage, setOfficePage] = useState(0);
+  const [bookOpen, setBookOpen] = useState(false);
   const [officeFocused, setOfficeFocused] = useState<string | null>(null);
   const [noteEditing, setNoteEditing] = useState<string | null>(null);
   const [noteDraft, setNoteDraft] = useState("");
@@ -417,6 +418,7 @@ export default function App() {
   const open = useCallback(
     (id: string) => {
       if (id === "exit") return;
+      setBookOpen(false);
       setNoteEditing(null);
       setSearchEditing(false);
       setOfficeFocused(null);
@@ -565,6 +567,8 @@ export default function App() {
   const openLesson = (id: string) => {
     setLessonId(id);
     open("library");
+    setBookOpen(true);
+    setOfficePage(0);
   };
   const applyBattle = (nextBattle: Battle, nextSave: Save) => {
     if (nextBattle.phase === "won") {
@@ -661,16 +665,31 @@ export default function App() {
         content,
         lessonId,
         page: officePage,
+        bookOpen,
         search,
         topic,
         noteEditing,
         noteDraft,
       }),
-    [save, lessonId, officePage, search, topic, noteEditing, noteDraft],
+    [
+      save,
+      lessonId,
+      officePage,
+      search,
+      topic,
+      noteEditing,
+      noteDraft,
+      bookOpen,
+    ],
   );
   const useWorldUi = realm === "desk" && !officeFallback;
   const handleOfficeAction = (action: OfficeAction) => {
     const id = action.id;
+    if (action.kind === "close-book") {
+      setBookOpen(false);
+      setNoteEditing(null);
+      setSearchEditing(false);
+    }
     if (action.kind === "open") open(id);
     if (action.kind === "lesson") {
       setOfficePage(0);
@@ -728,7 +747,7 @@ export default function App() {
   ).length;
   return (
     <div
-      className={`app ${useWorldUi ? "world-ui-view" : ""} ${realm === "desk" ? "home-view" : "network-view"} ${homeMoving && realm === "desk" ? "home-panning" : ""} ${save.settings.reducedMotion ? "reduced-motion" : ""}`}
+      className={`app gameplay-${panel ?? "explore"} maze-${mode} ${useWorldUi ? "world-ui-view" : ""} ${realm === "desk" ? "home-view" : "network-view"} ${homeMoving && realm === "desk" ? "home-panning" : ""} ${save.settings.reducedMotion ? "reduced-motion" : ""}`}
     >
       <header className="topbar">
         <a
@@ -901,10 +920,6 @@ export default function App() {
             <div className="scene-heading">
               <h1>Network gateway</h1>
             </div>
-            <div className="world-caption">
-              <span className="live-dot" /> ONLINE / THE TRANSIT NETWORK{" "}
-              <span>01 / THE GATEWAY</span>
-            </div>
           </>
         )}
         {panel &&
@@ -1071,10 +1086,7 @@ export default function App() {
               {panel === "maze" && (
                 <div className="maze-content">
                   <div className="maze-summary">
-                    <span className="pill">SEED {maze.seed}</span>
-                    <span>
-                      {maze.steps} steps · {maze.commands} commands
-                    </span>
+                    <span>{maze.steps} steps</span>
                     {trial && (
                       <strong className={trialExpired ? "danger" : ""}>
                         {Math.max(0, 90 - elapsed).toFixed(1)}s
@@ -1092,14 +1104,14 @@ export default function App() {
                       disabled={busy}
                       onClick={() => setMode("manual")}
                     >
-                      Explore manually
+                      Move
                     </button>
                     <button
                       className={mode === "blocks" ? "selected" : ""}
                       disabled={busy}
                       onClick={() => setMode("blocks")}
                     >
-                      Visual blocks
+                      Blocks
                     </button>
                     <button
                       className={mode === "python" ? "selected" : ""}
@@ -1111,32 +1123,34 @@ export default function App() {
                   </div>
                   {mode === "manual" ? (
                     <>
-                      <div
-                        className="maze-map"
-                        role="img"
-                        aria-label={`Maze map. Player at ${maze.position.join(",")}, exit at ${maze.goal.join(",")}.`}
-                        style={{
-                          gridTemplateColumns: `repeat(${maze.size},1fr)`,
-                        }}
-                      >
-                        {maze.grid.flatMap((row, y) =>
-                          row.map((wall, x) => (
-                            <span
-                              key={`${x}-${y}`}
-                              className={`${wall ? "wall" : "path"} ${maze.position[0] === x && maze.position[1] === y ? "player" : ""} ${maze.goal[0] === x && maze.goal[1] === y ? "exit" : ""}`}
-                            >
-                              {maze.position[0] === x && maze.position[1] === y
-                                ? "●"
-                                : maze.goal[0] === x && maze.goal[1] === y
-                                  ? "◇"
-                                  : ""}
-                            </span>
-                          )),
-                        )}
-                      </div>
+                      {officeFallback && (
+                        <div
+                          className="maze-map"
+                          role="img"
+                          aria-label={`Maze map. Player at ${maze.position.join(",")}, exit at ${maze.goal.join(",")}.`}
+                          style={{
+                            gridTemplateColumns: `repeat(${maze.size},1fr)`,
+                          }}
+                        >
+                          {maze.grid.flatMap((row, y) =>
+                            row.map((wall, x) => (
+                              <span
+                                key={`${x}-${y}`}
+                                className={`${wall ? "wall" : "path"} ${maze.position[0] === x && maze.position[1] === y ? "player" : ""} ${maze.goal[0] === x && maze.goal[1] === y ? "exit" : ""}`}
+                              >
+                                {maze.position[0] === x &&
+                                maze.position[1] === y
+                                  ? "●"
+                                  : maze.goal[0] === x && maze.goal[1] === y
+                                    ? "◇"
+                                    : ""}
+                              </span>
+                            )),
+                          )}
+                        </div>
+                      )}
                       <p className="muted small">
-                        Find the amber seal. WASD / arrows or the controls
-                        below.
+                        WASD / arrows · Reach the amber exit.
                       </p>
                       <div className="dpad">
                         {(
@@ -1253,70 +1267,71 @@ export default function App() {
                       </pre>
                     </>
                   )}
-                  <div className="maze-footer">
-                    <button disabled={busy} onClick={() => resetMaze()}>
-                      <RotateCcw size={14} />
-                      Reset maze
-                    </button>
-                    <button
-                      disabled={busy}
-                      onClick={() => {
-                        const seed = (maze.seed + 7919) % 2147483647;
-                        updateSave((s) => ({ ...s, seed }));
-                        resetMaze(seed);
-                      }}
-                    >
-                      New seed
-                    </button>
+                  <details className="activity-tools">
+                    <summary>Tools & hints</summary>
+                    <p>
+                      Layout {maze.seed} · {maze.commands} commands
+                    </p>
+                    <div className="maze-footer">
+                      <button disabled={busy} onClick={() => resetMaze()}>
+                        <RotateCcw size={14} />
+                        Reset maze
+                      </button>
+                      <button
+                        disabled={busy}
+                        onClick={() => {
+                          const seed = (maze.seed + 7919) % 2147483647;
+                          updateSave((s) => ({ ...s, seed }));
+                          resetMaze(seed);
+                        }}
+                      >
+                        New layout
+                      </button>
+                      <button
+                        className="text-button"
+                        onClick={() => setHint((n) => Math.min(3, n + 1))}
+                      >
+                        Hint
+                      </button>
+                    </div>
+                    {hint > 0 && (
+                      <p className="hint">
+                        {
+                          [
+                            "",
+                            "Start by looking at your neighbors. Keep track of cells you have already visited.",
+                            "BFS uses a queue. Store each cell together with the route that reached it.",
+                            "The graph-search library entry includes a complete BFS example. Run it, trace it, then try adapting it to a stack.",
+                          ][hint]
+                        }
+                      </p>
+                    )}
                     <button
                       className="text-button"
-                      onClick={() => setHint((n) => Math.min(3, n + 1))}
+                      onClick={() => openLesson("graph-search")}
                     >
-                      Hint
+                      Graph-search lesson ↗
                     </button>
-                  </div>
-                  {hint > 0 && (
-                    <p className="hint">
-                      {
-                        [
-                          "",
-                          "Start by looking at your neighbors. Keep track of cells you have already visited.",
-                          "BFS uses a queue. Store each cell together with the route that reached it.",
-                          "The graph-search library entry includes a complete BFS example. Run it, trace it, then try adapting it to a stack.",
-                        ][hint]
-                      }
-                    </p>
-                  )}
-                  <button
-                    className="text-button"
-                    onClick={() => openLesson("graph-search")}
-                  >
-                    Graph-search lesson ↗
-                  </button>
-                  {save.completed.includes("maze-chamber") && (
-                    <button
-                      className="trial-button"
-                      onClick={() =>
-                        resetMaze((maze.seed + 31) % 2147483647, !trial)
-                      }
-                    >
-                      {trial
-                        ? "Return to untimed exploration"
-                        : "Try a fresh 90-second trial"}
-                      {save.trialBest !== null &&
-                        ` · best ${save.trialBest.toFixed(1)}s`}
-                    </button>
-                  )}
+                    {save.completed.includes("maze-chamber") && (
+                      <button
+                        className="trial-button"
+                        onClick={() =>
+                          resetMaze((maze.seed + 31) % 2147483647, !trial)
+                        }
+                      >
+                        {trial
+                          ? "Return to untimed exploration"
+                          : "Try a fresh 90-second trial"}
+                        {save.trialBest !== null &&
+                          ` · best ${save.trialBest.toFixed(1)}s`}
+                      </button>
+                    )}
+                  </details>
                 </div>
               )}
               {panel === "battle" && (
                 <div className="combat-layout">
                   <div className="enemy-card">
-                    <span className="pill">
-                      {battle.enemyId === "echo-7"
-                        ? "FINAL ENCOUNTER · ECHO-7"
-                        : "GATEWAY SECURITY · LV. 1"}
-                    </span>
                     <div className="guardian-portrait">
                       <div className="guardian-head">
                         <i />
@@ -1349,7 +1364,9 @@ export default function App() {
                   </div>
                   <div className="combat-actions">
                     <div className="section-eyebrow">
-                      TURN {battle.turn} · YOUR MOVE
+                      Turn {battle.turn} · HP {save.character.hp}/
+                      {characterStats.maxHp} · Focus {save.character.focus}/
+                      {characterStats.maxFocus}
                     </div>
                     {battle.phase === "choose" && (
                       <>
@@ -1362,6 +1379,7 @@ export default function App() {
                             .map((skill) => (
                               <button
                                 key={skill.id}
+                                title={skill.description}
                                 disabled={
                                   save.character.focus < skill.cost ||
                                   save.character.hp === 0
@@ -1392,39 +1410,40 @@ export default function App() {
                                 </span>
                                 <span>
                                   <strong>{skill.title}</strong>
-                                  <small>{skill.description}</small>
                                 </span>
                                 <b>{skill.cost} FP</b>
                               </button>
                             ))}
                         </div>
-                        <h4>ITEMS · USES ONE TURN</h4>
-                        <div className="consumables">
-                          {items
-                            .filter((item) => item.kind !== "equipment")
-                            .map((item) => (
-                              <button
-                                key={item.id}
-                                disabled={!save.inventory[item.id]}
-                                onClick={() => {
-                                  try {
-                                    const result = useItem(
-                                      battle,
-                                      saveRef.current,
-                                      item,
-                                      content,
-                                    );
-                                    applyBattle(result.battle, result.save);
-                                  } catch (e) {
-                                    notify(String(e));
-                                  }
-                                }}
-                              >
-                                {item.title}{" "}
-                                <span>×{save.inventory[item.id] ?? 0}</span>
-                              </button>
-                            ))}
-                        </div>
+                        <details className="battle-items">
+                          <summary>Items · uses a turn</summary>
+                          <div className="consumables">
+                            {items
+                              .filter((item) => item.kind !== "equipment")
+                              .map((item) => (
+                                <button
+                                  key={item.id}
+                                  disabled={!save.inventory[item.id]}
+                                  onClick={() => {
+                                    try {
+                                      const result = useItem(
+                                        battle,
+                                        saveRef.current,
+                                        item,
+                                        content,
+                                      );
+                                      applyBattle(result.battle, result.save);
+                                    } catch (e) {
+                                      notify(String(e));
+                                    }
+                                  }}
+                                >
+                                  {item.title}{" "}
+                                  <span>×{save.inventory[item.id] ?? 0}</span>
+                                </button>
+                              ))}
+                          </div>
+                        </details>
                         {save.character.hp === 0 && (
                           <button className="primary" onClick={close}>
                             Return & recover
@@ -1434,15 +1453,6 @@ export default function App() {
                     )}
                     {battle.phase === "question" && currentQuestion && (
                       <>
-                        <span className="pill">
-                          {
-                            topicNames[
-                              lessons.find(
-                                (l) => l.id === currentQuestion.lesson,
-                              )!.topic
-                            ]
-                          }
-                        </span>
                         <h2>{currentQuestion.prompt}</h2>
                         <p className="muted">
                           {currentQuestion.format === "ordering"
@@ -1496,7 +1506,7 @@ export default function App() {
                           }
                           onClick={submitAnswer}
                         >
-                          Submit <ArrowRight size={16} />
+                          Use skill <ArrowRight size={16} />
                         </button>
                         <button
                           className="text-button"
@@ -2047,7 +2057,7 @@ export default function App() {
               Boolean(dialogueId) ||
               Boolean(cutsceneId)
             }
-              allowHover={!noteEditing}
+            allowHover={!noteEditing}
             onTurn={open}
           />
         )}

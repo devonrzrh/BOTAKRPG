@@ -1,4 +1,18 @@
-# Validation · 2026-11-06
+# Validation · 2026-11-07
+
+## Physical office and activity interfaces
+
+50 tests pass; production build passes. New tests cover pull-before-open sequencing, the cover swinging toward the reader, bounded animation poses, separate shelf/book controls, and page bounds.
+
+Browser checks at 1280 × 720 covered pinned evidence ray picking and hover outlines, fast edge entry, the flatter desk view, physical volume selection, opening/closing, pagination, and note editing/cancellation. The office rendered with WebGPU and forced WebGL2. Babylon move picking is enabled explicitly so normal foreground geometry still occludes hover targets.
+
+The maze shows the world with a compact movement HUD and optional code dock. A quiz turn applied damage and resolved the enemy turn; the Items drawer opened correctly. The simplified perceptron activity trained four labeled examples for 10 epochs and scored 100% on held-out points. Its reference link opened the matching book. Automatic renderer preference was restored after checks.
+
+![Physical investigation board](screenshots/physical-board.jpg)
+
+![Opened reference volume](screenshots/physical-book.jpg)
+
+![Desk and equipment ledger](screenshots/physical-desk.jpg)
 
 ## Velocity-driven turn blur
 

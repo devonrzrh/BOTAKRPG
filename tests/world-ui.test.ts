@@ -126,3 +126,30 @@ it("draws drafts in the world and leaves saved notes unchanged until saving", ()
   );
   expect(data.save.notes).toEqual({});
 });
+it("selects physical volumes before exposing the open book controls", () => {
+  const data = { ...input(), bookOpen: false };
+  let shelf = createOfficeUi(data).find((m) => m.id === "bookshelf")!;
+  expect(shelf.books).toHaveLength(3);
+  expect(shelf.buttons.some((b) => b.id === "close-book")).toBe(false);
+  expect(shelf.buttons.filter((b) => b.action.kind === "lesson")).toHaveLength(
+    3,
+  );
+  data.bookOpen = true;
+  shelf = createOfficeUi(data).find((m) => m.id === "bookshelf")!;
+  expect(shelf.buttons.find((b) => b.id === "close-book")?.action.kind).toBe(
+    "close-book",
+  );
+  expect(shelf.buttons.some((b) => b.action.kind === "lesson")).toBe(false);
+  const initialText = shelf.texts.map((t) => t.text).join(" ");
+  data.page = 1;
+  expect(
+    createOfficeUi(data)
+      .find((m) => m.id === "bookshelf")!
+      .texts.map((t) => t.text)
+      .join(" "),
+  ).not.toBe(initialText);
+  for (const b of shelf.buttons) {
+    expect(b.x + b.w).toBeLessThanOrEqual(SURFACE_WIDTH);
+    expect(b.y + b.h).toBeLessThanOrEqual(SURFACE_HEIGHT);
+  }
+});

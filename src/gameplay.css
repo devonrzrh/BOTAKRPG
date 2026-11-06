@@ -1,0 +1,375 @@
+/* Shared reading sizes. Reduce visible content rather than shrinking it. */
+body {
+  font-size: 18px;
+}
+.app button,
+.app input,
+.app textarea,
+.app select,
+.app summary,
+.app small,
+.app .small,
+.app .muted,
+.app .text-button,
+.app .pill,
+.app .section-eyebrow,
+.app .runner-status,
+.app .weights,
+.app .metric-grid span,
+.app .metric-grid b,
+.app label,
+.app .branch-status,
+.app .save-status,
+.app .world-footer,
+.app kbd {
+  font-size: 16px;
+  letter-spacing: 0;
+}
+.app p,
+.app .markdown p,
+.app .feedback {
+  font-size: 18px;
+  line-height: 1.5;
+}
+.app button {
+  min-height: 44px;
+}
+.app .brand {
+  font-size: 18px;
+  letter-spacing: 0;
+}
+.app .topbar .chapter {
+  display: none;
+}
+.app .topbar .top-actions {
+  margin-left: auto;
+}
+.app summary {
+  cursor: pointer;
+  padding: 10px 0;
+  color: #e0cba5;
+}
+.app summary:focus-visible {
+  outline: 2px solid #edc487;
+  outline-offset: 3px;
+}
+.app .activity-tools {
+  border-top: 1px solid #40505a;
+  margin-top: 12px;
+}
+.app .activity-tools p {
+  margin: 12px 0;
+}
+.room-turns > button {
+  top: 0;
+  bottom: 0;
+  width: 64px;
+  padding: 8px 3px;
+}
+.room-turns > button > span {
+  writing-mode: vertical-rl;
+  font-size: 16px;
+}
+.room-turns > button:hover {
+  background-color: #172e3e44;
+}
+.network-view {
+  grid-template-columns: minmax(0, 1fr);
+}
+.network-view > .rail,
+.network-view > .journey-sidebar {
+  display: none;
+}
+.network-view > .world-shell {
+  grid-column: 1;
+  grid-row: 2;
+}
+.network-view .world-footer {
+  display: none;
+}
+.world-caption {
+  display: none;
+}
+.app .travel-dock {
+  left: 24px;
+  right: auto;
+  bottom: 24px;
+  display: flex;
+  padding: 6px;
+  background: #121e27ed;
+  border: 1px solid #52606a;
+  backdrop-filter: none;
+}
+.app .travel-dock button {
+  padding: 12px 18px;
+  border-right-color: #52606a;
+}
+.app .travel-dock strong {
+  font-size: 18px;
+}
+.app .travel-dock small,
+.app .destination-number {
+  display: none;
+}
+.app .scene-heading {
+  top: 22px;
+  left: 24px;
+}
+.app .scene-heading h1 {
+  font-size: 26px;
+  margin: 0;
+}
+.app .activity-panel {
+  border-radius: 2px;
+}
+.app .panel-header {
+  padding: 12px 22px;
+}
+.app .panel-header h2 {
+  font-size: 24px;
+  margin: 0;
+}
+
+/* The maze is the play area. Programming is an optional tool dock. */
+.gameplay-maze .world-canvas.maze-world {
+  width: 100%;
+}
+.gameplay-maze.maze-manual .maze-panel {
+  inset: 0;
+  width: auto;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  pointer-events: none;
+}
+.gameplay-maze.maze-manual .panel-header {
+  background: linear-gradient(#101b23d9, transparent);
+  border: 0;
+  pointer-events: auto;
+}
+.gameplay-maze.maze-manual .maze-content {
+  position: absolute;
+  right: 24px;
+  bottom: 24px;
+  width: 395px;
+  max-height: calc(100% - 80px);
+  padding: 16px 20px;
+  background: #101c25f2;
+  border: 1px solid #51606b;
+  pointer-events: auto;
+}
+.app .maze-summary {
+  color: #d4d7cd;
+  font-size: 18px;
+  margin-bottom: 12px;
+}
+.app .segmented {
+  margin-bottom: 12px;
+}
+.app .segmented button {
+  font-size: 18px;
+  padding: 10px 12px;
+}
+.app .dpad {
+  margin: 12px auto;
+}
+.app .dpad button {
+  width: 48px;
+  height: 44px;
+}
+.app .maze-footer {
+  flex-wrap: wrap;
+}
+.app .trial-button {
+  font-size: 16px;
+}
+.gameplay-maze:not(.maze-manual) .maze-panel {
+  inset: 12px 12px 12px auto;
+  width: min(620px, 52%);
+}
+.gameplay-maze:not(.maze-manual) .world-canvas.maze-world {
+  width: 48%;
+}
+.app .program-workspace {
+  height: min(42vh, 420px);
+  min-height: 240px;
+}
+.app .run-controls {
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.app .terminal,
+.app .generated-code pre {
+  font-size: 16px;
+  line-height: 1.5;
+  max-height: 140px;
+  overflow: auto;
+}
+.app .terminal:empty {
+  display: none;
+}
+
+/* Enemy on stage; one current action below. */
+.gameplay-battle .battle-panel {
+  inset: 0;
+  border: 0;
+}
+.gameplay-battle .world-canvas.boss-world {
+  top: 40px;
+  height: 49%;
+  width: 100%;
+}
+.gameplay-battle .combat-actions {
+  min-height: 250px;
+  max-height: 56%;
+  padding: 18px 28px;
+  background: #101c26f5;
+  backdrop-filter: none;
+}
+.gameplay-battle .combat-actions > .section-eyebrow {
+  color: #c9d6db;
+}
+.gameplay-battle .combat-actions h2 {
+  font-size: 24px;
+  margin: 12px 0;
+  max-width: none;
+}
+.gameplay-battle .combat-actions > .muted,
+.gameplay-battle .combat-actions > .text-button,
+.gameplay-battle .answer-options button > span {
+  font-size: 16px;
+}
+.gameplay-battle .enemy-card {
+  min-height: 100px;
+}
+.gameplay-battle .enemy-card > small {
+  color: #e6e2d8;
+  font-size: 18px;
+}
+.gameplay-battle .enemy-card .bar {
+  width: 240px;
+  height: 7px;
+  bottom: 36px;
+}
+.gameplay-battle .enemy-card .effect-list {
+  bottom: 50px;
+}
+.gameplay-battle .skill-list {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 12px 0;
+  gap: 10px;
+}
+.gameplay-battle .skill-list > button {
+  flex: 1 1 200px;
+  padding: 12px 16px;
+}
+.gameplay-battle .skill-list strong {
+  font-size: 18px;
+}
+.gameplay-battle .skill-list b {
+  font-size: 16px;
+}
+.gameplay-battle .answer-options {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin: 14px 0;
+}
+.gameplay-battle .answer-options button {
+  padding: 12px 16px;
+  font-size: 18px;
+  line-height: 1.35;
+}
+.gameplay-battle .combat-actions > .primary {
+  min-width: 150px;
+}
+.gameplay-battle .battle-items {
+  margin-top: 8px;
+}
+.gameplay-battle .consumables {
+  flex-wrap: wrap;
+}
+.gameplay-battle .result-screen {
+  padding: 0;
+  text-align: left;
+}
+
+/* One instrument, three actions: label, train, test. */
+.gameplay-garden .activity-panel {
+  inset: 18px;
+  background: #101c26f2;
+}
+.app .garden-layout {
+  grid-template-columns: minmax(350px, 1fr) minmax(310px, 0.85fr);
+  gap: 40px;
+  padding: 20px 28px;
+}
+.app .garden-layout > div:first-child {
+  max-width: 540px;
+  justify-self: center;
+  width: 100%;
+}
+.app .garden-layout .neuron-plot {
+  max-width: min(100%, 45vh);
+  margin: 0 auto;
+  background: #14242b;
+}
+.app .garden-layout .segmented {
+  margin-top: 12px;
+}
+.app .experiment-controls {
+  max-width: 460px;
+  padding: 0;
+}
+.app .experiment-controls h3 {
+  margin: 0;
+  font-size: 26px;
+}
+.app .experiment-controls p {
+  color: #c2d0d0;
+}
+.app .metric-grid {
+  margin: 18px 0;
+}
+.app .metric-grid strong {
+  font-size: 26px;
+}
+.app .network-settings label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 10px 0;
+}
+.app .network-settings input {
+  width: 100px;
+}
+.app .weights b {
+  font-size: 18px;
+}
+.app .experiment-controls > button:not(.text-button) {
+  min-height: 48px;
+  font-size: 20px;
+}
+.app .experiment-controls .feedback {
+  min-height: 0;
+}
+@media (max-width: 900px) {
+  .app .topbar {
+    padding: 0 12px;
+    gap: 14px;
+  }
+  .app .save-status {
+    display: none;
+  }
+  .gameplay-maze:not(.maze-manual) .maze-panel {
+    width: 58%;
+  }
+  .gameplay-maze:not(.maze-manual) .world-canvas.maze-world {
+    width: 42%;
+  }
+  .app .garden-layout {
+    gap: 20px;
+    grid-template-columns: minmax(280px, 1fr) minmax(280px, 1fr);
+    padding: 18px;
+  }
+}

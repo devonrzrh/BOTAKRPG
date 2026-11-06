@@ -25,7 +25,6 @@ export function buildOffice(
   scene: Scene,
   surface: HTMLElement,
   state: () => { wall: HomeWall; reducedMotion: boolean; locked: boolean },
-  interact: (id: string) => void,
 ) {
   scene.clearColor = new Color4(0.025, 0.035, 0.045, 1);
   const camera = new UniversalCamera(
@@ -36,6 +35,10 @@ export function buildOffice(
   camera.fov = 1.03;
   camera.minZ = 0.05;
   camera.rotation.y = wallYaw[state().wall];
+  if (state().wall === "desk") {
+    camera.position.set(-1.25, 4.3, 0);
+    camera.rotation.x = 0.98;
+  }
   const motionBlur = attachTurnMotionBlur(camera);
   let previousWall = state().wall,
     turning = false;
@@ -68,7 +71,6 @@ export function buildOffice(
     d: number,
     color: string,
     parent?: TransformNode,
-    id?: string,
   ) => {
     const mesh = MeshBuilder.CreateBox(
       name,
@@ -78,7 +80,6 @@ export function buildOffice(
     mesh.position.set(x, y, z);
     mesh.material = mat(color);
     if (parent) mesh.parent = parent;
-    if (id) mesh.metadata = { interaction: id };
     return mesh;
   };
   box("floor", 0, -0.12, 0, 11, 0.2, 11, "#332e2a");
@@ -114,42 +115,24 @@ export function buildOffice(
         0.18,
         i === 0 ? "#443a2d" : "#303d3d",
         wall,
-        i === 0 ? "desk" : "quest",
       );
       for (const y of [0.4, 4.6])
         box("board frame", 0, y, 4.66, 7.7, 0.12, 0.22, "#74614a", wall);
       for (const x of [-3.8, 3.8])
         box("board frame", x, 2.5, 4.66, 0.12, 4.3, 0.22, "#74614a", wall);
     } else if (i === 1) {
-      box(
-        "bookshelf back",
-        0,
-        2.25,
-        4.86,
-        8,
-        4.3,
-        0.2,
-        "#272b2c",
-        wall,
-        "library",
-      );
+      box("bookshelf back", 0, 2.25, 4.86, 8, 4.3, 0.2, "#272b2c", wall);
       for (const x of [-4, 4])
-        box(
-          "bookcase side",
-          x,
-          2.25,
-          4.5,
-          0.18,
-          4.5,
-          0.9,
-          "#584b3f",
-          wall,
-          "library",
-        );
-      for (let row = 0; row < 5; row++) {
-        const y = 0.3 + row * 0.86;
-        box("shelf", 0, y, 4.5, 8, 0.12, 0.95, "#71604b", wall, "library");
+        box("bookcase side", x, 2.25, 4.5, 0.18, 4.5, 0.9, "#584b3f", wall);
+      for (let row = 0; row < 4; row++) {
+        const y = 0.3 + row * 1.25;
+        box("shelf", 0, y, 4.5, 8, 0.12, 0.95, "#71604b", wall);
         for (let n = 0; n < 25; n++) {
+          if (
+            row === 1 &&
+            [-2.2, 0, 2.2].some((x) => Math.abs(-3.7 + n * 0.3 - x) < 0.65)
+          )
+            continue;
           const height = 0.42 + ((n * 7 + row * 3) % 8) * 0.045;
           const book = box(
             "reference book",
@@ -161,53 +144,102 @@ export function buildOffice(
             0.55,
             ["#677d7d", "#957953", "#545e6c", "#8e6553"][n % 4],
             wall,
-            "library",
           );
           book.rotation.z = n % 9 === 0 ? 0.08 : 0;
         }
       }
-      box(
-        "reading stand frame",
-        0,
-        2.5,
-        4.0,
-        6.65,
-        3.85,
-        0.17,
-        "#69533c",
-        wall,
-      );
-      box("reading stand stem", 0, 0.45, 4.2, 0.22, 0.9, 0.25, "#69533c", wall);
     } else {
-      box("desk top", 0, 1, 3.4, 6.2, 0.18, 2.7, "#64503e", wall, "inventory");
+      box("desk top", 0, 1, 3.4, 6.2, 0.18, 2.7, "#64503e", wall);
       for (const x of [-2.8, 2.8])
-        box("drawers", x, 0.45, 3.6, 0.9, 0.9, 2, "#3a342f", wall, "inventory");
-      box(
-        "desk mat",
-        0,
-        1.11,
-        3.1,
-        4,
-        0.025,
-        1.9,
-        "#192a30",
-        wall,
-        "inventory",
+        box("drawers", x, 0.45, 3.6, 0.9, 0.9, 2, "#3a342f", wall);
+      box("desk mat", 0, 1.11, 3.1, 4, 0.025, 1.9, "#192a30", wall);
+
+      for (const x of [-2.7, 2.7])
+        for (const z of [2.3, 4.45])
+          box("desk leg", x, 0.45, z, 0.14, 0.9, 0.14, "#3d3026", wall);
+      for (let n = 0; n < 3; n++) {
+        box(
+          "drawer front",
+          -2.3,
+          0.2 + n * 0.25,
+          2.34,
+          1.1,
+          0.22,
+          0.1,
+          "#72553c",
+          wall,
+        );
+        box(
+          "brass handle",
+          -2.3,
+          0.2 + n * 0.25,
+          2.26,
+          0.35,
+          0.035,
+          0.07,
+          "#b39764",
+          wall,
+        );
+      }
+      box("window frame", 0, 3.25, 4.98, 6.8, 2.15, 0.13, "#171e23", wall);
+      box("night window", 0, 3.25, 4.87, 6.55, 1.96, 0.04, "#203b49", wall);
+      for (let n = 0; n < 18; n++) {
+        const h = 0.25 + ((n * 13) % 8) * 0.09;
+        box(
+          "city silhouette",
+          -3 + n * 0.35,
+          2.29 + h / 2,
+          4.81,
+          0.27,
+          h,
+          0.02,
+          "#101c25",
+          wall,
+        );
+      }
+      for (const x of [-1.1, 1.1])
+        box("window mullion", x, 3.25, 4.75, 0.05, 2, 0.08, "#171e23", wall);
+      box("window crossbar", 0, 3.3, 4.75, 6.6, 0.05, 0.08, "#171e23", wall);
+      const mug = MeshBuilder.CreateCylinder(
+        "coffee cup",
+        { diameter: 0.35, height: 0.4, tessellation: 24 },
+        scene,
       );
-      box("terminal", 0, 2.75, 4.02, 5.95, 3.4, 0.2, "#101b23", wall);
-      box("terminal keyboard", 0, 1.15, 2.4, 3.6, 0.12, 0.8, "#303e48", wall);
-      box(
-        "equipment case",
-        -2.7,
-        1.27,
-        2.6,
-        0.65,
-        0.35,
-        0.8,
-        "#303e48",
-        wall,
-        "inventory",
+      mug.parent = wall;
+      mug.position.set(2.85, 1.33, 4.05);
+      mug.material = mat("#c0b294");
+      const coffee = MeshBuilder.CreateCylinder(
+        "coffee",
+        { diameter: 0.3, height: 0.012, tessellation: 24 },
+        scene,
       );
+      coffee.parent = wall;
+      coffee.position.set(2.85, 1.54, 4.05);
+      coffee.material = mat("#2b1d16");
+      const handle = MeshBuilder.CreateTorus(
+        "cup handle",
+        { diameter: 0.26, thickness: 0.05, tessellation: 16 },
+        scene,
+      );
+      handle.parent = wall;
+      handle.position.set(3.07, 1.34, 4.05);
+      handle.rotation.z = Math.PI / 2;
+      handle.material = mat("#c0b294");
+      for (const [x, color] of [
+        [-2.9, "#739c8b"],
+        [-2.55, "#a5895b"],
+      ] as const) {
+        const vial = MeshBuilder.CreateCylinder(
+          "supply bottle",
+          { diameter: 0.23, height: 0.47, tessellation: 16 },
+          scene,
+        );
+        vial.parent = wall;
+        vial.position.set(x, 1.36, 4.3);
+        vial.material = mat(color);
+        box("bottle cap", x, 1.63, 4.3, 0.16, 0.1, 0.16, "#b5aa8c", wall);
+      }
+      box("equipment case", -2.7, 1.27, 2.6, 0.65, 0.35, 0.8, "#303e48", wall);
       box("lamp stem", -3, 1.9, 4.4, 0.05, 1.6, 0.05, "#b09566", wall);
       box("lamp shade", -3, 2.65, 4.4, 0.8, 0.25, 0.5, "#957953", wall);
     }
@@ -237,11 +269,20 @@ export function buildOffice(
       wallYaw[s.wall] + (s.reducedMotion || s.locked ? 0 : px * 0.025);
     const turn = shortestTurn(camera.rotation.y, target);
     const blend = s.reducedMotion ? 1 : 1 - Math.exp(-dt * 19);
+    const eye =
+      s.wall === "desk" ? new Vector3(-1.25, 4.3, 0) : new Vector3(0, 2.2, 0);
+    camera.position = Vector3.Lerp(
+      camera.position,
+      eye,
+      s.reducedMotion ? 1 : 1 - Math.exp(-dt * 12),
+    );
     const beforeYaw = camera.rotation.y,
       beforePitch = camera.rotation.x;
     camera.rotation.y += turn * blend;
     camera.rotation.x +=
-      ((s.reducedMotion || s.locked ? 0 : py * 0.018) - camera.rotation.x) *
+      ((s.wall === "desk" ? 0.98 : 0) +
+        (s.reducedMotion || s.locked ? 0 : py * 0.018) -
+        camera.rotation.x) *
       blend;
     if (
       s.reducedMotion ||
@@ -262,18 +303,10 @@ export function buildOffice(
       ),
     );
   });
-  const click = scene.onPointerObservable.add((info) => {
-    if (info.type === 1 && !state().locked) {
-      const id = scene.pick(scene.pointerX, scene.pointerY)?.pickedMesh
-        ?.metadata?.interaction;
-      if (id) interact(id);
-    }
-  });
   return () => {
     motionBlur.dispose();
     surface.removeEventListener("pointermove", pointer);
     surface.removeEventListener("pointerleave", leave);
     scene.onBeforeRenderObservable.remove(observer);
-    scene.onPointerObservable.remove(click);
   };
 }

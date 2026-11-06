@@ -190,7 +190,7 @@ export default function Blocks({
       toolbox,
       trashcan: true,
       scrollbars: true,
-      zoom: { controls: true, wheel: true, startScale: 0.85 },
+      zoom: { controls: true, wheel: true, startScale: 1.1 },
       grid: { spacing: 24, length: 2, colour: "#ccd5ca", snap: true },
       renderer: "zelos",
     });

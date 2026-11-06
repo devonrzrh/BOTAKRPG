@@ -98,7 +98,7 @@ export function RoomTurns({
               )
                 return;
               cancel();
-              timer.current = setTimeout(() => turn(direction), 550);
+              timer.current = setTimeout(() => turn(direction), 90);
             }}
             onPointerLeave={() => {
               cancel();
