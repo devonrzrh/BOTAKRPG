@@ -5,10 +5,12 @@ it("pulls the closed book clear before opening, then closes before returning", (
   expect(bookPose(0).travel).toBe(0);
   expect(bookPose(0).coverYaw).toBeCloseTo(-Math.PI);
   expect(bookPose(0.4).opening).toBe(0);
-  expect(bookPose(0.45).travel).toBe(1);
-  expect(bookPose(0.45).opening).toBe(0);
+  expect(bookPose(0.42).opening).toBe(0);
+  expect(bookPose(0.55).travel).toBe(1);
+  expect(bookPose(0.55).opening).toBeGreaterThan(0);
   expect(bookPose(1).travel).toBe(1);
   expect(bookPose(1).coverYaw).toBeCloseTo(0);
+  expect(bookPose(0.8).lift).toBeGreaterThan(0);
 });
 
 it("fits the full reading spread after resizing without cropping either page", () => {
@@ -21,7 +23,7 @@ it("fits the full reading spread after resizing without cropping either page", (
     expect(heightFill).toBeLessThanOrEqual(0.99001);
     expect(Math.max(widthFill, heightFill)).toBeCloseTo(0.99);
     expect(bookPose(1, scale).scale).toBeCloseTo(scale);
-    expect(bookPose(0, scale).scale).toBe(0.3);
+    expect(bookPose(0, scale).scale).toBe(0.24);
   }
 });
 

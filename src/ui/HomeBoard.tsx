@@ -84,7 +84,7 @@ export function HomeBoard({
         </button>
         <button
           className="pinned-paper board-file terminal-note"
-          onClick={() => onSelect(finaleReady ? "echo" : "network")}
+          onClick={() => onSelect(finaleReady || caseClosed ? "echo" : "quest")}
         >
           <span className="paper-pin" />
           <Monitor />
@@ -93,14 +93,14 @@ export function HomeBoard({
               ? "Replay ECHO-7"
               : finaleReady
                 ? "Confront ECHO-7"
-                : "Go online"}
+                : "Open quest board"}
           </strong>
           <small>
             {caseClosed
               ? "Case closed"
               : finaleReady
                 ? "All clues recovered"
-                : "Track ECHO-7"}
+                : "Choose the next lead"}
           </small>
           <ArrowUpRight size={17} />
         </button>

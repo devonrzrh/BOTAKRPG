@@ -501,6 +501,15 @@ export default function App() {
       setCombatEvent(null);
       if (tutorialRef.current) closeTutorial();
       if (id === "exit") return;
+      if (id === "library" && !officeFallback) {
+        setHomeWall("bookshelf");
+        setRealm("desk");
+        setScene("desk");
+        setPanel(null);
+        setBookOpen(false);
+        setChapterId(null);
+        return;
+      }
       const selectedChapter = content.entities.find(
         (e): e is Quest =>
           e.type === "quest" && e.kind === "chapter" && e.id === id,
@@ -605,9 +614,10 @@ export default function App() {
           setCutsceneId("first-connection");
           return;
         }
-        setRealm("hub");
-        setScene("hub");
-        setPanel(null);
+        setRealm("desk");
+        setScene("desk");
+        setHomeWall("quests");
+        setPanel("journal");
         setTrial(false);
         trialRef.current = false;
         return;
@@ -691,13 +701,14 @@ export default function App() {
         trialRef.current = false;
       }
     },
-    [realm],
+    [realm, officeFallback],
   );
   const close = () => {
     stop();
     setPanel(null);
-    setScene(realm);
-    if (realm === "desk") setHomeWall("investigation");
+    setRealm("desk");
+    setScene("desk");
+    if (realm !== "desk") setHomeWall("quests");
     setTrial(false);
     trialRef.current = false;
   };
@@ -730,20 +741,27 @@ export default function App() {
     )
       return;
     const next: TutorialId | undefined = bookOpen
-      ? "read"
-      : panel === "maze"
-        ? "maze"
-        : panel === "battle"
-          ? "battle"
-          : panel === "garden"
-            ? "lab"
-            : panel === "journal"
-              ? "quests"
-              : panel === "inventory"
-                ? "ledger"
-                : !panel && realm === "desk" && save.story.caseAccepted
-                  ? "room"
-                  : undefined;
+      ? undefined
+      : panel === "library"
+        ? "read"
+        : panel === "maze"
+          ? "maze"
+          : panel === "battle"
+            ? "battle"
+            : panel === "garden"
+              ? "lab"
+              : panel === "journal"
+                ? "quests"
+                : panel === "inventory"
+                  ? "ledger"
+                  : !panel && realm === "desk" && homeWall === "bookshelf"
+                    ? "read"
+                    : !panel &&
+                        realm === "desk" &&
+                        homeWall === "investigation" &&
+                        save.story.caseAccepted
+                      ? "room"
+                      : undefined;
     if (next && !save.onboarding.seenTips.includes(next)) setTutorialId(next);
   }, [
     booted,
@@ -756,6 +774,7 @@ export default function App() {
     panel,
     bookOpen,
     realm,
+    homeWall,
     chapterId,
     dialogueId,
     cutsceneId,
@@ -788,10 +807,22 @@ export default function App() {
     );
   };
   const openLesson = (id: string) => {
+    if (tutorialRef.current) closeTutorial();
     setLessonId(id);
-    open("library");
-    setBookOpen(true);
     setOfficePage(0);
+    if (officeFallback) {
+      open("library");
+      setBookOpen(true);
+      return;
+    }
+    setBookOpen(true);
+    setRealm("desk");
+    setScene("desk");
+    setHomeWall("bookshelf");
+    setPanel(null);
+    setChapterId(null);
+    setTrial(false);
+    trialRef.current = false;
   };
   const continueBranch = (activity: string) => {
     stop();
@@ -1259,11 +1290,13 @@ export default function App() {
           </span>
         )}
         {!panel && realm !== "desk" && (
-          <>
-            <div className="scene-heading">
-              <h1>Network gateway</h1>
-            </div>
-          </>
+          <div className="network-return" role="status">
+            <span className="section-eyebrow">CASE 007 · NETWORK</span>
+            <h2>The trace is still open.</h2>
+            <button className="primary" onClick={() => open("quest")}>
+              Return to the quest board
+            </button>
+          </div>
         )}
         {panel &&
           (!useWorldUi ||
@@ -2284,22 +2317,6 @@ export default function App() {
               )}
             </section>
           )}
-        {!panel && realm !== "desk" && (
-          <div className="travel-dock">
-            {destinations
-              .filter((d) => d.id !== "battle")
-              .map((d, index) => (
-                <button key={d.id} onClick={() => open(d.id)}>
-                  <span className="destination-number">0{index + 1}</span>
-                  <d.icon size={23} />
-                  <span>
-                    <strong>{d.name}</strong>
-                  </span>
-                  <ArrowUpRight size={16} />
-                </button>
-              ))}
-          </div>
-        )}
         {realm === "desk" && officeFallback && (
           <nav className="room-nav" aria-label="Room walls">
             {[
@@ -2537,9 +2554,10 @@ export default function App() {
                   story: { ...s.story, networkIntroSeen: true },
                 }));
                 setCutsceneId(null);
-                setRealm("hub");
-                setScene("hub");
-                setPanel(null);
+                setRealm("desk");
+                setScene("desk");
+                setHomeWall("quests");
+                setPanel("journal");
                 if (pendingActivity) {
                   const id = pendingActivity;
                   setPendingActivity(null);

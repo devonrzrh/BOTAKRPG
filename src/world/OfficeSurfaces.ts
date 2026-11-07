@@ -16,7 +16,7 @@ import {
   type SurfaceButton,
   type OfficeAction,
 } from "../game/officeUi";
-import { bookPose, bookReadingScale } from "../game/bookAnimation";
+import { bookPose } from "../game/bookAnimation";
 import { drawQuestGraph } from "./QuestGraphSurface";
 import {
   GRAPH_AREA,
@@ -638,6 +638,31 @@ export function attachOfficeSurfaces(
       c.setTransform(2, 0, 0, 2, 0, 0);
       c.fillStyle = "#e2d4b4";
       c.fillRect(0, 0, 1024, 576);
+      // The 3D prop is a transition, not a second reading surface. Blank pages
+      // avoid duplicate controls and warped lesson text during the opening.
+      if (wall === "bookshelf" && model.bookOpen) {
+        c.textAlign = "center";
+        c.fillStyle = "#8a7a5c";
+        c.font = "22px Georgia, serif";
+        c.fillText(model.title.slice(0, 24), 256, 250);
+        c.font = "16px Georgia, serif";
+        c.fillText("Opening the volume…", 768, 250);
+        c.strokeStyle = "#b7a786";
+        c.lineWidth = 1;
+        c.beginPath();
+        c.moveTo(512, 70);
+        c.lineTo(512, 330);
+        c.stroke();
+        pages.forEach((page, index) => {
+          const t = (page.material as StandardMaterial)
+            .diffuseTexture as DynamicTexture;
+          const pc = t.getContext() as unknown as Ctx;
+          pc.setTransform(1, 0, 0, 1, 0, 0);
+          pc.drawImage(source, index * 1024, 0, 1024, 1152, 0, 0, 1024, 1152);
+          t.update();
+        });
+        return;
+      }
       const shade = c.createLinearGradient(472, 0, 552, 0);
       shade.addColorStop(0, "#c8b58b00");
       shade.addColorStop(0.5, "#8f795d77");
@@ -668,7 +693,8 @@ export function attachOfficeSurfaces(
         440,
         wall === "desk" ? "#eee2c6" : "#453d30",
       );
-      if (wall === "desk") ink(c, "EVIDENCE FILES", 550, 25, 32, 430, "#eee2c6");
+      if (wall === "desk")
+        ink(c, "EVIDENCE FILES", 550, 25, 32, 430, "#eee2c6");
       for (const t of model.texts) {
         const width = Math.min(
           t.maxWidth ?? 440,
@@ -781,14 +807,8 @@ export function attachOfficeSurfaces(
       dt = Math.min(0.05, scene.getEngine().getDeltaTime() / 1000);
     progress = s.reducedMotion
       ? target
-      : Math.max(0, Math.min(1, progress + ((target ? 1 : -1) * dt) / 0.85));
-    const camera = scene.activeCamera!,
-      aspect =
-        scene.getEngine().getRenderWidth() /
-        scene.getEngine().getRenderHeight(),
-      // The HTML reading surface owns page layout. Keep the 3D prop visible
-      // beneath it without expanding the rendered book across the whole view.
-      pose = bookPose(progress, bookReadingScale(aspect, camera.fov) * 0.78),
+      : Math.max(0, Math.min(1, progress + ((target ? 1 : -1) * dt) / 1.05));
+    const pose = bookPose(progress, 0.46),
       volume =
         volumes.find((v) => v.id === activeBook) ??
         volumes.find((v) => books[v.index].topic === library.selectedTopic) ??
@@ -797,11 +817,11 @@ export function attachOfficeSurfaces(
     reading.root.setEnabled(progress > 0.001);
     reading.root.position = Vector3.Lerp(
       new Vector3(x - 0.435, 2.12, 4.38),
-      new Vector3(0, 2.2, 2.9),
+      new Vector3(0, 2.02 + pose.lift, 3.46),
       pose.travel,
     );
     reading.root.scaling.setAll(pose.scale);
-    reading.root.rotation.x = 0;
+    reading.root.rotation.x = -0.08 * pose.travel;
     reading.hinge.rotation.y = pose.coverYaw;
     for (const v of volumes)
       v.root.setEnabled(v.id !== volume?.id || progress < 0.01);

@@ -6,7 +6,6 @@ import {
   Compass,
   FileText,
   Gamepad2,
-  Globe2,
   HelpCircle,
   Home as HomeIcon,
   Library,
@@ -23,7 +22,6 @@ const menus = {
   ],
   Case: [
     ["Briefing", "briefing", FileText],
-    ["Go online", "network", Globe2],
     ["Quest board", "quest", Compass],
   ],
   Game: [

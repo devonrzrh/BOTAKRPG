@@ -36,6 +36,7 @@ export function BookReader(p: {
   onEncounter: () => void;
 }) {
   const [ready, setReady] = useState(p.reducedMotion);
+  const [closing, setClosing] = useState(false);
   const [mode, setMode] = useState<"book" | "fullscreen">("book");
   const [drawer, setDrawer] = useState<"contents" | "tools" | "notes" | null>(
     null,
@@ -79,12 +80,21 @@ export function BookReader(p: {
   );
 
   useEffect(() => {
-    const timer = setTimeout(() => setReady(true), p.reducedMotion ? 0 : 900);
+    const timer = setTimeout(() => setReady(true), p.reducedMotion ? 0 : 1100);
     return () => {
       clearTimeout(timer);
       clearTimeout(turnTimer.current);
     };
   }, [p.reducedMotion]);
+  const closeBook = () => {
+    if (closing) return;
+    setClosing(true);
+    if (p.reducedMotion) {
+      p.onClose();
+      return;
+    }
+    window.setTimeout(p.onClose, 260);
+  };
   const measure = useCallback(() => {
     const frame = viewport.current,
       page = article.current;
@@ -266,7 +276,7 @@ export function BookReader(p: {
   if (!ready) return null;
   return (
     <section
-      className={`book-reader reader-${mode} ${turn && !p.reducedMotion ? `turn-${turn}` : ""}`}
+      className={`book-reader reader-${mode} ${turn && !p.reducedMotion ? `turn-${turn}` : ""} ${closing ? "reader-closing" : ""}`}
       aria-label="Open book"
       style={{ "--reading-size": `${fontSize}px` } as React.CSSProperties}
       onKeyDown={(e) => {
@@ -274,7 +284,7 @@ export function BookReader(p: {
           e.stopPropagation();
           if (diagram) closeDiagram();
           else if (drawer) closeDrawer();
-          else p.onClose();
+          else closeBook();
         }
         if (diagram) return;
         if (
@@ -294,6 +304,7 @@ export function BookReader(p: {
     >
       <div className="reader-volume">
         <header className="reader-toolbar">
+          <span className="reader-source">BOOKSHELF</span>
           <button
             aria-expanded={drawer === "contents"}
             onClick={() => {
@@ -332,7 +343,7 @@ export function BookReader(p: {
             <SlidersHorizontal size={20} />
             <span>Tools</span>
           </button>
-          <button aria-label="Close book" onClick={p.onClose}>
+          <button aria-label="Close book" onClick={closeBook}>
             <X size={22} />
           </button>
         </header>
