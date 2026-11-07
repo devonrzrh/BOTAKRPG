@@ -2,166 +2,494 @@
   position: absolute;
   inset: 0;
   z-index: 30;
-  background: #eee4ce;
-  color: #29241e;
-  font-family: Georgia, serif;
-  font-size: 20px;
-}
-.book-reader header {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 14px 24px;
-  border-bottom: 1px solid #b9ac93;
-  background: #e3d5b9;
+  justify-content: center;
+  color: #27251f;
+  font-family: Georgia, serif;
+  background: #08101663;
 }
-.book-reader header strong {
+.reader-volume {
+  display: flex;
+  flex-direction: column;
+  width: min(1440px, calc(100% - 80px));
+  height: calc(100% - 48px);
+  min-height: 0;
+  background: #e8dcc1;
+  border: 8px solid #594332;
+  border-radius: 9px 15px 15px 9px;
+  box-shadow:
+    0 20px 70px #000b,
+    4px 4px 0 #b8a78a,
+    8px 8px 0 #594332;
+  overflow: hidden;
+}
+.reader-toolbar {
+  flex-shrink: 0;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 10px 14px;
+  border-bottom: 1px solid #b6a384;
+  background: #23363d;
+  color: #eee5cf;
+  font: 18px/1.4 var(--typewriter);
+}
+.book-reader .reader-toolbar button {
+  background: #293f46;
+  color: #f3ead5;
+  border-color: #78918e;
+}
+.book-reader .reader-toolbar button[aria-pressed="true"] {
+  background: #526255;
+  border-color: #d8c599;
+}
+.reader-title {
   flex: 1;
-  font-size: 20px;
+  min-width: 0;
+  font-size: 18px;
   font-weight: 400;
+  line-height: 1.4;
+  max-height: 3em;
+  overflow: auto;
+}
+.reader-view-options {
+  display: flex;
+  flex-shrink: 0;
+  gap: 0;
 }
 .book-reader button,
 .book-reader input,
-.book-reader textarea {
-  font-family: inherit;
-  font-size: 18px;
-  color: #29241e;
-  background: #f8f0df;
-  border: 1px solid #a99a7f;
-  border-radius: 4px;
-  padding: 10px 14px;
+.book-reader textarea,
+.book-reader select {
+  font: 400 18px/1.4 var(--typewriter);
+  color: #29251e;
+  background: #f5ecd8;
+  border: 1px solid #aa9673;
+  border-radius: 3px;
+  padding: 8px 12px;
 }
 .book-reader button {
   cursor: pointer;
+  min-height: 44px;
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
 }
-.book-reader button:hover,
+.book-reader button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+.book-reader button svg {
+  flex-shrink: 0;
+}
+.book-reader button:hover:not(:disabled),
 .book-reader button:focus-visible,
-.book-reader button[aria-current="page"] {
-  outline: 3px solid #675230;
+.book-reader input:focus-visible,
+.book-reader select:focus-visible,
+.book-reader textarea:focus-visible {
+  outline: 3px solid #66502d;
   outline-offset: 2px;
 }
-.book-reader-pages {
-  display: flex;
-  height: calc(100% - 76px);
+.book-reader button[aria-pressed="true"],
+.book-reader button[aria-current="page"] {
+  background: #394b49;
+  color: #fff5dd;
+  border-color: #394b49;
 }
-.book-reader nav {
-  width: min(370px, 35%);
-  flex-shrink: 0;
-  overflow-y: auto;
-  padding: 24px;
-  border-right: 1px solid #b9ac93;
+.reader-body {
+  position: relative;
+  flex: 1;
+  min-height: 0;
 }
-.book-reader nav h2 {
-  font-size: 22px;
-  margin: 24px 0 16px;
+.reader-paper {
+  height: 100%;
+  padding: 25px 34px 22px;
+  background: linear-gradient(
+    90deg,
+    #efe4c9 0%,
+    #f5ecd8 46%,
+    #cab995 49.7%,
+    #b6a37d 50%,
+    #e6d7b7 50.5%,
+    #f5ecd8 54%,
+    #eee2c6 100%
+  );
 }
-.book-reader nav button {
+.reader-viewport {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  scrollbar-gutter: stable;
+}
+.reader-spread-end {
+  position: absolute;
+  top: 0;
+  width: 1px;
+  height: 1px;
+  pointer-events: none;
+}
+.app .book-reader .reader-content {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  column-count: 2;
+  column-gap: 64px;
+  column-fill: auto;
+  color: #29251e;
+  font:
+    400 var(--reading-size)/1.65 Georgia,
+    serif;
+  overflow: visible;
+  outline: none;
+}
+.reader-content > :first-child {
+  margin-top: 0;
+}
+.app .book-reader .reader-content {
+  background: transparent;
+  border: 0;
+}
+.app .book-reader .reader-content > :first-child {
+  margin-top: 0;
+}
+.app .book-reader .markdown :is(p, li, blockquote) {
+  font: inherit;
+  color: inherit;
+}
+.app .book-reader .markdown :is(h1, h2, h3, h4) {
+  color: inherit;
+  font-weight: 400;
+  line-height: 1.3;
+  break-after: avoid;
+  margin: 1.1em 0 0.6em;
+}
+.app .book-reader .markdown h1 {
+  font-size: 32px;
+  max-width: none;
+}
+.app .book-reader .markdown h2 {
+  font-size: 28px;
+}
+.app .book-reader .markdown h3,
+.app .book-reader .markdown h4 {
+  font-size: 24px;
+}
+.app .book-reader .markdown strong {
+  color: inherit;
+  font-weight: 700;
+}
+.app .book-reader .markdown p {
+  margin: 0 0 1em;
+  orphans: 3;
+  widows: 3;
+}
+.app .book-reader .markdown :is(img, svg) {
   display: block;
+  max-width: 100%;
+  width: auto;
+  height: auto;
+  margin: 18px auto;
+  background: none;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  filter: none;
+  break-inside: avoid;
+}
+.app .book-reader .markdown img {
+  max-height: 280px;
+  object-fit: contain;
+  color-scheme: light;
+}
+.app .book-reader .markdown img[role="button"] {
+  cursor: zoom-in;
+}
+.app .book-reader .markdown img:focus-visible {
+  outline: 3px solid #66502d;
+  outline-offset: 3px;
+}
+.reader-diagram {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  display: flex;
+  flex-direction: column;
+  background: #f2e9d6;
+  padding: 16px 24px;
+}
+.reader-diagram-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font: 18px/1.4 var(--typewriter);
+  margin-bottom: 12px;
+}
+.reader-diagram-controls button:last-child {
+  margin-left: auto;
+}
+.reader-diagram-canvas {
+  overflow: auto;
+  flex: 1;
+  min-height: 0;
+}
+.reader-diagram-canvas img {
+  display: block;
+  height: auto;
+  max-width: none;
+  background: none;
+  color-scheme: light;
+}
+.app .book-reader .markdown pre {
+  max-height: 330px;
+  overflow: auto;
+  white-space: pre;
+  break-inside: avoid;
+  padding: 16px;
+  margin: 18px 0;
+  color: #eee8d9;
+  background: #252e31;
+  border: 1px solid #52605f;
+}
+.app .book-reader .markdown code {
+  font:
+    400 18px/1.55 Consolas,
+    monospace;
+}
+.app .book-reader .markdown :not(pre) > code {
+  color: #463d2e;
+  background: #d8ccb155;
+  padding: 1px 4px;
+}
+.app .book-reader .markdown table {
+  display: block;
+  max-height: 330px;
+  overflow: auto;
+  max-width: 100%;
+  break-inside: avoid;
+  font-size: 18px;
+  border-collapse: collapse;
+  margin: 18px 0;
+  background: transparent;
+}
+.app .book-reader .markdown :is(th, td) {
+  padding: 10px;
+  border: 1px solid #ad9b79;
+  color: inherit;
+  background: transparent;
+  min-width: 80px;
+}
+.app .book-reader .markdown a {
+  color: #245d69;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.app .book-reader .markdown details {
+  break-inside: avoid;
+  max-height: 330px;
+  overflow: auto;
+}
+.app .book-reader .markdown summary {
+  cursor: pointer;
+  padding: 10px;
+  border: 1px solid #aa9673;
+}
+.reader-footer {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 18px;
+  border-top: 1px solid #b6a384;
+  background: #e1d2b1;
+  font: 18px/1.4 var(--typewriter);
+}
+.reader-footer form,
+.reader-footer label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.reader-footer input {
+  width: 75px;
+  padding: 8px;
+}
+.reader-drawer {
+  position: absolute;
+  z-index: 4;
+  right: 12px;
+  top: 10px;
+  bottom: 10px;
+  width: min(440px, calc(100% - 24px));
+  overflow: auto;
+  background: #f1e6cd;
+  border: 1px solid #907d5b;
+  box-shadow: 0 8px 30px #0005;
+  padding: 20px;
+  font: 18px/1.5 var(--typewriter);
+}
+.reader-drawer-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+.reader-drawer h2 {
+  color: #29251e;
+  font-size: 24px;
+  font-weight: 400;
+  margin: 0;
+}
+.reader-drawer h3 {
+  color: #29251e;
+  font-size: 20px;
+  font-weight: 400;
+  margin: 24px 0 12px;
+}
+.reader-drawer nav button,
+.reader-drawer > button {
+  display: flex;
   width: 100%;
   text-align: left;
-  margin: 12px 0;
+  justify-content: flex-start;
+  margin: 10px 0;
 }
-.book-reader nav input {
+.reader-drawer label {
+  display: block;
+  margin: 18px 0;
+}
+.reader-drawer :is(input, select, textarea) {
+  display: block;
+  margin-top: 10px;
   width: 100%;
 }
-.book-reader article {
-  flex: 1;
+.reader-drawer textarea {
+  min-height: 280px;
+  resize: vertical;
+}
+.reader-fullscreen {
+  background: #f2e9d6;
+}
+.reader-fullscreen .reader-volume {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+.reader-fullscreen .reader-paper {
+  padding: 0;
+  background: #f2e9d6;
+}
+.reader-fullscreen .reader-viewport {
   overflow: auto;
-  padding: 30px max(28px, calc((100vw - 1040px) / 2));
-  min-width: 0;
-  line-height: 1.7;
+  scrollbar-gutter: stable;
 }
-.book-reader .markdown {
-  font-size: 20px;
-  line-height: 1.7;
-  color: inherit;
-}
-.book-reader .markdown p,
-.book-reader .markdown h1,
-.book-reader .markdown h2,
-.book-reader .markdown h3,
-.book-reader .markdown strong {
-  color: inherit;
-}
-.book-reader .markdown p,
-.book-reader .markdown li {
-  font-size: 20px;
-}
-.book-reader .markdown h1 {
-  max-width: none;
-  font-size: 32px;
-}
-.book-reader .markdown h2 {
-  font-size: 27px;
-}
-.book-reader .markdown h3 {
-  font-size: 23px;
-}
-.book-reader .markdown code {
-  font-size: 18px;
-}
-.book-reader .markdown img {
-  max-width: 100%;
-  width: 100%;
-  color-scheme: light;
+.app .reader-fullscreen .reader-content {
   height: auto;
-  display: block;
-  margin: 24px auto;
-  background: #fff;
-  border-radius: 4px;
+  min-height: 100%;
+  column-count: auto;
+  padding: 30px max(32px, calc((100% - 960px) / 2));
 }
-.book-reader .markdown pre {
-  overflow-x: auto;
-  font-size: 18px;
-  background: #262a2b;
-  color: #eee4ce;
-  padding: 20px;
+.app .reader-fullscreen .markdown img {
+  width: auto;
+  max-height: none;
 }
-.book-reader .markdown table {
-  display: block;
-  max-width: 100%;
-  overflow-x: auto;
-  font-size: 18px;
+.app .reader-fullscreen .markdown :is(pre, table, details) {
+  max-height: none;
 }
-.book-reader .markdown a {
-  color: #315b6b;
-  text-decoration: underline;
+.turn-next .reader-paper::after,
+.turn-previous .reader-paper::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 50%;
+  pointer-events: none;
+  background: linear-gradient(90deg, #6e563940, #fff8e833);
+  animation: reader-flip 0.35s ease-out both;
+  transform-origin: left;
+  right: 0;
 }
-.book-reader .markdown summary {
-  cursor: pointer;
-  padding: 12px;
-  border: 1px solid #a99a7f;
+.turn-previous .reader-paper::after {
+  left: 0;
+  right: auto;
+  transform-origin: right;
 }
-.book-reader .markdown details {
-  margin: 20px 0;
+@keyframes reader-flip {
+  from {
+    opacity: 0.9;
+    transform: perspective(900px) rotateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: perspective(900px) rotateY(-150deg);
+  }
 }
-.book-reader textarea {
-  display: block;
-  width: 100%;
-  min-height: 45vh;
-  margin-top: 16px;
-  line-height: 1.6;
+.turn-previous .reader-paper::after {
+  animation-name: reader-flip-back;
 }
-.book-prerequisites {
-  font-size: 18px;
-  color: #5b5143;
+@keyframes reader-flip-back {
+  from {
+    opacity: 0.9;
+    transform: perspective(900px) rotateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: perspective(900px) rotateY(150deg);
+  }
 }
-.book-prerequisites button {
-  margin-left: 10px;
+@media (max-width: 1050px) {
+  .reader-volume {
+    width: calc(100% - 36px);
+  }
+  .reader-toolbar {
+    flex-wrap: wrap;
+  }
+  .reader-title {
+    order: -1;
+    flex-basis: 100%;
+    font-size: 20px;
+  }
+  .reader-view-options {
+    margin-left: auto;
+  }
+  .reader-paper {
+    padding: 20px;
+  }
+  .app .book-reader .reader-content {
+    column-gap: 40px;
+  }
 }
-@media (max-width: 1100px) {
-  .book-reader header {
+@media (max-width: 800px) {
+  .app .reader-book .reader-content {
+    column-count: 1;
+  }
+  .reader-book .reader-paper {
+    background: #f5ecd8;
+  }
+  .reader-footer {
     flex-wrap: wrap;
     gap: 8px;
-    padding: 10px;
+    padding: 8px;
   }
-  .book-reader header strong {
-    min-width: 35%;
+  .reader-toolbar button {
+    padding: 8px;
   }
-  .book-reader-pages {
-    height: calc(100% - 120px);
+  .reader-volume {
+    width: calc(100% - 24px);
+    height: calc(100% - 24px);
   }
-  .book-reader article {
-    padding: 24px;
+}
+.reduced-motion .reader-paper::after {
+  display: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .reader-paper::after {
+    display: none !important;
   }
 }

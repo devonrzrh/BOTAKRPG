@@ -229,3 +229,11 @@ Browser verification at 1280 × 720: ACT revealed ECHO-7's weakness; Guard banke
 Browser checks confirmed the physical desk ledger displays two recovered files per spread, Next clues changes pages, and Open reference opens the linked full-screen book. The character menu retains skill unlocks separately. ECHO-7 replay started at full HP/focus and offered Skills / Inspect / Guard / Retreat with no Items command.
 
 ![Clue ledger](screenshots/clue-ledger.png)
+## Paged and fullscreen reader
+
+120 tests pass; production build passes. New pagination tests cover column counts, single-column layouts, page-jump bounds, and an odd final spread with a blank facing page.
+
+At 1280 × 720, the large book measured 1200px wide with visible room margins, 22px body text, and transparent SVG image backgrounds. Browser checks covered Previous/Next, keyboard page turning, direct jumps to the end of a long chapter, 24px repagination, chapter search, notes-panel focus, diagram enlargement, and switching to fullscreen while retaining the current content block. The full source chapter's concluding text remained reachable. Fullscreen uses a centered continuous column and Back to top. Code and oversized tables remain scrollable inside book pages.
+
+![Large book](screenshots/reader-book.png)
+![Fullscreen reader](screenshots/reader-fullscreen.png)
