@@ -1,22 +1,36 @@
 import { useEffect, useRef, useState } from "react";
-import { ChevronDown } from "lucide-react";
+import {
+  Archive,
+  BookOpen,
+  ChevronDown,
+  Compass,
+  FileText,
+  Gamepad2,
+  Globe2,
+  Home as HomeIcon,
+  Library,
+  NotebookPen,
+  Settings2,
+} from "lucide-react";
+import "./MenuBar.css";
 const menus = {
   Home: [
-    ["Investigation wall", "desk"],
-    ["Bookshelf", "library"],
-    ["Quest board", "quest"],
-    ["Inventory desk", "inventory"],
+    ["Investigation wall", "desk", Archive],
+    ["Bookshelf", "library", Library],
+    ["Quest board", "quest", Compass],
+    ["Inventory desk", "inventory", NotebookPen],
   ],
   Case: [
-    ["Briefing", "briefing"],
-    ["Go online", "network"],
-    ["Quest board", "quest"],
+    ["Briefing", "briefing", FileText],
+    ["Go online", "network", Globe2],
+    ["Quest board", "quest", Compass],
   ],
   Game: [
-    ["Replay intro", "intro"],
-    ["Settings & saves", "settings"],
+    ["Replay intro", "intro", BookOpen],
+    ["Settings & saves", "settings", Settings2],
   ],
-};
+} as const;
+const menuIcons = { Home: HomeIcon, Case: FileText, Game: Gamepad2 };
 export function MenuBar({ onSelect }: { onSelect: (id: string) => void }) {
   const [active, setActive] = useState<string | null>(null);
   const root = useRef<HTMLElement>(null);
@@ -45,6 +59,8 @@ export function MenuBar({ onSelect }: { onSelect: (id: string) => void }) {
       {Object.entries(menus).map(([name, entries]) => (
         <div className="menu-group" key={name}>
           <button
+            type="button"
+            className="menu-trigger"
             aria-expanded={active === name}
             aria-controls={`menu-${name}`}
             onClick={() => setActive(active === name ? null : name)}
@@ -60,8 +76,12 @@ export function MenuBar({ onSelect }: { onSelect: (id: string) => void }) {
               }
             }}
           >
-            {name}
-            <ChevronDown size={12} />
+            {(() => {
+              const Icon = menuIcons[name as keyof typeof menuIcons];
+              return <Icon aria-hidden="true" size={17} strokeWidth={1.8} />;
+            })()}
+            <span>{name}</span>
+            <ChevronDown aria-hidden="true" size={14} />
           </button>
           {active === name && (
             <div
@@ -80,15 +100,17 @@ export function MenuBar({ onSelect }: { onSelect: (id: string) => void }) {
                 ]?.focus();
               }}
             >
-              {entries.map(([label, id]) => (
+              {entries.map(([label, id, Icon]) => (
                 <button
                   key={id}
+                  type="button"
                   onClick={() => {
                     setActive(null);
                     onSelect(id);
                   }}
                 >
-                  {label}
+                  <Icon aria-hidden="true" size={17} strokeWidth={1.8} />
+                  <span>{label}</span>
                 </button>
               ))}
             </div>

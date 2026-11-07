@@ -4,6 +4,7 @@ import type { Battle } from "../game/combat";
 import { stats, type Save } from "../game/state";
 import { combatMotion } from "../game/combatPresentation";
 import { XpMeter } from "./XpMeter";
+import { Crosshair, Package, ScanSearch, LogOut } from "lucide-react";
 
 interface Props {
   battle: Battle;
@@ -390,10 +391,18 @@ export function BattleScreen(p: Props) {
             disabled={b.phase !== "choose" || !!motion}
             onClick={() => setMenu(menu === id ? null : id)}
           >
+            {id === "skills" ? (
+              <Crosshair size={22} aria-hidden="true" />
+            ) : id === "items" ? (
+              <Package size={22} aria-hidden="true" />
+            ) : (
+              <ScanSearch size={22} aria-hidden="true" />
+            )}
             {id[0].toUpperCase() + id.slice(1)}
           </button>
         ))}
         <button disabled={!!motion} onClick={p.onRetreat}>
+          <LogOut size={22} aria-hidden="true" />
           Retreat
         </button>
       </nav>

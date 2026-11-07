@@ -1,0 +1,143 @@
+.menu-bar {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  height: 100%;
+  color: #e9e4d6;
+}
+
+.menu-bar .menu-group {
+  position: relative;
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+.menu-bar .menu-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 40px;
+  padding: 0 13px;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  background: transparent;
+  color: #c1c9c8;
+  font: inherit;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: 0.025em;
+  transition:
+    color 120ms ease,
+    background 120ms ease,
+    border-color 120ms ease;
+}
+.menu-bar .menu-trigger > svg:first-child {
+  color: #a9b887;
+}
+.menu-bar .menu-trigger > svg:last-child {
+  color: #89989a;
+  transition: transform 120ms ease;
+}
+.menu-bar .menu-trigger:hover,
+.menu-bar .menu-trigger[aria-expanded="true"] {
+  color: #f1ead8;
+  background: #24343a;
+  border-color: #526257;
+}
+.menu-bar .menu-trigger[aria-expanded="true"] > svg:last-child {
+  transform: rotate(180deg);
+}
+.menu-bar button:focus-visible {
+  outline: 2px solid #c5ad72;
+  outline-offset: 2px;
+}
+
+.menu-bar .menu-popup {
+  position: absolute;
+  z-index: 100;
+  top: calc(100% + 2px);
+  left: 0;
+  min-width: 258px;
+  padding: 7px;
+  border: 1px solid #53615e;
+  border-top: 2px solid #b2a06d;
+  border-radius: 2px 2px 4px 4px;
+  background: #172328;
+  box-shadow:
+    0 16px 36px #000b,
+    inset 0 1px #ffffff08;
+  animation: menu-arrive 100ms ease-out;
+}
+.menu-bar .menu-popup button {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 44px;
+  padding: 9px 12px;
+  border: 1px solid transparent;
+  border-radius: 2px;
+  background: transparent;
+  color: #e2e4dc;
+  text-align: left;
+  font: inherit;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.3;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.menu-bar .menu-popup button svg {
+  flex: 0 0 auto;
+  color: #aeb88c;
+}
+.menu-bar .menu-popup button:hover,
+.menu-bar .menu-popup button:focus-visible {
+  border-color: #43564f;
+  background: #26383b;
+  color: #fff4d8;
+}
+.menu-bar .menu-popup button:focus-visible {
+  outline-offset: -2px;
+}
+
+@keyframes menu-arrive {
+  from {
+    opacity: 0;
+    transform: translateY(-3px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .menu-bar .menu-trigger,
+  .menu-bar .menu-trigger > svg:last-child {
+    transition: none;
+  }
+  .menu-bar .menu-popup {
+    animation: none;
+  }
+}
+.reduced-motion .menu-bar .menu-popup {
+  animation: none;
+}
+.reduced-motion .menu-bar .menu-trigger,
+.reduced-motion .menu-bar .menu-trigger > svg:last-child {
+  transition: none;
+}
+@media (max-width: 760px) {
+  .menu-bar {
+    gap: 1px;
+  }
+  .menu-bar .menu-trigger {
+    gap: 6px;
+    padding: 0 8px;
+    font-size: 16px;
+  }
+  .menu-bar .menu-trigger > svg:first-child {
+    width: 15px;
+  }
+}

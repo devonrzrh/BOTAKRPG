@@ -11,4 +11,5 @@ import "./ui/XpMeter.css";
 import "./ui/BookReader.css";
 import "./ui/Dialogue.css";
 import "./ui/LearningQuest.css";
+import "./investigation.css";
 createRoot(document.getElementById("root")!).render(<App />);

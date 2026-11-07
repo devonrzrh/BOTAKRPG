@@ -2,6 +2,14 @@ import { useEffect, useRef, useState } from "react";
 import { marked } from "marked";
 import DOMPurify from "dompurify";
 import type { Lesson } from "../content/schema";
+import {
+  Library,
+  Bookmark,
+  NotebookPen,
+  Swords,
+  X,
+  BookOpen,
+} from "lucide-react";
 
 export function BookReader(p: {
   lessons: Lesson[];
@@ -48,21 +56,35 @@ export function BookReader(p: {
     >
       <header>
         <button onClick={() => setContents(!contents)} aria-expanded={contents}>
-          Contents
+          <Library size={20} aria-hidden="true" /> Contents
         </button>
-        <strong>{p.lesson.title}</strong>
+        <strong>
+          <BookOpen size={22} aria-hidden="true" />
+          {p.lesson.title}
+        </strong>
         <button onClick={p.onBookmark} aria-pressed={p.bookmarked}>
+          <Bookmark
+            size={20}
+            fill={p.bookmarked ? "currentColor" : "none"}
+            aria-hidden="true"
+          />
           {p.bookmarked ? "Bookmarked" : "Bookmark"}
         </button>
         <button onClick={() => setNotes(!notes)} aria-expanded={notes}>
-          Notes
+          <NotebookPen size={20} aria-hidden="true" /> Notes
         </button>
         {p.lesson.source &&
           p.lesson.id !== "source-test-bank" &&
           p.lesson.id !== "source-guide" && (
-            <button onClick={p.onEncounter}>Enter encounter</button>
+            <button className="book-encounter" onClick={p.onEncounter}>
+              <Swords size={20} aria-hidden="true" />
+              Enter encounter
+            </button>
           )}
-        <button onClick={p.onClose}>Close book</button>
+        <button onClick={p.onClose}>
+          <X size={20} aria-hidden="true" />
+          Close book
+        </button>
       </header>
       <div className="book-reader-pages">
         {contents && (

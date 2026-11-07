@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { marked } from "marked";
 import DOMPurify from "dompurify";
+import { FileSearch, Check, ChevronRight, X } from "lucide-react";
 import type { Quest } from "../content/schema";
 import type { Save } from "../game/state";
 
@@ -26,6 +27,13 @@ export function LearningQuest(p: {
     [answer, setAnswer] = useState<number | null>(null),
     [feedback, setFeedback] = useState<boolean | null>(null),
     root = useRef<HTMLElement>(null);
+  const stages = [
+      "Concept",
+      "Worked example",
+      "Guided practice",
+      "Chapter check",
+    ],
+    stage = ["concept", "example", "practice", "ready"].indexOf(page);
   useEffect(() => {
     root.current?.querySelector<HTMLElement>("h2")?.focus();
   }, [page]);
@@ -55,9 +63,33 @@ export function LearningQuest(p: {
         }}
       >
         <header>
+          <FileSearch size={26} aria-hidden="true" />
           <span>{c.title}</span>
-          <button onClick={p.onClose}>Close</button>
+          <button onClick={p.onClose}>
+            <X size={20} aria-hidden="true" /> Close
+          </button>
         </header>
+        <ol className="learning-route" aria-label="Chapter progress">
+          {stages.map((label, index) => (
+            <li
+              key={label}
+              aria-current={index === stage ? "step" : undefined}
+              className={index < stage ? "visited" : ""}
+            >
+              <span className="learning-step-mark" aria-hidden="true">
+                {index < stage ? <Check size={18} /> : index + 1}
+              </span>
+              <span>{label}</span>
+              {index < stages.length - 1 && (
+                <ChevronRight
+                  className="learning-step-arrow"
+                  size={18}
+                  aria-hidden="true"
+                />
+              )}
+            </li>
+          ))}
+        </ol>
         <main>
           <p className="learning-stage">
             {page === "concept"
@@ -98,7 +130,10 @@ export function LearningQuest(p: {
                       setFeedback(null);
                     }}
                   >
-                    {option}
+                    <span className="learning-option-number" aria-hidden="true">
+                      {String.fromCharCode(65 + index)}
+                    </span>
+                    <span>{option}</span>
                   </button>
                 ))}
               </div>

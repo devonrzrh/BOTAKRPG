@@ -1,5 +1,21 @@
 # Validation · 2026-11-07
 
+## Investigation interface pass
+
+78 tests pass; production build passes with 269 validated records. Added a shared slate, teal and brass treatment across menus, chapter briefs, combat, settings and activity tools. The physical quest display now has a grid, connection sockets, framed nodes and clearer selected states. Text wraps at measured word boundaries. The desk ledger has printed equipment rows and skill cards. Full-screen books retain paper pages with an icon toolbar; equipment cards show item types and equipped state.
+
+Browser checks at 1280 × 720 covered menu navigation, selecting quest nodes by keyboard, chapter concept/example/practice transitions, full-screen reading, the physical ledger, compact settings, and combat Skills → Probe → question → Retreat. The top bar and XP stayed visible. Practice options use 18px text and chapter progress reflects the current stage. Existing rewards and save formats are unchanged.
+
+![Chapter investigation](screenshots/investigation-chapter.png)
+
+![Quest screen](screenshots/investigation-graph.png)
+
+![Reference book](screenshots/investigation-book.png)
+
+![Physical ledger](screenshots/investigation-ledger.png)
+
+![Combat](screenshots/investigation-combat.png)
+
 ## Typewriter dialogue
 
 78 tests pass; production build validates 269 records. Dialogue now uses a bottom conversation panel, speaker portraits, 22px typewriter text, punctuation pauses and numbered responses. Click or Space reveals the line without choosing a response. Reduced motion displays the complete line immediately; screen readers receive each complete line once.

@@ -36,7 +36,6 @@ import {
   Heart,
   Zap,
   Shield,
-  GraduationCap,
   Monitor,
   ScanLine,
   FolderSearch,
@@ -1779,7 +1778,7 @@ export default function App() {
                 <div className="inventory-content">
                   <div className="character-banner">
                     <span className="character-sigil">
-                      <GraduationCap size={42} />
+                      <FolderSearch size={42} />
                     </span>
                     <div>
                       <span className="section-eyebrow">
@@ -1821,10 +1820,24 @@ export default function App() {
                   <h3>Field equipment</h3>
                   <div className="item-grid">
                     {items.map((item) => (
-                      <div className="item-card" key={item.id}>
+                      <div
+                        className={`item-card ${save.character.equipment === item.id ? "is-equipped" : ""} ${!save.inventory[item.id] ? "is-unowned" : ""}`}
+                        key={item.id}
+                      >
+                        <span className="equipment-glyph" aria-hidden="true">
+                          {item.kind === "equipment" ? (
+                            <Shield size={30} />
+                          ) : item.kind === "focus" ? (
+                            <Zap size={30} />
+                          ) : (
+                            <Heart size={30} />
+                          )}
+                        </span>
                         <span className="pill">
                           {item.kind === "equipment"
-                            ? "EQUIPMENT"
+                            ? save.character.equipment === item.id
+                              ? "EQUIPPED"
+                              : "MODULE"
                             : `× ${save.inventory[item.id] ?? 0}`}
                         </span>
                         <h4>{item.title}</h4>

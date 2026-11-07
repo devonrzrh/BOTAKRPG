@@ -654,8 +654,34 @@ export function attachOfficeSurfaces(
         c.lineTo(996, y);
         c.stroke();
       }
-      ink(c, model.title, 35, 25, wall === "desk" ? 32 : 22, 440);
-      if (wall === "desk") ink(c, "SKILLS", 550, 25, 32, 430);
+      if (wall === "desk") {
+        c.fillStyle = "#30464a";
+        c.fillRect(20, 14, 463, 48);
+        c.fillRect(535, 14, 469, 48);
+        c.strokeStyle = "#826f51";
+        c.lineWidth = 1;
+        c.strokeRect(20, 72, 463, 128);
+        c.fillStyle = "#6b574414";
+        c.fillRect(20, 72, 463, 128);
+        for (let y = 212; y < 450; y += 85) {
+          c.fillStyle = "#f4ebd555";
+          c.fillRect(20, y, 463, 78);
+          c.strokeStyle = "#927d5d";
+          c.strokeRect(20, y, 463, 78);
+          c.fillStyle = "#7d6042";
+          c.fillRect(20, y, 4, 78);
+        }
+      }
+      ink(
+        c,
+        model.title,
+        35,
+        25,
+        wall === "desk" ? 32 : 22,
+        440,
+        wall === "desk" ? "#eee2c6" : "#453d30",
+      );
+      if (wall === "desk") ink(c, "SKILLS", 550, 25, 32, 430, "#eee2c6");
       for (const t of model.texts) {
         const width = Math.min(
           t.maxWidth ?? 440,
@@ -671,6 +697,16 @@ export function attachOfficeSurfaces(
         );
       }
       for (const b of model.buttons) {
+        c.globalAlpha = 1;
+        if (wall === "desk" && b.x > 512) {
+          c.fillStyle = selected === b.id ? "#b0b8a855" : "#f6efdf66";
+          c.fillRect(b.x, b.y - 4, b.w, b.h + 8);
+          c.strokeStyle = b.disabled ? "#9f957b" : "#667c72";
+          c.lineWidth = b.disabled ? 1 : 2;
+          c.strokeRect(b.x, b.y - 4, b.w, b.h + 8);
+          c.fillStyle = b.disabled ? "#9f957b" : "#667c72";
+          c.fillRect(b.x, b.y - 4, 3, b.h + 8);
+        }
         c.globalAlpha = b.disabled ? 0.72 : 1;
         const size = wall === "desk" ? 30 : 20,
           lines = wrapLines(
