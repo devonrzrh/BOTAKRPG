@@ -359,9 +359,7 @@ export function BattleScreen(p: Props) {
         </section>
       )}
       <div className="battle-player-hud">
-        <strong>
-          {save.character.name} · Lv {save.character.level}
-        </strong>
+        <strong>{save.character.name}</strong>
         {meter("HP", save.character.hp, limits.maxHp, "health")}
         {meter("Focus", save.character.focus, limits.maxFocus, "focus")}
         <div className="battle-status-effects">
@@ -371,12 +369,6 @@ export function BattleScreen(p: Props) {
               <span key={e.id}>Shield · {e.remaining} turns</span>
             ))}
         </div>
-      </div>
-      <div className="battle-xp-hud">
-        <XpMeter
-          xp={save.character.xp}
-          reducedMotion={save.settings.reducedMotion}
-        />
       </div>
       <nav className="battle-command-menu" aria-label="Battle commands">
         <span>Turn {b.turn}</span>

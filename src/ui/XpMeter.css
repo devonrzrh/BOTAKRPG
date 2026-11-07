@@ -1,0 +1,79 @@
+.xp-meter > div:first-child {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 18px;
+  margin-bottom: 7px;
+}
+.xp-meter strong {
+  font-size: 18px;
+}
+.xp-meter [role="progressbar"] {
+  height: 8px;
+  background: #071118;
+  border: 1px solid #68798a;
+  overflow: hidden;
+}
+.xp-meter i {
+  display: block;
+  height: 100%;
+  background: #c7a36c;
+}
+.xp-next {
+  display: block;
+  font-size: 16px;
+  margin-top: 7px;
+  color: #c5d1d5;
+}
+.topbar .xp-compact {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-left: auto;
+  flex-shrink: 0;
+  font-size: 16px;
+  color: #dce2dd;
+}
+.xp-compact > span {
+  white-space: nowrap;
+}
+.xp-compact-track {
+  width: 135px;
+  display: grid;
+  gap: 4px;
+}
+.xp-compact-track strong {
+  font-size: 16px;
+  font-weight: 400;
+  text-align: center;
+}
+.xp-compact-track [role="progressbar"] {
+  height: 6px;
+}
+.app .topbar .top-actions {
+  margin-left: 0;
+}
+@media (max-width: 1150px) {
+  .app .topbar {
+    gap: 14px;
+    padding-inline: 16px;
+  }
+  .app .topbar .save-status {
+    display: none;
+  }
+  .topbar .xp-compact {
+    gap: 10px;
+  }
+}
+@media (max-width: 900px) {
+  .app .topbar .brand-mark,
+  .app .topbar .avatar {
+    display: none;
+  }
+  .xp-compact-track {
+    width: 105px;
+  }
+  .topbar .xp-compact {
+    gap: 8px;
+  }
+}

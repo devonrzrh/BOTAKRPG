@@ -1,5 +1,13 @@
 # Validation · 2026-11-07
 
+## Persistent top-bar XP
+
+57 tests pass; production build passes. Level, XP progress, and XP to next level now appear in the global top bar. Removed the duplicate battle XP box; the victory reward meter remains. Shared XP styles are independent of the battle component. Initial save loading remounts the compact meter so restored XP does not look like a newly earned reward.
+
+Browser checks covered the office and ECHO-7 encounter at 1280 × 720: all menus and top-bar XP labels fit, and combat retains only HP/focus in its player HUD. No browser warnings or errors were recorded.
+
+![Persistent XP bar](screenshots/topbar-xp.jpg)
+
 ## XP interface
 
 57 tests pass; production build passes. New XP display tests cover starting progress, 99 → 100 XP, partial progress after leveling, and the level-100 cap. Combat now presents a persistent XP meter plus victory XP, animated progress, level-up stat gains, and available skills. Reduced motion skips the progress animation.

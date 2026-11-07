@@ -26,7 +26,7 @@
 - Use regular-weight readable text or a typewriter font. Primary screen text: at least 18px; secondary controls: at least 16px. Check actual projected text size in the 3D view; texture font size alone is insufficient.
 - Never shrink text to fit. Reduce copy, paginate, or reorganize instead.
 - Battle: visible 3D enemy with its HP centered above it; quiz panel in the middle. Player HP/focus stay bottom-left, Skills / Items / Inspect / Retreat bottom-right. Clear the quiz during brief attack transitions; respect reduced motion.
-- Show level and XP progress in combat. Victory shows XP gained and any level-up stat gains or available skills. Practice victories must not imply duplicate XP rewards.
+- Show persistent level, XP progress, and XP to next level in the top bar across the office and activities; avoid a duplicate combat XP box. Victory keeps the larger XP reward and level-up summary. Practice victories must not imply duplicate XP rewards.
 - Maze: world first, compact controls; open code tools only when selected. AI activity: classify, train, test; advanced settings can be expanded.
 
 ## Foundations

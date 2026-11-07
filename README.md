@@ -50,7 +50,7 @@ Cross-Origin-Embedder-Policy: require-corp
 
 ## Saves and boundaries
 
-Combat shows the current level, XP bar, and XP needed for the next level. Victory displays earned XP, animated level progress, stat gains on level-up, and newly available skills. Replays explain that their XP was already earned. Level 100 displays MAX. This presents the existing progression rules without changing rewards or topic mastery.
+The persistent top bar shows the current level, XP bar, and XP needed for the next level across the office and activities. Victory displays earned XP, animated level progress, stat gains on level-up, and newly available skills. Replays explain that their XP was already earned. Level 100 displays MAX. This presents the existing progression rules without changing rewards or topic mastery.
 
 Saves contain character stats, inventory, completion and reward claims, mastery evidence, notes, bookmarks, code, blocks, seed, trial record, and preferences. Use **Settings → Export journal** before clearing browser storage. Invalid imports leave the existing save untouched. Corrupt stored data is not automatically overwritten; a recovery download and explicit replacement control are available. Encounter state and training points are session-local experiments; progression persists.
 

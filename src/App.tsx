@@ -55,6 +55,7 @@ import {
   type Dialogue as DialogueContent,
 } from "./content/schema";
 import { BattleScreen } from "./ui/BattleScreen";
+import { XpMeter } from "./ui/XpMeter";
 import { Cutscene } from "./ui/Cutscene";
 import { Dialogue } from "./ui/Dialogue";
 import { MenuBar } from "./ui/MenuBar";
@@ -807,6 +808,12 @@ export default function App() {
           <span>NULL / TRACE</span>
         </a>
         <MenuBar onSelect={open} />
+        <XpMeter
+          key={booted ? "ready" : "loading"}
+          compact
+          xp={save.character.xp}
+          reducedMotion={save.settings.reducedMotion}
+        />
         <div className="chapter">
           <span className="chapter-dot" />
           CASE 007 <span className="top-divider">/</span> ECHO-7
