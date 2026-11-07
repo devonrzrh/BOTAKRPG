@@ -55,6 +55,7 @@ import {
   type Dialogue as DialogueContent,
 } from "./content/schema";
 import { BattleScreen } from "./ui/BattleScreen";
+import { battleCue, type BattleCue } from "./game/combatPresentation";
 import { XpMeter } from "./ui/XpMeter";
 import { LearningQuest } from "./ui/LearningQuest";
 import {
@@ -275,6 +276,8 @@ export default function App() {
     [battleNotice, setBattleNotice] = useState("");
   const battleRef = useRef(battle);
   battleRef.current = battle;
+  const [combatEvent, setCombatEvent] = useState<BattleCue | null>(null);
+  const combatSequence = useRef(0);
   const [lessonId, setLessonId] = useState(lessons[0].id),
     [search, setSearch] = useState(""),
     [topic, setTopic] = useState("all");
@@ -453,6 +456,7 @@ export default function App() {
   };
   const open = useCallback(
     (id: string) => {
+      setCombatEvent(null);
       if (id === "exit") return;
       const selectedChapter = content.entities.find(
         (e): e is Quest =>
@@ -712,7 +716,21 @@ export default function App() {
   const narratedBattle = Boolean(
     activityStory(content, battleActivityId, "before"),
   );
-  const applyBattle = (nextBattle: Battle, nextSave: Save) => {
+  const applyBattle = (
+    nextBattle: Battle,
+    nextSave: Save,
+    cause?: "guard" | "item",
+  ) => {
+    const cue = battleCue(
+      battleRef.current,
+      nextBattle,
+      saveRef.current,
+      nextSave,
+      content,
+      ++combatSequence.current,
+      cause,
+    );
+    if (cue) setCombatEvent(cue);
     if (nextBattle.phase === "won") {
       const activity =
         content.entities.find(
@@ -1096,6 +1114,7 @@ export default function App() {
               Boolean(cutsceneId)
             }
             encounter={panel === "battle"}
+            combatCue={panel === "battle" ? combatEvent : null}
             finalBoss={["echo-7", "route-warden", "archive-keeper"].includes(
               battle.enemyId,
             )}
@@ -1566,6 +1585,7 @@ export default function App() {
                 <BattleScreen
                   key={battle.enemyId}
                   battle={battle}
+                  cue={combatEvent}
                   save={save}
                   content={content}
                   question={currentQuestion}
@@ -1598,7 +1618,7 @@ export default function App() {
                         item,
                         content,
                       );
-                      applyBattle(result.battle, result.save);
+                      applyBattle(result.battle, result.save, "item");
                     } catch (e) {
                       notify(String(e));
                     }
@@ -1611,7 +1631,7 @@ export default function App() {
                         saveRef.current,
                         content,
                       );
-                      applyBattle(result.battle, result.save);
+                      applyBattle(result.battle, result.save, "guard");
                     } catch (e) {
                       notify(String(e));
                     }

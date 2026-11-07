@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import type { Content, Item, Question, Skill } from "../content/schema";
 import { enemyIntent, type Battle } from "../game/combat";
 import { stats, type Save } from "../game/state";
-import { combatMotion } from "../game/combatPresentation";
+import { combatCueDuration, type BattleCue } from "../game/combatPresentation";
 import { XpMeter } from "./XpMeter";
 import {
   Crosshair,
@@ -14,6 +14,7 @@ import {
 
 interface Props {
   battle: Battle;
+  cue: BattleCue | null;
   save: Save;
   content: Content;
   question?: Question;
@@ -41,11 +42,8 @@ export function BattleScreen(p: Props) {
   );
   const [reviewing, setReviewing] = useState(false);
   const [impact, setImpact] = useState("");
-  const [motion, setMotion] = useState<
-    ReturnType<typeof combatMotion> | "recover"
-  >(null);
-  const previous = useRef(b),
-    startingSave = useRef(save),
+  const [motion, setMotion] = useState<BattleCue["kind"] | null>(null);
+  const startingSave = useRef(save),
     title = useRef<HTMLHeadingElement>(null),
     skillsButton = useRef<HTMLButtonElement>(null);
   const continuation = useRef(p.onContinue),
@@ -70,26 +68,34 @@ export function BattleScreen(p: Props) {
     return () => clearTimeout(timer);
   }, [b, correctFeedback, reviewing, save.settings.reducedMotion]);
   useEffect(() => {
-    const next = combatMotion(previous.current, b);
-    const cue =
-      next === "enemy" &&
-      enemyIntent(previous.current, save, p.content).kind === "recover"
-        ? "recover"
-        : next;
-    previous.current = b;
-    if (next)
-      setImpact(
-        next === "player" || next === "miss"
-          ? (b.log.at(-2) ?? p.notice)
-          : (b.log.at(-1) ?? ""),
-      );
-    setMotion(save.settings.reducedMotion ? null : cue);
-    if (next && b.phase !== "choose") setMenu(null);
-    const timer = next ? setTimeout(() => setMotion(null), 500) : undefined;
-    return () => {
-      if (timer) clearTimeout(timer);
-    };
-  }, [b, save.settings.reducedMotion]);
+    const cue = p.cue;
+    if (!cue) {
+      setMotion(null);
+      return;
+    }
+    setMotion(cue.kind);
+    setImpact(
+      cue.kind === "player"
+        ? `${p.content.entities.find((e) => e.id === cue.skill)?.title ?? "Hit"}`
+        : cue.kind === "poison"
+          ? "Poison"
+          : cue.kind === "miss"
+            ? "Turn spent"
+            : cue.kind === "recover"
+              ? "Opening"
+              : cue.blocked
+                ? "Guard absorbed the hit"
+                : cue.heavy
+                  ? "Heavy strike"
+                  : "Enemy strike",
+    );
+    if (b.phase !== "choose") setMenu(null);
+    const timer = setTimeout(
+      () => setMotion(null),
+      combatCueDuration(save.settings.reducedMotion),
+    );
+    return () => clearTimeout(timer);
+  }, [p.cue, save.settings.reducedMotion]);
   useEffect(() => {
     if (motion) return;
     if ((menu && menu !== "skills") || b.phase !== "choose")
@@ -124,7 +130,17 @@ export function BattleScreen(p: Props) {
   );
   const activeCard =
     !motion && (b.phase !== "choose" || (menu && menu !== "skills"));
-  const intent = enemyIntent(b, save, p.content);
+  const upcomingIntent = enemyIntent(b, save, p.content);
+  const intent =
+    motion === "enemy" && p.cue
+      ? {
+          kind: p.cue.heavy ? "heavy" : "strike",
+          label: p.cue.heavy ? "Heavy Strike" : "Strike",
+          damage: p.cue.amount,
+        }
+      : motion === "recover"
+        ? { kind: "recover", label: "Opening", damage: 0 }
+        : upcomingIntent;
   const displayOptions =
     q?.options
       .map((text, index) => ({ text, index }))
@@ -235,9 +251,34 @@ export function BattleScreen(p: Props) {
         </div>
       </div>
       {motion && (
-        <div className="battle-impact" role="status">
-          {impact}
-        </div>
+        <>
+          {motion === "enemy" && !p.cue?.blocked && (
+            <div
+              className="battle-hit-flash"
+              aria-hidden="true"
+              key={`flash-${p.cue?.sequence}`}
+            />
+          )}
+          <div
+            key={p.cue?.sequence}
+            className={`battle-damage-number number-${motion} ${p.cue?.blocked ? "is-blocked" : ""}`}
+            aria-hidden="true"
+          >
+            {motion === "miss"
+              ? "MISS"
+              : motion === "recover"
+                ? p.cue?.amount
+                  ? `+${p.cue.amount} FP`
+                  : "OPENING"
+                : `${p.cue?.blocked ? "BLOCK " : ""}−${p.cue?.amount ?? 0}`}
+          </div>
+          <div className="battle-impact" role="status">
+            {impact}
+            {p.cue && p.cue.amount > 0
+              ? ` · ${p.cue.amount}${motion === "recover" ? " focus" : " damage"}`
+              : ""}
+          </div>
+        </>
       )}
       {activeCard && (
         <section

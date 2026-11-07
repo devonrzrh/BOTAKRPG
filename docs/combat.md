@@ -24,4 +24,10 @@ Victory retains its XP and level summary. It does not auto-advance into another 
 
 ## Further design work
 
-Individual enemy patterns, boss phase changes, sound, and distinct attack animations can build on these intent and action interfaces. Enemies currently share the pattern above; their chapter question pools and existing combat effects remain distinct content.
+Individual enemy patterns, boss phase changes and sound can build on these intent and action interfaces. Enemies currently share the pattern above; their chapter question pools and existing combat effects remain distinct content.
+
+## Attack presentation
+
+Resolved actions emit sequenced visual cues before level-up rewards can change HP. Babylon animates the robot's body and shoulder pivots, with a projectile arriving before recoil, a contact ring and sparks. Enemy strikes wind up and lunge; heavy strikes have stronger movement. Blocks show a foreground shield, misses whiff without a hit reaction, and defeated robots fall and hold their pose until the encounter resets. Skill effects use distinct colors.
+
+The quiz clears for the 900ms action animation. Damage numbers appear around contact; incoming hits add a short red edge pulse. Recovery does not lunge, and poison finishes cannot invent an enemy attack. Reduced motion uses a 200ms static glow/number cue without particles, translation or flashes. A fixed pool of nine effect meshes is reused and disposed with the scene. Replays clear cues and restore the rig.

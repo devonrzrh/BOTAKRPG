@@ -12,6 +12,9 @@ import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { Color3, Color4 } from "@babylonjs/core/Maths/math.color";
 import { DynamicTexture } from "@babylonjs/core/Materials/Textures/dynamicTexture";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
+import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import { attachBattleEffects } from "./BattleEffects";
+import type { BattleCue } from "../game/combatPresentation";
 import "@babylonjs/core/Rendering/edgesRenderer";
 import { PointerEventTypes } from "@babylonjs/core/Events/pointerEvents";
 import "@babylonjs/core/Engines/Extensions/engine.dynamicTexture";
@@ -43,6 +46,7 @@ interface Props {
   onRendererReady?: () => void;
   scene: SceneId;
   encounter?: boolean;
+  combatCue?: BattleCue | null;
   finalBoss?: boolean;
   homeWall?: HomeWall;
   homeLookLocked?: boolean;
@@ -421,6 +425,7 @@ function WorldCanvas(props: Props) {
       cylinder("column", x, height / 2 + 0.3, z, 0.27, height, light);
       box("capital", x, height + 0.35, z, 0.85, 0.25, 0.85, light);
     };
+    let disposeBattleEffects: (() => void) | undefined;
     if (props.scene === "maze") {
       const m = props.maze;
       box(
@@ -490,6 +495,20 @@ function WorldCanvas(props: Props) {
       cylinder("sentinel platform", 5, 0.05, 4, 3, 0.2, stone, 32);
       cylinder("platform ring", 5, 0.17, 4, 2.4, 0.04, teal, 32);
       cylinder("platform inset", 5, 0.2, 4, 2.25, 0.04, edge, 32);
+      const enemyRoot = new TransformNode("enemy combat rig", scene);
+      enemyRoot.position.set(5, 0, 4);
+      enemyRoot.computeWorldMatrix(true);
+      const arms = [-1, 1].map((side) => {
+        const pivot = new TransformNode(
+          side < 0 ? "left shoulder pivot" : "right shoulder pivot",
+          scene,
+        );
+        pivot.parent = enemyRoot;
+        pivot.position.set(side * 1.03, 2.12, 0);
+        pivot.computeWorldMatrix(true);
+        return pivot;
+      });
+      const firstRobotMesh = scene.meshes.length;
       box("sentinel torso", 5, 1.55, 4, 1.45, 1.65, 0.85, light);
       box("chest plate", 5, 1.55, 3.53, 1.14, 1.1, 0.13, stone);
       box("chest indicator", 5, 1.7, 3.44, 0.42, 0.13, 0.05, teal);
@@ -506,11 +525,46 @@ function WorldCanvas(props: Props) {
       );
       for (const side of [-1, 1]) {
         box("shoulder", 5 + side * 1.03, 2.12, 4, 0.55, 0.5, 0.85, stone);
-        box("arm", 5 + side * 1.03, 1.43, 4, 0.4, 1.05, 0.55, light);
-        box("hand", 5 + side * 1.03, 0.82, 4, 0.44, 0.32, 0.55, stone);
+        box("arm", 5 + side * 1.03, 1.43, 4, 0.4, 1.05, 0.55, light).setParent(
+          arms[side < 0 ? 0 : 1],
+        );
+        box(
+          "hand",
+          5 + side * 1.03,
+          0.82,
+          4,
+          0.44,
+          0.32,
+          0.55,
+          stone,
+        ).setParent(arms[side < 0 ? 0 : 1]);
         box("leg", 5 + side * 0.43, 0.52, 4, 0.47, 0.6, 0.6, light);
         box("foot", 5 + side * 0.43, 0.28, 3.86, 0.57, 0.2, 0.9, stone);
       }
+      const robotMaterials = new Map<StandardMaterial, StandardMaterial>();
+      for (const mesh of scene.meshes.slice(firstRobotMesh)) {
+        if (!mesh.parent) mesh.setParent(enemyRoot);
+        const original = mesh.material as StandardMaterial;
+        if (!robotMaterials.has(original))
+          robotMaterials.set(
+            original,
+            original.clone(`enemy ${original.name}`),
+          );
+        mesh.material = robotMaterials.get(original)!;
+      }
+      disposeBattleEffects = attachBattleEffects(
+        scene,
+        {
+          root: enemyRoot,
+          leftArm: arms[0],
+          rightArm: arms[1],
+          materials: [...robotMaterials.values()],
+        },
+        () => ({
+          cue: latest.current.combatCue ?? null,
+          reducedMotion: latest.current.reducedMotion,
+        }),
+      );
       const spotlight = new PointLight(
         "sentinel light",
         new Vector3(5, 3, 1),
@@ -751,6 +805,7 @@ function WorldCanvas(props: Props) {
       if (canvas.current) canvas.current.style.cursor = "";
       if (sceneRef.current === scene) sceneRef.current = null;
       actorRef.current = null;
+      disposeBattleEffects?.();
       scene.dispose();
     };
   }, [

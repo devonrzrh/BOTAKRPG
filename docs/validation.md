@@ -1,5 +1,17 @@
 # Validation · 2026-11-07
 
+## Animated attack impact
+
+104 tests pass; build validates 282 records. Added real Babylon enemy wind-up, shoulder swing and lunge; player projectiles, contact sparks/rings and recoil; guarded impacts, miss cues and a held defeat pose. Skill colors, floating damage and a brief incoming-hit vignette share sequenced action cues with the world. Full-canvas shaking is removed. Reduced motion uses static cues instead.
+
+Browser checks exercised player hits, a miss, guarded enemy strikes, a heavy unguarded hit, recovery and an ECHO-7 practice victory. Effects rendered with automatic WebGPU and forced WebGL2. Reduced motion suppressed movement and particles. Replay awarded no XP; original renderer and motion preferences were restored. NullEngine tests verify contact/recoil timing, heavy arm/root movement, no false recoil or glow on a miss, reduced-motion invariants, pose reset, bounded resource counts and disposal. Model tests cover exact damage, guards, finishers and poison kills without phantom enemy attacks.
+
+![Player impact](screenshots/attack-impact.png)
+
+![Enemy impact](screenshots/enemy-impact.png)
+
+![Guard impact](screenshots/guard-impact.png)
+
 ## Combat flow and tactics
 
 92 tests pass; build validates 282 content records. Added exact enemy intent previews, strike/heavy/opening turns, Guard with focus recovery, direct skill selection, numbered answer shortcuts and automatic correct-answer continuation with an optional review pause. Wrong answers retain deliberate explanation/Continue. Full-resource items are rejected without consuming a turn, and stale callbacks cannot resolve a turn twice. Status durations use enemy turns, including openings.
