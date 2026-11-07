@@ -117,6 +117,13 @@ export function MenuBar({ onSelect }: { onSelect: (id: string) => void }) {
           )}
         </div>
       ))}
+      <span
+        className="menu-version"
+        title={`NULL / TRACE build ${__APP_VERSION__}`}
+        aria-label={`Version ${__APP_VERSION__}`}
+      >
+        v{__APP_VERSION__}
+      </span>
     </nav>
   );
 }
