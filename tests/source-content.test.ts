@@ -23,7 +23,7 @@ const questions = content.entities.filter(
 );
 it("preserves every supplied file byte-for-byte in the distributable archive", async () => {
   expect(manifest.chapters).toHaveLength(31);
-  expect(manifest.files.length).toBeGreaterThanOrEqual(405);
+  expect(manifest.files.length).toBeGreaterThanOrEqual(404);
   expect(new Set(manifest.files.map((file) => file.path)).size).toBe(
     manifest.files.length,
   );

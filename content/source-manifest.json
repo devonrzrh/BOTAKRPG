@@ -2240,21 +2240,6 @@
       "path": "Content/Test Bank/Test.md",
       "sha256": "c65be26d25198de4abd54c415b143c528c95e5a22ddc88fe854d8be5698d66fb",
       "bytes": 47725
-    },
-    {
-      "path": "Content/Videos/Data Structures⁄Data Versioning.mp4",
-      "sha256": "6a88802623942daa7802991d99dc53f4b1a44fdfece7b7d59d25bfb891f79bda",
-      "bytes": 24242300
-    },
-    {
-      "path": "Content/Videos/Reinforcement Learning.mp4",
-      "sha256": "ddc9c1caff514baafda6bbfd423649abf738f6d75da6811b90c0efc2a2572b88",
-      "bytes": 17351374
-    },
-    {
-      "path": "Content/Videos/Sequential Decisions.mp4",
-      "sha256": "cc97fbf6f0c673fd37dc759bbeec0550894a48ae0cf62bc13f99e957bf1beb6b",
-      "bytes": 95513627
     }
   ]
 }

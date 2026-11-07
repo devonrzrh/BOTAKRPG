@@ -167,7 +167,4 @@ I used a separate AI learner walkthrough for Chapters 02, 06, and 09. It reached
 
 ## Supplementary materials
 
-- [Data Structures⁄Data Versioning](/materials/Content/Videos/Data%20Structures%E2%81%84Data%20Versioning.mp4)
-- [Reinforcement Learning](/materials/Content/Videos/Reinforcement%20Learning.mp4)
-- [Sequential Decisions](/materials/Content/Videos/Sequential%20Decisions.mp4)
 - [Test](/materials/Content/Test%20Bank/Test.md)
