@@ -4,14 +4,71 @@ A local-first learning RPG built with TypeScript, React, Babylon.js, Blockly, an
 
 ## Run
 
-Requires Node.js 22 or newer.
+### Requirements
+
+- **Node.js 22 or newer** (includes npm). Check with `node --version` and `npm --version`.
+- A modern browser with **WebGPU** or **WebGL2**. The app tries WebGPU first and falls back to WebGL2.
+- No Python installation is required for normal play: Python runs in the browser through Pyodide.
+- Optional: **Poppler** (`pdftotext` on `PATH`) only if you want to re-import the untracked `Source/` material with `npm run source:import`.
+
+### Install and start
 
 ```sh
 npm install
 npm run dev
 ```
 
-Open the local URL printed by Vite. `npm run build` validates Markdown, copies the installed Python runtime, type-checks, and builds `dist/`. `npm run preview` serves that build with the required runtime headers. `npm test` checks pure models, content validation, save persistence, and worker lifecycle.
+Open the URL Vite prints, normally `http://127.0.0.1:5173/`. If that port is busy, Vite prints the next free port.
+
+On Windows you can also double-click `run-dev.bat`, which checks for Node and installed dependencies before starting Vite.
+
+### Other commands
+
+```sh
+npm test        # model, content, save and worker tests
+npm run check   # TypeScript only, no build
+npm run build   # validate content, copy Python runtime, type-check, build dist/
+npm run preview # serve dist/ with the required COOP/COEP headers
+```
+
+`npm run dev` and `npm run build` regenerate `src/generated/content.json` and copy the installed Pyodide files into `public/pyodide/` automatically. `dist/` is build output; do not edit it by hand.
+
+### Dependencies
+
+Runtime packages:
+
+| Package               | Used for                                       |
+| --------------------- | ---------------------------------------------- |
+| `react`, `react-dom`  | UI and screens                                 |
+| `@babylonjs/core`     | 3D office, maze, encounters and combat effects |
+| `zod`                 | Save and content validation                    |
+| `marked`, `dompurify` | Lesson Markdown rendering and sanitising       |
+| `@codemirror/*`       | Python editor                                  |
+| `blockly`             | Visual block editor                            |
+| `pyodide`             | Browser Python runtime                         |
+| `yaml`                | Markdown/YAML content import                   |
+| `lucide-react`        | Interface icons                                |
+
+Development-only packages: `vite`, `@vitejs/plugin-react`, `typescript`, `vitest`, `tsx`, `prettier`, `fake-indexeddb`, `@types/*`.
+
+### Python and hosting headers
+
+Browser Python needs cross-origin isolation. `npm run dev` and `npm run preview` set the headers automatically. For a static host, keep `public/_headers` (copied into `dist/`) or return these headers:
+
+```text
+Cross-Origin-Opener-Policy: same-origin
+Cross-Origin-Embedder-Policy: require-corp
+```
+
+Without them the app explains that Python is unavailable and the manual activities still work.
+
+### Troubleshooting
+
+- **`npm` not found**: install Node.js 22+ and reopen the terminal.
+- **Blank page**: check the browser console; force WebGL2 in Settings if WebGPU is unsupported.
+- **Python unavailable**: the page is not cross-origin isolated, or `public/pyodide/` is missing. Run `npm run runtime` and serve with the headers above.
+- **Save looks stale**: progress is in IndexedDB for that origin. Export from Settings before clearing site data or changing ports.
+- **Port already in use**: stop the other dev server, or open the alternate URL Vite prints.
 
 ## Source curriculum
 
