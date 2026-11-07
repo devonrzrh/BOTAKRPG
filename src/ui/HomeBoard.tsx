@@ -1,6 +1,6 @@
 import {
   BookOpen,
-  Backpack,
+  NotebookPen,
   Monitor,
   FolderSearch,
   ArrowUpRight,
@@ -77,9 +77,9 @@ export function HomeBoard({
           onClick={() => onSelect("inventory")}
         >
           <span className="paper-pin" />
-          <Backpack />
-          <strong>Inventory desk</strong>
-          <small>Items & skills</small>
+          <NotebookPen />
+          <strong>Clue ledger</strong>
+          <small>Review recovered evidence</small>
           <ArrowUpRight size={17} />
         </button>
         <button

@@ -2,7 +2,6 @@ import { expect, it } from "vitest";
 import raw from "../src/generated/content.json";
 import {
   validateContent,
-  type Item,
   type Question,
   type Quest,
   type Skill,
@@ -27,6 +26,7 @@ import {
   parseSave,
   recordAnswer,
   stats,
+  recoverResources,
 } from "../src/game/state";
 import {
   activityUnlocked,
@@ -47,7 +47,6 @@ import {
   enemyTurn,
   isCorrect,
   selectSkill,
-  useItem,
 } from "../src/game/combat";
 
 const content = validateContent(raw);
@@ -59,9 +58,6 @@ const questions = content.entities.filter(
 );
 const insight = content.entities.find(
   (e): e is Skill => e.type === "skill" && e.id === "insight",
-)!;
-const healing = content.entities.find(
-  (e): e is Item => e.type === "item" && e.id === "healing-draught",
 )!;
 
 function trainOrientation() {
@@ -90,21 +86,13 @@ function wrongAnswer(question: Question) {
 }
 
 function winEncounter(save: ReturnType<typeof initialSave>, id: string) {
+  save = recoverResources(save);
   const activity = content.entities.find((e) => e.id === id);
   if (activity?.type !== "activity" || !activity.enemy)
     throw new Error(`Missing encounter ${id}`);
   let battle = createBattle(activity.enemy),
-    turns = 0,
-    potions = 0;
+    turns = 0;
   while (battle.phase !== "won" && battle.phase !== "lost" && turns < 100) {
-    if (save.character.hp <= 20 && save.inventory[healing.id] > 0) {
-      const result = useItem(battle, save, healing, content);
-      battle = result.battle;
-      save = result.save;
-      potions++;
-      turns++;
-      continue;
-    }
     battle = selectSkill(battle, save, insight, questions);
     const question = questions.find((q) => q.id === battle.question)!;
     const hit = answerBattle(battle, save, content, question.answer);
@@ -115,7 +103,7 @@ function winEncounter(save: ReturnType<typeof initialSave>, id: string) {
     turns++;
   }
   expect(battle.phase, id).toBe("won");
-  return { save, potions, turns };
+  return { save, turns };
 }
 
 it("trains and tests a real orientation model to the Garden's held-out completion threshold", () => {
@@ -211,7 +199,6 @@ it("plays the signal investigation through ordered chapter practice, combat, sav
       }
       const result = winEncounter(save, id);
       save = result.save;
-      potions += result.potions;
       turns += result.turns;
       save = addXp(completeActivity(save, id), 20);
     }
@@ -221,7 +208,6 @@ it("plays the signal investigation through ordered chapter practice, combat, sav
   }
 
   expect(turns).toBeGreaterThan(0);
-  expect(potions).toBeGreaterThan(0);
   expect(questComplete(save, signal)).toBe(true);
   expect(save.completed).toEqual(expect.arrayContaining(signal.objectives));
   expect(save.completed).not.toContain("maze-chamber");
@@ -239,10 +225,8 @@ it("plays the signal investigation through ordered chapter practice, combat, sav
     /Verified handshake.*M-04/is,
   );
   save = acknowledgeStory(save, ending!);
-  const beforeClaim = save.inventory["focus-tea"];
   save = claimQuest(save, signal, content);
   expect(save.claimed).toContain(signal.id);
-  expect(save.inventory["focus-tea"]).toBe(beforeClaim + 1);
   expect(claimQuest(save, signal, content)).toBe(save);
   expect(finaleAvailable(save, content)).toBe(false);
   expect(

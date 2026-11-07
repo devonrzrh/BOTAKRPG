@@ -2,7 +2,6 @@ import type {
   CombatTactics,
   Content,
   Effect,
-  Item,
   Question,
   Skill,
 } from "../content/schema";
@@ -470,45 +469,6 @@ export function evadeTurn(
       ],
     },
     save,
-    content,
-  );
-}
-export function useItem(
-  battle: Battle,
-  save: Save,
-  item: Item,
-  content: Content,
-): { battle: Battle; save: Save } {
-  if (
-    battle.phase !== "choose" ||
-    item.kind === "equipment" ||
-    !(save.inventory[item.id] > 0) ||
-    (item.kind === "healing" &&
-      save.character.hp >= stats(save, content).maxHp) ||
-    (item.kind === "focus" &&
-      save.character.focus >= stats(save, content).maxFocus)
-  )
-    throw new Error("Item unavailable");
-  const player = structuredClone(save),
-    limits = stats(save, content);
-  player.inventory[item.id]--;
-  if (item.kind === "healing")
-    player.character.hp = Math.min(
-      limits.maxHp,
-      player.character.hp + item.amount,
-    );
-  else
-    player.character.focus = Math.min(
-      limits.maxFocus,
-      player.character.focus + item.amount,
-    );
-  return enemyTurn(
-    {
-      ...battle,
-      phase: "feedback",
-      log: [...battle.log, `Used ${item.title}.`],
-    },
-    player,
     content,
   );
 }

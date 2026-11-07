@@ -222,3 +222,10 @@ The measured difference is too small to establish a performance advantage. Captu
 Browser verification at 1280 × 720: ACT revealed ECHO-7's weakness; Guard banked Boost; selecting Boost updated damage previews; two matching hits broke stance and skipped the response; a charged Limit attack won without duplicate practice XP. The timed dodge completed and reduced incoming damage. Forced WebGL2 rendered correctly, and reduced motion offered an immediate assisted dodge. Automatic rendering and motion preferences were restored afterward. Peaceful completion gates are verified by model tests; that route was not played through in this browser pass.
 
 ![Combat depth](screenshots/combat-depth.png)
+## Clue-only desk
+
+118 tests pass; production build passes with 279 validated content records. Branch walkthrough tests now recover between encounters without consumables. Legacy inventory/equipment fields are validated and removed on import, preserving completion, XP, skills, and clue evidence. Ledger tests cover discovery, duplicate completion, save round trips, pagination, and reference actions.
+
+Browser checks confirmed the physical desk ledger displays two recovered files per spread, Next clues changes pages, and Open reference opens the linked full-screen book. The character menu retains skill unlocks separately. ECHO-7 replay started at full HP/focus and offered Skills / Inspect / Guard / Retreat with no Items command.
+
+![Clue ledger](screenshots/clue-ledger.png)

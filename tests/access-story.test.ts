@@ -5,7 +5,6 @@ import {
   type Quest,
   type Question,
   type Skill,
-  type Item,
 } from "../src/content/schema";
 import {
   activityStory,
@@ -20,6 +19,7 @@ import {
   claimQuest,
   parseSave,
   recordAnswer,
+  recoverResources,
 } from "../src/game/state";
 import {
   activityUnlocked,
@@ -32,7 +32,6 @@ import {
   selectSkill,
   answerBattle,
   enemyTurn,
-  useItem,
 } from "../src/game/combat";
 const content = validateContent(raw),
   branch = content.entities.find(
@@ -44,11 +43,8 @@ const questions = content.entities.filter(
 const probe = content.entities.find(
   (e): e is Skill => e.type === "skill" && e.id === "insight",
 )!;
-const healing = content.entities.find(
-  (e): e is Item => e.type === "item" && e.id === "healing-draught",
-)!;
 
-it("plays the entire archive independently, including healing, boss, saved dialogue and its own reward", () => {
+it("plays the entire archive independently, including resource recovery, boss, saved dialogue and its own reward", () => {
   let save = initialSave();
   save.story = {
     ...save.story,
@@ -56,8 +52,7 @@ it("plays the entire archive independently, including healing, boss, saved dialo
     prologueSeen: true,
     networkIntroSeen: true,
   };
-  let turns = 0,
-    potions = 0;
+  let turns = 0;
   for (const id of branch.objectives) {
     expect(nextObjective(save, branch)).toBe(id);
     expect(activityUnlocked(save, id, content)).toBe(true);
@@ -68,6 +63,7 @@ it("plays the entire archive independently, including healing, boss, saved dialo
     save = parseSave(JSON.parse(JSON.stringify(save)), content);
     const activity = content.entities.find((e) => e.id === id);
     if (activity?.type !== "activity") throw new Error(id);
+    save = recoverResources(save);
     let battle = createBattle(
       activity.enemy ?? {
         id: "sentinel",
@@ -79,14 +75,6 @@ it("plays the entire archive independently, including healing, boss, saved dialo
       },
     );
     while (battle.phase !== "won" && battle.phase !== "lost" && turns < 160) {
-      if (save.character.hp <= 20 && save.inventory[healing.id] > 0) {
-        const result = useItem(battle, save, healing, content);
-        battle = result.battle;
-        save = result.save;
-        potions++;
-        turns++;
-        continue;
-      }
       battle = selectSkill(battle, save, probe, questions);
       const q = questions.find((q) => q.id === battle.question)!;
       const hit = answerBattle(battle, save, content, q.answer);
@@ -99,7 +87,6 @@ it("plays the entire archive independently, including healing, boss, saved dialo
     expect(battle.phase, id).toBe("won");
     save = addXp(completeActivity(save, id), 20);
   }
-  expect(potions).toBeGreaterThan(0);
   expect(questComplete(save, branch)).toBe(true);
   expect(save.completed).not.toContain("maze-chamber");
   expect(save.claimed).not.toContain("routing-trace");
@@ -107,10 +94,8 @@ it("plays the entire archive independently, including healing, boss, saved dialo
   expect(ending.nodes.map((n) => n.text).join(" ")).toContain("M-04");
   save = acknowledgeStory(save, ending);
   const owner = storyBranch(content, ending.trigger!.activity)!;
-  const before = save.inventory[healing.id];
   save = claimQuest(save, owner, content);
   expect(save.claimed).toEqual(["access-records"]);
-  expect(save.inventory[healing.id]).toBe(before + 1);
   expect(claimQuest(save, owner, content)).toBe(save);
   expect(save.character.level).toBe(3);
   expect(save.character.xp).toBe(260);

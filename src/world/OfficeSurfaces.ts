@@ -404,7 +404,7 @@ export function attachOfficeSurfaces(
     },
   );
   sheet(
-    "equipment receipt",
+    "clue ledger index",
     "investigation",
     -2.25,
     0.95,
@@ -414,9 +414,9 @@ export function attachOfficeSurfaces(
     0.045,
     (c, m) => {
       paper(c);
-      ink(c, "EQUIPMENT CHECKOUT", 30, 80, 48);
+      ink(c, "CLUE LEDGER", 30, 80, 48);
       rule(c, 300);
-      ink(c, "Field kit / desk", 30, 400, 46);
+      ink(c, "Evidence recovered", 30, 400, 46);
       return zone(m, "inventory");
     },
   );
@@ -658,30 +658,17 @@ export function attachOfficeSurfaces(
         c.fillStyle = "#30464a";
         c.fillRect(20, 14, 463, 48);
         c.fillRect(535, 14, 469, 48);
-        c.strokeStyle = "#826f51";
-        c.lineWidth = 1;
-        c.strokeRect(20, 72, 463, 128);
-        c.fillStyle = "#6b574414";
-        c.fillRect(20, 72, 463, 128);
-        for (let y = 212; y < 450; y += 85) {
-          c.fillStyle = "#f4ebd555";
-          c.fillRect(20, y, 463, 78);
-          c.strokeStyle = "#927d5d";
-          c.strokeRect(20, y, 463, 78);
-          c.fillStyle = "#7d6042";
-          c.fillRect(20, y, 4, 78);
-        }
       }
       ink(
         c,
-        model.title,
+        wall === "desk" ? "CLUE LEDGER" : model.title,
         35,
         25,
         wall === "desk" ? 32 : 22,
         440,
         wall === "desk" ? "#eee2c6" : "#453d30",
       );
-      if (wall === "desk") ink(c, "SKILLS", 550, 25, 32, 430, "#eee2c6");
+      if (wall === "desk") ink(c, "EVIDENCE FILES", 550, 25, 32, 430, "#eee2c6");
       for (const t of model.texts) {
         const width = Math.min(
           t.maxWidth ?? 440,
@@ -762,7 +749,7 @@ export function attachOfficeSurfaces(
     return { root, hinge, pages, draw };
   };
   const reading = makeBook("selected reference book", "bookshelf"),
-    ledger = makeBook("equipment ledger", "desk");
+    ledger = makeBook("clue ledger", "desk");
   const readingBackdrop = MeshBuilder.CreatePlane(
     "full-screen reading backdrop",
     { size: 2 },

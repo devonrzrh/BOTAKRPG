@@ -1,0 +1,28 @@
+.clue-ledger {
+  padding: 24px;
+  color: #e0e2d6;
+  font-size: 18px;
+}
+.clue-ledger article {
+  margin: 20px 0;
+  padding: 22px;
+  border: 1px solid #8e8870;
+  border-left: 4px solid #c2ae77;
+  background: #19242bec;
+}
+.clue-ledger h3 {
+  margin: 12px 0;
+  font-size: 24px;
+  font-weight: 400;
+}
+.clue-ledger p {
+  line-height: 1.6;
+}
+.clue-file-number {
+  font: 16px/1.5 var(--typewriter);
+  color: #ccb98e;
+}
+.clue-ledger button {
+  font-size: 18px;
+  min-height: 44px;
+}

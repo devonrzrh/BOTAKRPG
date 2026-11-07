@@ -18,7 +18,7 @@ const menus = {
     ["Investigation wall", "desk", Archive],
     ["Bookshelf", "library", Library],
     ["Quest board", "quest", Compass],
-    ["Inventory desk", "inventory", NotebookPen],
+    ["Clue ledger", "inventory", NotebookPen],
   ],
   Case: [
     ["Briefing", "briefing", FileText],

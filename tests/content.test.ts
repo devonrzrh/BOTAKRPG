@@ -70,9 +70,25 @@ it("supports reusable cutscenes with different frame counts and pursuit steps", 
   expect(intro?.type === "story" && intro.frames[1].steps).toBe(6);
   expect(connection?.type === "story" && connection.frames.length).toBe(2);
 });
-it("compiles sample curriculum with all public record types", () => {
+it("compiles active curriculum types without retired inventory items", () => {
   const c = validateContent(raw);
-  expect(new Set(c.entities.map((x) => x.type)).size).toBe(9);
+  expect(new Set(c.entities.map((x) => x.type))).toEqual(
+    new Set([
+      "lesson",
+      "question",
+      "activity",
+      "quest",
+      "skill",
+      "effect",
+      "story",
+      "dialogue",
+    ]),
+  );
+  expect(
+    c.entities
+      .filter((e) => e.type === "quest")
+      .every((q) => q.rewards.length === 0),
+  ).toBe(true);
 });
 it("validates quest prerequisites and rejects dependency cycles", () => {
   const missing = structuredClone(raw);

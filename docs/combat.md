@@ -14,7 +14,7 @@ Enemies use individually authored deterministic patterns composed of these actio
 
 The intent shows the actual incoming damage after current defenses. Guard spends a turn without a question, restores up to 4 focus, and reduces the next hit by approximately 70%, with the same 1-damage minimum. It preserves skill shields. Poison resolves before the enemy can act. Effects tick on each enemy turn, including openings.
 
-Items spend a turn and cannot be used when their matching resource is full. Available skills show damage, focus cost and effect. Number keys choose a skill or answer; Enter confirms an answer. In ordering questions, number keys follow the displayed positions and the separate # badges show the selected sequence.
+HP and focus reset before each encounter. There are no consumables or equipment. Available skills show damage, focus cost and effect. Number keys choose a skill or answer; Enter confirms an answer. In ordering questions, number keys follow the displayed positions and the separate # badges show the selected sequence.
 
 ## Presentation
 

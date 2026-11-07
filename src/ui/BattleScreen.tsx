@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import type { Content, Item, Question, Skill } from "../content/schema";
+import type { Content, Question, Skill } from "../content/schema";
 import {
   canSpare,
   previewDamage,
@@ -11,13 +11,7 @@ import "./BattleDepth.css";
 import { stats, type Save } from "../game/state";
 import { combatCueDuration, type BattleCue } from "../game/combatPresentation";
 import { XpMeter } from "./XpMeter";
-import {
-  Crosshair,
-  Package,
-  ScanSearch,
-  LogOut,
-  ShieldCheck,
-} from "lucide-react";
+import { Crosshair, ScanSearch, LogOut, ShieldCheck } from "lucide-react";
 
 interface Props {
   battle: Battle;
@@ -29,7 +23,6 @@ interface Props {
   notice: string;
   onAnswer: (answer: number[]) => void;
   onSkill: (skill: Skill) => void;
-  onItem: (item: Item) => void;
   onGuard: () => void;
   onBoost: (amount: number) => void;
   onFinisher: () => void;
@@ -49,9 +42,9 @@ interface Props {
 export function BattleScreen(p: Props) {
   const { battle: b, save, question: q } = p,
     limits = stats(save, p.content);
-  const [menu, setMenu] = useState<
-    "skills" | "items" | "inspect" | "act" | null
-  >("skills");
+  const [menu, setMenu] = useState<"skills" | "inspect" | "act" | null>(
+    "skills",
+  );
   const [evading, setEvading] = useState(false);
   const [reviewing, setReviewing] = useState(false);
   const [impact, setImpact] = useState("");
@@ -128,9 +121,6 @@ export function BattleScreen(p: Props) {
   const skills = p.content.entities.filter(
     (e): e is Skill =>
       e.type === "skill" && save.character.skills.includes(e.id),
-  );
-  const items = p.content.entities.filter(
-    (e): e is Item => e.type === "item" && e.kind !== "equipment",
   );
   const meter = (label: string, value: number, max: number, kind: string) => (
     <div className={`battle-meter ${kind}`}>
@@ -368,11 +358,9 @@ export function BattleScreen(p: Props) {
                 <h2 ref={title} tabIndex={-1}>
                   {menu === "skills"
                     ? "Skills"
-                    : menu === "items"
-                      ? "Items"
-                      : menu === "act"
-                        ? "ACT"
-                        : "Inspect"}
+                    : menu === "act"
+                      ? "ACT"
+                      : "Inspect"}
                 </h2>
                 <button onClick={() => setMenu("skills")}>Back</button>
               </header>
@@ -397,38 +385,6 @@ export function BattleScreen(p: Props) {
                     </button>
                   ))}
                 </div>
-              )}
-              {menu === "items" && (
-                <>
-                  <p>Using an item spends your turn.</p>
-                  <div className="battle-item-options">
-                    {items.map((item) => (
-                      <button
-                        key={item.id}
-                        disabled={
-                          !save.inventory[item.id] ||
-                          (item.kind === "healing"
-                            ? save.character.hp >= limits.maxHp
-                            : save.character.focus >= limits.maxFocus)
-                        }
-                        onClick={() => {
-                          setMenu(null);
-                          p.onItem(item);
-                        }}
-                      >
-                        <span>
-                          <strong>
-                            {item.title} ×{save.inventory[item.id] ?? 0}
-                          </strong>
-                          <span>
-                            Restores {item.amount}{" "}
-                            {item.kind === "healing" ? "HP" : "focus"}
-                          </span>
-                        </span>
-                      </button>
-                    ))}
-                  </div>
-                </>
               )}
               {menu === "act" && b.tactics && (
                 <div className="battle-act-options">
@@ -606,7 +562,7 @@ export function BattleScreen(p: Props) {
                       <p>
                         Available skills:{" "}
                         {newSkills.map((s) => s.title).join(", ")}. Learn them
-                        at the desk.
+                        in the character menu.
                       </p>
                     )}
                   </>
@@ -709,7 +665,7 @@ export function BattleScreen(p: Props) {
       )}
       <nav className="battle-command-menu" aria-label="Battle commands">
         <span>Turn {b.turn}</span>
-        {(["skills", "items", "inspect"] as const).map((id) => (
+        {(["skills", "inspect"] as const).map((id) => (
           <button
             key={id}
             aria-expanded={b.phase === "choose" && menu === id}
@@ -718,8 +674,6 @@ export function BattleScreen(p: Props) {
           >
             {id === "skills" ? (
               <Crosshair size={22} aria-hidden="true" />
-            ) : id === "items" ? (
-              <Package size={22} aria-hidden="true" />
             ) : (
               <ScanSearch size={22} aria-hidden="true" />
             )}

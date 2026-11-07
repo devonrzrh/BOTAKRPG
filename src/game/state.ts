@@ -1,5 +1,5 @@
 import { z } from "zod";
-import type { Content, Item, Quest, Skill } from "../content/schema";
+import type { Content, Quest, Skill } from "../content/schema";
 import { STARTER_CODE } from "./maze";
 import { questUnlocked } from "./investigation";
 const masterySchema = z.object({
@@ -65,9 +65,9 @@ export const saveSchema = z
       hp: z.number().min(0),
       focus: z.number().min(0),
       skills: z.array(z.string()),
-      equipment: z.string().nullable(),
+      equipment: z.string().nullable().optional(),
     }),
-    inventory: z.record(z.number().int().min(0).max(999)),
+    inventory: z.record(z.number().int().min(0).max(999)).optional(),
     completed: z.array(z.string()),
     claimed: z.array(z.string()),
     mastery: z.record(masterySchema),
@@ -82,7 +82,11 @@ export const saveSchema = z
       reducedMotion: z.boolean(),
     }),
   })
-  .strict();
+  .strict()
+  .transform(({ inventory: _inventory, character, ...save }) => {
+    const { equipment: _equipment, ...player } = character;
+    return { ...save, character: player };
+  });
 export type Save = z.infer<typeof saveSchema>;
 export function initialSave(): Save {
   return {
@@ -104,9 +108,7 @@ export function initialSave(): Save {
       hp: 60,
       focus: 12,
       skills: ["insight", "ward"],
-      equipment: null,
     },
-    inventory: { "healing-draught": 3, "focus-tea": 2 },
     completed: [],
     claimed: [],
     mastery: {},
@@ -119,15 +121,19 @@ export function initialSave(): Save {
     settings: { renderer: "auto", reducedMotion: false },
   };
 }
-export function stats(save: Save, content?: Content) {
-  const item = content?.entities.find(
-    (e): e is Item => e.type === "item" && e.id === save.character.equipment,
-  );
+export function stats(save: Save, _content?: Content) {
   return {
     maxHp: 60 + (save.character.level - 1) * 10,
     maxFocus: 12 + (save.character.level - 1) * 2,
-    attack: 6 + (save.character.level - 1) * 2 + (item?.amount ?? 0),
+    attack: 6 + (save.character.level - 1) * 2,
     defense: 2 + save.character.level - 1,
+  };
+}
+export function recoverResources(save: Save): Save {
+  const limits = stats(save);
+  return {
+    ...save,
+    character: { ...save.character, hp: limits.maxHp, focus: limits.maxFocus },
   };
 }
 export function addXp(save: Save, amount: number): Save {
@@ -197,12 +203,7 @@ export function claimQuest(save: Save, quest: Quest, content?: Content): Save {
     !quest.objectives.every((id) => save.completed.includes(id))
   )
     return save;
-  const inventory = { ...save.inventory };
-  quest.rewards.forEach((id) => (inventory[id] = (inventory[id] ?? 0) + 1));
-  return addXp(
-    { ...save, inventory, claimed: [...save.claimed, quest.id] },
-    quest.xp,
-  );
+  return addXp({ ...save, claimed: [...save.claimed, quest.id] }, quest.xp);
 }
 export function unlockSkill(save: Save, skill: Skill): Save {
   if (
@@ -220,6 +221,25 @@ export function unlockSkill(save: Save, skill: Skill): Save {
   };
 }
 export function parseSave(input: unknown, content: Content): Save {
+  const retiredItems = new Set([
+    "healing-draught",
+    "focus-tea",
+    "scholar-charm",
+  ]);
+  if (input && typeof input === "object" && !Array.isArray(input)) {
+    const legacy = input as {
+      inventory?: unknown;
+      character?: { equipment?: unknown };
+    };
+    if (legacy.inventory && typeof legacy.inventory === "object") {
+      for (const id of Object.keys(legacy.inventory))
+        if (!retiredItems.has(id))
+          throw new Error(`Save contains unknown retired item: ${id}`);
+    }
+    const equipment = legacy.character?.equipment;
+    if (typeof equipment === "string" && !retiredItems.has(equipment))
+      throw new Error(`Save contains unknown retired item: ${equipment}`);
+  }
   const save = saveSchema.parse(input),
     ids = new Map(content.entities.map((e) => [e.id, e.type]));
   const check = (values: string[], type: string) =>
@@ -241,7 +261,6 @@ export function parseSave(input: unknown, content: Content): Save {
       throw new Error(`Invalid chapter progress: ${id}`);
   }
   check(save.story.seenDialogues, "dialogue");
-  check(Object.keys(save.inventory), "item");
   for (const quest of content.entities.filter(
     (e): e is Quest => e.type === "quest" && e.kind === "finale",
   )) {
@@ -257,7 +276,6 @@ export function parseSave(input: unknown, content: Content): Save {
     )
       throw new Error("Final encounter requires all clue branches");
   }
-  if (save.character.equipment) check([save.character.equipment], "item");
   const s = stats(save, content);
   if (
     save.character.level !==
@@ -266,16 +284,6 @@ export function parseSave(input: unknown, content: Content): Save {
     save.character.focus > s.maxFocus
   )
     throw new Error("Save has inconsistent character stats");
-  if (save.character.equipment) {
-    const item = content.entities.find(
-      (e): e is Item => e.type === "item" && e.id === save.character.equipment,
-    );
-    if (
-      !(save.inventory[save.character.equipment] > 0) ||
-      item?.kind !== "equipment"
-    )
-      throw new Error("Equipped item must be owned equipment");
-  }
   for (const [key, value] of Object.entries(save.mastery)) {
     if (
       value.correct !== value.answered.length ||

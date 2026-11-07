@@ -12,7 +12,6 @@ import {
   Compass,
   Swords,
   Sprout,
-  Backpack,
   Settings,
   X,
   ArrowUp,
@@ -42,6 +41,7 @@ import {
 } from "lucide-react";
 import DOMPurify from "dompurify";
 import { marked } from "marked";
+import { ClueLedger } from "./ui/ClueLedger";
 import { BookReader } from "./ui/BookReader";
 import rawContent from "./generated/content.json";
 import {
@@ -50,7 +50,6 @@ import {
   type Question,
   type Quest,
   type Skill,
-  type Item,
   type Story,
   type Dialogue as DialogueContent,
 } from "./content/schema";
@@ -95,6 +94,7 @@ import {
   completeActivity,
   evidence,
   initialSave,
+  recoverResources,
   parseSave,
   recordAnswer,
   stats,
@@ -112,7 +112,6 @@ import {
   spareBattle,
   evadeTurn,
   selectSkill,
-  useItem,
   type Battle,
 } from "./game/combat";
 import { activityTemplates } from "./game/activities";
@@ -155,7 +154,6 @@ const questions = content.entities.filter(
   (e): e is Question => e.type === "question",
 );
 const skills = content.entities.filter((e): e is Skill => e.type === "skill");
-const items = content.entities.filter((e): e is Item => e.type === "item");
 const quest = content.entities.find(
   (e): e is Quest => e.type === "quest" && e.id === "first-principles",
 )!;
@@ -189,6 +187,7 @@ type Panel =
   | "battle"
   | "garden"
   | "inventory"
+  | "character"
   | "journal"
   | "settings"
   | null;
@@ -531,6 +530,7 @@ export default function App() {
         setRealm("hub");
         setScene("hub");
         setPanel("battle");
+        updateSave(recoverResources);
         const enemy = encounter.enemy;
         setBattle(
           createBattle(
@@ -618,6 +618,7 @@ export default function App() {
         return;
       }
       if (id === "echo") {
+        updateSave(recoverResources);
         setRealm("hub");
         setScene("hub");
         setPanel("battle");
@@ -639,6 +640,7 @@ export default function App() {
         setScene(id === "battle" || id === "garden" ? "hub" : realm);
         setPanel(id as Panel);
         if (id === "battle") {
+          updateSave(recoverResources);
           const enemy = createBattle();
           const activity = content.entities.find(
             (e) => e.type === "activity" && e.id === "guardian-battle",
@@ -755,22 +757,6 @@ export default function App() {
       nextSave = completeActivity(nextSave, activity);
       if (first)
         nextSave = addXp(nextSave, activity === "echo-battle" ? 60 : 20);
-      if (first && activity.startsWith("encounter-")) {
-        nextSave = {
-          ...nextSave,
-          inventory: {
-            ...nextSave.inventory,
-            "healing-draught": Math.min(
-              999,
-              (nextSave.inventory["healing-draught"] ?? 0) + 1,
-            ),
-            "focus-tea": Math.min(
-              999,
-              (nextSave.inventory["focus-tea"] ?? 0) + 1,
-            ),
-          },
-        };
-      }
     }
     battleRef.current = nextBattle;
     setBattle(nextBattle);
@@ -968,14 +954,6 @@ export default function App() {
       );
       if (q) updateSave((s) => claimQuest(s, q, content));
     }
-    if (action.kind === "equip" && saveRef.current.inventory[id])
-      updateSave((s) => ({
-        ...s,
-        character: {
-          ...s.character,
-          equipment: s.character.equipment === id ? null : id,
-        },
-      }));
     if (action.kind === "learn") {
       const skill = skills.find((s) => s.id === id);
       if (skill) updateSave((s) => unlockSkill(s, skill));
@@ -1033,7 +1011,7 @@ export default function App() {
           <button
             className="avatar"
             aria-label="Open character"
-            onClick={() => open("inventory")}
+            onClick={() => open("character")}
           >
             V
           </button>
@@ -1076,11 +1054,11 @@ export default function App() {
           ))}
         <div className="rail-spacer" />
         <button
-          aria-label="Open inventory and skills"
+          aria-label="Open clue ledger"
           className={panel === "inventory" ? "active" : ""}
           onClick={() => open("inventory")}
         >
-          <Backpack size={21} />
+          <FolderSearch size={21} />
         </button>
         <button
           aria-label="Open quest journal"
@@ -1122,6 +1100,7 @@ export default function App() {
             homeWall={homeWall}
             homeLookLocked={
               panel === "settings" ||
+              panel === "character" ||
               !save.story.prologueSeen ||
               prologueReplay ||
               Boolean(chapterId) ||
@@ -1176,7 +1155,9 @@ export default function App() {
           </>
         )}
         {panel &&
-          (!useWorldUi || panel === "settings") &&
+          (!useWorldUi ||
+            panel === "settings" ||
+            panel === "character") &&
           !(realm === "desk" && homeMoving) && (
             <section
               className={`activity-panel ${realm === "desk" ? `home-panel home-${homeWall}` : ""} ${panel === "maze" ? "maze-panel" : ""} ${panel === "battle" ? "battle-panel" : ""}`}
@@ -1192,7 +1173,8 @@ export default function App() {
                           maze: "Packet labyrinth",
                           battle: battle.enemyName,
                           garden: "Perceptron lab",
-                          inventory: "Equipment & skills",
+                          inventory: "Clue ledger",
+                          character: "Detective skills",
                           journal: "Quest board",
                           settings: "Settings",
                         }[panel]
@@ -1624,20 +1606,6 @@ export default function App() {
                       notify(String(e));
                     }
                   }}
-                  onItem={(item) => {
-                    if (battleRef.current !== battle) return;
-                    try {
-                      const result = useItem(
-                        battle,
-                        saveRef.current,
-                        item,
-                        content,
-                      );
-                      applyBattle(result.battle, result.save, "item");
-                    } catch (e) {
-                      notify(String(e));
-                    }
-                  }}
                   onGuard={() => {
                     if (battleRef.current !== battle) return;
                     try {
@@ -1824,7 +1792,7 @@ export default function App() {
                   <div className="quest-reward">
                     <Sparkles />
                     <span>
-                      <strong>{quest.xp} XP · Trace amplifier</strong>
+                      <strong>{quest.xp} XP</strong>
                       <small>Level 2 unlocks more skills.</small>
                     </span>
                   </div>
@@ -1833,9 +1801,7 @@ export default function App() {
                     disabled={done !== 3 || save.claimed.includes(quest.id)}
                     onClick={() => {
                       updateSave((s) => claimQuest(s, quest, content));
-                      notify(
-                        "Case reward claimed. Equipment and skills updated.",
-                      );
+                      notify("Case reward claimed.");
                     }}
                   >
                     {save.claimed.includes(quest.id)
@@ -1909,6 +1875,13 @@ export default function App() {
                 </div>
               )}
               {panel === "inventory" && (
+                <ClueLedger
+                  save={save}
+                  content={content}
+                  onLesson={openLesson}
+                />
+              )}
+              {panel === "character" && (
                 <div className="inventory-content">
                   <div className="character-banner">
                     <span className="character-sigil">
@@ -1950,59 +1923,6 @@ export default function App() {
                       <strong>{characterStats.defense}</strong>
                       <span>Defense</span>
                     </div>
-                  </div>
-                  <h3>Field equipment</h3>
-                  <div className="item-grid">
-                    {items.map((item) => (
-                      <div
-                        className={`item-card ${save.character.equipment === item.id ? "is-equipped" : ""} ${!save.inventory[item.id] ? "is-unowned" : ""}`}
-                        key={item.id}
-                      >
-                        <span className="equipment-glyph" aria-hidden="true">
-                          {item.kind === "equipment" ? (
-                            <Shield size={30} />
-                          ) : item.kind === "focus" ? (
-                            <Zap size={30} />
-                          ) : (
-                            <Heart size={30} />
-                          )}
-                        </span>
-                        <span className="pill">
-                          {item.kind === "equipment"
-                            ? save.character.equipment === item.id
-                              ? "EQUIPPED"
-                              : "MODULE"
-                            : `× ${save.inventory[item.id] ?? 0}`}
-                        </span>
-                        <h4>{item.title}</h4>
-                        <p>{item.description}</p>
-                        {item.kind === "equipment" ? (
-                          <button
-                            disabled={!save.inventory[item.id]}
-                            onClick={() =>
-                              updateSave((s) => ({
-                                ...s,
-                                character: {
-                                  ...s.character,
-                                  equipment:
-                                    s.character.equipment === item.id
-                                      ? null
-                                      : item.id,
-                                },
-                              }))
-                            }
-                          >
-                            {save.character.equipment === item.id
-                              ? "Unequip"
-                              : save.inventory[item.id]
-                                ? "Equip module"
-                                : "Earn from the main quest"}
-                          </button>
-                        ) : (
-                          <small>Use during battle</small>
-                        )}
-                      </div>
-                    ))}
                   </div>
                   <h3>Skills</h3>
                   <div className="skill-tree">
@@ -2219,7 +2139,7 @@ export default function App() {
               ["investigation", "Investigation wall", "desk"],
               ["bookshelf", "Bookshelf", "library"],
               ["quests", "Quest board", "quest"],
-              ["desk", "Inventory desk", "inventory"],
+              ["desk", "Clue ledger", "inventory"],
             ].map(([wall, label, id]) => (
               <button
                 key={wall}
@@ -2260,7 +2180,7 @@ export default function App() {
             onEncounter={() => open(`encounter-${lessonId}`)}
           />
         )}
-        {useWorldUi && !bookOpen && (
+        {useWorldUi && !bookOpen && panel !== "character" && (
           <RoomTurns
             wall={homeWall}
             disabled={
@@ -2276,7 +2196,7 @@ export default function App() {
             onTurn={open}
           />
         )}
-        {useWorldUi && !bookOpen && (
+        {useWorldUi && !bookOpen && panel !== "character" && (
           <WorldUiControls
             model={officeUi.find((m) => m.id === homeWall)!}
             blocked={
@@ -2325,7 +2245,7 @@ export default function App() {
           <button
             className="icon-button"
             aria-label="View character skills"
-            onClick={() => open("inventory")}
+            onClick={() => open("character")}
           >
             <ArrowUpRight size={18} />
           </button>

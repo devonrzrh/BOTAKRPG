@@ -61,7 +61,7 @@ export function QuestBranches({
               >
                 {save.claimed.includes(branch.id)
                   ? "Reward claimed"
-                  : `Claim ${branch.xp} XP + item`}
+                  : `Claim ${branch.xp} XP`}
               </button>
             </div>
           </article>
@@ -116,7 +116,7 @@ export function FinaleCard({
         >
           {save.claimed.includes(finale.id)
             ? "Case reward claimed"
-            : `Claim ${finale.xp} XP + item`}
+            : `Claim ${finale.xp} XP`}
         </button>
       )}
     </section>

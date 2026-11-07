@@ -21,8 +21,7 @@ objectives:
   - encounter-source-alg-10
   - route-warden
 xp: 20
-rewards:
-  - focus-tea
+rewards: []
 kind: branch
 prerequisites: []
 lesson: graph-search
@@ -48,8 +47,7 @@ objectives:
   - encounter-source-ds-10
   - archive-keeper
 xp: 20
-rewards:
-  - healing-draught
+rewards: []
 kind: branch
 prerequisites: []
 lesson: stacks-queues
@@ -75,8 +73,7 @@ objectives:
   - encounter-source-ai-10
   - signal-mimic
 xp: 20
-rewards:
-  - focus-tea
+rewards: []
 kind: branch
 prerequisites: []
 lesson: perceptron-basics
@@ -127,8 +124,7 @@ description: Combine the three clues to reach the robot in the abandoned subnet.
 objectives:
   - echo-battle
 xp: 100
-rewards:
-  - healing-draught
+rewards: []
 kind: finale
 prerequisites:
   - routing-trace

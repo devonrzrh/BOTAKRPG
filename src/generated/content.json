@@ -243,36 +243,9 @@
         "perceptron-exhibit"
       ],
       "xp": 120,
-      "rewards": [
-        "scholar-charm",
-        "healing-draught"
-      ],
+      "rewards": [],
       "kind": "case",
       "prerequisites": []
-    },
-    {
-      "id": "healing-draught",
-      "title": "Integrity patch",
-      "type": "item",
-      "description": "Restore 24 HP. Using it in battle takes a turn.",
-      "kind": "healing",
-      "amount": 24
-    },
-    {
-      "id": "focus-tea",
-      "title": "Bandwidth cell",
-      "type": "item",
-      "description": "Restore 8 focus. Using it in battle takes a turn.",
-      "kind": "focus",
-      "amount": 8
-    },
-    {
-      "id": "scholar-charm",
-      "title": "Trace amplifier",
-      "type": "item",
-      "description": "A recovered signal module. Equip for +3 attack.",
-      "kind": "equipment",
-      "amount": 3
     },
     {
       "id": "shield",
@@ -444,9 +417,7 @@
         "route-warden"
       ],
       "xp": 20,
-      "rewards": [
-        "focus-tea"
-      ],
+      "rewards": [],
       "kind": "branch",
       "prerequisites": [],
       "lesson": "graph-search"
@@ -471,9 +442,7 @@
         "archive-keeper"
       ],
       "xp": 20,
-      "rewards": [
-        "healing-draught"
-      ],
+      "rewards": [],
       "kind": "branch",
       "prerequisites": [],
       "lesson": "stacks-queues"
@@ -498,9 +467,7 @@
         "signal-mimic"
       ],
       "xp": 20,
-      "rewards": [
-        "focus-tea"
-      ],
+      "rewards": [],
       "kind": "branch",
       "prerequisites": [],
       "lesson": "perceptron-basics"
@@ -556,9 +523,7 @@
         "echo-battle"
       ],
       "xp": 100,
-      "rewards": [
-        "healing-draught"
-      ],
+      "rewards": [],
       "kind": "finale",
       "prerequisites": [
         "routing-trace",

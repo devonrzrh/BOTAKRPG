@@ -1,6 +1,6 @@
 # NULL / TRACE
 
-A local-first learning RPG built with TypeScript, React, Babylon.js, Blockly, and a browser-local Pyodide worker. Detective Vale pursues ECHO-7, a rogue robot that escapes into the network. The home is a first-person room. Its investigation wall, bookshelf, quest board, and inventory desk are connected by quick camera turns. The top menu bar stays visible during gameplay, cutscenes, and dialogue. The first chapter includes an algorithm maze, quiz battle, and perceptron lab.
+A local-first learning RPG built with TypeScript, React, Babylon.js, Blockly, and a browser-local Pyodide worker. Detective Vale pursues ECHO-7, a rogue robot that escapes into the network. The home is a first-person room. Its investigation wall, bookshelf, quest board, and clue ledger are connected by quick camera turns. The top menu bar stays visible during gameplay, cutscenes, and dialogue. The first chapter includes an algorithm maze, quiz battle, and perceptron lab.
 
 ## Run
 
@@ -19,7 +19,7 @@ Quests now follow the material chapters. Choose a subject on the quest screen, t
 
 All 31 supplied chapters are available through **Bookshelf → open a volume → Contents**. Search covers the full text. Books show the original diagrams, code, tables and exercises, with bookmarks and personal notes. The module guide includes the supplied review records and links to supporting indexes. The test-bank book includes all 95 questions and explanations; its 13 written exercises are self-assessed.
 
-Each of the three clue branches now continues through its subject's chapters and ends at a boss: Route Warden, Archive Keeper or Signal Mimic. The existing maze, sentinel and perceptron activities introduce those branches. **Pursue lead** opens the next unfinished activity; **Materials** opens its chapter. All three branch bosses must be completed to unlock ECHO-7. Chapter encounters grant first-clear XP and supplies; replaying cannot claim them twice.
+Each of the three clue branches now continues through its subject's chapters and ends at a boss: Route Warden, Archive Keeper or Signal Mimic. The existing maze, sentinel and perceptron activities introduce those branches. **Pursue lead** opens the next unfinished activity; **Materials** opens its chapter. All three branch bosses must be completed to unlock ECHO-7. Chapter encounters grant first-clear XP; replaying cannot claim them twice.
 
 `content/source/` is the committed, playable Markdown edition. `public/materials/` preserves every supplied file unchanged, and `content/source-manifest.json` records checksums and chapter IDs. Normal builds work without the untracked `Source/` folder or PDF tools. To refresh from an updated `Source/`, install Poppler (`pdftotext` on PATH), then run `npm run source:import`. See [coverage and editorial changes](docs/source-coverage.md).
 
@@ -29,9 +29,9 @@ Each of the three clue branches now continues through its subject's chapters and
 
 1. Complete or skip the short pursuit prologue. Take the case in the briefing. Select **Home → Bookshelf** or the pinned bookshelf note. Read “Finding a way through.” Bookmarks and margin notes save locally.
 2. Enter **Packet labyrinth**. Reach the amber exit manually, with visual blocks, or using Python. The graph-search lesson contains working BFS code; DFS and other valid routes also work. Run resets the maze while retaining your program. Reset retains code and blocks. New seed creates another layout. Completing a maze unlocks an optional 90-second trial.
-3. Meet the **Sentinel A-03**. Choose a skill, answer, then continue to the enemy turn. Items spend a turn without a question. Mistakes have explanations. Battles are entered as accepted-case encounters. Rest in the network hub to replenish health and focus.
+3. Meet the **Sentinel A-03**. Choose a skill, answer, then continue to the enemy turn. Guard restores focus and reduces the next hit. Mistakes have explanations. Health and focus reset when entering each encounter.
 4. Open the **Perceptron lab**. Add class 0 points such as (-0.8, -0.8), (-0.5, 0) and class 1 points such as (0.8, 0.8), (0.5, 0). Train for 20 epochs at 0.2, then test held-out points. Reach 83% after at least 10 epochs to record the objective. Held-out locations cannot enter training.
-5. Open **Home → Quest board**. Claim the three-objective quest reward. Open equipment, equip the trace amplifier, and learn the level-2 skills.
+5. Open **Home → Quest board**. Claim the three-objective quest reward. File recovered evidence at **Home → Clue ledger**. Learn level-2 skills through the top-bar character menu.
 
 WASD / arrows move; E interacts nearby; drag to orbit; Escape closes the current panel. Destination buttons are keyboard-accessible alternatives. Ctrl+Enter runs Python in its editor. Python execution disables manual maze movement. Blockly generates Python; copying to the handwritten editor is intentionally one-way.
 
@@ -64,7 +64,7 @@ Cross-Origin-Embedder-Policy: require-corp
 
 The persistent top bar shows the current level, XP bar, and XP needed for the next level across the office and activities. Victory displays earned XP, animated level progress, stat gains on level-up, and newly available skills. Replays explain that their XP was already earned. Level 100 displays MAX. This presents the existing progression rules without changing rewards or topic mastery.
 
-Saves contain character stats, inventory, completion and reward claims, mastery evidence, notes, bookmarks, code, blocks, seed, trial record, and preferences. Use **Settings → Export journal** before clearing browser storage. Invalid imports leave the existing save untouched. Corrupt stored data is not automatically overwritten; a recovery download and explicit replacement control are available. Encounter state and training points are session-local experiments; progression persists.
+Saves contain character stats, completion and reward claims, mastery evidence, notes, bookmarks, code, blocks, seed, trial record, and preferences. Use **Settings → Export journal** before clearing browser storage. Invalid imports leave the existing save untouched. Corrupt stored data is not automatically overwritten; a recovery download and explicit replacement control are available. Collected clues are derived from completed activities and survive save/import. Legacy item inventories and equipped modules are discarded on loading; XP, skills, and evidence remain. Encounter state is session-local.
 
 This slice is single-player, desktop-first, and uses placeholder art. It has no accounts, cloud synchronization, telemetry, LLM generation, or multiplayer. Python is for trusted self-study code: a worker keeps execution off the UI thread, but is not a security boundary against deliberately hostile Python/JS interop. Content cannot define arbitrary executable templates.
 

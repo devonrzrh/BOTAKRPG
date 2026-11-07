@@ -1,6 +1,6 @@
 # Combat mechanics
 
-Quizzes remain untimed. Choose a skill, answer, then resolve the enemy's telegraphed response. Items, Guard, ACT, and Evade spend a turn without a quiz. Only correct, unaided quiz answers provide answer mastery evidence.
+Quizzes remain untimed. Choose a skill, answer, then resolve the enemy's telegraphed response. Guard, ACT, and Evade spend a turn without a quiz. Only correct, unaided quiz answers provide answer mastery evidence. Health and focus reset on encounter entry; no inventory, consumables, or equipment are required. Collected clues live in the office desk ledger.
 
 ## Weakness and stance
 

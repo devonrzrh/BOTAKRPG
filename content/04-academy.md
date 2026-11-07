@@ -56,34 +56,7 @@ title: Trace ECHO-7
 description: Pursue three clue branches in any order. Combine their evidence to locate ECHO-7.
 objectives: [maze-chamber, guardian-battle, perceptron-exhibit]
 xp: 120
-rewards: [scholar-charm, healing-draught]
-```
-
-```entity
-type: item
-id: healing-draught
-title: Integrity patch
-description: Restore 24 HP. Using it in battle takes a turn.
-kind: healing
-amount: 24
-```
-
-```entity
-type: item
-id: focus-tea
-title: Bandwidth cell
-description: Restore 8 focus. Using it in battle takes a turn.
-kind: focus
-amount: 8
-```
-
-```entity
-type: item
-id: scholar-charm
-title: Trace amplifier
-description: A recovered signal module. Equip for +3 attack.
-kind: equipment
-amount: 3
+rewards: []
 ```
 
 ```entity

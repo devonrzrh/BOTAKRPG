@@ -4,10 +4,9 @@ import {
   enemyIntent,
   enemyTurn,
   guardTurn,
-  useItem,
 } from "../src/game/combat";
 import { initialSave, stats, type Save } from "../src/game/state";
-import { validateContent, type Item } from "../src/content/schema";
+import { validateContent } from "../src/content/schema";
 import raw from "../src/generated/content.json";
 
 const content = validateContent(raw);
@@ -140,25 +139,4 @@ describe("combat tactics", () => {
     expect(guardTurn(battle, save, content)).toEqual({ battle, save });
   });
 
-  it("rejects healing or focus items at the matching resource cap without spending them", () => {
-    const limits = stats(initialSave(), content);
-    const consumables = content.entities.filter(
-      (entity): entity is Item =>
-        entity.type === "item" &&
-        (entity.kind === "healing" || entity.kind === "focus"),
-    );
-    for (const item of consumables) {
-      const save: Save = initialSave();
-      save.character[item.kind === "healing" ? "hp" : "focus"] =
-        item.kind === "healing" ? limits.maxHp : limits.maxFocus;
-      const beforeInventory = { ...save.inventory };
-      const battle = createBattle();
-      expect(() => useItem(battle, save, item, content)).toThrow(
-        "Item unavailable",
-      );
-      expect(save.inventory).toEqual(beforeInventory);
-      expect(battle.turn).toBe(1);
-      expect(battle.phase).toBe("choose");
-    }
-  });
 });

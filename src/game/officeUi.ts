@@ -1,6 +1,7 @@
-import type { Content, Quest, Lesson, Skill, Item } from "../content/schema";
+import type { Content, Quest, Lesson } from "../content/schema";
 import { finaleAvailable, questComplete, nextObjective } from "./investigation";
-import { stats, type Save } from "./state";
+import type { Save } from "./state";
+import { recoveredClues } from "./evidence";
 import { pendingStory } from "./questStory";
 import { chaptersForBranch } from "./chapterQuest";
 import type { HomeWall } from "../world/Office";
@@ -16,7 +17,6 @@ export type OfficeAction = {
     | "open"
     | "lesson"
     | "claim"
-    | "equip"
     | "learn"
     | "bookmark"
     | "page"
@@ -238,7 +238,7 @@ export function createOfficeUi(input: OfficeUiInput): SurfaceModel[] {
     309,
     550,
     74,
-    "Inventory desk",
+    "Clue ledger",
     "open",
     "inventory",
   );
@@ -555,7 +555,7 @@ export function createOfficeUi(input: OfficeUiInput): SurfaceModel[] {
       44,
       save.claimed.includes(branch.id)
         ? "Reward claimed"
-        : `Claim ${branch.xp} XP + item`,
+        : `Claim ${branch.xp} XP`,
       "claim",
       branch.id,
       !done || save.claimed.includes(branch.id),
@@ -596,7 +596,7 @@ export function createOfficeUi(input: OfficeUiInput): SurfaceModel[] {
     45,
     save.claimed.includes(main.id)
       ? "Clue reward claimed"
-      : `Claim ${main.xp} XP + equipment`,
+      : `Claim ${main.xp} XP`,
     "claim",
     main.id,
     !questComplete(save, main) || save.claimed.includes(main.id),
@@ -626,87 +626,63 @@ export function createOfficeUi(input: OfficeUiInput): SurfaceModel[] {
     !closed || save.claimed.includes(finale.id),
   );
 
-  const inventory = panel("desk", "FIELD EQUIPMENT", "paper");
-  const character = stats(save, content);
-  text(
-    inventory,
-    30,
-    82,
-    `${save.character.name} / LEVEL ${save.character.level}`,
-    24,
-  );
-  text(
-    inventory,
-    30,
-    124,
-    `HP ${save.character.hp}/${character.maxHp}  FOCUS ${save.character.focus}/${character.maxFocus}`,
-    25,
-  );
-  text(
-    inventory,
-    30,
-    163,
-    `ATK ${character.attack}  DEF ${character.defense}`,
-    25,
-    430,
-  );
-  const items = content.entities.filter((e): e is Item => e.type === "item");
-  items.forEach((item, index) => {
+  const inventory = panel("desk", "CLUE LEDGER", "paper");
+  const clues = recoveredClues(save, content);
+  const cluePages = Math.max(1, Math.ceil(clues.length / 2));
+  const cluePage = Math.min(input.page, cluePages - 1);
+  text(inventory, 30, 85, String(clues.length) + " recovered clues", 26);
+  if (!clues.length)
     text(
       inventory,
       30,
-      220 + index * 85,
-      `${item.title} ×${save.inventory[item.id] ?? 0}`,
+      150,
+      "No evidence filed yet. Follow a lead on the quest board.",
       26,
-      420,
+      900,
     );
-    if (item.kind === "equipment")
-      button(
-        inventory,
-        `equip-${item.id}`,
-        30,
-        255 + index * 85,
-        420,
-        44,
-        save.character.equipment === item.id
-          ? "Unequip module"
-          : "Equip module",
-        "equip",
-        item.id,
-        !save.inventory[item.id],
-      );
-    else
-      text(
-        inventory,
-        30,
-        255 + index * 85,
-        `+${item.amount} ${item.kind === "healing" ? "HP" : "focus"} / in battle`,
-        24,
-        420,
-      );
+  clues.slice(cluePage * 2, cluePage * 2 + 2).forEach((clue, index) => {
+    const x = index === 0 ? 30 : 550;
+    text(inventory, x, 140, clue.title, 30, 430);
+    wrapLines(clue.text, 23).forEach((line, i) =>
+      text(inventory, x, 245 + i * 38, line, 30, 430),
+    );
+    button(
+      inventory,
+      "clue-reference-" + clue.id,
+      x,
+      425,
+      430,
+      48,
+      "Open reference",
+      "lesson",
+      clue.lesson,
+    );
   });
-  content.entities
-    .filter((e): e is Skill => e.type === "skill")
-    .forEach((skill, index) => {
-      const learned = save.character.skills.includes(skill.id),
-        locked =
-          save.character.level < skill.level ||
-          Boolean(
-            skill.parent && !save.character.skills.includes(skill.parent),
-          );
-      button(
-        inventory,
-        `learn-${skill.id}`,
-        515,
-        185 + index * 75,
-        480,
-        54,
-        `${skill.title} / ${learned ? "learned" : `level ${skill.level}`}`,
-        "learn",
-        skill.id,
-        learned || locked,
-      );
-    });
+  text(inventory, 415, 525, String(cluePage + 1) + " / " + cluePages, 25, 180);
+  button(
+    inventory,
+    "clues-prev",
+    30,
+    496,
+    270,
+    48,
+    "Previous clues",
+    "page",
+    String(cluePage - 1),
+    cluePage === 0,
+  );
+  button(
+    inventory,
+    "clues-next",
+    720,
+    496,
+    275,
+    48,
+    "Next clues",
+    "page",
+    String(cluePage + 1),
+    cluePage >= cluePages - 1,
+  );
   library.books = lessons.slice(0, 3).map((l) => ({
     id: l.id,
     title: l.title,

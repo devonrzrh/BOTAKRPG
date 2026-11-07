@@ -823,7 +823,7 @@ function WorldCanvas(props: Props) {
         className={`world-canvas ${props.scene === "maze" ? "maze-world" : ""} ${props.encounter ? "boss-world" : ""}`}
         aria-label={
           props.scene === "desk"
-            ? "Detective office. Investigation wall, bookshelf, quest board, and inventory desk."
+            ? "Detective office. Investigation wall, bookshelf, quest board, and clue ledger."
             : "Interactive network world. WASD to move, E to interact. Use destination buttons for keyboard navigation."
         }
         tabIndex={0}

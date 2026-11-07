@@ -6,7 +6,7 @@ const labels: Record<HomeWall, string> = {
   investigation: "Investigation wall",
   bookshelf: "Bookshelf",
   quests: "Quest board",
-  desk: "Inventory desk",
+  desk: "Clue ledger",
 };
 const destination: Record<HomeWall, string> = {
   investigation: "desk",

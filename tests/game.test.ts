@@ -12,7 +12,6 @@ import {
   selectSkill,
   answerBattle,
   enemyTurn,
-  useItem,
 } from "../src/game/combat";
 import {
   initialSave,
@@ -24,6 +23,7 @@ import {
   stats,
   addXp,
   evidence,
+  recoverResources,
 } from "../src/game/state";
 import {
   addSample,
@@ -37,7 +37,6 @@ import {
   type Question,
   type Quest,
   type Skill,
-  type Item,
 } from "../src/content/schema";
 import raw from "../src/generated/content.json";
 const content = validateContent(raw),
@@ -164,18 +163,6 @@ describe("Combat rules", () => {
     );
     expect(weakened.save.character.hp).toBe(55);
   });
-  it("consumes an item once, caps restoration, and spends a turn", () => {
-    const save = initialSave();
-    save.character.hp = 55;
-    const item = content.entities.find(
-      (e): e is Item => e.id === "healing-draught" && e.type === "item",
-    )!;
-    const result = useItem(createBattle(), save, item, content);
-    expect(result.save.character.hp).toBe(52);
-    expect(result.save.inventory[item.id]).toBe(2);
-    expect(result.battle.turn).toBe(2);
-    expect(save.inventory[item.id]).toBe(3);
-  });
   it("defeat is explicit and unaffordable skills cannot be selected", () => {
     const save = initialSave();
     save.character.hp = 1;
@@ -206,7 +193,7 @@ describe("Progression and saves", () => {
     for (const id of quest.objectives) next = completeActivity(next, id);
     next = claimQuest(next, quest);
     expect(next.character.level).toBe(2);
-    expect(next.inventory["scholar-charm"]).toBe(1);
+    expect(next.character.xp).toBe(quest.xp);
     expect(claimQuest(next, quest)).toBe(next);
     expect(
       unlockSkill(
@@ -243,6 +230,36 @@ describe("Progression and saves", () => {
     save.blocks = { blocks: { languageVersion: 0, blocks: [] } };
     expect(parseSave(JSON.parse(JSON.stringify(save)), content)).toEqual(save);
   });
+  it("migrates retired item fields while preserving progress and validates their shape", () => {
+    const save = initialSave();
+    save.completed = ["maze-chamber"];
+    save.claimed = ["routing-trace"];
+    save.character.xp = 120;
+    save.character.level = 2;
+    const old = {
+      ...save,
+      inventory: { "healing-draught": 2, "focus-tea": 1, "scholar-charm": 1 },
+      character: { ...save.character, equipment: "scholar-charm" },
+    };
+    const migrated = parseSave(old, content);
+    expect(migrated.completed).toEqual(save.completed);
+    expect(migrated.claimed).toEqual(save.claimed);
+    expect(migrated.character.xp).toBe(120);
+    expect(migrated).not.toHaveProperty("inventory");
+    expect(migrated.character).not.toHaveProperty("equipment");
+    expect(() =>
+      parseSave({ ...old, inventory: { "healing-draught": -1 } }, content),
+    ).toThrow();
+    expect(() =>
+      parseSave({ ...old, inventory: { unknown: 1 } }, content),
+    ).toThrow(/unknown retired item/);
+    expect(
+      recoverResources({
+        ...migrated,
+        character: { ...migrated.character, hp: 1, focus: 0 },
+      }).character,
+    ).toMatchObject({ hp: 70, focus: 14 });
+  });
   it("loads foundation saves that predate the prologue", () => {
     const { story: _story, ...legacy } = initialSave();
     expect(parseSave(legacy, content).story.prologueSeen).toBe(false);
@@ -272,11 +289,9 @@ describe("Progression and saves", () => {
     expect(() => parseSave({ ...save, blocks: "bad" }, content)).toThrow();
     expect(save).toEqual(initialSave());
   });
-  it("equipment modifies stats and leveling restores resources", () => {
+  it("equipment-free stats and leveling restore resources", () => {
     let save = addXp(initialSave(), 120);
-    save.inventory["scholar-charm"] = 1;
-    save.character.equipment = "scholar-charm";
-    expect(stats(save, content).attack).toBe(11);
+    expect(stats(save, content).attack).toBe(8);
     expect(save.character.hp).toBe(70);
   });
 });

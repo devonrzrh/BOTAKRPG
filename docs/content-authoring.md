@@ -51,12 +51,12 @@ Story files use frontmatter with `type: story`, `id`, `title`, optional `visual:
 | Type       | Fields                                                                                                               |
 | ---------- | -------------------------------------------------------------------------------------------------------------------- |
 | `activity` | `template`: maze / battle / perceptron; `lesson`; optional integer `seed` (default 42)                               |
-| `quest`    | `description`; nonempty `objectives` activity IDs; positive integer `xp`; `rewards` item IDs                         |
-| `item`     | `description`; `kind`: healing / focus / equipment; positive integer `amount`                                        |
+| `quest`    | `description`; nonempty `objectives` activity IDs; positive integer `xp`; `rewards: []`                              |
+| `item`     | Retired from playable content; retained in the schema for reference compatibility                                        |
 | `skill`    | `description`; nonnegative `cost`, `power`; positive integer `level`; `lesson`; optional `parent` skill and `effect` |
 | `effect`   | `description`; positive integer `duration`; positive `magnitude`                                                     |
 
-Registered templates live in `src/game/activities.ts`. Adding a new template requires a TypeScript implementation and extending the template schema; Markdown alone cannot execute code. The first slice expects the sample encounter and item IDs; new curriculum records can be added freely, while replacing the chapter requires updating its host composition.
+Registered templates live in `src/game/activities.ts`. Adding a new template requires a TypeScript implementation and extending the template schema; Markdown alone cannot execute code. The first slice expects the sample encounter IDs; new curriculum records can be added freely, while replacing the chapter requires updating its host composition.
 
 Effects currently supported by combat are `shield`, `poison`, and `weaken`. Shield reduces incoming damage; weaken reduces enemy attack; poison ticks before enemy attacks. Duration counts enemy turns. Applying the same effect refreshes it, rather than stacking. A poison knockout prevents that enemy's attack. Player item use takes one enemy turn. Correct skill answers spend focus and deal attack plus skill power; incorrect answers spend focus and the turn. Incoming damage is at least 1 after defense and effects.
 
@@ -77,3 +77,7 @@ Activities may supply `clue: { title, text }`. Completed quest objectives expose
 Quest `kind` is `case` (default), `branch`, or `finale`. Each branch may link a `lesson`. Quest `prerequisites` reference other quests; the compiler rejects missing references and cycles. A prerequisite is satisfied when its objectives are complete; reward claiming is optional for unlocks. See `content/07-quest-branches.md`.
 
 Battle activities may configure an `enemy` with `id`, `title`, positive integer `hp` and `attack`, and `mixedQuestions` (default false). Mixed encounters select from the full question bank; ordinary encounters select by skill lesson. The finale uses this shared battle implementation.
+
+## Evidence and rewards
+
+Clues belong to an activity’s `clue: { title, text }`. Completing that activity files the clue at the desk; unfinished clues remain hidden. The ledger links each file to the activity’s lesson. Quest rewards grant XP once; set `rewards: []`. Do not author consumables or equipment. Skills unlock from levels through the character menu. Health and focus reset before encounters. Legacy saves import without losing completion, clues, XP, or skills; retired item fields are removed.
