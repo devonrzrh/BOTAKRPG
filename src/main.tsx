@@ -9,4 +9,5 @@ import "./gameplay.css";
 import "./ui/BattleScreen.css";
 import "./ui/XpMeter.css";
 import "./ui/BookReader.css";
+import "./ui/Dialogue.css";
 createRoot(document.getElementById("root")!).render(<App />);

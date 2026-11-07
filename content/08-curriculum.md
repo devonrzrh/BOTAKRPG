@@ -755,8 +755,8 @@ enemy:
     - source-alg-09
     - source-alg-10
 clue:
-  title: Maintenance route
-  text: The route resolves to a maintenance relay used by ECHO-7.
+  title: PATCH's signed receipt
+  text: "Receipt: ECHO-7 entered maintenance relay R-17 at 02:14."
 ```
 
 ```entity
@@ -943,8 +943,8 @@ enemy:
     - source-ds-09
     - source-ds-10
 clue:
-  title: Gateway log
-  text: The archived revisions identify the robot's forged access record.
+  title: FOLIO's signed audit
+  text: "Signed audit: ECHO-7 used M-04, then erased its gateway entry."
 ```
 
 ```entity

@@ -97,6 +97,10 @@ export const storySchema = z.object({
 export const dialogueSchema = z.object({
   ...base,
   type: z.literal("dialogue"),
+  trigger: z
+    .object({ activity: id, when: z.enum(["before", "after"]) })
+    .optional(),
+  enemyName: z.string().min(1).optional(),
   start: id,
   nodes: z
     .array(
@@ -110,7 +114,7 @@ export const dialogueSchema = z.object({
               .object({
                 label: z.string().min(1),
                 next: id.optional(),
-                action: z.enum(["accept-case", "close"]).optional(),
+                action: z.enum(["accept-case", "close", "continue"]).optional(),
               })
               .refine(
                 (c) => Boolean(c.next) !== Boolean(c.action),
@@ -152,7 +156,14 @@ export type Dialogue = z.infer<typeof dialogueSchema>;
 export function validateContent(input: unknown): Content {
   const content = contentSchema.parse(input);
   const map = new Map<string, Entity>();
+  const triggers = new Set<string>();
   for (const entity of content.entities) {
+    if (entity.type === "dialogue" && entity.trigger) {
+      const key = `${entity.trigger.activity}:${entity.trigger.when}`;
+      if (triggers.has(key))
+        throw new Error(`${entity.id}: duplicate story trigger '${key}'`);
+      triggers.add(key);
+    }
     if (entity.type === "dialogue") {
       const nodes = new Set(entity.nodes.map((n) => n.id));
       if (nodes.size !== entity.nodes.length)
@@ -181,6 +192,8 @@ export function validateContent(input: unknown): Content {
   for (const entity of content.entities) {
     if ("lesson" in entity && entity.lesson)
       ref(entity.id, entity.lesson, "lesson");
+    if (entity.type === "dialogue" && entity.trigger)
+      ref(entity.id, entity.trigger.activity, "activity");
     if (entity.type === "lesson")
       for (const prerequisite of entity.prerequisites)
         ref(entity.id, prerequisite, "lesson");

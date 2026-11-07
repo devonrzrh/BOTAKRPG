@@ -18,6 +18,7 @@ export const saveSchema = z
         briefingSeen: z.boolean().default(false),
         caseAccepted: z.boolean().default(false),
         networkIntroSeen: z.boolean().default(false),
+        seenDialogues: z.array(z.string()).default([]),
       })
       .default({
         prologueSeen: false,
@@ -60,6 +61,7 @@ export function initialSave(): Save {
       briefingSeen: false,
       caseAccepted: false,
       networkIntroSeen: false,
+      seenDialogues: [],
     },
     character: {
       name: "Detective Vale",
@@ -197,6 +199,7 @@ export function parseSave(input: unknown, content: Content): Save {
   check(Object.keys(save.notes), "lesson");
   check(Object.keys(save.mastery), "lesson");
   check(save.character.skills, "skill");
+  check(save.story.seenDialogues, "dialogue");
   check(Object.keys(save.inventory), "item");
   for (const quest of content.entities.filter(
     (e): e is Quest => e.type === "quest" && e.kind === "finale",

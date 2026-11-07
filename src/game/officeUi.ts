@@ -1,6 +1,7 @@
 import type { Content, Quest, Lesson, Skill, Item } from "../content/schema";
 import { finaleAvailable, questComplete, nextObjective } from "./investigation";
 import { stats, type Save } from "./state";
+import { pendingStory } from "./questStory";
 import type { HomeWall } from "../world/Office";
 import {
   createQuestGraph,
@@ -474,7 +475,11 @@ export function createOfficeUi(input: OfficeUiInput): SurfaceModel[] {
       278,
       310,
       44,
-      done ? "Replay activity" : "Pursue lead",
+      done
+        ? pendingStory(save, content, branch.objectives.at(-1)!, "after")
+          ? "Read conclusion"
+          : "Replay activity"
+        : "Pursue lead",
       "open",
       destination,
       !save.story.caseAccepted,

@@ -21,7 +21,9 @@ interface Props {
   onReview: () => void;
   onRetreat: () => void;
   onJournal: () => void;
+  victoryActionLabel?: string;
   onRecover: () => void;
+  onRetry?: () => void;
 }
 export function BattleScreen(p: Props) {
   const { battle: b, save, question: q } = p,
@@ -298,7 +300,7 @@ export function BattleScreen(p: Props) {
               <h2 ref={title} tabIndex={-1}>
                 {b.enemyId === "echo-7"
                   ? "ECHO-7 contained"
-                  : "Sentinel defeated"}
+                  : `${b.enemyName} defeated`}
               </h2>
               <div className="battle-xp-reward">
                 <strong role="status">
@@ -342,7 +344,7 @@ export function BattleScreen(p: Props) {
               )}
               <footer>
                 <button className="primary" onClick={p.onJournal}>
-                  Quest map
+                  {p.victoryActionLabel ?? "Quest map"}
                 </button>
                 <button onClick={p.onRetreat}>Return to network</button>
               </footer>
@@ -354,6 +356,11 @@ export function BattleScreen(p: Props) {
                 Connection lost
               </h2>
               <p>Your evidence is safe. Return to recover before retrying.</p>
+              {p.onRetry && (
+                <button className="primary" onClick={p.onRetry}>
+                  Recover and retry encounter
+                </button>
+              )}
               <button className="primary" onClick={p.onRecover}>
                 Return & recover
               </button>

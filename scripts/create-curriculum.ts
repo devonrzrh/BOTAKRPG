@@ -309,16 +309,16 @@ const specs = [
     branch: "routing-trace",
     boss: "route-warden",
     title: "Route Warden",
-    clue: "Maintenance route",
-    text: "The route resolves to a maintenance relay used by ECHO-7.",
+    clue: "PATCH's signed receipt",
+    text: "Receipt: ECHO-7 entered maintenance relay R-17 at 02:14.",
   },
   {
     topic: "structures",
     branch: "access-records",
     boss: "archive-keeper",
     title: "Archive Keeper",
-    clue: "Gateway log",
-    text: "The archived revisions identify the robot's forged access record.",
+    clue: "FOLIO's signed audit",
+    text: "Signed audit: ECHO-7 used M-04, then erased its gateway entry.",
   },
   {
     topic: "ai",
@@ -380,7 +380,12 @@ for (const spec of specs) {
       ...chapters.map((c: { id: string }) => `encounter-${c.id}`),
       spec.boss,
     ];
-    branch.description = `Investigate ${chapters.length} ${spec.topic === "ai" ? "connectionist AI" : spec.topic} chapters, then defeat ${spec.title} to recover the clue.`;
+    branch.description =
+      spec.topic === "algorithms"
+        ? "Find the trapped courier PATCH. Trace ECHO-7's forged routes and recover its signed delivery receipt from the Route Warden."
+        : spec.topic === "structures"
+          ? "Restore the archivist FOLIO's identity, reconstruct the erased gateway log and confront the Archive Keeper."
+          : `Investigate ${chapters.length} ${spec.topic === "ai" ? "connectionist AI" : spec.topic} chapters, then defeat ${spec.title} to recover the clue.`;
   }
 }
 await writeFile(

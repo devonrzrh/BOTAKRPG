@@ -21,6 +21,8 @@ Topics: `algorithms`, `structures`, `ai`. IDs start with a lowercase letter and 
 
 ## Questions
 
+Activity dialogue can specify `trigger: { activity: activity-id, when: before }` (or `after`) and an optional `enemyName`. Trigger bindings must be unique. A terminal `action: continue` acknowledges a story scene; `close` leaves it unread. See `content/09-routing-story.md` and `docs/routing-branch.md`. Story acknowledgments persist in saves with a default empty list for older journals.
+
 Place a fenced block with language `question` in a lesson file. These blocks compile into question data and are removed from the rendered lesson.
 
 ```yaml
@@ -64,7 +66,7 @@ The compiler rejects malformed fields, duplicate IDs, unresolved references, inv
 
 ## Dialogues and clues
 
-A `type: dialogue` record has `id`, `title`, `start`, and `nodes`. Each node has a unique `id`, a `speaker`, `text`, and `choices`. Each choice has a `label` and exactly one of `next` (an existing node ID) or `action` (`accept-case` or `close`). See `content/05-case-dialogue.md`. Missing targets and ambiguous choices fail validation. Dialogue loops are allowed.
+A `type: dialogue` record has `id`, `title`, `start`, and `nodes`. Each node has a unique `id`, a `speaker`, `text`, and `choices`. Each choice has a `label` and exactly one of `next` (an existing node ID) or `action` (`accept-case`, `close`, or `continue`). See `content/05-case-dialogue.md`. Missing targets and ambiguous choices fail validation. Dialogue loops are allowed. Story endings resolve their owning branch from the activity trigger; never hardcode another branch's reward.
 
 Activities may supply `clue: { title, text }`. Completed quest objectives expose those clues on the quest board. Clues derive from saved completion IDs; no separate duplicate reward can be claimed. Briefing, quest acceptance, and connection cutscene flags persist with story progress.
 

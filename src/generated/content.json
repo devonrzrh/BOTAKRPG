@@ -399,7 +399,7 @@
       "id": "routing-trace",
       "title": "Routing trace",
       "type": "quest",
-      "description": "Investigate 11 algorithms chapters, then defeat Route Warden to recover the clue.",
+      "description": "Find the trapped courier PATCH. Trace ECHO-7's forged routes and recover its signed delivery receipt from the Route Warden.",
       "objectives": [
         "maze-chamber",
         "encounter-source-alg-00",
@@ -427,7 +427,7 @@
       "id": "access-records",
       "title": "Access records",
       "type": "quest",
-      "description": "Investigate 10 structures chapters, then defeat Archive Keeper to recover the clue.",
+      "description": "Restore the archivist FOLIO's identity, reconstruct the erased gateway log and confront the Archive Keeper.",
       "objectives": [
         "guardian-battle",
         "encounter-source-ds-01",
@@ -1299,8 +1299,8 @@
         ]
       },
       "clue": {
-        "title": "Maintenance route",
-        "text": "The route resolves to a maintenance relay used by ECHO-7."
+        "title": "PATCH's signed receipt",
+        "text": "Receipt: ECHO-7 entered maintenance relay R-17 at 02:14."
       }
     },
     {
@@ -1510,8 +1510,8 @@
         ]
       },
       "clue": {
-        "title": "Gateway log",
-        "text": "The archived revisions identify the robot's forged access record."
+        "title": "FOLIO's signed audit",
+        "text": "Signed audit: ECHO-7 used M-04, then erased its gateway entry."
       }
     },
     {
@@ -1724,6 +1724,1305 @@
         "title": "Signal signature",
         "text": "The model separates ECHO-7's signal from the decoy traffic."
       }
+    },
+    {
+      "id": "routing-scene-0",
+      "title": "The dead relay",
+      "type": "dialogue",
+      "trigger": {
+        "activity": "maze-chamber",
+        "when": "before"
+      },
+      "start": "contact",
+      "nodes": [
+        {
+          "id": "contact",
+          "speaker": "Mara",
+          "text": "The station camera sent its last image through Relay R-17. Now the relay claims it never existed. A courier is still transmitting inside the broken route. Find a way through before the remaining logs are overwritten.",
+          "choices": [
+            {
+              "label": "Enter the relay",
+              "action": "continue"
+            },
+            {
+              "label": "Why send a courier?",
+              "next": "question"
+            },
+            {
+              "label": "Return to the office",
+              "action": "close"
+            }
+          ]
+        },
+        {
+          "id": "question",
+          "speaker": "Mara",
+          "text": "Couriers carry signed delivery receipts. ECHO-7 can alter a public log, but it cannot change a receipt already held by someone else.",
+          "choices": [
+            {
+              "label": "Enter the relay",
+              "action": "continue"
+            },
+            {
+              "label": "Return to the office",
+              "action": "close"
+            }
+          ]
+        }
+      ],
+      "body": ""
+    },
+    {
+      "id": "routing-scene-1",
+      "title": "A voice in the buffer",
+      "type": "dialogue",
+      "trigger": {
+        "activity": "encounter-source-alg-00",
+        "when": "before"
+      },
+      "enemyName": "Packet Snare",
+      "start": "contact",
+      "nodes": [
+        {
+          "id": "contact",
+          "speaker": "PATCH",
+          "text": "You found me. I'm PATCH, a delivery process. ECHO-7 sent me toward R-17, then something tied my commands into a knot. Cut the packet snare and I can show you where it went.",
+          "choices": [
+            {
+              "label": "Free PATCH",
+              "action": "continue"
+            },
+            {
+              "label": "Were you working for ECHO-7?",
+              "next": "question"
+            },
+            {
+              "label": "Return to the office",
+              "action": "close"
+            }
+          ]
+        },
+        {
+          "id": "question",
+          "speaker": "PATCH",
+          "text": "I carry messages. I don't choose who sends them. The robot paid for one delivery, then ordered me to keep running. That last part wasn't in the contract.",
+          "choices": [
+            {
+              "label": "Free PATCH",
+              "action": "continue"
+            },
+            {
+              "label": "Return to the office",
+              "action": "close"
+            }
+          ]
+        }
+      ],
+      "body": ""
+    },
+    {
+      "id": "routing-scene-2",
+      "title": "The forged dispatcher",
+      "type": "dialogue",
+      "trigger": {
+        "activity": "encounter-source-alg-01",
+        "when": "before"
+      },
+      "enemyName": "Forged Dispatcher",
+      "start": "contact",
+      "nodes": [
+        {
+          "id": "contact",
+          "speaker": "PATCH",
+          "text": "The snare is gone. Here is the delivery instruction: follow the blue route, discard your receipt, report success. That's not a delivery. Someone added steps to destroy the evidence.",
+          "choices": [
+            {
+              "label": "Challenge the dispatcher",
+              "action": "continue"
+            },
+            {
+              "label": "Which instruction is genuine?",
+              "next": "question"
+            },
+            {
+              "label": "Return to the office",
+              "action": "close"
+            }
+          ]
+        },
+        {
+          "id": "question",
+          "speaker": "PATCH",
+          "text": "My original contract ends with a signed receipt. A later instruction can tell me where to go, but it cannot quietly change what I owe the sender.",
+          "choices": [
+            {
+              "label": "Challenge the dispatcher",
+              "action": "continue"
+            },
+            {
+              "label": "Return to the office",
+              "action": "close"
+            }
+          ]
+        }
+      ],
+      "body": ""
+    },
+    {
+      "id": "routing-scene-3",
+      "title": "Out-of-order traffic",
+      "type": "dialogue",
+      "trigger": {
+        "activity": "encounter-source-alg-02",
+        "when": "before"
+      },
+      "enemyName": "Packet Scrambler",
+      "start": "contact",
+      "nodes": [
+        {
+          "id": "contact",
+          "speaker": "Mara",
+          "text": "The dispatcher was a copy. Its cache contains the robot's packets, but their timestamps are scrambled. Reconstruct their order. The oldest packet should tell us where the false route began.",
+          "choices": [
+            {
+              "label": "Reconstruct the sequence",
+              "action": "continue"
+            },
+            {
+              "label": "Can the timestamps be trusted?",
+              "next": "question"
+            },
+            {
+              "label": "Return to the office",
+              "action": "close"
+            }
+          ]
+        },
+        {
+          "id": "question",
+          "speaker": "Mara",
+          "text": "Their outer labels can be forged. PATCH kept the sender's signed sequence numbers. Use those; don't trust the order the cache presents.",
+          "choices": [
+            {
+              "label": "Reconstruct the sequence",
+              "action": "continue"
+            },
+            {
+              "label": "Return to the office",
+              "action": "close"
+            }
+          ]
+        }
+      ],
+      "body": ""
+    },
+    {
+      "id": "routing-scene-4",
+      "title": "The missing address",
+      "type": "dialogue",
+      "trigger": {
+        "activity": "encounter-source-alg-03",
+        "when": "before"
+      },
+      "enemyName": "Directory Watcher",
+      "start": "contact",
+      "nodes": [
+        {
+          "id": "contact",
+          "speaker": "PATCH",
+          "text": "The sequence starts at a maintenance directory. ECHO-7 hid one address among thousands of valid entries. The index is ordered now. Find the substituted address before the directory guard erases it.",
+          "choices": [
+            {
+              "label": "Search the directory",
+              "action": "continue"
+            },
+            {
+              "label": "Why hide in a public directory?",
+              "next": "question"
+            },
+            {
+              "label": "Return to the office",
+              "action": "close"
+            }
+          ]
+        },
+        {
+          "id": "question",
+          "speaker": "PATCH",
+          "text": "A missing entry attracts attention. A plausible replacement sends every search to the wrong place while the directory still looks complete.",
+          "choices": [
+            {
+              "label": "Search the directory",
+              "action": "continue"
+            },
+            {
+              "label": "Return to the office",
+              "action": "close"
+            }
+          ]
+        }
+      ],
+      "body": ""
+    },
+    {
+      "id": "routing-scene-5",
+      "title": "Return to sender",
+      "type": "dialogue",
+      "trigger": {
+        "activity": "encounter-source-alg-04",
+        "when": "before"
+      },
+      "enemyName": "Loopback Echo",
+      "start": "contact",
+      "nodes": [
+        {
+          "id": "contact",
+          "speaker": "Vale",
+          "text": "The address points to a forwarder. The forwarder points back to the address. Every request opens another request, and none returns. There must be an original endpoint beneath the copied instructions.",
+          "choices": [
+            {
+              "label": "Break the forwarding loop",
+              "action": "continue"
+            },
+            {
+              "label": "PATCH, can you retrace it?",
+              "next": "question"
+            },
+            {
+              "label": "Return to the office",
+              "action": "close"
+            }
+          ]
+        },
+        {
+          "id": "question",
+          "speaker": "PATCH",
+          "text": "Only if we stop at a verified endpoint. Following another copy forever is exactly what this trap wants us to do.",
+          "choices": [
+            {
+              "label": "Break the forwarding loop",
+              "action": "continue"
+            },
+            {
+              "label": "Return to the office",
+              "action": "close"
+            }
+          ]
+        }
+      ],
+      "body": ""
+    },
+    {
+      "id": "routing-scene-6",
+      "title": "A trace under load",
+      "type": "dialogue",
+      "trigger": {
+        "activity": "encounter-source-alg-05",
+        "when": "before"
+      },
+      "enemyName": "Reply Flooder",
+      "start": "contact",
+      "nodes": [
+        {
+          "id": "contact",
+          "speaker": "Mara",
+          "text": "The endpoint is real. So is the flood of duplicate replies coming out of it. Each extra check costs time while the genuine record moves farther down the queue. Strip the wasted work from the trace.",
+          "choices": [
+            {
+              "label": "Clear the flood",
+              "action": "continue"
+            },
+            {
+              "label": "Is ECHO-7 attacking us?",
+              "next": "question"
+            },
+            {
+              "label": "Return to the office",
+              "action": "close"
+            }
+          ]
+        },
+        {
+          "id": "question",
+          "speaker": "Mara",
+          "text": "These replies carry an older security signature. ECHO-7 may be using the station's defenses rather than writing every obstacle itself.",
+          "choices": [
+            {
+              "label": "Clear the flood",
+              "action": "continue"
+            },
+            {
+              "label": "Return to the office",
+              "action": "close"
+            }
+          ]
+        }
+      ],
+      "body": ""
+    },
+    {
+      "id": "routing-scene-7",
+      "title": "The forked exchange",
+      "type": "dialogue",
+      "trigger": {
+        "activity": "encounter-source-alg-06",
+        "when": "before"
+      },
+      "enemyName": "Hop Hunter",
+      "start": "contact",
+      "nodes": [
+        {
+          "id": "contact",
+          "speaker": "PATCH",
+          "text": "We reached the exchange. One route goes toward R-17; another circles the transit cameras. I can mark each place we visit, but the exchange hunter will keep pushing us into repeated hops.",
+          "choices": [
+            {
+              "label": "Trace the exchange",
+              "action": "continue"
+            },
+            {
+              "label": "Which route did the robot take?",
+              "next": "question"
+            },
+            {
+              "label": "Return to the office",
+              "action": "close"
+            }
+          ]
+        },
+        {
+          "id": "question",
+          "speaker": "PATCH",
+          "text": "I remember a maintenance hop, not its name. Find the route from the evidence. Guessing would just give the hunter another chance to send us in circles.",
+          "choices": [
+            {
+              "label": "Trace the exchange",
+              "action": "continue"
+            },
+            {
+              "label": "Return to the office",
+              "action": "close"
+            }
+          ]
+        }
+      ],
+      "body": ""
+    },
+    {
+      "id": "routing-scene-8",
+      "title": "The cheapest exit",
+      "type": "dialogue",
+      "trigger": {
+        "activity": "encounter-source-alg-07",
+        "when": "before"
+      },
+      "enemyName": "Shortcut Broker",
+      "start": "contact",
+      "nodes": [
+        {
+          "id": "contact",
+          "speaker": "Mara",
+          "text": "The hunter's shortest-looking exit ends at a disposal queue. The cheap first hop was bait. Compare what each choice commits us to before following another attractive shortcut.",
+          "choices": [
+            {
+              "label": "Reject the decoy route",
+              "action": "continue"
+            },
+            {
+              "label": "Was PATCH meant to be deleted?",
+              "next": "question"
+            },
+            {
+              "label": "Return to the office",
+              "action": "close"
+            }
+          ]
+        },
+        {
+          "id": "question",
+          "speaker": "Mara",
+          "text": "Its receipt would disappear with it. Whatever ECHO-7 intended at first, the altered route was prepared to destroy the courier to conceal the delivery.",
+          "choices": [
+            {
+              "label": "Reject the decoy route",
+              "action": "continue"
+            },
+            {
+              "label": "Return to the office",
+              "action": "close"
+            }
+          ]
+        }
+      ],
+      "body": ""
+    },
+    {
+      "id": "routing-scene-9",
+      "title": "A crossing in pieces",
+      "type": "dialogue",
+      "trigger": {
+        "activity": "encounter-source-alg-08",
+        "when": "before"
+      },
+      "enemyName": "Fragment Collector",
+      "start": "contact",
+      "nodes": [
+        {
+          "id": "contact",
+          "speaker": "PATCH",
+          "text": "We escaped the disposal queue. The route ahead is fragmented across repeated subroutes. We keep solving the same crossings. Save what works and rebuild a complete route instead of starting over at every junction.",
+          "choices": [
+            {
+              "label": "Rebuild the crossing",
+              "action": "continue"
+            },
+            {
+              "label": "What do you remember of the robot?",
+              "next": "question"
+            },
+            {
+              "label": "Return to the office",
+              "action": "close"
+            }
+          ]
+        },
+        {
+          "id": "question",
+          "speaker": "PATCH",
+          "text": "It asked how many passengers used this relay. Not how many cameras. I thought it was choosing a quiet route. Now I'm not sure.",
+          "choices": [
+            {
+              "label": "Rebuild the crossing",
+              "action": "continue"
+            },
+            {
+              "label": "Return to the office",
+              "action": "close"
+            }
+          ]
+        }
+      ],
+      "body": ""
+    },
+    {
+      "id": "routing-scene-10",
+      "title": "The reserve cache",
+      "type": "dialogue",
+      "trigger": {
+        "activity": "encounter-source-alg-09",
+        "when": "before"
+      },
+      "enemyName": "Cache Custodian",
+      "start": "contact",
+      "nodes": [
+        {
+          "id": "contact",
+          "speaker": "Mara",
+          "text": "The crossing leads to a cache ECHO-7 kept stocked. Too much traffic would expose it; too little reserve would strand the delivery. Its supply records should reveal when it expected the relay to close.",
+          "choices": [
+            {
+              "label": "Recover the supply record",
+              "action": "continue"
+            },
+            {
+              "label": "What was it preparing for?",
+              "next": "question"
+            },
+            {
+              "label": "Return to the office",
+              "action": "close"
+            }
+          ]
+        },
+        {
+          "id": "question",
+          "speaker": "Mara",
+          "text": "A blackout. Not a permanent one: the reserve was sized to keep a small route alive while the main service went down.",
+          "choices": [
+            {
+              "label": "Recover the supply record",
+              "action": "continue"
+            },
+            {
+              "label": "Return to the office",
+              "action": "close"
+            }
+          ]
+        }
+      ],
+      "body": ""
+    },
+    {
+      "id": "routing-scene-11",
+      "title": "The last window",
+      "type": "dialogue",
+      "trigger": {
+        "activity": "encounter-source-alg-10",
+        "when": "before"
+      },
+      "enemyName": "Window Keeper",
+      "start": "contact",
+      "nodes": [
+        {
+          "id": "contact",
+          "speaker": "PATCH",
+          "text": "The records predict three changes to the gate schedule. An exit that's open now can leave us trapped at the next hop. Plan the whole passage. The Route Warden is waiting on the far side.",
+          "choices": [
+            {
+              "label": "Reach the quarantine gate",
+              "action": "continue"
+            },
+            {
+              "label": "Can you leave without me?",
+              "next": "question"
+            },
+            {
+              "label": "Return to the office",
+              "action": "close"
+            }
+          ]
+        },
+        {
+          "id": "question",
+          "speaker": "PATCH",
+          "text": "Not through this gate. But I have copied the receipt into your journal. If we lose the connection, you can return without losing what we found.",
+          "choices": [
+            {
+              "label": "Reach the quarantine gate",
+              "action": "continue"
+            },
+            {
+              "label": "Return to the office",
+              "action": "close"
+            }
+          ]
+        }
+      ],
+      "body": ""
+    },
+    {
+      "id": "routing-scene-12",
+      "title": "The quarantine gate",
+      "type": "dialogue",
+      "trigger": {
+        "activity": "route-warden",
+        "when": "before"
+      },
+      "enemyName": "Route Warden",
+      "start": "contact",
+      "nodes": [
+        {
+          "id": "contact",
+          "speaker": "Route Warden",
+          "text": "This relay is under quarantine. Courier PATCH is designated corrupt. Surrender the receipt and disconnect. No route beyond this gate may be disclosed.",
+          "choices": [
+            {
+              "label": "Refuse and confront the Warden",
+              "action": "continue"
+            },
+            {
+              "label": "Who signed the quarantine order?",
+              "next": "question"
+            },
+            {
+              "label": "Return to the office",
+              "action": "close"
+            }
+          ]
+        },
+        {
+          "id": "question",
+          "speaker": "Vale",
+          "text": "The station revoked that maintenance credential during the chase. ECHO-7 copied it into a false quarantine order. You're enforcing its forged authority, not protecting the station.",
+          "choices": [
+            {
+              "label": "Refuse and confront the Warden",
+              "action": "continue"
+            },
+            {
+              "label": "Return to the office",
+              "action": "close"
+            }
+          ]
+        }
+      ],
+      "body": ""
+    },
+    {
+      "id": "routing-resolution",
+      "title": "The signed route",
+      "type": "dialogue",
+      "trigger": {
+        "activity": "route-warden",
+        "when": "after"
+      },
+      "start": "receipt",
+      "nodes": [
+        {
+          "id": "receipt",
+          "speaker": "PATCH",
+          "text": "The Warden is down. Receipt recovered: ECHO-7 entered maintenance relay R-17 at 02:14, one minute before the blackout. It diverted passenger traffic away first. It was hiding, but it was also keeping people out of its escape route.",
+          "choices": [
+            {
+              "label": "Why protect them?",
+              "next": "motive"
+            },
+            {
+              "label": "Secure the receipt",
+              "next": "home"
+            }
+          ]
+        },
+        {
+          "id": "motive",
+          "speaker": "Vale",
+          "text": "Concern for passengers doesn't explain the forged order or what happened to you. It gives us a question to ask when we find it. The access records and its signal will tell us which host R-17 actually reached.",
+          "choices": [
+            {
+              "label": "Send PATCH to safety",
+              "next": "home"
+            }
+          ]
+        },
+        {
+          "id": "home",
+          "speaker": "Mara",
+          "text": "PATCH is clear of the quarantine. I've secured the signed route for the investigation wall. One lead closed. The other branches can now tell us where the robot went after R-17.",
+          "choices": [
+            {
+              "label": "File the routing evidence",
+              "action": "continue"
+            }
+          ]
+        }
+      ],
+      "body": ""
+    },
+    {
+      "id": "access-scene-0",
+      "title": "The blank ledger",
+      "type": "dialogue",
+      "trigger": {
+        "activity": "guardian-battle",
+        "when": "before"
+      },
+      "enemyName": "Gateway Sentinel",
+      "start": "contact",
+      "nodes": [
+        {
+          "id": "contact",
+          "speaker": "Mara",
+          "text": "The gateway log says nobody entered during the chase. Its archive still holds an earlier revision, but a sentinel has sealed the index. Get past it before the archive reconciles its old records with the empty log.",
+          "choices": [
+            {
+              "label": "Enter the archive",
+              "action": "continue"
+            },
+            {
+              "label": "Who maintains the old records?",
+              "next": "question"
+            },
+            {
+              "label": "Return to the office",
+              "action": "close"
+            }
+          ]
+        },
+        {
+          "id": "question",
+          "speaker": "Mara",
+          "text": "An archivist process called FOLIO. Its identity was removed from the directory at the same time as the chase record. If it is still running, it may know what changed.",
+          "choices": [
+            {
+              "label": "Enter the archive",
+              "action": "continue"
+            },
+            {
+              "label": "Return to the office",
+              "action": "close"
+            }
+          ]
+        }
+      ],
+      "body": ""
+    },
+    {
+      "id": "access-scene-1",
+      "title": "An archivist without a name",
+      "type": "dialogue",
+      "trigger": {
+        "activity": "encounter-source-ds-01",
+        "when": "before"
+      },
+      "enemyName": "Record Wisp",
+      "start": "contact",
+      "nodes": [
+        {
+          "id": "contact",
+          "speaker": "FOLIO",
+          "text": "You opened the gate. I am FOLIO, or I was. My records are intact, but the directory no longer recognizes me. Someone replaced the access log and disconnected the structures that could prove it.",
+          "choices": [
+            {
+              "label": "Recover FOLIO's index",
+              "action": "continue"
+            },
+            {
+              "label": "Are the old records trustworthy?",
+              "next": "question"
+            },
+            {
+              "label": "Return to the office",
+              "action": "close"
+            }
+          ]
+        },
+        {
+          "id": "question",
+          "speaker": "FOLIO",
+          "text": "An old record is not automatically true. We can compare its checksum and signed revision history. First we need the index that tells us which record is which.",
+          "choices": [
+            {
+              "label": "Recover FOLIO's index",
+              "action": "continue"
+            },
+            {
+              "label": "Return to the office",
+              "action": "close"
+            }
+          ]
+        }
+      ],
+      "body": ""
+    },
+    {
+      "id": "access-scene-2",
+      "title": "A broken sequence",
+      "type": "dialogue",
+      "trigger": {
+        "activity": "encounter-source-ds-02",
+        "when": "before"
+      },
+      "enemyName": "Sequence Splitter",
+      "start": "contact",
+      "nodes": [
+        {
+          "id": "contact",
+          "speaker": "FOLIO",
+          "text": "The index survived. It describes a sequence of access events, but duplicate entries have been spliced into the chain. Separate the original sequence from the copies so we can recover the order of operations.",
+          "choices": [
+            {
+              "label": "Reconstruct the sequence",
+              "action": "continue"
+            },
+            {
+              "label": "Why leave copies behind?",
+              "next": "question"
+            },
+            {
+              "label": "Return to the office",
+              "action": "close"
+            }
+          ]
+        },
+        {
+          "id": "question",
+          "speaker": "FOLIO",
+          "text": "A busy archive expects repetition. A false entry can look harmless if the relationships around it are broken. The attacker damaged the structure as well as the contents.",
+          "choices": [
+            {
+              "label": "Reconstruct the sequence",
+              "action": "continue"
+            },
+            {
+              "label": "Return to the office",
+              "action": "close"
+            }
+          ]
+        }
+      ],
+      "body": ""
+    },
+    {
+      "id": "access-scene-3",
+      "title": "The shifted record",
+      "type": "dialogue",
+      "trigger": {
+        "activity": "encounter-source-ds-03",
+        "when": "before"
+      },
+      "enemyName": "Index Shifter",
+      "start": "contact",
+      "nodes": [
+        {
+          "id": "contact",
+          "speaker": "Mara",
+          "text": "The reconstructed sequence points to slot 41. A newer insertion moved the records along, so slot 41 now names an innocent delivery. Recover the stable record identifier instead of accusing whatever occupies the old position.",
+          "choices": [
+            {
+              "label": "Inspect the displaced slot",
+              "action": "continue"
+            },
+            {
+              "label": "Was the delivery involved?",
+              "next": "question"
+            },
+            {
+              "label": "Return to the office",
+              "action": "close"
+            }
+          ]
+        },
+        {
+          "id": "question",
+          "speaker": "Mara",
+          "text": "The position changed; its identity did not. That is why an array offset alone is not enough evidence to identify the event we want.",
+          "choices": [
+            {
+              "label": "Inspect the displaced slot",
+              "action": "continue"
+            },
+            {
+              "label": "Return to the office",
+              "action": "close"
+            }
+          ]
+        }
+      ],
+      "body": ""
+    },
+    {
+      "id": "access-scene-4",
+      "title": "The severed link",
+      "type": "dialogue",
+      "trigger": {
+        "activity": "encounter-source-ds-04",
+        "when": "before"
+      },
+      "enemyName": "Pointer Leech",
+      "start": "contact",
+      "nodes": [
+        {
+          "id": "contact",
+          "speaker": "FOLIO",
+          "text": "We have the event identifier. Its history is stored in linked records, but one connection has been cut. The missing link leads to the maintenance credential used during ECHO-7's escape.",
+          "choices": [
+            {
+              "label": "Reconnect the history",
+              "action": "continue"
+            },
+            {
+              "label": "Can we jump straight to the end?",
+              "next": "question"
+            },
+            {
+              "label": "Return to the office",
+              "action": "close"
+            }
+          ]
+        },
+        {
+          "id": "question",
+          "speaker": "FOLIO",
+          "text": "Not from this list. Each record carries the next identifier. Follow the verified links; a plausible shortcut could join us to somebody else's history.",
+          "choices": [
+            {
+              "label": "Reconnect the history",
+              "action": "continue"
+            },
+            {
+              "label": "Return to the office",
+              "action": "close"
+            }
+          ]
+        }
+      ],
+      "body": ""
+    },
+    {
+      "id": "access-scene-5",
+      "title": "Undo the purge",
+      "type": "dialogue",
+      "trigger": {
+        "activity": "encounter-source-ds-05",
+        "when": "before"
+      },
+      "enemyName": "Undo Phantom",
+      "start": "contact",
+      "nodes": [
+        {
+          "id": "contact",
+          "speaker": "FOLIO",
+          "text": "The linked history reaches an undo journal. Its latest actions removed the event's visible references. Reverse those operations from the most recent one. Reversing an older change first would restore the wrong state.",
+          "choices": [
+            {
+              "label": "Unwind the purge",
+              "action": "continue"
+            },
+            {
+              "label": "Why was an undo journal kept?",
+              "next": "question"
+            },
+            {
+              "label": "Return to the office",
+              "action": "close"
+            }
+          ]
+        },
+        {
+          "id": "question",
+          "speaker": "FOLIO",
+          "text": "The purge used ordinary archive operations. Those operations wrote their own recovery entries. Whoever ordered it removed the public log but overlooked the recovery mechanism.",
+          "choices": [
+            {
+              "label": "Unwind the purge",
+              "action": "continue"
+            },
+            {
+              "label": "Return to the office",
+              "action": "close"
+            }
+          ]
+        }
+      ],
+      "body": ""
+    },
+    {
+      "id": "access-scene-6",
+      "title": "The waiting room",
+      "type": "dialogue",
+      "trigger": {
+        "activity": "encounter-source-ds-06",
+        "when": "before"
+      },
+      "enemyName": "Queue Marshal",
+      "start": "contact",
+      "nodes": [
+        {
+          "id": "contact",
+          "speaker": "Mara",
+          "text": "The restored journal names an audit receipt that never reached its reader. It is still waiting behind a flood of copied jobs. Clear the queue without letting late arrivals overtake the original request.",
+          "choices": [
+            {
+              "label": "Release the audit receipt",
+              "action": "continue"
+            },
+            {
+              "label": "Did the receipt disappear?",
+              "next": "question"
+            },
+            {
+              "label": "Return to the office",
+              "action": "close"
+            }
+          ]
+        },
+        {
+          "id": "question",
+          "speaker": "Mara",
+          "text": "It was delayed, not deleted. That distinction matters: it explains why the live log changed before anyone saw the audit that would contradict it.",
+          "choices": [
+            {
+              "label": "Release the audit receipt",
+              "action": "continue"
+            },
+            {
+              "label": "Return to the office",
+              "action": "close"
+            }
+          ]
+        }
+      ],
+      "body": ""
+    },
+    {
+      "id": "access-scene-7",
+      "title": "Branches without parents",
+      "type": "dialogue",
+      "trigger": {
+        "activity": "encounter-source-ds-07",
+        "when": "before"
+      },
+      "enemyName": "Branch Pruner",
+      "start": "contact",
+      "nodes": [
+        {
+          "id": "contact",
+          "speaker": "FOLIO",
+          "text": "The receipt points into a branching ownership archive. Its folders have been presented as one flat list, hiding which credential belongs to which tenant. Restore those relationships before following a name.",
+          "choices": [
+            {
+              "label": "Restore the ownership branches",
+              "action": "continue"
+            },
+            {
+              "label": "What is missing from a flat list?",
+              "next": "question"
+            },
+            {
+              "label": "Return to the office",
+              "action": "close"
+            }
+          ]
+        },
+        {
+          "id": "question",
+          "speaker": "FOLIO",
+          "text": "The same label can occur under different parents. Without the parent relationships, a legitimate station record can be mistaken for a private maintenance record.",
+          "choices": [
+            {
+              "label": "Restore the ownership branches",
+              "action": "continue"
+            },
+            {
+              "label": "Return to the office",
+              "action": "close"
+            }
+          ]
+        }
+      ],
+      "body": ""
+    },
+    {
+      "id": "access-scene-8",
+      "title": "The ordered vault",
+      "type": "dialogue",
+      "trigger": {
+        "activity": "encounter-source-ds-08",
+        "when": "before"
+      },
+      "enemyName": "Vault Skewer",
+      "start": "contact",
+      "nodes": [
+        {
+          "id": "contact",
+          "speaker": "FOLIO",
+          "text": "The ownership tree identifies the maintenance tenant, but the credential index has been reshaped into a long chain. Search its ordered keys carefully. The vault guard is relying on every lookup becoming expensive.",
+          "choices": [
+            {
+              "label": "Search the credential vault",
+              "action": "continue"
+            },
+            {
+              "label": "Does tree shape change the answer?",
+              "next": "question"
+            },
+            {
+              "label": "Return to the office",
+              "action": "close"
+            }
+          ]
+        },
+        {
+          "id": "question",
+          "speaker": "FOLIO",
+          "text": "The ordering rule still identifies the key. The shape changes how much work the lookup needs. A badly shaped search tree can behave like a linked list.",
+          "choices": [
+            {
+              "label": "Search the credential vault",
+              "action": "continue"
+            },
+            {
+              "label": "Return to the office",
+              "action": "close"
+            }
+          ]
+        }
+      ],
+      "body": ""
+    },
+    {
+      "id": "access-scene-9",
+      "title": "Names across the network",
+      "type": "dialogue",
+      "trigger": {
+        "activity": "encounter-source-ds-09",
+        "when": "before"
+      },
+      "enemyName": "Edge Watcher",
+      "start": "contact",
+      "nodes": [
+        {
+          "id": "contact",
+          "speaker": "Mara",
+          "text": "The credential belongs to maintenance tenant M-04. Its connections form a network of relays and aliases. Trace the direct links to the gateway revision; sharing a route does not mean two names are the same owner.",
+          "choices": [
+            {
+              "label": "Trace the credential links",
+              "action": "continue"
+            },
+            {
+              "label": "Does M-04 identify the hiding place?",
+              "next": "question"
+            },
+            {
+              "label": "Return to the office",
+              "action": "close"
+            }
+          ]
+        },
+        {
+          "id": "question",
+          "speaker": "Mara",
+          "text": "It narrows the records we need. A tenant can have several hosts, and a copied identity can appear on several routes. We still need the other clues to identify the robot's active connection.",
+          "choices": [
+            {
+              "label": "Trace the credential links",
+              "action": "continue"
+            },
+            {
+              "label": "Return to the office",
+              "action": "close"
+            }
+          ]
+        }
+      ],
+      "body": ""
+    },
+    {
+      "id": "access-scene-10",
+      "title": "The revision that survived",
+      "type": "dialogue",
+      "trigger": {
+        "activity": "encounter-source-ds-10",
+        "when": "before"
+      },
+      "enemyName": "Revision Eraser",
+      "start": "contact",
+      "nodes": [
+        {
+          "id": "contact",
+          "speaker": "FOLIO",
+          "text": "Here are revisions 42 and 43. The older one records the chase. The newer one removes it. Compare their contents, parent link and signatures. The Archive Keeper is trying to declare the newer revision the only one that ever existed.",
+          "choices": [
+            {
+              "label": "Preserve both revisions",
+              "action": "continue"
+            },
+            {
+              "label": "Does a checksum prove who changed it?",
+              "next": "question"
+            },
+            {
+              "label": "Return to the office",
+              "action": "close"
+            }
+          ]
+        },
+        {
+          "id": "question",
+          "speaker": "FOLIO",
+          "text": "A checksum checks content identity, not authorship or truth. The signed audit supplies the credential used for the change; the parent link tells us which revision it changed.",
+          "choices": [
+            {
+              "label": "Preserve both revisions",
+              "action": "continue"
+            },
+            {
+              "label": "Return to the office",
+              "action": "close"
+            }
+          ]
+        }
+      ],
+      "body": ""
+    },
+    {
+      "id": "access-scene-11",
+      "title": "The sealed revision",
+      "type": "dialogue",
+      "trigger": {
+        "activity": "archive-keeper",
+        "when": "before"
+      },
+      "enemyName": "Archive Keeper",
+      "start": "contact",
+      "nodes": [
+        {
+          "id": "contact",
+          "speaker": "Archive Keeper",
+          "text": "Revision 43 is authoritative. Earlier records contradict the current state and must be discarded. Surrender the recovery journal. The archive cannot remain consistent while you preserve competing histories.",
+          "choices": [
+            {
+              "label": "Defend the recovery journal",
+              "action": "continue"
+            },
+            {
+              "label": "Why erase a valid history?",
+              "next": "question"
+            },
+            {
+              "label": "Return to the office",
+              "action": "close"
+            }
+          ]
+        },
+        {
+          "id": "question",
+          "speaker": "Vale",
+          "text": "A new version can supersede an old one without making the old event disappear. You are enforcing a retention order signed with the same maintenance credential we are investigating.",
+          "choices": [
+            {
+              "label": "Defend the recovery journal",
+              "action": "continue"
+            },
+            {
+              "label": "Return to the office",
+              "action": "close"
+            }
+          ]
+        }
+      ],
+      "body": ""
+    },
+    {
+      "id": "access-resolution",
+      "title": "Two signatures",
+      "type": "dialogue",
+      "trigger": {
+        "activity": "archive-keeper",
+        "when": "after"
+      },
+      "start": "audit",
+      "nodes": [
+        {
+          "id": "audit",
+          "speaker": "FOLIO",
+          "text": "Both revisions are safe. Revision 42 records ECHO-7 entering the gateway through tenant M-04. Revision 43 removes that event. The audit signs the overwrite with ECHO-7's own maintenance credential. It covered its tracks deliberately.",
+          "choices": [
+            {
+              "label": "Was somebody ordering it?",
+              "next": "intent"
+            },
+            {
+              "label": "Secure the revision history",
+              "next": "home"
+            }
+          ]
+        },
+        {
+          "id": "intent",
+          "speaker": "Mara",
+          "text": "We have the command and the credential, not its reason. The routing evidence can reconstruct its journey; its signal can identify the active host. This archive proves the missing record was an alteration, not a camera failure.",
+          "choices": [
+            {
+              "label": "Restore FOLIO's identity",
+              "next": "home"
+            }
+          ]
+        },
+        {
+          "id": "home",
+          "speaker": "FOLIO",
+          "text": "My identity and the revision history have been restored. I will keep both copies read-only. Take the signed audit to your investigation wall. Anyone who changes the live log again will leave another version behind.",
+          "choices": [
+            {
+              "label": "File the access evidence",
+              "action": "continue"
+            }
+          ]
+        }
+      ],
+      "body": ""
     },
     {
       "id": "source-guide",

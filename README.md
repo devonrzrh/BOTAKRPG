@@ -23,6 +23,8 @@ Each of the three clue branches now continues through its subject's chapters and
 
 ## Orientation activities
 
+**Playable story branches:** choose a lead on the quest board. **Routing trace** follows PATCH through the maze and eleven algorithm encounters to the Route Warden. **Access records** restores FOLIO's erased archive through the sentinel, ten data-structure encounters and the Archive Keeper. Each has dialogue choices, a conclusion and its own evidence reward. Victory continues directly to the next lead. See the [routing walkthrough](docs/routing-branch.md) and [archive walkthrough](docs/access-branch.md).
+
 1. Complete or skip the short pursuit prologue. Take the case in the briefing. Select **Home → Bookshelf** or the pinned bookshelf note. Read “Finding a way through.” Bookmarks and margin notes save locally.
 2. Enter **Packet labyrinth**. Reach the amber exit manually, with visual blocks, or using Python. The graph-search lesson contains working BFS code; DFS and other valid routes also work. Run resets the maze while retaining your program. Reset retains code and blocks. New seed creates another layout. Completing a maze unlocks an optional 90-second trial.
 3. Meet the **Sentinel A-03**. Choose a skill, answer, then continue to the enemy turn. Items spend a turn without a question. Mistakes have explanations. Battles are entered as accepted-case encounters. Rest in the network hub to replenish health and focus.

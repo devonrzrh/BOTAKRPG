@@ -72,6 +72,13 @@ import {
 } from "./game/questGraph";
 import { QuestBranches, FinaleCard } from "./ui/QuestBranches";
 import { finaleAvailable, activityUnlocked } from "./game/investigation";
+import { nextObjective } from "./game/investigation";
+import {
+  activityStory,
+  pendingStory,
+  acknowledgeStory,
+  storyBranch,
+} from "./game/questStory";
 import type { HomeWall } from "./world/Office";
 import { atGoal, move, shortestPath, type Maze } from "./game/maze";
 import {
@@ -436,6 +443,28 @@ export default function App() {
   const open = useCallback(
     (id: string) => {
       if (id === "exit") return;
+      const activityId =
+        (
+          {
+            maze: "maze-chamber",
+            battle: "guardian-battle",
+            garden: "perceptron-exhibit",
+            echo: "echo-battle",
+          } as Record<string, string>
+        )[id] ?? id;
+      if (
+        saveRef.current.story.networkIntroSeen &&
+        activityUnlocked(saveRef.current, activityId, content)
+      ) {
+        const beat =
+          pendingStory(saveRef.current, content, activityId, "after") ??
+          pendingStory(saveRef.current, content, activityId, "before");
+        if (beat) {
+          setBookOpen(false);
+          setDialogueId(beat.id);
+          return;
+        }
+      }
       const encounter = content.entities.find(
         (e) => e.type === "activity" && e.template === "battle" && e.id === id,
       );
@@ -448,7 +477,19 @@ export default function App() {
         setRealm("hub");
         setScene("hub");
         setPanel("battle");
-        setBattle(createBattle(encounter.enemy));
+        const enemy = encounter.enemy;
+        setBattle(
+          createBattle(
+            enemy
+              ? {
+                  ...enemy,
+                  title:
+                    activityStory(content, id, "before")?.enemyName ??
+                    enemy.title,
+                }
+              : undefined,
+          ),
+        );
         setAnswer([]);
         setBattleNotice("");
         return;
@@ -544,7 +585,18 @@ export default function App() {
         setScene(id === "battle" || id === "garden" ? "hub" : realm);
         setPanel(id as Panel);
         if (id === "battle") {
-          setBattle(createBattle());
+          const enemy = createBattle();
+          const activity = content.entities.find(
+            (e) => e.type === "activity" && e.id === "guardian-battle",
+          );
+          setBattle({
+            ...enemy,
+            lessons:
+              activity?.type === "activity" ? [activity.lesson] : undefined,
+            enemyName:
+              activityStory(content, "guardian-battle", "before")?.enemyName ??
+              enemy.enemyName,
+          });
           setAnswer([]);
           setBattleNotice("");
         }
@@ -605,6 +657,26 @@ export default function App() {
     setBookOpen(true);
     setOfficePage(0);
   };
+  const continueBranch = (activity: string) => {
+    stop();
+    const branch = storyBranch(content, activity);
+    if (!branch) {
+      open("journal");
+      return;
+    }
+    const last = branch.objectives.at(-1)!;
+    if (saveRef.current.completed.includes(last)) {
+      if (pendingStory(saveRef.current, content, last, "after")) open(last);
+      else open("journal");
+    } else open(activityDestination(nextObjective(saveRef.current, branch)));
+  };
+  const battleActivityId =
+    content.entities.find(
+      (e) => e.type === "activity" && e.enemy?.id === battle.enemyId,
+    )?.id ?? "guardian-battle";
+  const narratedBattle = Boolean(
+    activityStory(content, battleActivityId, "before"),
+  );
   const applyBattle = (nextBattle: Battle, nextSave: Save) => {
     if (nextBattle.phase === "won") {
       const activity =
@@ -670,6 +742,10 @@ export default function App() {
       await storeSave(parsed);
       stop();
       updateSave(() => parsed);
+      setDialogueId(null);
+      setCutsceneId(null);
+      setPendingActivity(null);
+      setPrologueReplay(false);
       updateMaze(createMaze(parsed.seed));
       setStorageReady(true);
       setPanel("settings");
@@ -969,7 +1045,9 @@ export default function App() {
               Boolean(cutsceneId)
             }
             encounter={panel === "battle"}
-            finalBoss={battle.enemyId === "echo-7"}
+            finalBoss={["echo-7", "route-warden", "archive-keeper"].includes(
+              battle.enemyId,
+            )}
             maze={maze}
             renderer={save.settings.renderer}
             reducedMotion={save.settings.reducedMotion}
@@ -1191,6 +1269,14 @@ export default function App() {
                       <span className="success">
                         <Check size={15} /> Exit reached
                       </span>
+                    )}
+                    {save.completed.includes("maze-chamber") && (
+                      <button
+                        disabled={busy}
+                        onClick={() => continueBranch("maze-chamber")}
+                      >
+                        Follow the routing trace
+                      </button>
                     )}
                   </div>
                   <div className="segmented">
@@ -1426,6 +1512,7 @@ export default function App() {
               )}
               {panel === "battle" && (
                 <BattleScreen
+                  key={battle.enemyId}
                   battle={battle}
                   save={save}
                   content={content}
@@ -1472,7 +1559,29 @@ export default function App() {
                     notify("Lesson saved for review after battle.");
                   }}
                   onRetreat={close}
-                  onJournal={() => open("journal")}
+                  victoryActionLabel={
+                    narratedBattle
+                      ? activityStory(content, battleActivityId, "after")
+                        ? "Recover evidence"
+                        : "Follow the lead"
+                      : undefined
+                  }
+                  onJournal={
+                    narratedBattle
+                      ? () => continueBranch(battleActivityId)
+                      : () => open("journal")
+                  }
+                  onRetry={() => {
+                    updateSave((s) => ({
+                      ...s,
+                      character: {
+                        ...s.character,
+                        hp: stats(s).maxHp,
+                        focus: stats(s).maxFocus,
+                      },
+                    }));
+                    open(activityDestination(battleActivityId));
+                  }}
                   onRecover={() => {
                     updateSave((s) => ({
                       ...s,
@@ -2162,6 +2271,22 @@ export default function App() {
             key={dialogueId}
             dialogue={dialogueContent.find((d) => d.id === dialogueId)!}
             onAction={(action) => {
+              const beat = dialogueContent.find((d) => d.id === dialogueId)!;
+              if (beat.trigger) {
+                setDialogueId(null);
+                if (action === "continue") {
+                  updateSave((s) => acknowledgeStory(s, beat));
+                  if (beat.trigger.when === "before")
+                    open(activityDestination(beat.trigger.activity));
+                  else {
+                    const owner = storyBranch(content, beat.trigger.activity);
+                    if (owner) updateSave((s) => claimQuest(s, owner, content));
+                    open("journal");
+                    notify(`${owner?.title ?? "Case"} evidence filed.`);
+                  }
+                } else open("journal");
+                return;
+              }
               updateSave((s) => ({
                 ...s,
                 story: {

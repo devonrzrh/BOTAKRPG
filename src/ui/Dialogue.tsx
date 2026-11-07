@@ -6,7 +6,7 @@ export function Dialogue({
   onAction,
 }: {
   dialogue: DialogueContent;
-  onAction: (action: "accept-case" | "close") => void;
+  onAction: (action: "accept-case" | "close" | "continue") => void;
 }) {
   const [nodeId, setNodeId] = useState(dialogue.start);
   const root = useRef<HTMLElement>(null);
@@ -43,7 +43,8 @@ export function Dialogue({
         }}
       >
         <div className="dialogue-portrait" aria-hidden="true">
-          D<span>COMMS</span>
+          {node.speaker[0]}
+          <span>{node.speaker === "Vale" ? "LOCAL" : "COMMS"}</span>
         </div>
         <div className="dialogue-body">
           <h2>{node.speaker}</h2>

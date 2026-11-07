@@ -4,8 +4,8 @@
 id: routing-trace
 title: Routing trace
 type: quest
-description: Investigate 11 algorithms chapters, then defeat Route Warden to
-  recover the clue.
+description: Find the trapped courier PATCH. Trace ECHO-7's forged routes and
+  recover its signed delivery receipt from the Route Warden.
 objectives:
   - maze-chamber
   - encounter-source-alg-00
@@ -32,8 +32,8 @@ lesson: graph-search
 id: access-records
 title: Access records
 type: quest
-description: Investigate 10 structures chapters, then defeat Archive Keeper to
-  recover the clue.
+description: Restore the archivist FOLIO's identity, reconstruct the erased
+  gateway log and confront the Archive Keeper.
 objectives:
   - guardian-battle
   - encounter-source-ds-01

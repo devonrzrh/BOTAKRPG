@@ -1,5 +1,17 @@
 # Validation · 2026-11-07
 
+## Playable routing and archive stories
+
+70 tests pass; production build passes with 238 validated records. Both branches now have complete model playthroughs from fresh characters, including encounters, dialogue/save restoration, first-clear progression, branch-local reward claims and ending recovery. Routing also traverses the real maze model; Access records completes independently and exercises healing items. Duplicate story triggers and unknown saved dialogue IDs are rejected. Imported saves clear transient conversations and pending cutscenes.
+
+Browser QA played Routing trace from its introduction through the maze, all eleven chapter encounters and Route Warden, then resumed its pending ending after reopening the browser and filed the evidence. Sequential encounters remount their victory meter so XP summaries show only that encounter's gain. The conversation text and buttons use 20px and 18px text, with keyboard focus outlines and the persistent menu bar above.
+
+Browser QA also completed Access records: gateway sentinel, all ten chapter encounters, Archive Keeper, optional ending conversation and evidence filing. Reloading before filing restored **Read conclusion**; filing awarded the archive reward and left the routing reward unchanged. The quest graph showed both clues complete, the claimed archive reward disabled and ECHO-7 still locked behind the remaining signal branch. Shortened the clue summaries to fit the physical quest screen; full evidence remains in the dialogue. No browser errors or warnings were recorded.
+
+![Routing story](screenshots/routing-story.jpg)
+
+![Archive story](screenshots/access-story.jpg)
+
 ## Complete Source curriculum
 
 64 tests pass; production build passes with 211 validated records. Coverage checks verify all 405 archived file checksums, 31 chapter books and their local links, 82 imported objective questions, 13 written exercises with model answers, exact-set scoring, still versions of all 98 animated SVGs, chapter/boss ordering and old-save restoration. Existing maze, worker cancellation, combat, progression, quest graph and IndexedDB checks remain passing.
