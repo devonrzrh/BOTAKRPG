@@ -139,7 +139,7 @@ describe("Combat rules", () => {
       reply.save,
       content,
     );
-    expect(reply.save.character.hp).toBe(54);
+    expect(reply.save.character.hp).toBe(47);
     expect(reply.battle.effects).toEqual([]);
   });
   it("poison can win before an enemy attacks; weaken reduces damage", () => {

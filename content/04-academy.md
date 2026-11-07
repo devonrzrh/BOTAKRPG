@@ -72,7 +72,7 @@ amount: 3
 type: effect
 id: shield
 title: Shield
-description: Reduce damage from the next two enemy attacks.
+description: Reduce incoming damage for two enemy turns.
 duration: 2
 magnitude: 5
 ```
@@ -110,7 +110,7 @@ lesson: stacks-queues
 type: skill
 id: ward
 title: Firewall
-description: Deal damage and shield against two attacks.
+description: Deal damage and gain a shield for two enemy turns.
 cost: 3
 power: 3
 level: 1

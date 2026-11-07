@@ -278,7 +278,7 @@ function WorldCanvas(props: Props) {
     };
     resize();
     const obs = engine.onResizeObservable.add(resize);
-    camera.attachControl(canvas.current!, true);
+    if (!props.encounter) camera.attachControl(canvas.current!, true);
     camera.inputs.removeByType("ArcRotateCameraKeyboardMoveInput");
     camera.lowerBetaLimit = 0.4;
     camera.upperBetaLimit = 1.15;

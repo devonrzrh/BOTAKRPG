@@ -12,4 +12,5 @@ import "./ui/BookReader.css";
 import "./ui/Dialogue.css";
 import "./ui/LearningQuest.css";
 import "./investigation.css";
+import "./ui/CombatRevamp.css";
 createRoot(document.getElementById("root")!).render(<App />);

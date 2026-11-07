@@ -1,0 +1,231 @@
+.app .battle-enemy-hud {
+  top: 14px;
+  width: min(360px, 45%);
+}
+.app .battle-enemy-hud h2 {
+  margin-bottom: 7px;
+}
+.app .battle-intent {
+  position: absolute;
+  left: calc(100% + 18px);
+  top: 20px;
+  min-width: 210px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  padding: 7px 12px;
+  margin-top: 8px;
+  color: #d8dfd7;
+  font: 16px/1.4 var(--typewriter);
+  border: 1px solid #687b7c;
+  background: #10242df5;
+}
+.app .battle-intent strong {
+  font-size: 16px;
+  font-weight: 400;
+  color: #e0bc8c;
+}
+.app .battle-intent.intent-heavy {
+  border-color: #d49b7e;
+  background: #352a29f5;
+}
+.app .battle-intent.intent-heavy strong {
+  color: #ffc4a4;
+}
+.app .battle-intent.intent-recover {
+  border-color: #8db8aa;
+}
+.app .battle-intent.intent-recover strong {
+  color: #a9debd;
+}
+.app .battle-player-hud {
+  width: 255px;
+}
+.app .battle-command-menu {
+  width: min(780px, calc(100% - 330px));
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
+}
+.app .battle-command-menu > span {
+  font-size: 16px;
+}
+.app .battle-command-menu button {
+  padding: 9px 10px;
+  gap: 7px;
+  font: 400 18px/1.3 var(--ui-font);
+  justify-content: center;
+  border-radius: 1px;
+}
+.app .battle-command-menu button span {
+  font-size: 16px;
+  white-space: nowrap;
+}
+.app .battle-command-menu button:nth-last-child(2) {
+  flex-wrap: wrap;
+}
+.app .battle-command-menu button svg {
+  flex-shrink: 0;
+  width: 20px;
+}
+.app .battle-skill-tray {
+  position: absolute;
+  right: 24px;
+  bottom: 108px;
+  width: min(780px, calc(100% - 330px));
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+.app .battle-skill-tray button {
+  display: grid;
+  justify-content: stretch;
+  align-content: start;
+  gap: 10px;
+  background: linear-gradient(120deg, #29454ff5, #142732f5);
+  color: #e7eadf;
+  border: 1px solid #759394;
+  border-left: 3px solid #ccb27e;
+  border-radius: 1px;
+  padding: 14px 16px;
+  text-align: left;
+  cursor: pointer;
+  pointer-events: auto;
+}
+.app .battle-skill-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+}
+.app .battle-skill-title strong {
+  font: 400 22px/1.3 var(--typewriter);
+}
+.app .battle-skill-title > span {
+  margin-left: auto;
+  font-size: 16px;
+  color: #e1c895;
+}
+.app .battle-skill-title kbd {
+  display: grid;
+  place-items: center;
+  min-width: 25px;
+  height: 25px;
+  border: 1px solid #7e9393;
+  font-size: 16px;
+  color: #d7be8b;
+}
+.app .battle-skill-detail {
+  font-size: 18px;
+  color: #c2d2d1;
+}
+.app .battle-skill-tray button:hover:not(:disabled),
+.app .battle-skill-tray button:focus-visible {
+  outline: 2px solid #e7cc95;
+  outline-offset: 2px;
+  background: #31545e;
+}
+.app .battle-skill-tray button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+.app .battle-decision.quiz-panel {
+  top: 45%;
+  max-height: calc(100% - 354px);
+  width: min(840px, calc(100% - 64px));
+  padding: 22px 26px;
+  scrollbar-gutter: stable;
+}
+.app .battle-decision.quiz-panel h2 {
+  font-weight: 400;
+  font-size: 25px;
+}
+.app .battle-decision.quiz-panel:has(.battle-xp-reward) {
+  top: 43%;
+  max-height: calc(100% - 300px);
+}
+.app .battle-decision.command-panel {
+  bottom: 108px;
+  width: min(530px, calc(100% - 48px));
+  max-height: calc(100% - 265px);
+}
+.app .battle-answer-options {
+  gap: 9px;
+  margin-top: 16px;
+}
+.app .battle-answer-options button {
+  font-weight: 400;
+  border-radius: 1px;
+  padding: 12px;
+  justify-content: flex-start;
+}
+.app .battle-decision footer {
+  margin-top: 16px;
+}
+.app .battle-decision.quiz-panel footer {
+  position: sticky;
+  bottom: -22px;
+  background: #172c36;
+  padding: 10px 0;
+}
+.app .battle-decision footer .primary {
+  gap: 18px;
+}
+.app .battle-decision kbd {
+  font-size: 16px;
+  font-weight: 400;
+  border: 1px solid #c1d1c980;
+  padding: 2px 7px;
+}
+.app .battle-decision.feedback-panel.answer-correct {
+  width: min(630px, calc(100% - 64px));
+}
+.app .battle-decision.feedback-panel.answer-correct h2 {
+  color: #b5d6ba;
+}
+.app .battle-impact {
+  top: 43%;
+  max-width: 760px;
+  padding: 14px 22px;
+  text-align: center;
+  background: #0b1c29de;
+  border: 1px solid #8ba8a6;
+  font: 24px/1.4 var(--typewriter);
+}
+.app .motion-recover .battle-impact {
+  color: #b4d7be;
+  border-color: #8fbaa0;
+}
+@media (max-width: 1000px) {
+  .app .battle-command-menu,
+  .app .battle-skill-tray {
+    width: calc(100% - 305px);
+    right: 16px;
+  }
+  .app .battle-command-menu {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .app .battle-command-menu button {
+    font-size: 18px;
+  }
+  .app .battle-skill-tray {
+    bottom: 162px;
+  }
+  .app .battle-decision.command-panel {
+    bottom: 162px;
+  }
+}
+@media (max-height: 650px) {
+  .app .battle-decision.quiz-panel {
+    max-height: calc(100% - 300px);
+    top: 43%;
+  }
+  .app .battle-skill-tray button {
+    padding: 10px 12px;
+  }
+}
+.app.gameplay-battle .world-canvas.boss-world,
+.app.gameplay-battle:has(.quiz-panel) .world-canvas.boss-world {
+  top: 0;
+  height: calc(100% - 220px);
+}

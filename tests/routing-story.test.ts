@@ -5,6 +5,7 @@ import {
   type Quest,
   type Question,
   type Skill,
+  type Item,
 } from "../src/content/schema";
 import {
   activityStory,
@@ -32,6 +33,7 @@ import {
   selectSkill,
   answerBattle,
   enemyTurn,
+  useItem,
 } from "../src/game/combat";
 const content = validateContent(raw);
 const route = content.entities.find(
@@ -42,6 +44,9 @@ const questions = content.entities.filter(
 );
 const probe = content.entities.find(
   (e): e is Skill => e.type === "skill" && e.id === "insight",
+)!;
+const healing = content.entities.find(
+  (e): e is Item => e.type === "item" && e.kind === "healing",
 )!;
 
 it("plays the complete routing story from the maze to the Warden and files its reward once", () => {
@@ -73,6 +78,13 @@ it("plays the complete routing story from the maze to the Warden and files its r
         title: scene.enemyName ?? activity.enemy.title,
       });
       while (battle.phase !== "won" && battle.phase !== "lost" && turns < 100) {
+        if (save.character.hp <= 20 && save.inventory[healing.id] > 0) {
+          const result = useItem(battle, save, healing, content);
+          battle = result.battle;
+          save = result.save;
+          turns++;
+          continue;
+        }
         battle = selectSkill(battle, save, probe, questions);
         const question = questions.find((q) => q.id === battle.question)!;
         const hit = answerBattle(battle, save, content, question.answer);

@@ -1,5 +1,17 @@
 # Validation · 2026-11-07
 
+## Combat flow and tactics
+
+92 tests pass; build validates 282 content records. Added exact enemy intent previews, strike/heavy/opening turns, Guard with focus recovery, direct skill selection, numbered answer shortcuts and automatic correct-answer continuation with an optional review pause. Wrong answers retain deliberate explanation/Continue. Full-resource items are rejected without consuming a turn, and stale callbacks cannot resolve a turn twice. Status durations use enemy turns, including openings.
+
+Browser QA used a completed three-clue journal at 1280 × 720: keyboard Firewall and answer confirmation, automatic enemy response, shield-adjusted heavy preview, Guard's capped focus recovery and one-turn resolution, wrong-answer pause, an opening without attack, one consumed healing item, disabled focus item at cap, retreat/restart, paused correct-answer review, keyboard BFS ordering, and a finishing hit against ECHO-7. Victory awarded 60 XP and level 9, stayed open, and returned to the quest map. Quiz and victory controls fit above player vitals. All three branch playthrough tests still pass; routing now exercises healing under the stronger heavy attack.
+
+![Direct combat commands](screenshots/combat-tactics.png)
+
+![Central question](screenshots/combat-question.png)
+
+![Victory](screenshots/combat-victory.png)
+
 ## Signal identification branch
 
 84 tests pass; production build validates 282 records. Three Luna subagents authored the signal narrative, added branch playthrough tests, and audited integration plus experiment persistence. Signal identification now has LUMA, twelve introductory scenes, ten chapter-aligned opponents, Signal Mimic, and a recoverable ending. Its independently verified handshake identifies M-04, R-17 and the abandoned subnet. The story supports pursuing this branch before the other two.

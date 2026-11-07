@@ -103,6 +103,7 @@ import {
 import {
   answerBattle,
   enemyTurn,
+  guardTurn,
   selectSkill,
   useItem,
   type Battle,
@@ -272,6 +273,8 @@ export default function App() {
   const [battle, setBattle] = useState<Battle>(createBattle),
     [answer, setAnswer] = useState<number[]>([]),
     [battleNotice, setBattleNotice] = useState("");
+  const battleRef = useRef(battle);
+  battleRef.current = battle;
   const [lessonId, setLessonId] = useState(lessons[0].id),
     [search, setSearch] = useState(""),
     [topic, setTopic] = useState("all");
@@ -736,10 +739,12 @@ export default function App() {
         };
       }
     }
+    battleRef.current = nextBattle;
     setBattle(nextBattle);
     updateSave(() => nextSave);
   };
   const submitAnswer = () => {
+    if (battleRef.current !== battle || battle.phase !== "question") return;
     try {
       const result = answerBattle(battle, saveRef.current, content, answer);
       const q = questions.find((q) => q.id === battle.question)!;
@@ -1568,10 +1573,16 @@ export default function App() {
                   notice={battleNotice}
                   onAnswer={setAnswer}
                   onSkill={(skill) => {
+                    if (battleRef.current !== battle) return;
                     try {
-                      setBattle(
-                        selectSkill(battle, saveRef.current, skill, questions),
+                      const next = selectSkill(
+                        battle,
+                        saveRef.current,
+                        skill,
+                        questions,
                       );
+                      battleRef.current = next;
+                      setBattle(next);
                       setAnswer([]);
                       setBattleNotice("");
                     } catch (e) {
@@ -1579,11 +1590,25 @@ export default function App() {
                     }
                   }}
                   onItem={(item) => {
+                    if (battleRef.current !== battle) return;
                     try {
                       const result = useItem(
                         battle,
                         saveRef.current,
                         item,
+                        content,
+                      );
+                      applyBattle(result.battle, result.save);
+                    } catch (e) {
+                      notify(String(e));
+                    }
+                  }}
+                  onGuard={() => {
+                    if (battleRef.current !== battle) return;
+                    try {
+                      const result = guardTurn(
+                        battle,
+                        saveRef.current,
                         content,
                       );
                       applyBattle(result.battle, result.save);
@@ -1597,6 +1622,11 @@ export default function App() {
                     setBattleNotice(currentQuestion!.explanation);
                   }}
                   onContinue={() => {
+                    if (
+                      battleRef.current !== battle ||
+                      battle.phase !== "feedback"
+                    )
+                      return;
                     const result = enemyTurn(battle, saveRef.current, content);
                     applyBattle(result.battle, result.save);
                     setAnswer([]);

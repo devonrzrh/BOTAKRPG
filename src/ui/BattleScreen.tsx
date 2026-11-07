@@ -1,10 +1,16 @@
 import { useEffect, useRef, useState } from "react";
 import type { Content, Item, Question, Skill } from "../content/schema";
-import type { Battle } from "../game/combat";
+import { enemyIntent, type Battle } from "../game/combat";
 import { stats, type Save } from "../game/state";
 import { combatMotion } from "../game/combatPresentation";
 import { XpMeter } from "./XpMeter";
-import { Crosshair, Package, ScanSearch, LogOut } from "lucide-react";
+import {
+  Crosshair,
+  Package,
+  ScanSearch,
+  LogOut,
+  ShieldCheck,
+} from "lucide-react";
 
 interface Props {
   battle: Battle;
@@ -16,6 +22,7 @@ interface Props {
   onAnswer: (answer: number[]) => void;
   onSkill: (skill: Skill) => void;
   onItem: (item: Item) => void;
+  onGuard: () => void;
   onSubmit: () => void;
   onHint: () => void;
   onContinue: () => void;
@@ -29,17 +36,55 @@ interface Props {
 export function BattleScreen(p: Props) {
   const { battle: b, save, question: q } = p,
     limits = stats(save, p.content);
-  const [menu, setMenu] = useState<"skills" | "items" | "inspect" | null>(null);
-  const [motion, setMotion] = useState<ReturnType<typeof combatMotion>>(null);
+  const [menu, setMenu] = useState<"skills" | "items" | "inspect" | null>(
+    "skills",
+  );
+  const [reviewing, setReviewing] = useState(false);
+  const [impact, setImpact] = useState("");
+  const [motion, setMotion] = useState<
+    ReturnType<typeof combatMotion> | "recover"
+  >(null);
   const previous = useRef(b),
     startingSave = useRef(save),
     title = useRef<HTMLHeadingElement>(null),
     skillsButton = useRef<HTMLButtonElement>(null);
+  const continuation = useRef(p.onContinue),
+    resolved = useRef<Battle | null>(null);
+  continuation.current = p.onContinue;
+  const advance = () => {
+    if (b.phase !== "feedback" || resolved.current === b) return;
+    resolved.current = b;
+    continuation.current();
+  };
+  const correctFeedback = b.phase === "feedback" && p.notice === "Correct";
+  useEffect(() => {
+    setReviewing(false);
+    if (b.phase === "choose") setMenu("skills");
+  }, [b.turn, b.phase]);
+  useEffect(() => {
+    if (!correctFeedback || reviewing) return;
+    const timer = setTimeout(
+      advance,
+      save.settings.reducedMotion ? 1100 : 1400,
+    );
+    return () => clearTimeout(timer);
+  }, [b, correctFeedback, reviewing, save.settings.reducedMotion]);
   useEffect(() => {
     const next = combatMotion(previous.current, b);
+    const cue =
+      next === "enemy" &&
+      enemyIntent(previous.current, save, p.content).kind === "recover"
+        ? "recover"
+        : next;
     previous.current = b;
-    setMotion(save.settings.reducedMotion ? null : next);
-    if (next) setMenu(null);
+    if (next)
+      setImpact(
+        next === "player" || next === "miss"
+          ? (b.log.at(-2) ?? p.notice)
+          : (b.log.at(-1) ?? ""),
+      );
+    setMotion(save.settings.reducedMotion ? null : cue);
+    if (next && b.phase !== "choose") setMenu(null);
     const timer = next ? setTimeout(() => setMotion(null), 500) : undefined;
     return () => {
       if (timer) clearTimeout(timer);
@@ -47,7 +92,8 @@ export function BattleScreen(p: Props) {
   }, [b, save.settings.reducedMotion]);
   useEffect(() => {
     if (motion) return;
-    if (menu || b.phase !== "choose") title.current?.focus();
+    if ((menu && menu !== "skills") || b.phase !== "choose")
+      title.current?.focus();
     else skillsButton.current?.focus();
   }, [b.phase, menu, motion]);
   const skills = p.content.entities.filter(
@@ -76,7 +122,35 @@ export function BattleScreen(p: Props) {
       </div>
     </div>
   );
-  const activeCard = !motion && (b.phase !== "choose" || menu);
+  const activeCard =
+    !motion && (b.phase !== "choose" || (menu && menu !== "skills"));
+  const intent = enemyIntent(b, save, p.content);
+  const displayOptions =
+    q?.options
+      .map((text, index) => ({ text, index }))
+      .sort((a, c) =>
+        q.format === "ordering"
+          ? ((a.index + 2) % q.options.length) -
+            ((c.index + 2) % q.options.length)
+          : a.index - c.index,
+      ) ?? [];
+  const selectAnswer = (index: number) => {
+    if (!q || b.phase !== "question") return;
+    p.onAnswer(
+      q.format === "choice"
+        ? [index]
+        : p.answer.includes(index)
+          ? p.answer.filter((x) => x !== index)
+          : [...p.answer, index],
+    );
+  };
+  const answerReady =
+    q &&
+    (q.format === "choice"
+      ? p.answer.length === 1
+      : q.format === "multiple"
+        ? p.answer.length > 0
+        : p.answer.length === q.options.length);
   const gainedXp = Math.max(
     0,
     save.character.xp - startingSave.current.character.xp,
@@ -94,16 +168,62 @@ export function BattleScreen(p: Props) {
     <div
       className={`battle-screen phase-${b.phase} ${motion ? `motion-${motion}` : ""}`}
       onKeyDown={(e) => {
+        if (e.repeat || e.ctrlKey || e.altKey || e.metaKey) return;
         if (e.key === "Escape" && menu) {
           e.preventDefault();
           e.stopPropagation();
-          setMenu(null);
+          setMenu(menu === "skills" ? null : "skills");
+        }
+        if (motion) return;
+        if (/^[1-9]$/.test(e.key)) {
+          const index = Number(e.key) - 1;
+          if (b.phase === "question" && q && index < q.options.length) {
+            e.preventDefault();
+            e.stopPropagation();
+            selectAnswer(displayOptions[index].index);
+          } else if (
+            b.phase === "choose" &&
+            menu === "skills" &&
+            skills[index] &&
+            save.character.focus >= skills[index].cost
+          ) {
+            e.preventDefault();
+            e.stopPropagation();
+            p.onSkill(skills[index]);
+          }
+        }
+        if (
+          e.key === "Enter" &&
+          b.phase === "question" &&
+          answerReady &&
+          (!(e.target as HTMLElement).closest("button, summary") ||
+            Boolean(
+              (e.target as HTMLElement).closest(
+                '.battle-answer-options button[aria-pressed="true"]',
+              ),
+            ))
+        ) {
+          e.preventDefault();
+          e.stopPropagation();
+          p.onSubmit();
         }
       }}
     >
       <div className="battle-enemy-hud">
         <h2>{b.enemyName}</h2>
         {meter("Enemy HP", b.hp, b.maxHp, "enemy")}
+        {b.phase !== "won" && b.phase !== "lost" && (
+          <div className={`battle-intent intent-${intent.kind}`} role="status">
+            <span>{intent.label}</span>
+            <strong>
+              {intent.damage
+                ? `${intent.damage} damage`
+                : intent.kind === "recover"
+                  ? "+3 focus"
+                  : "Poison will finish"}
+            </strong>
+          </div>
+        )}
         <div className="battle-status-effects">
           {b.effects
             .filter((e) => e.id !== "shield")
@@ -116,16 +236,12 @@ export function BattleScreen(p: Props) {
       </div>
       {motion && (
         <div className="battle-impact" role="status">
-          {motion === "player"
-            ? p.notice
-            : motion === "enemy"
-              ? `${b.enemyName} attacks`
-              : "Turn spent"}
+          {impact}
         </div>
       )}
       {activeCard && (
         <section
-          className={`battle-decision ${b.phase === "choose" ? "command-panel" : "quiz-panel"}`}
+          className={`battle-decision ${b.phase === "choose" ? "command-panel" : "quiz-panel"} ${b.phase === "feedback" ? "feedback-panel" : ""} ${correctFeedback ? "answer-correct" : ""}`}
           aria-label={
             b.phase === "question" ? "Battle question" : "Battle decision"
           }
@@ -140,7 +256,7 @@ export function BattleScreen(p: Props) {
                       ? "Items"
                       : "Inspect"}
                 </h2>
-                <button onClick={() => setMenu(null)}>Back</button>
+                <button onClick={() => setMenu("skills")}>Back</button>
               </header>
               {menu === "skills" && (
                 <div className="battle-skill-options">
@@ -171,7 +287,12 @@ export function BattleScreen(p: Props) {
                     {items.map((item) => (
                       <button
                         key={item.id}
-                        disabled={!save.inventory[item.id]}
+                        disabled={
+                          !save.inventory[item.id] ||
+                          (item.kind === "healing"
+                            ? save.character.hp >= limits.maxHp
+                            : save.character.focus >= limits.maxFocus)
+                        }
                         onClick={() => {
                           setMenu(null);
                           p.onItem(item);
@@ -197,9 +318,9 @@ export function BattleScreen(p: Props) {
                     Attack {b.attack} · Your defense {limits.defense}
                   </p>
                   <p>
-                    Answer a skill’s question to act. A wrong answer spends the
-                    turn. Shield and weaken reduce incoming damage; poison
-                    damages the enemy.
+                    Guard reduces the next hit and restores 4 focus. A wrong
+                    answer spends the turn. Shield and weaken reduce incoming
+                    damage; poison damages the enemy.
                   </p>
                   <div
                     className="battle-recent-log"
@@ -225,53 +346,31 @@ export function BattleScreen(p: Props) {
               )}
               {q.format === "multiple" && <p>Select all that apply.</p>}
               <div className="battle-answer-options">
-                {q.options
-                  .map((text, index) => ({ text, index }))
-                  .sort((a, c) =>
-                    q.format === "ordering"
-                      ? ((a.index + 2) % q.options.length) -
-                        ((c.index + 2) % q.options.length)
-                      : a.index - c.index,
-                  )
-                  .map(({ text, index }) => (
-                    <button
-                      key={index}
-                      aria-pressed={p.answer.includes(index)}
-                      className={p.answer.includes(index) ? "selected" : ""}
-                      onClick={() =>
-                        p.onAnswer(
-                          q.format === "choice"
-                            ? [index]
-                            : p.answer.includes(index)
-                              ? p.answer.filter((x) => x !== index)
-                              : [...p.answer, index],
-                        )
-                      }
-                    >
-                      <span>
-                        {q.format === "ordering"
-                          ? p.answer.includes(index)
-                            ? p.answer.indexOf(index) + 1
-                            : "·"
-                          : String.fromCharCode(65 + index)}
-                      </span>
-                      {text}
-                    </button>
-                  ))}
+                {displayOptions.map(({ text, index }, position) => (
+                  <button
+                    key={index}
+                    aria-pressed={p.answer.includes(index)}
+                    className={p.answer.includes(index) ? "selected" : ""}
+                    onClick={() => selectAnswer(index)}
+                  >
+                    <span>{position + 1}</span>
+                    {q.format === "ordering" && p.answer.includes(index) && (
+                      <strong className="answer-order">
+                        #{p.answer.indexOf(index) + 1}
+                      </strong>
+                    )}
+                    {text}
+                  </button>
+                ))}
               </div>
               <footer>
                 <button
                   className="primary"
-                  disabled={
-                    q.format === "choice"
-                      ? p.answer.length !== 1
-                      : q.format === "multiple"
-                        ? !p.answer.length
-                        : p.answer.length !== q.options.length
-                  }
+                  disabled={!answerReady}
                   onClick={p.onSubmit}
                 >
-                  Use skill
+                  Use {skills.find((s) => s.id === b.skill)?.title ?? "skill"}{" "}
+                  <kbd>Enter</kbd>
                 </button>
                 <button onClick={p.onHint}>Hint · no mastery credit</button>
               </footer>
@@ -287,11 +386,23 @@ export function BattleScreen(p: Props) {
               <h2 ref={title} tabIndex={-1}>
                 {p.notice}
               </h2>
-              <p className="battle-explanation">{q?.explanation}</p>
+              {(!correctFeedback || reviewing) && (
+                <p className="battle-explanation">{q?.explanation}</p>
+              )}
               <footer>
-                <button className="primary" onClick={p.onContinue}>
-                  Continue
+                <button className="primary" onClick={advance}>
+                  {correctFeedback ? "Next turn" : "Continue"}
                 </button>
+                {correctFeedback && !reviewing && (
+                  <button
+                    onClick={() => {
+                      setReviewing(true);
+                      title.current?.focus();
+                    }}
+                  >
+                    Pause to review
+                  </button>
+                )}
                 <button onClick={p.onReview}>Review lesson later</button>
               </footer>
             </>
@@ -381,12 +492,34 @@ export function BattleScreen(p: Props) {
             ))}
         </div>
       </div>
+      {b.phase === "choose" && !motion && menu === "skills" && (
+        <div className="battle-skill-tray" aria-label="Available skills">
+          {skills.map((s, index) => (
+            <button
+              key={s.id}
+              ref={index === 0 ? skillsButton : undefined}
+              disabled={save.character.focus < s.cost}
+              onClick={() => p.onSkill(s)}
+              title={s.description}
+            >
+              <span className="battle-skill-title">
+                <kbd>{index + 1}</kbd>
+                <strong>{s.title}</strong>
+                <span>{s.cost ? `${s.cost} FP` : "Free"}</span>
+              </span>
+              <span className="battle-skill-detail">
+                {limits.attack + s.power} damage
+                {s.effect ? ` · ${s.effect}` : ""}
+              </span>
+            </button>
+          ))}
+        </div>
+      )}
       <nav className="battle-command-menu" aria-label="Battle commands">
         <span>Turn {b.turn}</span>
         {(["skills", "items", "inspect"] as const).map((id) => (
           <button
             key={id}
-            ref={id === "skills" ? skillsButton : undefined}
             aria-expanded={b.phase === "choose" && menu === id}
             disabled={b.phase !== "choose" || !!motion}
             onClick={() => setMenu(menu === id ? null : id)}
@@ -401,6 +534,14 @@ export function BattleScreen(p: Props) {
             {id[0].toUpperCase() + id.slice(1)}
           </button>
         ))}
+        <button
+          disabled={b.phase !== "choose" || !!motion}
+          onClick={p.onGuard}
+          title="Reduce the incoming hit by 70% and restore 4 focus. Spends a turn; no question."
+        >
+          <ShieldCheck size={22} aria-hidden="true" />
+          Guard <span>+4 FP</span>
+        </button>
         <button disabled={!!motion} onClick={p.onRetreat}>
           <LogOut size={22} aria-hidden="true" />
           Retreat

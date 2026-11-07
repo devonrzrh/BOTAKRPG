@@ -20,6 +20,7 @@ export interface Battle {
   effects: ActiveEffect[];
   log: string[];
   assisted: boolean;
+  guarding?: boolean;
 }
 export function createBattle(
   enemy: {
@@ -150,25 +151,93 @@ export function enemyTurn(
   }
   if (next.hp === 0) {
     next.phase = "won";
+    next.guarding = false;
     return { battle: next, save: player };
   }
-  const reduction = next.effects
-    .filter((e) => e.id === "shield" || e.id === "weaken")
-    .reduce((sum, e) => sum + e.magnitude, 0);
-  const damage = Math.max(
-    1,
-    battle.attack - stats(save, content).defense - reduction,
-  );
-  player.character.hp = Math.max(0, player.character.hp - damage);
-  next.log.push(`${battle.enemyName} deals ${damage} damage.`);
+  const intent = enemyIntent(battle, player, content);
+  const incoming = intent.damage;
+  if (intent.kind === "recover") {
+    player.character.focus = Math.min(
+      stats(player, content).maxFocus,
+      player.character.focus + 3,
+    );
+    next.log.push(`${battle.enemyName} pauses. You recover 3 focus.`);
+  } else {
+    player.character.hp = Math.max(0, player.character.hp - incoming);
+    next.log.push(
+      `${battle.enemyName} ${intent.kind === "heavy" ? "unleashes a heavy strike" : "strikes"} for ${incoming} damage.`,
+    );
+  }
   next.effects = next.effects
     .map((e) => ({ ...e, remaining: e.remaining - 1 }))
     .filter((e) => e.remaining > 0);
   next.turn++;
   next.phase = player.character.hp === 0 ? "lost" : "choose";
+  next.guarding = false;
   next.skill = null;
   next.question = null;
   return { battle: next, save: player };
+}
+
+export interface EnemyIntent {
+  kind: "strike" | "heavy" | "recover";
+  label: string;
+  description: string;
+  damage: number;
+}
+
+/** Deterministic telegraph for the enemy action resolving this turn. */
+export function enemyIntent(
+  battle: Battle,
+  save: Save,
+  content: Content,
+): EnemyIntent {
+  const kind = (["strike", "heavy", "recover"] as const)[(battle.turn - 1) % 3];
+  const poisonedToDeath =
+    battle.effects.some((e) => e.id === "poison") &&
+    battle.effects.find((e) => e.id === "poison")!.magnitude >= battle.hp;
+  if (kind === "recover")
+    return {
+      kind,
+      label: "Opening",
+      description: `${battle.enemyName} pauses; you recover 3 focus.`,
+      damage: 0,
+    };
+  const base =
+    kind === "heavy" ? Math.ceil(battle.attack * 1.7) : battle.attack;
+  const reduction = battle.effects
+    .filter((e) => e.id === "shield" || e.id === "weaken")
+    .reduce((sum, e) => sum + e.magnitude, 0);
+  let damage = Math.max(1, base - stats(save, content).defense - reduction);
+  if (battle.guarding) damage = Math.max(1, damage - Math.ceil(damage * 0.7));
+  if (poisonedToDeath) damage = 0;
+  return {
+    kind,
+    label: kind === "heavy" ? "Heavy Strike" : "Strike",
+    description: `${battle.enemyName} will ${kind === "heavy" ? "unleash a heavy strike" : "strike"} for ${damage} damage.`,
+    damage,
+  };
+}
+
+/** Spend a turn bracing; guard reduces the next enemy hit by about 70%. */
+export function guardTurn(
+  battle: Battle,
+  save: Save,
+  content: Content,
+): { battle: Battle; save: Save } {
+  if (battle.phase !== "choose") return { battle, save };
+  const guarded = {
+    ...battle,
+    phase: "feedback" as const,
+    guarding: true,
+    log: [...battle.log, "You brace for the incoming attack."],
+  };
+  const player = structuredClone(save);
+  player.character.focus = Math.min(
+    stats(save, content).maxFocus,
+    player.character.focus + 4,
+  );
+  return enemyTurn(guarded, player, content);
 }
 export function useItem(
   battle: Battle,
@@ -179,7 +248,11 @@ export function useItem(
   if (
     battle.phase !== "choose" ||
     item.kind === "equipment" ||
-    !(save.inventory[item.id] > 0)
+    !(save.inventory[item.id] > 0) ||
+    (item.kind === "healing" &&
+      save.character.hp >= stats(save, content).maxHp) ||
+    (item.kind === "focus" &&
+      save.character.focus >= stats(save, content).maxFocus)
   )
     throw new Error("Item unavailable");
   const player = structuredClone(save),
