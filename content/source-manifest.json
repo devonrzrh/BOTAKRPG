@@ -4,187 +4,187 @@
       "id": "source-alg-00",
       "title": "Introduction to Python Programming",
       "topic": "algorithms",
-      "file": "Content/Markdown/Algorithm/00 introduction to python programming.md"
+      "file": "Content/Markdown/1_Algorithm/00 introduction to python programming.md"
     },
     {
       "id": "source-alg-01",
       "title": "Introduction to Algorithms",
       "topic": "algorithms",
-      "file": "Content/Markdown/Algorithm/01 introduction to algorithms.md"
+      "file": "Content/Markdown/1_Algorithm/01 introduction to algorithms.md"
     },
     {
       "id": "source-alg-02",
       "title": "Basic Sorting Algorithms",
       "topic": "algorithms",
-      "file": "Content/Markdown/Algorithm/02 basic sorting algorithms.md"
+      "file": "Content/Markdown/1_Algorithm/02 basic sorting algorithms.md"
     },
     {
       "id": "source-alg-03",
       "title": "Binary Search, Linear Search, and Big O Notation",
       "topic": "algorithms",
-      "file": "Content/Markdown/Algorithm/03 binary search linear search and big o notation.md"
+      "file": "Content/Markdown/1_Algorithm/03 binary search linear search and big o notation.md"
     },
     {
       "id": "source-alg-04",
       "title": "Recursion and Call Stack",
       "topic": "algorithms",
-      "file": "Content/Markdown/Algorithm/04 recursion and call stack.md"
+      "file": "Content/Markdown/1_Algorithm/04 recursion and call stack.md"
     },
     {
       "id": "source-alg-05",
       "title": "Time Complexity Analysis",
       "topic": "algorithms",
-      "file": "Content/Markdown/Algorithm/05 time complexity analysis.md"
+      "file": "Content/Markdown/1_Algorithm/05 time complexity analysis.md"
     },
     {
       "id": "source-alg-06",
       "title": "Graph Searching: BFS, DFS & Routing and Coverage",
       "topic": "algorithms",
-      "file": "Content/Markdown/Algorithm/06 graph searching routing and coverage.md"
+      "file": "Content/Markdown/1_Algorithm/06 graph searching routing and coverage.md"
     },
     {
       "id": "source-alg-07",
       "title": "Greedy Algorithm and Optimization",
       "topic": "algorithms",
-      "file": "Content/Markdown/Algorithm/07 greedy algorithm and optimization.md"
+      "file": "Content/Markdown/1_Algorithm/07 greedy algorithm and optimization.md"
     },
     {
       "id": "source-alg-08",
       "title": "Dynamic Programming (DP)",
       "topic": "algorithms",
-      "file": "Content/Markdown/Algorithm/08 dynamic programming.md"
+      "file": "Content/Markdown/1_Algorithm/08 dynamic programming.md"
     },
     {
       "id": "source-alg-09",
       "title": "Inventory and Uncertainty Management",
       "topic": "algorithms",
-      "file": "Content/Markdown/Algorithm/09 inventory and uncertainty management.md"
+      "file": "Content/Markdown/1_Algorithm/09 inventory and uncertainty management.md"
     },
     {
       "id": "source-alg-10",
       "title": "Sequential Decisions Over Time",
       "topic": "algorithms",
-      "file": "Content/Markdown/Algorithm/10 sequential decisions over time.md"
+      "file": "Content/Markdown/1_Algorithm/10 sequential decisions over time.md"
     },
     {
       "id": "source-ds-01",
       "title": "Data Structures",
       "topic": "structures",
-      "file": "Content/Markdown/Data-Structures/01 introduction to data structures.md"
+      "file": "Content/Markdown/2_Data-Structures/01 introduction to data structures.md"
     },
     {
       "id": "source-ds-02",
       "title": "Linear Data Structures",
       "topic": "structures",
-      "file": "Content/Markdown/Data-Structures/02 linear data structures.md"
+      "file": "Content/Markdown/2_Data-Structures/02 linear data structures.md"
     },
     {
       "id": "source-ds-03",
       "title": "Arrays",
       "topic": "structures",
-      "file": "Content/Markdown/Data-Structures/03 arrays.md"
+      "file": "Content/Markdown/2_Data-Structures/03 arrays.md"
     },
     {
       "id": "source-ds-04",
       "title": "Linked List",
       "topic": "structures",
-      "file": "Content/Markdown/Data-Structures/04 linked lists.md"
+      "file": "Content/Markdown/2_Data-Structures/04 linked lists.md"
     },
     {
       "id": "source-ds-05",
       "title": "Stack",
       "topic": "structures",
-      "file": "Content/Markdown/Data-Structures/05 stacks.md"
+      "file": "Content/Markdown/2_Data-Structures/05 stacks.md"
     },
     {
       "id": "source-ds-06",
       "title": "Queue",
       "topic": "structures",
-      "file": "Content/Markdown/Data-Structures/06 queues.md"
+      "file": "Content/Markdown/2_Data-Structures/06 queues.md"
     },
     {
       "id": "source-ds-07",
       "title": "Nonlinear Data Structures",
       "topic": "structures",
-      "file": "Content/Markdown/Data-Structures/07 nonlinear data structures.md"
+      "file": "Content/Markdown/2_Data-Structures/07 nonlinear data structures.md"
     },
     {
       "id": "source-ds-08",
       "title": "Trees",
       "topic": "structures",
-      "file": "Content/Markdown/Data-Structures/08 trees.md"
+      "file": "Content/Markdown/2_Data-Structures/08 trees.md"
     },
     {
       "id": "source-ds-09",
       "title": "Graphs",
       "topic": "structures",
-      "file": "Content/Markdown/Data-Structures/09 graphs.md"
+      "file": "Content/Markdown/2_Data-Structures/09 graphs.md"
     },
     {
       "id": "source-ds-10",
       "title": "Data Versioning",
       "topic": "structures",
-      "file": "Content/Markdown/Data-Structures/10 data versioning.md"
+      "file": "Content/Markdown/2_Data-Structures/10 data versioning.md"
     },
     {
       "id": "source-ai-01",
       "title": "Introduction to Connectionist AI (Brief)",
       "topic": "ai",
-      "file": "Content/Markdown/Connetionist-AI/01 introduction to connectionist ai.md"
+      "file": "Content/Markdown/3_Connectionist-AI/01 introduction to connectionist ai.md"
     },
     {
       "id": "source-ai-02",
       "title": "Basic Concepts, Terminology and Architectures of Neural Networks",
       "topic": "ai",
-      "file": "Content/Markdown/Connetionist-AI/02 neural network concepts terminology architectures.md"
+      "file": "Content/Markdown/3_Connectionist-AI/02 neural network concepts terminology architectures.md"
     },
     {
       "id": "source-ai-03",
       "title": "Applications of Neural Networks (Brief)",
       "topic": "ai",
-      "file": "Content/Markdown/Connetionist-AI/03 applications of neural networks.md"
+      "file": "Content/Markdown/3_Connectionist-AI/03 applications of neural networks.md"
     },
     {
       "id": "source-ai-04",
       "title": "Deep Learning and Activation Functions",
       "topic": "ai",
-      "file": "Content/Markdown/Connetionist-AI/04 deep learning and activation functions.md"
+      "file": "Content/Markdown/3_Connectionist-AI/04 deep learning and activation functions.md"
     },
     {
       "id": "source-ai-05",
       "title": "Demand Forecasting and Time-Series Forecasting",
       "topic": "ai",
-      "file": "Content/Markdown/Connetionist-AI/05 demand and time series forecasting.md"
+      "file": "Content/Markdown/3_Connectionist-AI/05 demand and time series forecasting.md"
     },
     {
       "id": "source-ai-06",
       "title": "Probabilistic Forecasting",
       "topic": "ai",
-      "file": "Content/Markdown/Connetionist-AI/06 probabilistic forecasting.md"
+      "file": "Content/Markdown/3_Connectionist-AI/06 probabilistic forecasting.md"
     },
     {
       "id": "source-ai-07",
       "title": "Online and Incremental Learning",
       "topic": "ai",
-      "file": "Content/Markdown/Connetionist-AI/07 online and incremental learning.md"
+      "file": "Content/Markdown/3_Connectionist-AI/07 online and incremental learning.md"
     },
     {
       "id": "source-ai-08",
       "title": "Recommendation Systems (Brief)",
       "topic": "ai",
-      "file": "Content/Markdown/Connetionist-AI/08 recommendation systems.md"
+      "file": "Content/Markdown/3_Connectionist-AI/08 recommendation systems.md"
     },
     {
       "id": "source-ai-09",
       "title": "Reinforcement Learning",
       "topic": "ai",
-      "file": "Content/Markdown/Connetionist-AI/09 reinforcement learning.md"
+      "file": "Content/Markdown/3_Connectionist-AI/09 reinforcement learning.md"
     },
     {
       "id": "source-ai-10",
       "title": "Model Training and Optimisation",
       "topic": "ai",
-      "file": "Content/Markdown/Connetionist-AI/10 model training and optimization.md"
+      "file": "Content/Markdown/3_Connectionist-AI/10 model training and optimization.md"
     }
   ],
   "questions": 82,
@@ -2021,210 +2021,210 @@
       "bytes": 2333235
     },
     {
-      "path": "Content/Markdown/Algorithm/00 introduction to python programming.md",
-      "sha256": "31a68feed3633f84e0e1bc9018e31070f92c19256c5fda32cbf8b1c7345ef81c",
-      "bytes": 13114,
+      "path": "Content/Markdown/1_Algorithm/00 introduction to python programming.md",
+      "sha256": "14c531a5876af174b3ba2aee4cc452f18704f7a7dbc6e58caff523bb950ea5ad",
+      "bytes": 15649,
       "lesson": "source-alg-00"
     },
     {
-      "path": "Content/Markdown/Algorithm/01 introduction to algorithms.md",
-      "sha256": "20af12d77c40eb0126447680dcbc47d3c8eefbc39cc86bc5dad8c23b896a8a77",
-      "bytes": 5450,
+      "path": "Content/Markdown/1_Algorithm/01 introduction to algorithms.md",
+      "sha256": "6fa12de8a44c6fa78dfd31ff958421b90cfe81c64b25dc67df811c107fdca30d",
+      "bytes": 7183,
       "lesson": "source-alg-01"
     },
     {
-      "path": "Content/Markdown/Algorithm/02 basic sorting algorithms.md",
-      "sha256": "8defdafb5b58e6dfaaf8324707d2955cdade5e212906e5b8de03f96118d8e084",
-      "bytes": 3798,
+      "path": "Content/Markdown/1_Algorithm/02 basic sorting algorithms.md",
+      "sha256": "1913cd126f8cdea422e51adc1ff2f2ecf6ec90fac9b265cd93730e42019da561",
+      "bytes": 6617,
       "lesson": "source-alg-02"
     },
     {
-      "path": "Content/Markdown/Algorithm/03 binary search linear search and big o notation.md",
-      "sha256": "661f6f0fb4a9f70864700f1b1d2ed67b453728d7597a5ed1c9a41cefca546305",
-      "bytes": 3977,
+      "path": "Content/Markdown/1_Algorithm/03 binary search linear search and big o notation.md",
+      "sha256": "423d69888ab3a0a42d56f97b143b68114a3810ab0d67db2c5d31585bd75c6be7",
+      "bytes": 6046,
       "lesson": "source-alg-03"
     },
     {
-      "path": "Content/Markdown/Algorithm/04 recursion and call stack.md",
-      "sha256": "ee58f0aac8ccc44f45cf202d439c89856f71b1075dff420ec1e91edc37c80507",
-      "bytes": 2906,
+      "path": "Content/Markdown/1_Algorithm/04 recursion and call stack.md",
+      "sha256": "91c09d6d13023f1bf9f6c8142f2c7ba1fb2b63cced916f699d5c091693220592",
+      "bytes": 5787,
       "lesson": "source-alg-04"
     },
     {
-      "path": "Content/Markdown/Algorithm/05 time complexity analysis.md",
-      "sha256": "6abb71375bc7691f8cda2c0e6c5222c23d597e16be63119c1cea2ee3b71cfce6",
-      "bytes": 1025,
+      "path": "Content/Markdown/1_Algorithm/05 time complexity analysis.md",
+      "sha256": "84b66524857bede79baaf3c346c60c4b99dfcf592f0853b3f05e6bc033476038",
+      "bytes": 3319,
       "lesson": "source-alg-05"
     },
     {
-      "path": "Content/Markdown/Algorithm/06 graph searching routing and coverage.md",
-      "sha256": "bc5342601caaad5b26ab8125c146d9950d0df3bc15f4e364186b3160ed5cd41a",
-      "bytes": 7655,
+      "path": "Content/Markdown/1_Algorithm/06 graph searching routing and coverage.md",
+      "sha256": "cd78c66acacedd15387aabcbef80b65b4a5840669e2c91a16b4bc2f5c825950f",
+      "bytes": 12343,
       "lesson": "source-alg-06"
     },
     {
-      "path": "Content/Markdown/Algorithm/07 greedy algorithm and optimization.md",
-      "sha256": "287618330f51c4097751427480549be2cd26d6bceb9e3e6145a3d6b37a03b0f2",
-      "bytes": 7004,
+      "path": "Content/Markdown/1_Algorithm/07 greedy algorithm and optimization.md",
+      "sha256": "99c046ae322a2f6936b2374e6e60f7a9be494150cfd30423daa7eda30996a1b5",
+      "bytes": 11461,
       "lesson": "source-alg-07"
     },
     {
-      "path": "Content/Markdown/Algorithm/08 dynamic programming.md",
-      "sha256": "078921f09d8fc6b0f3639f3eec9bfc403e47656eaa6dd19e9124bd611513d9dd",
-      "bytes": 3042,
+      "path": "Content/Markdown/1_Algorithm/08 dynamic programming.md",
+      "sha256": "0ac19bb63cd4b8cbc9e54d9a37d8255811d58ede62cd84cb115412691d97c85f",
+      "bytes": 5030,
       "lesson": "source-alg-08"
     },
     {
-      "path": "Content/Markdown/Algorithm/09 inventory and uncertainty management.md",
-      "sha256": "1b4949c517e9787624a5fa2b938971255eec443e8a9723f2187f3094ffb4699b",
-      "bytes": 8208,
+      "path": "Content/Markdown/1_Algorithm/09 inventory and uncertainty management.md",
+      "sha256": "2bcc32835d90169fa6ed614809b7a10b1af2826d7209179facf08b3e170a124d",
+      "bytes": 10399,
       "lesson": "source-alg-09"
     },
     {
-      "path": "Content/Markdown/Algorithm/10 sequential decisions over time.md",
-      "sha256": "ea3d118551fc5bd56d05cde66d816d06796fec5ab23e7778fd01efb2978fcea0",
-      "bytes": 13801,
+      "path": "Content/Markdown/1_Algorithm/10 sequential decisions over time.md",
+      "sha256": "1c2aa1c3b57e280038af9d80e6b3bd43236592d077e14ba3941192511ba5b4f9",
+      "bytes": 16909,
       "lesson": "source-alg-10"
     },
     {
-      "path": "Content/Markdown/Algorithm/Reviews.md",
+      "path": "Content/Markdown/1_Algorithm/Reviews.md",
       "sha256": "a62eeadb6ad80659487bc0697debafd8f66b5c487cfd47afd0939b5d469f3a0a",
       "bytes": 1101
     },
     {
-      "path": "Content/Markdown/Connetionist-AI/01 introduction to connectionist ai.md",
-      "sha256": "8137fb536b63a4bb6dd166551259b76b04d8989d9ae1d89fb38664c2848c580a",
-      "bytes": 9982,
-      "lesson": "source-ai-01"
-    },
-    {
-      "path": "Content/Markdown/Connetionist-AI/02 neural network concepts terminology architectures.md",
-      "sha256": "c3c4aeb340e87cc64988f8ecbf0f40b9db5590e81f314686601cbd93d07ae61a",
-      "bytes": 19964,
-      "lesson": "source-ai-02"
-    },
-    {
-      "path": "Content/Markdown/Connetionist-AI/03 applications of neural networks.md",
-      "sha256": "61fe194747bd06640a921904ca02be686fd5d345ce78c9e4c798a110ae13f7b2",
-      "bytes": 10429,
-      "lesson": "source-ai-03"
-    },
-    {
-      "path": "Content/Markdown/Connetionist-AI/04 deep learning and activation functions.md",
-      "sha256": "0a761e1db2157c3d663088888eb4a41a750fe2c732ada0be1782a957c4de7587",
-      "bytes": 13679,
-      "lesson": "source-ai-04"
-    },
-    {
-      "path": "Content/Markdown/Connetionist-AI/05 demand and time series forecasting.md",
-      "sha256": "cb794e5e439c3a6b2c036d43fc488a3d40eef3623785d6fd3d138b180948f4df",
-      "bytes": 17471,
-      "lesson": "source-ai-05"
-    },
-    {
-      "path": "Content/Markdown/Connetionist-AI/06 probabilistic forecasting.md",
-      "sha256": "5ade6caeccf55d84e6494b4f29e1e5b0523b9c9111eff1603433c4ec35545d52",
-      "bytes": 15583,
-      "lesson": "source-ai-06"
-    },
-    {
-      "path": "Content/Markdown/Connetionist-AI/07 online and incremental learning.md",
-      "sha256": "56f6be4170b3e76970efd59c2a8ba5c6e43ce83c9c7088921ba26a883ac37fb3",
-      "bytes": 15876,
-      "lesson": "source-ai-07"
-    },
-    {
-      "path": "Content/Markdown/Connetionist-AI/08 recommendation systems.md",
-      "sha256": "eaa605a998dc1e2934df4a9f63a4d18c7a6a4a41f5d80387b0ce50a5219e766c",
-      "bytes": 13158,
-      "lesson": "source-ai-08"
-    },
-    {
-      "path": "Content/Markdown/Connetionist-AI/09 reinforcement learning.md",
-      "sha256": "85c465590480b2fd05ae45cbe440e8a1fe01d928c675bf5b047bd7fd40f2c7c7",
-      "bytes": 17904,
-      "lesson": "source-ai-09"
-    },
-    {
-      "path": "Content/Markdown/Connetionist-AI/10 model training and optimization.md",
-      "sha256": "c0e34381bfc0e5916ac58d2b2ca495e2172e6897d8fdbb21806e8d220a29bd39",
-      "bytes": 22191,
-      "lesson": "source-ai-10"
-    },
-    {
-      "path": "Content/Markdown/Connetionist-AI/Review1.md",
-      "sha256": "d75b12104bae0fd87200d07872b4e5b4ac7a3f15a0c9fbadbeebc783ec6a71ed",
-      "bytes": 1975
-    },
-    {
-      "path": "Content/Markdown/Data-Structures/01 introduction to data structures.md",
-      "sha256": "f08e449845a3e59e1367fa4b1439de8c2bb91ce1175d0a6f984d21cd2f9e175b",
-      "bytes": 5190,
+      "path": "Content/Markdown/2_Data-Structures/01 introduction to data structures.md",
+      "sha256": "b8cf245dd3dd42fde292846aa302246fbe523eee1ee02a1e54dd9f7719a173ac",
+      "bytes": 5471,
       "lesson": "source-ds-01"
     },
     {
-      "path": "Content/Markdown/Data-Structures/02 linear data structures.md",
-      "sha256": "1297e426e3861f14fed6aa1f6a18097488de26705fa22ce4b0e2bdb8f37ea4bb",
-      "bytes": 2030,
+      "path": "Content/Markdown/2_Data-Structures/02 linear data structures.md",
+      "sha256": "44c54dfbb851413f34747cac1fd88d6e633098c3605457bb0d55f7cbe47a49b4",
+      "bytes": 2296,
       "lesson": "source-ds-02"
     },
     {
-      "path": "Content/Markdown/Data-Structures/03 arrays.md",
-      "sha256": "da83f5ce907ef808a522084f58df140645a63ec5783fcd76de44ba4e7058400c",
-      "bytes": 5239,
+      "path": "Content/Markdown/2_Data-Structures/03 arrays.md",
+      "sha256": "f7fd25a5f821ddd63ad8e56015cac594ce9827b53b46850a9bf8304ab2c5465f",
+      "bytes": 5703,
       "lesson": "source-ds-03"
     },
     {
-      "path": "Content/Markdown/Data-Structures/04 linked lists.md",
-      "sha256": "14f9328960c42176f261a83197a4470a121252a2bc4911498f48523d78b78048",
-      "bytes": 4021,
+      "path": "Content/Markdown/2_Data-Structures/04 linked lists.md",
+      "sha256": "6fe5bad9dd3a3a69a08529ce449958f69f059bbf2b9ff01fb6b93e8fcacebaa1",
+      "bytes": 4256,
       "lesson": "source-ds-04"
     },
     {
-      "path": "Content/Markdown/Data-Structures/05 stacks.md",
-      "sha256": "050a325b8dcace6c8792d097ddca392314496a0554f716fb27d61838d3bdc075",
-      "bytes": 2988,
+      "path": "Content/Markdown/2_Data-Structures/05 stacks.md",
+      "sha256": "1b6dc3eaf1ce9816014324cc3786614d170ca61e75e99e01a985dbe1c87f1ca8",
+      "bytes": 3163,
       "lesson": "source-ds-05"
     },
     {
-      "path": "Content/Markdown/Data-Structures/06 queues.md",
-      "sha256": "1979ce579cf902b090e38cfd9f37876a6bb61ac926e4fb1166a18547fe18aa08",
-      "bytes": 4242,
+      "path": "Content/Markdown/2_Data-Structures/06 queues.md",
+      "sha256": "48b2d65fd1b0e7a1591f1ef18662b375df065cfb3da37b295730ce0679583781",
+      "bytes": 4444,
       "lesson": "source-ds-06"
     },
     {
-      "path": "Content/Markdown/Data-Structures/07 nonlinear data structures.md",
-      "sha256": "f8f5d8fd45f18462d256a0a0817318463235e7d43aa4ecced9a2bf93b11dc6a0",
-      "bytes": 2383,
+      "path": "Content/Markdown/2_Data-Structures/07 nonlinear data structures.md",
+      "sha256": "f8f2c1a69fed65c1a578e6fb7d09c9904b9969dd7bfe88dc685ef585fb2c7c7e",
+      "bytes": 2761,
       "lesson": "source-ds-07"
     },
     {
-      "path": "Content/Markdown/Data-Structures/08 trees.md",
-      "sha256": "8ed2fcce5fedce19e6ff28497ce114d9f0db2ffb674e3355e0aa7b26428334e7",
-      "bytes": 10669,
+      "path": "Content/Markdown/2_Data-Structures/08 trees.md",
+      "sha256": "cab5d7d2a61bc8293d3add508443427a8e2e4c4e185c01b52101f46522842a8b",
+      "bytes": 11267,
       "lesson": "source-ds-08"
     },
     {
-      "path": "Content/Markdown/Data-Structures/09 graphs.md",
-      "sha256": "ff0b34f9dfab1894b2489d9d6559a66225fe0d2983e983b5a8561f49d7f14e78",
-      "bytes": 5005,
+      "path": "Content/Markdown/2_Data-Structures/09 graphs.md",
+      "sha256": "0f3397a8cb617ef37e720a3ed01899000a0c3e43a576fa1c01def43b1fef6290",
+      "bytes": 5349,
       "lesson": "source-ds-09"
     },
     {
-      "path": "Content/Markdown/Data-Structures/10 data versioning.md",
-      "sha256": "7063c2f79886f5045089f7aeeb7f357815619e30d9bb4877e81b38cabcdbe11c",
-      "bytes": 21737,
+      "path": "Content/Markdown/2_Data-Structures/10 data versioning.md",
+      "sha256": "ccc8f0c80c78c3afb4d096bd4459d4a43aaf83a1776d1904645b0832d8cb84c3",
+      "bytes": 22593,
       "lesson": "source-ds-10"
     },
     {
-      "path": "Content/Markdown/Data-Structures/Review2.md",
+      "path": "Content/Markdown/2_Data-Structures/Review2.md",
       "sha256": "2ab5100095ac4139489ea906ab274fdab5032fedb307642783152e92f65b4d64",
       "bytes": 887
     },
     {
-      "path": "Content/Markdown/Data-Structures/Reviews.md",
-      "sha256": "6060d2a2530a2716c2513455856cf1d78a1208c38db8cea99ecc70ca79364123",
-      "bytes": 1154
+      "path": "Content/Markdown/2_Data-Structures/Reviews.md",
+      "sha256": "1bba6cf463fa688c74ef1484ad4cc5e1bae9431d1ebcbb7c1da53556b8c7089f",
+      "bytes": 1177
+    },
+    {
+      "path": "Content/Markdown/3_Connectionist-AI/01 introduction to connectionist ai.md",
+      "sha256": "d98f4fd9ab4551bf02634a6d254cebb1331dd6a753aea1f403c96d00737664e5",
+      "bytes": 10597,
+      "lesson": "source-ai-01"
+    },
+    {
+      "path": "Content/Markdown/3_Connectionist-AI/02 neural network concepts terminology architectures.md",
+      "sha256": "a925258c7dec2203930df5cdbd027492911314743d54b29889a403c2a3110444",
+      "bytes": 20856,
+      "lesson": "source-ai-02"
+    },
+    {
+      "path": "Content/Markdown/3_Connectionist-AI/03 applications of neural networks.md",
+      "sha256": "2eb072d4a6a6ce8bfa0e1960e8b1e94f554579577e0cb5409ab509b9855f6020",
+      "bytes": 11038,
+      "lesson": "source-ai-03"
+    },
+    {
+      "path": "Content/Markdown/3_Connectionist-AI/04 deep learning and activation functions.md",
+      "sha256": "09e2ce1e12d1ff73300c185c87355e525bf0518e04d4fb98f4d3af4aaa62fc29",
+      "bytes": 14273,
+      "lesson": "source-ai-04"
+    },
+    {
+      "path": "Content/Markdown/3_Connectionist-AI/05 demand and time series forecasting.md",
+      "sha256": "dbb15d3d87fb6fa58809d31582aaf75da2b13b64f3a6e48bfe6a96b929eb49a2",
+      "bytes": 18486,
+      "lesson": "source-ai-05"
+    },
+    {
+      "path": "Content/Markdown/3_Connectionist-AI/06 probabilistic forecasting.md",
+      "sha256": "638f59b7b4a2c974f206f64cda0e294da58e91ef75bf5db41ea06a6d4b1e2b42",
+      "bytes": 16623,
+      "lesson": "source-ai-06"
+    },
+    {
+      "path": "Content/Markdown/3_Connectionist-AI/07 online and incremental learning.md",
+      "sha256": "50118aec006895290540a16b6ceade6ef1fbbb8f0872d5998977e15e5200ad7b",
+      "bytes": 16721,
+      "lesson": "source-ai-07"
+    },
+    {
+      "path": "Content/Markdown/3_Connectionist-AI/08 recommendation systems.md",
+      "sha256": "6e9fc742554420fe1937dab50a6d4aca75264739d7442180f8563638b3f8c89a",
+      "bytes": 13845,
+      "lesson": "source-ai-08"
+    },
+    {
+      "path": "Content/Markdown/3_Connectionist-AI/09 reinforcement learning.md",
+      "sha256": "64394a620d8d7b6050ac30b6ac28fa245f8f344bbd02feefc56052b9d1a6bc45",
+      "bytes": 18724,
+      "lesson": "source-ai-09"
+    },
+    {
+      "path": "Content/Markdown/3_Connectionist-AI/10 model training and optimization.md",
+      "sha256": "e1bf0d8793a4cb77a1c699db9caa154b95c5aa2029cc0e9e62d4bd06dc897c5f",
+      "bytes": 23278,
+      "lesson": "source-ai-10"
+    },
+    {
+      "path": "Content/Markdown/3_Connectionist-AI/Review1.md",
+      "sha256": "d75b12104bae0fd87200d07872b4e5b4ac7a3f15a0c9fbadbeebc783ec6a71ed",
+      "bytes": 1975
     },
     {
       "path": "Content/Markdown/Module Outline.md",
@@ -2238,13 +2238,23 @@
     },
     {
       "path": "Content/Test Bank/Test.md",
-      "sha256": "182940b3a03b0a08e9418e2de901430e268cf040f1b3cbbeab4a7705abd35f5d",
-      "bytes": 28
+      "sha256": "c65be26d25198de4abd54c415b143c528c95e5a22ddc88fe854d8be5698d66fb",
+      "bytes": 47725
     },
     {
-      "path": "Content/Videos/Videos.md",
-      "sha256": "e8f1094210d9805ad6751b2d4b4447741776caea59fb183d51ee04a6218b599f",
-      "bytes": 20
+      "path": "Content/Videos/Data Structures⁄Data Versioning.mp4",
+      "sha256": "6a88802623942daa7802991d99dc53f4b1a44fdfece7b7d59d25bfb891f79bda",
+      "bytes": 24242300
+    },
+    {
+      "path": "Content/Videos/Reinforcement Learning.mp4",
+      "sha256": "ddc9c1caff514baafda6bbfd423649abf738f6d75da6811b90c0efc2a2572b88",
+      "bytes": 17351374
+    },
+    {
+      "path": "Content/Videos/Sequential Decisions.mp4",
+      "sha256": "cc97fbf6f0c673fd37dc759bbeec0550894a48ae0cf62bc13f99e957bf1beb6b",
+      "bytes": 95513627
     }
   ]
 }

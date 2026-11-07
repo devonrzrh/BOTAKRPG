@@ -6,14 +6,32 @@ topic: ai
 summary: Chapter 9 · Reinforcement Learning
 prerequisites:
   - source-ai-08
-source: Source/Content/Markdown/Connetionist-AI/09 reinforcement learning.md
+source: Source/Content/Markdown/3_Connectionist-AI/09 reinforcement learning.md
 ---
 
 # Chapter 9: Reinforcement Learning
 
 **Level:** Beginner to Intermediate | **Reading time:** ~55 minutes
 
-## What you will learn
+## Learning Objectives
+## Contents
+
+- [Learning Objectives](#learning-objectives)
+- [1. What Is Reinforcement Learning?](#1-what-is-reinforcement-learning)
+- [2. Core Vocabulary](#2-core-vocabulary)
+- [3. Markov Decision Process (MDP)](#3-markov-decision-process-mdp)
+- [4. Value Functions and the Bellman Equation](#4-value-functions-and-the-bellman-equation)
+- [5. Exploration vs Exploitation](#5-exploration-vs-exploitation)
+- [6. Tabular Q-Learning](#6-tabular-q-learning)
+- [7. Deep Reinforcement Learning](#7-deep-reinforcement-learning)
+- [8. Reward Design](#8-reward-design)
+- [9. Applications](#9-applications)
+- [10. Challenges](#10-challenges)
+- [11. Practical Tips](#11-practical-tips)
+- [Key Takeaways](#key-takeaways)
+- [Practice Questions](#practice-questions)
+- [Answer Key](#answer-key)
+
 - The reinforcement learning (RL) framework and its vocabulary
 - Markov decision processes, returns, value functions and the Bellman equation
 - Exploration vs exploitation
@@ -80,7 +98,7 @@ RL problems are usually formalised as an MDP: a set of states, actions, transiti
 
 ![An illustrative state-action choice has two possible next states. The transition probabilities 0.7 and 0.3 sum to one. Rewards are attached to transitions.](/materials/Assets/Connectionist%20AI/Static/rl-mdp-transition.svg)
 
-### Return and Discounting
+### 3.1 Return and Discounting
 ```
 G_t = r_(t+1) + γ·r_(t+2) + γ²·r_(t+3) + ...
 ```
@@ -125,7 +143,7 @@ Only exploiting traps the agent in a mediocre routine; only exploring never cash
 
 ![With epsilon 0.2, eighty percent of decisions use a current best action and twenty percent choose randomly from all actions. The random branch may also select a best action.](/materials/Assets/Connectionist%20AI/Static/rl-epsilon-greedy.svg)
 
-### The Multi-Armed Bandit (simplest case)
+### 5.1 The Multi-Armed Bandit (simplest case)
 One state, several actions (slot-machine arms), unknown payouts. It isolates the explore/exploit trade-off and underlies A/B testing and online recommendation.
 
 ## 6. Tabular Q-Learning
@@ -148,7 +166,7 @@ new Q    = 0 + 0.5 × 2.8 = 1.4
 
 ![With old Q zero, target 2.8 and learning rate 0.5, one Q-learning update moves halfway to the target, to 1.4.](/materials/Assets/Connectionist%20AI/Static/rl-q-update.svg)
 
-### Runnable Example: A 5-Cell Corridor
+### 6.1 Runnable Example: A 5-Cell Corridor
 States 0 to 4 in a line. The agent starts at 0, moves left or right, and gets **+1** on reaching cell 4.
 
 ```python
@@ -187,7 +205,7 @@ Reading this, the policy "always go right" emerges. Notice how value spreads **b
 
 ![An agent moves right through states zero to four. Reaching state four gives reward one. The learned right-action values are 0.729,0.81,0.9,1.0 before the goal.](/materials/Assets/Connectionist%20AI/Animated/rl-corridor.svg)
 
-### On-Policy vs Off-Policy
+### 6.2 On-Policy vs Off-Policy
 - **Q-learning is off-policy:** it learns the value of the *greedy* policy while behaving with an exploratory one.
 - **SARSA is on-policy:** it updates using the action actually taken next, `Q(s',a')`, so it learns the value of the policy it follows (more cautious near dangers).
 
@@ -249,7 +267,7 @@ PPO clips its surrogate objective to discourage excessively large policy updates
 
 ![For positive advantage equal to one and clipping epsilon 0.2, the clipped surrogate equals the probability ratio up to 1.2 and then stays at 1.2.](/materials/Assets/Connectionist%20AI/Static/rl-ppo-clip.svg)
 
-### Method Overview
+### 7.5 Method Overview
 
 | Family | Learns | Examples | Best for |
 |---|---|---|---|

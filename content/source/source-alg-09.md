@@ -6,10 +6,10 @@ topic: algorithms
 summary: Chapter 10 · Inventory and Uncertainty Management
 prerequisites:
   - source-alg-08
-source: Source/Content/Markdown/Algorithm/09 inventory and uncertainty management.md
+source: Source/Content/Markdown/1_Algorithm/09 inventory and uncertainty management.md
 ---
 
-# Inventory and Uncertainty Management
+# Chapter 9: Inventory and Uncertainty Management
 
 Algorithms are not only used to search and sort information. They can also help us decide **how to use limited resources**.
 
@@ -22,12 +22,31 @@ Imagine you manage a small campus shop selling notebooks:
 - You need a sensible balance, not simply the biggest or smallest possible order.
 
 ![Four notebooks leave two unsold if demand is 2, match demand 4, and miss two customers if demand is 6.](/materials/Assets/Algorithms/Static/inventory-stock-balance.svg)
+## Contents
 
-## Where Do Algorithms Enter the Picture?
+- [1. Where Do Algorithms Enter the Picture?](#1-where-do-algorithms-enter-the-picture)
+- [2. Managing Uncertainty in Inventory: What If We Don't Know What Happens Next?](#2-managing-uncertainty-in-inventory-what-if-we-dont-know-what-happens-next)
+- [3. Python Implementation: Compare Stock Quantities](#3-python-implementation-compare-stock-quantities)
+- [4. Connecting Inventory Management to Dynamic Programming](#4-connecting-inventory-management-to-dynamic-programming)
+- [Further Reading](#further-reading)
+- [5. Quick Knowledge Check](#5-quick-knowledge-check)
+
+## Further Reading
+
+[Cornell Optimization Wiki — Newsvendor Problem](https://optimization.cbe.cornell.edu/index.php?title=Newsvendor_problem) — an introduction to single-period inventory under uncertain demand.
+
+[Data-driven newsvendor problem](https://doi.org/10.1016/j.ijpe.2022.108509) — further reading about expected overstock and shortage costs.
+
+---
+
+---
+
+
+## 1. Where Do Algorithms Enter the Picture?
 
 The decision depends on the type of problem:
 
-1. **A simple greedy rule:** "Order what sold yesterday." This is easy, but yesterday's demand may not represent tomorrow's demand.
+1. **A simple heuristic:** "Order what sold yesterday." This is easy, but yesterday's sales may not represent tomorrow's demand, and the rule ignores current inventory. It is not necessarily a greedy optimization algorithm, because it does not explicitly optimize a defined immediate objective.
 2. **Single-day optimization:** Compare possible order quantities and choose the one with the lowest estimated cost (or highest expected profit).
 3. **Dynamic programming (DP):** If inventory carries over across many days, the amount you order today changes what is available tomorrow. DP can compare decisions across a sequence of days by storing results for smaller states such as **(day, stock remaining)**.
 
@@ -35,7 +54,7 @@ The decision depends on the type of problem:
 
 ---
 
-## Managing Uncertainty in Inventory: What If We Don't Know What Happens Next?
+## 2. Managing Uncertainty in Inventory: What If We Don't Know What Happens Next?
 
 There is an extra complication in our notebook shop: **we do not know exactly how many people will buy a notebook tomorrow**.
 
@@ -56,6 +75,8 @@ Let's also assume:
 - Each unsold notebook costs us **2 units** in extra costs.
 - Each customer we cannot serve costs us **5 units** in missed opportunity.
 - We may choose to stock **2, 4, or 6** notebooks.
+
+For this one-day example, assume we begin with **zero stock**, receive the order before sales start, and cannot replenish during the day. The two costs are total per-unit penalties for excess stock and unmet demand; other costs and profits are excluded. Thus the order quantity equals the stock available for sale here. If stock already exists, ordering four more notebooks is different from stocking four in total.
 
 For any one possible demand:
 
@@ -97,7 +118,7 @@ Let's compare the alternatives:
 
 With these **specific assumptions**, stocking **4 notebooks** gives the lowest expected cost among the three choices. This does **not** guarantee tomorrow's cost will be 3.2; it is an average cost across the possible outcomes, weighted by their probabilities.
 
-## Python Implementation: Compare Stock Quantities
+## 3. Python Implementation: Compare Stock Quantities
 
 ```python
 # Illustrative probabilities, not real demand forecasts.
@@ -139,7 +160,7 @@ Best stock quantity: 4
 
 This code simply **evaluates possible decisions**; it is **not a dynamic programming implementation**. It introduces the idea of making decisions using expected outcomes.
 
-## Connecting Inventory Management to Dynamic Programming
+## 4. Connecting Inventory Management to Dynamic Programming
 
 Now imagine the shop needs to plan for **seven days**, and leftover notebooks remain available the next morning.
 
@@ -152,6 +173,8 @@ Now imagine the shop needs to plan for **seven days**, and leftover notebooks re
 
 DP can calculate the best future expected cost for each state, so it does not have to solve the same situation repeatedly. When future demand is random, this is an example of **stochastic dynamic programming** (DP with uncertainty).
 
+For example, if deliveries arrive immediately and unmet demand is lost rather than carried forward, the next stock is `max(current_stock + order - demand, 0)`. The demand distribution for each day must be supplied or estimated. Delivery delays or backorders require extra state information, such as outstanding orders or unmet demand; `(day, current_stock)` alone would then be insufficient. End-of-horizon leftover value or disposal cost must also be specified.
+
 Here is the distinction:
 
 | Concept | Main question |
@@ -163,22 +186,20 @@ Here is the distinction:
 
 **Key takeaway:** Inventory management and uncertainty management are **real-world problems/considerations**, while greedy algorithms and dynamic programming are **algorithm design methods** that can help address them. They often overlap, but they are not four algorithms of the same type.
 
-## Further Reading
-
-[Cornell Optimization Wiki — Newsvendor Problem](https://optimization.cbe.cornell.edu/index.php?title=Newsvendor_problem) — an introduction to single-period inventory under uncertain demand.
-
-[Data-driven newsvendor problem](https://doi.org/10.1016/j.ijpe.2022.108509) — further reading about expected overstock and shortage costs.
-
----
-
----
-
-## Quick Knowledge Check
+## 5. Quick Knowledge Check
 
 1. What is the difference between **overstocking** and **understocking**?
 2. Why might ordering exactly what sold yesterday be unreliable?
 3. When we calculate **expected cost**, why do we multiply each possible cost by its probability?
 4. In the Python example, which stock quantity has the smallest expected cost?
 5. Why might planning inventory for seven days require a different approach from choosing tomorrow's quantity?
+
+### 5.1 Answers
+
+1. Overstocking leaves excess items; understocking leaves some demand unmet.
+2. Demand can change, yesterday's sales can be limited by stock-outs, and existing stock also matters.
+3. Expected cost is a probability-weighted average: more likely outcomes contribute more to the estimate.
+4. Stocking four notebooks has the lowest expected cost, `3.2`, among the three permitted choices.
+5. Leftovers and future orders link the days, so today's lowest immediate cost may not give the lowest total cost.
 
 **Summary:** Inventory management is the practical problem of balancing available stock against demand and costs. A simple rule may be enough in some situations; comparing expected costs helps when demand is uncertain; and dynamic programming can help when inventory decisions affect many future days.

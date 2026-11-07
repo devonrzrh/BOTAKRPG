@@ -5,10 +5,56 @@ title: Introduction to Connectionist AI (Brief)
 topic: ai
 summary: Chapter 1 · Introduction to Connectionist AI (Brief)
 prerequisites: []
-source: Source/Content/Markdown/Connetionist-AI/01 introduction to connectionist ai.md
+source: Source/Content/Markdown/3_Connectionist-AI/01 introduction to
+  connectionist ai.md
 ---
 
 # Chapter 1: Introduction to Connectionist AI (Brief)
+## Contents
+
+- [1. What Is Connectionist AI?](#1-what-is-connectionist-ai)
+- [2. The Core Principles of Connectionism](#2-the-core-principles-of-connectionism)
+- [3. Symbolic AI vs Connectionist AI](#3-symbolic-ai-vs-connectionist-ai)
+- [4. A Short History](#4-a-short-history)
+- [5. Why Did It Take So Long to Work?](#5-why-did-it-take-so-long-to-work)
+- [6. Your First Neuron: A Hands-On Example](#6-your-first-neuron-a-hands-on-example)
+- [7. Common Misconceptions](#7-common-misconceptions)
+- [Key Takeaways](#key-takeaways)
+- [Practice Questions](#practice-questions)
+- [Answer Key](#answer-key)
+
+## Key Takeaways
+- Connectionism builds intelligence from many simple connected units whose weights are learned.
+- It excels at messy, perceptual data; symbolic AI excels at explicit logic.
+- Data, compute and better algorithms made deep learning take off around 2012.
+- A single neuron is limited; layers give networks their power.
+
+---
+
+## Practice Questions
+
+1. In one sentence, what is the main idea of connectionism?
+2. What in an artificial network plays the role of a synapse?
+3. Give one strength and one weakness of connectionist AI versus symbolic AI.
+4. What is "distributed representation"?
+5. Which training method was popularised for multi-layer networks in 1986?
+6. Which logic function can a single neuron *not* learn?
+7. Name the three ingredients behind the deep learning boom.
+8. True or False: Artificial neural networks are accurate simulations of the brain.
+
+---
+
+## Answer Key
+
+1. Intelligence emerges from many simple connected units whose connection strengths are learned.
+2. The weight.
+3. Strength: handles messy data like images. Weakness: hard to interpret (or needs lots of data).
+4. A concept is spread across many units, and each unit helps represent many concepts.
+5. Backpropagation.
+6. XOR.
+7. Data, compute (GPUs), better algorithms.
+8. False. They are loose, simplified inspirations.
+
 
 ## 1. What Is Connectionist AI?
 
@@ -133,35 +179,3 @@ for input1 in (0, 1):
 - **"AI means neural networks."** AI also includes symbolic methods, search, probabilistic models and more.
 
 ![During training, targets help update the weights. During prediction, the weights stay fixed.](/materials/Assets/Connectionist%20AI/Static/train-vs-use.svg)
-
-## Key Takeaways
-- Connectionism builds intelligence from many simple connected units whose weights are learned.
-- It excels at messy, perceptual data; symbolic AI excels at explicit logic.
-- Data, compute and better algorithms made deep learning take off around 2012.
-- A single neuron is limited; layers give networks their power.
-
----
-
-## Practice Questions
-
-1. In one sentence, what is the main idea of connectionism?
-2. What in an artificial network plays the role of a synapse?
-3. Give one strength and one weakness of connectionist AI versus symbolic AI.
-4. What is "distributed representation"?
-5. Which training method was popularised for multi-layer networks in 1986?
-6. Which logic function can a single neuron *not* learn?
-7. Name the three ingredients behind the deep learning boom.
-8. True or False: Artificial neural networks are accurate simulations of the brain.
-
----
-
-## Answer Key
-
-1. Intelligence emerges from many simple connected units whose connection strengths are learned.
-2. The weight.
-3. Strength: handles messy data like images. Weakness: hard to interpret (or needs lots of data).
-4. A concept is spread across many units, and each unit helps represent many concepts.
-5. Backpropagation.
-6. XOR.
-7. Data, compute (GPUs), better algorithms.
-8. False. They are loose, simplified inspirations.

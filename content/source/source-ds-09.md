@@ -6,10 +6,10 @@ topic: structures
 summary: Chapter 9 · Graphs
 prerequisites:
   - source-ds-08
-source: Source/Content/Markdown/Data-Structures/09 graphs.md
+source: Source/Content/Markdown/2_Data-Structures/09 graphs.md
 ---
 
-# Graphs
+# Chapter 9: Graphs
 
 A graph has a set of **vertices** and a set of **edges** that connect pairs of vertices. In a friendship network, the vertices are people and the edges are friendships.
 
@@ -20,8 +20,15 @@ A graph has a set of **vertices** and a set of **edges** that connect pairs of v
 - A **directed graph** has connections with a direction.
 
   ![An arrow points from Nicky to Darren.](/materials/Assets/Data%20Structures/Static/graph-directed.svg)
+## Contents
 
-## Example: a small friendship network
+- [1. Example: a small friendship network](#1-example-a-small-friendship-network)
+- [2. Storing the friendship graph](#2-storing-the-friendship-graph)
+- [3. Graph traversal](#3-graph-traversal)
+- [4. Application](#4-application)
+- [5. Python example](#5-python-example)
+- [References](#references)
+## 1. Example: a small friendship network
 
 Each person below is a vertex, and each line is an undirected edge. This example is made for these notes.
 
@@ -29,7 +36,7 @@ Each person below is a vertex, and each line is an undirected edge. This example
 
 Nicky can reach Glen in two steps by following the edges Nicky → Neil → Glen.
 
-## Storing the friendship graph
+## 2. Storing the friendship graph
 
 Two vertices are **adjacent** if one edge connects them. An **adjacency list** records each vertex's direct neighbors. Each friendship appears in both people's lists because the graph is undirected.
 
@@ -46,7 +53,7 @@ An **adjacency matrix** has one row and one column for each vertex. In this unwe
 
 The list makes it easy to see all of Nicky's neighbors. The matrix lets you check a particular pair directly, such as Nicky and Glen, by reading one cell.
 
-## Graph traversal
+## 3. Graph traversal
 
 A graph traversal visits vertices by following edges from a starting vertex. Keep track of which vertices you have seen so that a cycle does not lead to repeated visits.
 
@@ -68,7 +75,7 @@ Start at Nicky and choose Darren first.
 
 **Expected answer.** Nicky → Neil → Glen → Darren. The order changes, but it still reaches all four people.
 
-## Application
+## 4. Application
 
 Nicky hears that the club meeting has moved to Friday. In each round, anyone who just heard the news tells their friends. Who hears it first, and how many rounds does it take to reach Glen?
 
@@ -76,7 +83,7 @@ In round 1, Nicky tells Darren and Neil. In round 2, Glen hears from Darren or N
 
 ![Nicky starts with the news. Darren and Neil hear in round 1, then Glen hears in round 2.](/materials/Assets/Data%20Structures/Animated/application-club-announcement.svg)
 
-## Python example
+## 5. Python example
 
 - `friends` is a dictionary that gives each person's list of neighbors.
 - `queue` holds people in the order they joined. The `front` index tells us who to visit next.
@@ -114,6 +121,7 @@ Darren
 Neil
 Glen
 ```
+
 
 ## References
 

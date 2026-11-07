@@ -6,10 +6,52 @@ topic: ai
 summary: Chapter 3 · Applications of Neural Networks (Brief)
 prerequisites:
   - source-ai-02
-source: Source/Content/Markdown/Connetionist-AI/03 applications of neural networks.md
+source: Source/Content/Markdown/3_Connectionist-AI/03 applications of neural
+  networks.md
 ---
 
 # Chapter 3: Applications of Neural Networks (Brief)
+## Contents
+
+- [1. Why So Many Applications?](#1-why-so-many-applications)
+- [2. Major Application Areas](#2-major-application-areas)
+- [3. Quick Reference](#3-quick-reference)
+- [4. A Typical Project Pipeline](#4-a-typical-project-pipeline)
+- [5. When Is a Neural Network a Good Fit?](#5-when-is-a-neural-network-a-good-fit)
+- [6. Mini Case Study: Defect Detection on a Production Line](#6-mini-case-study-defect-detection-on-a-production-line)
+- [7. Responsible Use](#7-responsible-use)
+- [Key Takeaways](#key-takeaways)
+- [Practice Questions](#practice-questions)
+- [Answer Key](#answer-key)
+
+## Key Takeaways
+- The same core idea adapts to many tasks by choosing the right architecture.
+- Match the **metric** to the real-world cost of errors.
+- Start with a baseline; deploy with monitoring.
+- Neural networks are powerful but not always the best tool.
+
+---
+
+## Practice Questions
+
+1. Match task to model: (a) defect photos, (b) translation, (c) unusual machine behaviour, no fault labels.
+2. Name two situations where a neural network is a poor choice.
+3. Why track recall, not just accuracy, in fraud detection?
+4. Why monitor a model after deployment?
+5. What baseline would you try first on a plain spreadsheet dataset?
+6. Name one risk of using biased training data.
+
+---
+
+## Answer Key
+
+1. (a) CNN, (b) Transformer, (c) Autoencoder.
+2. E.g. tiny datasets; a simple rule already works; full explainability required.
+3. Fraud is rare, so a model can be highly "accurate" while missing most fraud.
+4. Real-world data changes, so performance can silently degrade.
+5. Gradient boosting or a linear model.
+6. The model learns and repeats unfair patterns, harming some groups.
+
 
 ## 1. Why So Many Applications?
 
@@ -164,31 +206,3 @@ Most applications fall into a few **task types**:
 - **Transparency:** document what the model is for, its data, and its limits.
 
 ![The same model scores 90 percent overall, 98 percent on one group, and 82 percent on an equally sized group.](/materials/Assets/Connectionist%20AI/Static/subgroup-evaluation.svg)
-
-## Key Takeaways
-- The same core idea adapts to many tasks by choosing the right architecture.
-- Match the **metric** to the real-world cost of errors.
-- Start with a baseline; deploy with monitoring.
-- Neural networks are powerful but not always the best tool.
-
----
-
-## Practice Questions
-
-1. Match task to model: (a) defect photos, (b) translation, (c) unusual machine behaviour, no fault labels.
-2. Name two situations where a neural network is a poor choice.
-3. Why track recall, not just accuracy, in fraud detection?
-4. Why monitor a model after deployment?
-5. What baseline would you try first on a plain spreadsheet dataset?
-6. Name one risk of using biased training data.
-
----
-
-## Answer Key
-
-1. (a) CNN, (b) Transformer, (c) Autoencoder.
-2. E.g. tiny datasets; a simple rule already works; full explainability required.
-3. Fraud is rare, so a model can be highly "accurate" while missing most fraud.
-4. Real-world data changes, so performance can silently degrade.
-5. Gradient boosting or a linear model.
-6. The model learns and repeats unfair patterns, harming some groups.

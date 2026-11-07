@@ -237,3 +237,10 @@ At 1280 × 720, the large book measured 1200px wide with visible room margins, 2
 
 ![Large book](screenshots/reader-book.png)
 ![Fullscreen reader](screenshots/reader-fullscreen.png)
+## Numbered Source folders and chapter contents
+
+124 tests pass; production build passes with 31 source chapters and 279 validated runtime records. The refreshed manifest covers 407 byte-preserved original files, including three supplied videos. Tests verify stable lesson IDs, renamed folder paths, every chapter's code fences and asset links, repaired guide links, and all chapter contents anchors. Quest/encounter definitions are unchanged by regeneration.
+
+Browser checks opened the refreshed Introduction to Algorithms chapter, followed its inline Implementation link to book pages 5–6, switched to fullscreen, and followed Check Your Understanding to the correct section. Both jumps stayed inside the reader without changing the game URL. Existing Level 9 case progress restored successfully.
+
+![Refreshed chapter](screenshots/source-refresh.png)

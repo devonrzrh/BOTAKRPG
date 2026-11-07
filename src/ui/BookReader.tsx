@@ -6,7 +6,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { marked } from "marked";
+import { renderLessonMarkdown } from "../game/markdown";
 import DOMPurify from "dompurify";
 import type { Lesson } from "../content/schema";
 import {
@@ -66,15 +66,14 @@ export function BookReader(p: {
   const html = useMemo(
     () =>
       DOMPurify.sanitize(
-        marked.parse(
+        renderLessonMarkdown(
           p.reducedMotion
             ? p.lesson.body.replace(
                 /\/materials\/([^\s)]+\/Animated\/[^\s)]+)/g,
                 "/materials-still/$1",
               )
             : p.lesson.body,
-          { async: false },
-        ) as string,
+        ),
       ),
     [p.lesson.body, p.reducedMotion],
   );
@@ -244,8 +243,10 @@ export function BookReader(p: {
       ),
     [html],
   );
-  const jumpSection = (index: number) => {
-    const heading = article.current?.querySelectorAll("h1,h2,h3")[index];
+  const jumpSection = (index: number, allHeadings = false) => {
+    const heading = article.current?.querySelectorAll(
+      allHeadings ? "h1,h2,h3,h4,h5,h6" : "h1,h2,h3",
+    )[index];
     const frame = viewport.current;
     if (!heading || !frame) return;
     if (mode === "book")
@@ -359,6 +360,16 @@ export function BookReader(p: {
                     e.preventDefault();
                     const id = link.hash.slice(8);
                     if (p.lessons.some((l) => l.id === id)) p.onSelect(id);
+                  } else if (link?.hash) {
+                    const id = decodeURIComponent(link.hash.slice(1));
+                    const index = Array.from(
+                      article.current?.querySelectorAll("h1,h2,h3,h4,h5,h6") ??
+                        [],
+                    ).findIndex((heading) => heading.id === id);
+                    if (index >= 0) {
+                      e.preventDefault();
+                      jumpSection(index, true);
+                    }
                   }
                 }}
                 onKeyDown={(e) => {

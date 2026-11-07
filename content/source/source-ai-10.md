@@ -6,14 +6,37 @@ topic: ai
 summary: Chapter 10 · Model Training and Optimisation
 prerequisites:
   - source-ai-09
-source: Source/Content/Markdown/Connetionist-AI/10 model training and optimization.md
+source: Source/Content/Markdown/3_Connectionist-AI/10 model training and
+  optimization.md
 ---
 
 # Chapter 10: Model Training and Optimisation
 
 **Level:** Beginner to Intermediate | **Reading time:** ~60 minutes
 
-## What you will learn
+## Learning Objectives
+## Contents
+
+- [Learning Objectives](#learning-objectives)
+- [1. The Goal of Training](#1-the-goal-of-training)
+- [2. Loss Functions](#2-loss-functions)
+- [3. Gradient Descent](#3-gradient-descent)
+- [4. Optimisers](#4-optimisers)
+- [5. The Learning Rate](#5-the-learning-rate)
+- [6. Batch Size](#6-batch-size)
+- [7. Overfitting and Underfitting](#7-overfitting-and-underfitting)
+- [8. Regularisation Toolbox](#8-regularisation-toolbox)
+- [9. Normalisation, Initialisation and Stability](#9-normalisation-initialisation-and-stability)
+- [10. Hyperparameter Tuning](#10-hyperparameter-tuning)
+- [11. A Complete Training Loop (PyTorch)](#11-a-complete-training-loop-pytorch)
+- [12. Debugging Checklist](#12-debugging-checklist)
+- [13. Efficiency and Practical Tricks](#13-efficiency-and-practical-tricks)
+- [14. Common Mistakes](#14-common-mistakes)
+- [Key Takeaways](#key-takeaways)
+- [Practice Questions](#practice-questions)
+- [Answer Key](#answer-key)
+- [15. 🎓 Course Wrap-Up](#15--course-wrap-up)
+
 - What training is trying to achieve, and how to split data
 - Loss functions and gradient descent, with worked numbers
 - Optimisers: SGD, Momentum, RMSprop, Adam, AdamW
@@ -29,7 +52,7 @@ source: Source/Content/Markdown/Connetionist-AI/10 model training and optimizati
 
 Find parameters (weights and biases) that **minimise a loss function** on training data while **generalising** to new data. Training too well on the training set is not success. Performance on unseen data is.
 
-### Data Splits
+### 1.1 Data Splits
 
 | Set | Purpose | Typical share |
 |---|---|---|
@@ -83,12 +106,12 @@ If the gradient were −2 with w = 5, η = 0.5 → w = 5 + 1 = **6**.
 
 ![Successive gradient descent steps approach the minimum of a toy squared loss.](/materials/Assets/Connectionist%20AI/Animated/descent-steps.svg)
 
-### Backpropagation
+### 3.1 Backpropagation
 Computes the gradient for **every** weight efficiently using the chain rule, working backwards from the loss. Frameworks do this automatically (`loss.backward()`).
 
 ![Backward gradients follow the forward dependencies in reverse.](/materials/Assets/Connectionist%20AI/Animated/chain-rule-path.svg)
 
-### Variants
+### 3.2 Variants
 
 | Variant | Data per update | Notes |
 |---|---|---|
@@ -96,7 +119,7 @@ Computes the gradient for **every** weight efficiently using the chain rule, wor
 | **Stochastic GD (SGD)** | 1 sample | Very noisy, fast updates |
 | **Mini-batch GD** | e.g. 32–512 samples | **The standard.** Good speed, noise and hardware use |
 
-### Challenges in the Loss Landscape
+### 3.3 Challenges in the Loss Landscape
 - **Local minima:** in high dimensions, most points where the gradient is zero are **saddle points** or flat regions rather than bad minima.
 - **Plateaus:** gradients near zero.
 - **Ravines:** steep in one direction, shallow in another, so SGD zigzags (momentum helps).
@@ -104,7 +127,7 @@ Computes the gradient for **every** weight efficiently using the chain rule, wor
 
 ## 4. Optimisers
 
-### SGD with Momentum
+### 4.1 SGD with Momentum
 Accumulates a **velocity** of past gradients, which smooths zigzags and speeds movement along consistent directions.
 ```
 v ← β·v + g
@@ -120,11 +143,11 @@ Steps grow while the direction stays consistent.
 
 ![With constant gradient one, beta 0.9 and learning rate 0.1, the three update sizes are 0.1,0.19,0.271. They grow as velocity accumulates.](/materials/Assets/Connectionist%20AI/Static/train-momentum.svg)
 
-### AdaGrad, RMSprop
+### 4.2 AdaGrad, RMSprop
 Give each parameter its **own step size**, shrinking it where gradients have been large.
 RMSprop keeps a moving average of squared gradients (good for RNNs).
 
-### Adam
+### 4.3 Adam
 Combines **momentum** (average of gradients, `m`) with **adaptive scaling** (average of squared gradients, `v`):
 ```
 m ← β1·m + (1−β1)·g
@@ -137,7 +160,7 @@ Fun fact: on the very first step the update size is about **η** regardless of t
 
 ![The same gradient contributes to a first-moment average and a second-moment average of squared gradients. Bias-corrected estimates combine to scale the update.](/materials/Assets/Connectionist%20AI/Static/train-adam.svg)
 
-### AdamW
+### 4.4 AdamW
 Adam with **decoupled weight decay**, the usual choice for Transformers and many modern models.
 
 | Optimiser | Strengths | Watch out for |
@@ -164,7 +187,7 @@ The most important hyperparameter.
 
 ![On this toy quadratic, rate 0.02 converges slowly, 0.2 converges quickly, and 1.005 diverges. All losses are divided by the starting loss.](/materials/Assets/Connectionist%20AI/Static/train-learning-rate.svg)
 
-### Schedules
+### 5.1 Schedules
 
 | Schedule | Idea |
 |---|---|
@@ -234,10 +257,10 @@ A common heuristic is to scale the learning rate with batch size. **Gradient acc
 
 ## 9. Normalisation, Initialisation and Stability
 
-### Input Scaling
+### 9.1 Input Scaling
 Standardise features (mean 0, std 1), or scale to [0, 1]. It speeds training and avoids features with large ranges dominating. Use **training-set statistics only**.
 
-### Normalisation Layers
+### 9.2 Normalisation Layers
 | Layer | Normalises over | Typical use |
 |---|---|---|
 | **Batch Norm** | The batch, per feature/channel | CNNs |
@@ -249,14 +272,14 @@ Remember: Batch Norm behaves differently in `train()` and `eval()` mode.
 
 ![In the left sample-by-feature matrix, batch normalization uses values down one feature column. In the right matrix, layer normalization uses the features across one sample row.](/materials/Assets/Connectionist%20AI/Static/train-normalisation-axes.svg)
 
-### Weight Initialisation
+### 9.3 Weight Initialisation
 - **Never all zeros** (symmetry: every neuron learns the same thing).
 - **Xavier/Glorot** for tanh/sigmoid; **He** for ReLU-family.
 - Frameworks default to sensible choices, but custom layers need care.
 
 ![Identical incoming weights can preserve identical behavior when updates are the same.](/materials/Assets/Connectionist%20AI/Static/initialisation-symmetry.svg)
 
-### Gradient Clipping
+### 9.4 Gradient Clipping
 Cap the gradient norm (e.g. 1.0) to stop exploding gradients:
 ```python
 torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
@@ -264,7 +287,7 @@ torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
 
 ![Norm clipping scales a gradient vector while keeping its direction.](/materials/Assets/Connectionist%20AI/Static/gradient-clipping.svg)
 
-### Residual Connections
+### 9.5 Residual Connections
 `output = layer(x) + x` lets gradients flow through very deep networks (Chapter 4).
 
 ![The input passes through a transformation and also reaches the output by an identity path.](/materials/Assets/Connectionist%20AI/Animated/residual-path.svg)
@@ -415,7 +438,7 @@ model.load_state_dict(torch.load("best.pt"))
 
 ---
 
-# 🎓 Course Wrap-Up
+## 15. 🎓 Course Wrap-Up
 
 You have now covered the connectionist AI journey: what it is (Ch 1), how networks work (Ch 2), where they're used (Ch 3), depth and activations (Ch 4), forecasting (Ch 5–6), learning from streams (Ch 7), recommendations (Ch 8), reinforcement learning (Ch 9), and how to train well (Ch 10).
 

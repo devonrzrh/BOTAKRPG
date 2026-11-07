@@ -5,18 +5,23 @@ title: Data Structures
 topic: structures
 summary: Chapter 1 · Data Structures
 prerequisites: []
-source: Source/Content/Markdown/Data-Structures/01 introduction to data structures.md
+source: Source/Content/Markdown/2_Data-Structures/01 introduction to data structures.md
 ---
 
-# Data Structures
+# Chapter 1: Data Structures
+## Contents
 
-## Introduction to Data Structures
+- [1. Introduction to Data Structures](#1-introduction-to-data-structures)
+- [2. Complexity Analysis in Data Structures](#2-complexity-analysis-in-data-structures)
+- [References](#references)
+- [3. Read more](#3-read-more)
+## 1. Introduction to Data Structures
 
-### Definition of Data Structures
+### 1.1 Definition of Data Structures
 
 A data structure is a way of organizing and storing data so a program can use it. The choice of structure affects how the program accesses (gets), adds, removes, and changes data.
 
-### Importance of Data Structures in Programming
+### 1.2 Importance of Data Structures in Programming
 
 Programs often need to work with many related pieces of information. A suitable data structure keeps that information organized and makes common operations easier to perform.
 
@@ -26,7 +31,7 @@ For example, a program that stores student scores can use an ordered collection 
 
 The best choice depends on what the program needs to do most often. A structure that makes one operation quick may need more memory or make another operation slower.
 
-### Classification of Data Structures
+### 1.3 Classification of Data Structures
 
 Data structures are commonly grouped as **linear** or **nonlinear**:
 
@@ -35,7 +40,7 @@ Data structures are commonly grouped as **linear** or **nonlinear**:
 
 These groups describe how elements relate to one another. Different structures within either group support different operations and use cases.
 
-### Overview of Data Structures
+### 1.4 Overview of Data Structures
 
 - **Array:** Stores elements in an ordered sequence. Each item has an index, a number identifying its position. Arrays are useful when items need to be accessed by position.
 
@@ -56,7 +61,7 @@ These groups describe how elements relate to one another. Different structures w
 
   ![A graph connects people through friendships.](/materials/Assets/Data%20Structures/Static/friendship-graph.svg)
 
-## Complexity Analysis in Data Structures
+## 2. Complexity Analysis in Data Structures
 
 Suppose a collection stores the scores 72, 85, and 91.
 
@@ -70,11 +75,18 @@ Suppose a collection stores the scores 72, 85, and 91.
 
 The better choice depends on which operations the program uses most and how much memory it can use.
 
-### Check your understanding
+### 2.1 Check your understanding
 
 A program often reads items by their position and rarely inserts items between existing ones. Which structure, an array or a linked list, is likely to fit better? Give one reason.
 
 **Expected answer:** An array is likely to fit better because it gives direct access by position, usually in `O(1)` time. This assumes the program does not need many insertions in the middle.
+
+
+## 3. Read more
+
+- [Linear Data Structures](#lesson=source-ds-02)
+- [Nonlinear Data Structures](#lesson=source-ds-07)
+- [Data Versioning](#lesson=source-ds-10).
 
 
 ## References
@@ -82,9 +94,3 @@ A program often reads items by their position and rarely inserts items between e
 - IBM, [What is a data structure?](https://www.ibm.com/think/topics/data-structure)
 - GeeksforGeeks, [Introduction to Linear Data Structures](https://www.geeksforgeeks.org/dsa/introduction-to-linear-data-structures/) (operation costs and link overhead).
 - GeeksforGeeks, [Difference between Linear and Non-linear Data Structures](https://www.geeksforgeeks.org/dsa/difference-between-linear-and-non-linear-data-structures/) (linear and nonlinear classification).
-
-## Read more
-
-- [Linear Data Structures](#lesson=source-ds-02)
-- [Nonlinear Data Structures](#lesson=source-ds-07)
-- [Data Versioning](#lesson=source-ds-10).

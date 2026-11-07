@@ -6,16 +6,65 @@ topic: ai
 summary: Chapter 2 · Basic Concepts, Terminology and Architectures of Neural Networks
 prerequisites:
   - source-ai-01
-source: Source/Content/Markdown/Connetionist-AI/02 neural network concepts
+source: Source/Content/Markdown/3_Connectionist-AI/02 neural network concepts
   terminology architectures.md
 ---
 
 # Chapter 2: Basic Concepts, Terminology and Architectures of Neural Networks
+## Contents
+
+- [1. The Artificial Neuron](#1-the-artificial-neuron)
+- [2. Essential Terminology](#2-essential-terminology)
+- [3. Layers and Matrix Form](#3-layers-and-matrix-form)
+- [4. A Complete Worked Example: Forward Pass, Loss and One Weight Update](#4-a-complete-worked-example-forward-pass-loss-and-one-weight-update)
+- [5. What Backpropagation Really Is](#5-what-backpropagation-really-is)
+- [6. The Learning Loop](#6-the-learning-loop)
+- [7. Common Loss Functions](#7-common-loss-functions)
+- [8. Architectures](#8-architectures)
+- [9. How to Choose an Architecture](#9-how-to-choose-an-architecture)
+- [10. Tiny Code Example (PyTorch)](#10-tiny-code-example-pytorch)
+- [11. Common Beginner Mistakes](#11-common-beginner-mistakes)
+- [Key Takeaways](#key-takeaways)
+- [Practice Questions](#practice-questions)
+- [Answer Key](#answer-key)
+
+## Key Takeaways
+- A neuron = weighted sum + bias + activation.
+- A network is layers of neurons; parameters = weights + biases.
+- Training = forward pass, loss, backpropagation, update, repeated.
+- Choose the architecture to match the data's structure.
+
+---
+
+## Practice Questions
+
+1. Compute a ReLU neuron with inputs `[2, 1]`, weights `[0.4, 0.6]`, bias `-1`.
+2. Parameters in a dense layer with 5 inputs and 3 neurons?
+3. 2,000 samples, batch size 250: how many iterations per epoch?
+4. Order these: update weights, forward pass, compute loss, backward pass.
+5. Which neural network architecture suits (a) photos, (b) spreadsheet, (c) translation?
+6. What problem do LSTM gates help solve?
+7. What does validation loss rising while training loss falls indicate?
+8. Why is a bias term useful?
+
+---
+
+## Answer Key
+
+1. z = 0.8 + 0.6 − 1 = 0.4, ReLU → **0.4**.
+2. 5×3 + 3 = **18**.
+3. 2000 / 250 = **8**.
+4. Forward pass → loss → backward pass → update.
+5. (a) CNN, (b) MLP, (c) Transformer. For plain spreadsheet data, try gradient boosting or a linear model as a baseline first.
+6. Vanishing gradients and forgetting over long sequences.
+7. Overfitting.
+8. It shifts the activation threshold so the neuron isn't forced through the origin.
+
 
 
 ## 1. The Artificial Neuron
 
-### How Does an Artificial Neuron Work?
+### 1.1 How Does an Artificial Neuron Work?
 
 A neuron performs three simple steps:
 
@@ -168,7 +217,7 @@ Output neuron: weights `[1.0, -0.5]`, bias `0.2`.
 
 ![Signals travel from both inputs to both ReLU neurons, then combine at the output to predict 0.05.](/materials/Assets/Connectionist%20AI/Animated/worked-network.svg)
 
-### Step 1: Forward Pass (Making a Prediction)
+### 4.1 Step 1: Forward Pass (Making a Prediction)
 
 First, calculate the outputs of both hidden neurons using their weights, biases, and ReLU activation function.
 
@@ -190,7 +239,7 @@ Next, use these two outputs as inputs for the output neuron. Since it uses a lin
 
 The network's prediction is **0.05**, while the correct answer is **1**.
 
-### Step 2: Loss Calculation (Measuring the Error)
+### 4.2 Step 2: Loss Calculation (Measuring the Error)
 
 Loss measures how far the network's prediction is from the correct answer. Here, we use **Squared Error**, which squares the difference between the prediction and the target.
 
@@ -211,7 +260,7 @@ L = 0.9025
 
 The loss is **0.9025**. A smaller loss means the prediction is closer to the correct answer.
 
-### Step 3: Backward Pass (Calculating the Error's Effect)
+### 4.3 Step 3: Backward Pass (Calculating the Error's Effect)
 
 Backpropagation calculates how much each weight affects the loss. This information helps the network decide how to adjust its weights.
 
@@ -235,7 +284,7 @@ The result `-0.57` is the gradient. It tells us how changing this weight affects
 
 Note: This example only calculates the gradient for one weight. A complete training process calculates gradients for all trainable weights and biases.
 
-### Step 4: Weight Update (Learning from the Error)
+### 4.4 Step 4: Weight Update (Learning from the Error)
 
 Now, we adjust the weight using the gradient and a value called the **learning rate**.
 
@@ -259,7 +308,7 @@ The new weight is **1.057**, increased from 1.0.
 
 This adjustment moves the prediction closer to the target value of 1.
 
-### What Happens Next?
+### 4.5 What Happens Next?
 
 ![One training step predicts 0.05, computes a loss of 0.9025 and a gradient of −0.57, then updates the output weight to 1.057.](/materials/Assets/Connectionist%20AI/Animated/training-step.svg)
 
@@ -390,7 +439,7 @@ Attention(Q, K, V) = softmax(Q·Kᵀ / √d) · V
 
 ![Three neighbors send messages to a central graph node, which combines them with its own features.](/materials/Assets/Connectionist%20AI/Static/graph-messages.svg)
 
-### Architecture Comparison
+### 8.8 Architecture Comparison
 
 | Architecture | Typical data | Key idea | Main strength | Main limitation |
 |---|---|---|---|---|
@@ -440,38 +489,6 @@ print(model(x).item())   # close to 1.0
 - Evaluating on training data only.
 - Using softmax **and** a loss that already includes softmax (e.g. PyTorch `CrossEntropyLoss` expects raw scores).
 - Making the network far bigger than the data justifies.
-
-## Key Takeaways
-- A neuron = weighted sum + bias + activation.
-- A network is layers of neurons; parameters = weights + biases.
-- Training = forward pass, loss, backpropagation, update, repeated.
-- Choose the architecture to match the data's structure.
-
----
-
-## Practice Questions
-
-1. Compute a ReLU neuron with inputs `[2, 1]`, weights `[0.4, 0.6]`, bias `-1`.
-2. Parameters in a dense layer with 5 inputs and 3 neurons?
-3. 2,000 samples, batch size 250: how many iterations per epoch?
-4. Order these: update weights, forward pass, compute loss, backward pass.
-5. Which neural network architecture suits (a) photos, (b) spreadsheet, (c) translation?
-6. What problem do LSTM gates help solve?
-7. What does validation loss rising while training loss falls indicate?
-8. Why is a bias term useful?
-
----
-
-## Answer Key
-
-1. z = 0.8 + 0.6 − 1 = 0.4, ReLU → **0.4**.
-2. 5×3 + 3 = **18**.
-3. 2000 / 250 = **8**.
-4. Forward pass → loss → backward pass → update.
-5. (a) CNN, (b) MLP, (c) Transformer. For plain spreadsheet data, try gradient boosting or a linear model as a baseline first.
-6. Vanishing gradients and forgetting over long sequences.
-7. Overfitting.
-8. It shifts the activation threshold so the neuron isn't forced through the origin.
 
 
 ## Reading note

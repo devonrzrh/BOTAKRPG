@@ -6,14 +6,26 @@ topic: ai
 summary: Chapter 8 · Recommendation Systems (Brief)
 prerequisites:
   - source-ai-07
-source: Source/Content/Markdown/Connetionist-AI/08 recommendation systems.md
+source: Source/Content/Markdown/3_Connectionist-AI/08 recommendation systems.md
 ---
 
 # Chapter 8: Recommendation Systems (Brief)
 
 **Level:** Beginner | **Reading time:** ~25 minutes
 
-## What you will learn
+## Learning Objectives
+## Contents
+
+- [Learning Objectives](#learning-objectives)
+- [1. What Is a Recommender System?](#1-what-is-a-recommender-system)
+- [2. Main Approaches](#2-main-approaches)
+- [3. A Typical Large-Scale Pipeline](#3-a-typical-large-scale-pipeline)
+- [4. Key Challenges](#4-key-challenges)
+- [5. Evaluation](#5-evaluation)
+- [Key Takeaways](#key-takeaways)
+- [Practice Questions](#practice-questions)
+- [Answer Key](#answer-key)
+
 - What recommender systems do and the data they use
 - Content-based, collaborative, matrix factorisation and neural approaches
 - How a large-scale pipeline (retrieval, ranking, re-ranking) is organised
@@ -28,7 +40,7 @@ A recommender **predicts which items a user will find relevant** and presents a 
 
 ![Item scores are sorted to give a ranked recommendation list.](/materials/Assets/Connectionist%20AI/Static/ranking-scores.svg)
 
-### Data Used
+### 1.1 Data Used
 | Type | Examples | Notes |
 |---|---|---|
 | **Explicit feedback** | Star ratings, likes, thumbs | Clear but scarce |
@@ -129,7 +141,7 @@ class MF(nn.Module):
 
 ![Separate networks encode user history and item features into vectors. Their similarity retrieves candidate items. Item vectors can be computed before the request.](/materials/Assets/Connectionist%20AI/Animated/rec-two-towers.svg)
 
-### Training Signals for Implicit Data
+### 2.5 Training Signals for Implicit Data
 - **Negative sampling:** treat observed interactions as positives and randomly sampled unobserved items as negatives.
 - **BPR (Bayesian Personalized Ranking):** learn that a clicked item should score higher than a random non-clicked one.
 - **Softmax / contrastive losses** over in-batch negatives, common in two-tower training.
@@ -175,7 +187,7 @@ Retrieval must be **fast**, ranking can be **more accurate and expensive**, and 
 
 ## 5. Evaluation
 
-### Offline Metrics (on held-out interactions)
+### 5.1 Offline Metrics (on held-out interactions)
 - **Precision@K:** share of the top K recommendations that are relevant.
   10 shown, 3 relevant → Precision@10 = **0.3**.
 - **Recall@K:** share of all relevant items found in the top K.
@@ -196,12 +208,12 @@ Retrieval must be **fast**, ranking can be **more accurate and expensive**, and 
 
 ![The chapter compares relevance patterns one,zero,one and one,one,zero. The first has DCG 1.5, the ideal has about 1.631, and their ratio is about 0.92.](/materials/Assets/Connectionist%20AI/Static/rec-ndcg.svg)
 
-### Online Metrics
+### 5.2 Online Metrics
 Click-through rate, conversion, watch time, retention, revenue, measured with **A/B tests**. Offline gains don't always translate online, so A/B testing is the final judge.
 
 ![Users are assigned at random to model A or B. The two groups' observed outcomes are compared over the same measurement period.](/materials/Assets/Connectionist%20AI/Static/rec-ab-test.svg)
 
-### Splitting Data
+### 5.3 Splitting Data
 Use a **time-based split** (train on the past, test on later interactions), or leave-last-out per user. Random splits leak future behaviour.
 
 ![For each user's chronological interactions, the last interaction is held out. Earlier interactions are used for training in this simplified leave-last-out example.](/materials/Assets/Connectionist%20AI/Static/rec-user-time-split.svg)

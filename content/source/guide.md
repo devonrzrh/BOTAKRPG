@@ -79,7 +79,7 @@ Start with the Python chapter. Maze scripts run in the game's Python worker usin
 
 The following are the supplied peer reviews. They are retained as review records; their recommendations are not claims that every source issue has been corrected. Original files are preserved unchanged.
 
-### Algorithm: Reviews
+### 1_Algorithm: Reviews
 
 # Algorithms Review
 
@@ -99,7 +99,7 @@ Status: Needs revision.
 
 
 
-### Data-Structures: Review2
+### 2_Data-Structures: Review2
 
 # Data Structures Review
 
@@ -118,7 +118,7 @@ I recommend these improvements:
 there is also a bit of unclear tree transitions and missing python guidance.
 
 
-### Data-Structures: Reviews
+### 2_Data-Structures: Reviews
 
 # Content Review: Data Structures
 
@@ -145,7 +145,7 @@ I have reviewed the Data Structures content, including the introduction, linear 
 
 The content is suitable for beginners and can be used in our learning module. Before the final submission, we can improve a few explanations and add more examples where needed. No major changes are required.
 
-### Connetionist-AI: Review1
+### 3_Connectionist-AI: Review1
 
 # Connectionist AI Peer Review
 
@@ -165,10 +165,9 @@ I used a separate AI learner walkthrough for Chapters 02, 06, and 09. It reached
 
 
 
-## Supplementary folders
+## Supplementary materials
 
-The supplied video, slide and Markdown test-bank indexes contain placeholders rather than additional teaching material.
-
-- [Video index](/materials/Content/Videos/Videos.md)
-- [Slide index](/materials/Content/PPT%20Slides/PPT%20Slides.md)
-- [Test index](/materials/Content/Test%20Bank/Test.md)
+- [Data Structures⁄Data Versioning](/materials/Content/Videos/Data%20Structures%E2%81%84Data%20Versioning.mp4)
+- [Reinforcement Learning](/materials/Content/Videos/Reinforcement%20Learning.mp4)
+- [Sequential Decisions](/materials/Content/Videos/Sequential%20Decisions.mp4)
+- [Test](/materials/Content/Test%20Bank/Test.md)

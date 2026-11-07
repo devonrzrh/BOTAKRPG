@@ -40,7 +40,7 @@ import {
   FolderSearch,
 } from "lucide-react";
 import DOMPurify from "dompurify";
-import { marked } from "marked";
+import { renderLessonMarkdown } from "./game/markdown";
 import { ClueLedger } from "./ui/ClueLedger";
 import { BookReader } from "./ui/BookReader";
 import rawContent from "./generated/content.json";
@@ -1284,9 +1284,7 @@ export default function App() {
                       className="markdown"
                       dangerouslySetInnerHTML={{
                         __html: DOMPurify.sanitize(
-                          marked.parse(currentLesson.body, {
-                            async: false,
-                          }) as string,
+                          renderLessonMarkdown(currentLesson.body),
                         ),
                       }}
                     />

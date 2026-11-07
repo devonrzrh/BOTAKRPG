@@ -1,6 +1,6 @@
 # Source curriculum coverage
 
-The imported snapshot contains **405 original files** (39 Markdown, 364 SVG, one PNG, one PDF; 4,127,594 bytes). Every file is copied unchanged into `public/materials/`, with SHA-256 checksums in `content/source-manifest.json`. `Source/` and `References/PythonWeb` are not modified or staged.
+The imported snapshot contains **407 original files** (38 Markdown, 364 SVG, one PNG, one PDF, three MP4 videos; 141,325,361 bytes). Every file is copied unchanged into `public/materials/`, with SHA-256 checksums in `content/source-manifest.json`. `Source/` and `References/PythonWeb` are not modified or staged.
 
 ## Playable coverage
 
@@ -14,7 +14,7 @@ All chapter prose, examples, diagrams and practice exercises remain in their boo
 
 There are **119 playable questions**: six existing questions, 31 chapter checkpoints, and 82 imported objective questions (40 true/false and 42 multiple choice, including two select-all questions). All reference a lesson for review and mastery. Chapter checkpoints cover topics missing from the PDF. The test-bank book contains all 95 questions, including the 13 open-ended prompts and model answers in disclosure sections. Written responses use personal notes and are self-assessed; no automatic free-text grading is claimed. The original illustrated PDF is also linked.
 
-The module guide retains the supplied outline and four peer review records. The video, slide and Markdown test-bank indexes are placeholders in the source, not missing imported media; their original files remain linked. README artwork and all diagrams are included in the archive. SVGs retain their authored dark/light styles, with the book requesting light colors for readable contrast. Reduced motion uses still editions under `public/materials-still/`.
+The module guide retains the supplied outline and four peer review records. Its supplementary links now include the three supplied videos and the Markdown test bank; empty placeholder indexes are omitted. Videos are linked original files, not downloaded during ordinary reading. README artwork and all diagrams are included in the archive. SVGs retain their authored dark/light styles, with the book requesting light colors for readable contrast. Reduced motion uses still editions under `public/materials-still/`.
 
 ## Editorial changes in the game edition
 
@@ -29,3 +29,5 @@ General Python examples are reading material; the maze worker exposes its existi
 Chapter IDs and bank IDs are stable. Existing bookmarks, notes, mastery and rewards keep their IDs. New saves mark `curriculumVersion: 2` and require the expanded branches before ECHO-7. Older completed-case saves retain their closure if all three original orientation activities were completed; no chapter completions are fabricated. Old claims are never awarded again. Imports still validate before replacing the existing save.
 
 Run `npm run source:import` to refresh from the supplied files. Poppler's `pdftotext` is needed only for this explicit import. It rebuilds the book snapshot, archive, still diagrams, manifest and authored encounters. `npm run content` recursively validates Markdown and references; ordinary development/builds need only the committed snapshot.
+
+Subject folders currently use `1_Algorithm`, `2_Data-Structures`, and `3_Connectionist-AI`. Import discovery accepts numbered subject folders and the former names, including the old AI spelling. Legacy links in the module outline are remapped in the playable edition. Lesson IDs, quest IDs, and prerequisites stay stable. Source chapter contents links target numbered headings in both reader modes; unique pre-numbering fragments are repaired without changing original downloads. Obsolete archive files are removed only when owned by the previous manifest.

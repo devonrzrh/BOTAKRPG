@@ -6,10 +6,10 @@ topic: structures
 summary: Chapter 10 · Data Versioning
 prerequisites:
   - source-ds-09
-source: Source/Content/Markdown/Data-Structures/10 data versioning.md
+source: Source/Content/Markdown/2_Data-Structures/10 data versioning.md
 ---
 
-# Data Versioning
+# Chapter 10: Data Versioning
 
 **Data versioning** is the practice of identifying and managing different states of data and recording how they relate. It lets us retrieve an earlier state, explain a change, and identify exactly which data an analysis used.
 
@@ -17,7 +17,21 @@ Data versioning is an application of data structures. A list can hold successive
 
 ![Saved revision sheets preserve the marks history; an earlier report still uses r1 and mean 75.](/materials/Assets/Data%20Structures/Static/versioning-overview.svg)
 
-## Learning outcomes
+## Learning Objectives
+## Contents
+
+- [Learning Objectives](#learning-objectives)
+- [1. Why keep earlier versions?](#1-why-keep-earlier-versions)
+- [2. Revision and release](#2-revision-and-release)
+- [3. The six data versioning principles](#3-the-six-data-versioning-principles)
+- [4. More than a sequence of edited files](#4-more-than-a-sequence-of-edited-files)
+- [5. How data structures organise version history](#5-how-data-structures-organise-version-history)
+- [6. Storing full snapshots or changes](#6-storing-full-snapshots-or-changes)
+- [7. Python example: preserve and retrieve snapshots](#7-python-example-preserve-and-retrieve-snapshots)
+- [8. A practical versioning workflow](#8-a-practical-versioning-workflow)
+- [9. Practice activities](#9-practice-activities)
+- [References](#references)
+
 
 After this topic, you should be able to:
 
@@ -29,7 +43,7 @@ After this topic, you should be able to:
 
 **Before starting:** review [linked lists](#lesson=source-ds-04), [trees](#lesson=source-ds-08), and [graphs](#lesson=source-ds-09). The Python example uses lists, dictionaries, loops, and functions.
 
-## Why keep earlier versions?
+## 1. Why keep earlier versions?
 
 Suppose a club records three students' quiz marks. Each student ID identifies one record.
 
@@ -49,7 +63,7 @@ In `r2`, the club corrects S02's mark. In `r3`, it adds S03's result. If each up
 
 A backup provides a recoverable copy. Versioning also identifies states and their relationships. A backup of only the latest file cannot explain which earlier state produced a result.
 
-## Revision and release
+## 2. Revision and release
 
 A **revision** is a changed instance of a dataset that is separately identified. At the technical level, a revision records a change in the **bitstream**, the sequence of bytes making up a digital object. Detecting that the bytes changed does not explain whether the content or only its representation changed. A **release** is a selected revision published for reuse through an editorial process. Not every revision becomes a release.
 
@@ -65,7 +79,7 @@ Here, `r2` is an internal correction. The club publishes `r3` as release `1.1` a
 
 The labels `1.0` and `1.1` are a local convention for this example. Teams should document what their labels mean. The significance of a data change depends on its intended use; a small numerical correction can have a large effect on a conclusion.
 
-## The six data versioning principles
+## 3. The six data versioning principles
 
 The six principles help identify changes, explain their significance, and trace the relationships between datasets.
 
@@ -86,7 +100,7 @@ Granularity includes identifying and versioning a collection and its constituent
 
 ![A collection folder contains Class A r2 and Class B r1; a table selects S02 from Class A r2.](/materials/Assets/Data%20Structures/Static/versioning-granularity.svg)
 
-## More than a sequence of edited files
+## 4. More than a sequence of edited files
 
 The Functional Requirements for Bibliographic Records (FRBR), now part of the IFLA Library Reference Model (LRM), provides a library-based framework for explaining relationships that ordinary revision numbers do not fully describe. It distinguishes four levels: Work, Expression, Manifestation, and Item.
 
@@ -109,11 +123,11 @@ A **checksum** is a value calculated from a file's bytes to help detect changes.
 
 **Metadata** describes data, such as its title, creator, and available formats. Correcting a catalogue description does not necessarily change the data itself. Catalogue changes and data revisions are distinct. Metadata versioning practices vary, and there is no consensus on implementing metadata versioning in aggregators. Make clear whether an identifier refers to the dataset or to its metadata record.
 
-## How data structures organise version history
+## 5. How data structures organise version history
 
 The structures below are implementation choices for learning. The appropriate structure depends on the operations a system needs.
 
-### Lists and links: a linear history
+### 5.1 Lists and links: a linear history
 
 A list can store revisions in order: `[r1, r2, r3]`. A separate parent reference can link each revision to its predecessor, like links between nodes in a linked list.
 
@@ -123,7 +137,7 @@ A list can store revisions in order: `[r1, r2, r3]`. A separate parent reference
 
 This is useful for displaying history or tracing how the current state arose. Reaching a much older revision by following links requires visiting the intervening revisions. Storing a history in a list does not automatically make every revision's data immutable: the contents must also be protected from accidental changes.
 
-### Dictionaries: lookup by identifier
+### 5.2 Dictionaries: lookup by identifier
 
 A **dictionary** maps a key to a value. For a version store, the key can be `r2` and the value can contain its parent ID, data, author, and change note.
 
@@ -137,7 +151,7 @@ A **dictionary** maps a key to a value. For a version store, the key can be `r2`
 
 A hash-based dictionary provides expected constant-time lookup by revision ID. Copying or reading the entire stored dataset still takes time proportional to its size. Fast identification and fast retrieval of all data are different operations.
 
-### Trees and graphs: branches and merges
+### 5.3 Trees and graphs: branches and merges
 
 A **branch** lets someone develop a different line of changes from an existing revision. If each revision has at most one parent, a branching history can form a rooted tree. A **merge** combines lines of work and can give a revision more than one parent. The following is a separate example, using IDs `b1` to `b4` rather than the earlier linear history.
 
@@ -155,7 +169,7 @@ The branching diagram follows changes forward from parent to child. The dictiona
 
 A graph records relationships; it does not decide whether a merge is correct. If two branches change S02's mark to different values, the conflict needs a decision based on evidence. Parent links also provide only part of provenance: record the source, processing method, and responsible person where relevant.
 
-## Storing full snapshots or changes
+## 6. Storing full snapshots or changes
 
 A **snapshot** stores the complete dataset state. A **delta** stores changes relative to another state, such as “set S02 to 85.” These are storage strategies, separate from the six principles.
 
@@ -175,7 +189,7 @@ If every full snapshot contains about `n` records and there are `v` revisions, f
 
 **Expected answer.** No. The missing change can make reconstruction incomplete unless another snapshot or recovery copy supplies the needed state.
 
-## Python example: preserve and retrieve snapshots
+## 7. Python example: preserve and retrieve snapshots
 
 This in-memory example implements the linear history from the first table. Each revision stores a full snapshot. Dictionaries make revision lookup simple; parent IDs record the chain. All dataset values here are integers, so a shallow dictionary copy is sufficient.
 
@@ -242,7 +256,7 @@ Without `data.copy()` when saving, each stored revision would refer to the same 
 
 This example loses its data when the program stops and permits direct edits to `versions`. A real system needs durable storage and controls that preserve recorded history. The example demonstrates snapshots and references, rather than a complete version-control service.
 
-## A practical versioning workflow
+## 8. A practical versioning workflow
 
 A small student project can follow these steps.
 
@@ -259,15 +273,15 @@ For an AI project, record the training-data version alongside the processing cod
 
 ![An experiment sheet records its training-data version, code revision, settings, and outputs.](/materials/Assets/Data%20Structures/Static/versioning-ai-lineage.svg)
 
-## Practice activities
+## 9. Practice activities
 
-### 1. Trace the earlier state
+### 9.1 Trace the earlier state
 
 Using the marks table, a report says its mean is `75`. Another student recalculates using `r3` and gets approximately `81.67`. Explain the difference and identify what the report should record.
 
 **Answer.** The report used `r1`, before S02's correction and S03's addition. The calculations use different inputs. The report should identify `r1` or release `1.0`, the records included, and the calculation method so someone can repeat it.
 
-### 2. Classify the relationship
+### 9.2 Classify the relationship
 
 For each case, explain what changed:
 
@@ -278,23 +292,24 @@ For each case, explain what changed:
 
 **Answers.** (1) A data revision; the team separately decides whether to publish a new release. (2) A new manifestation of the same data product. (3) Another item, or mirrored copy, which should refer to the authoritative source. (4) A metadata correction; distinguish the metadata record from the data object rather than assuming both changed.
 
-### 3. Choose a structure
+### 9.3 Choose a structure
 
 A project needs to retrieve a revision by ID and also record a merge with two parents. Which structures from this chapter could it combine?
 
 **Answer.** Use a dictionary keyed by revision ID for lookup and store a list of parent IDs in each revision record. Those parent lists represent the edges of a directed history graph. A single predecessor link cannot represent both parents of the merge.
 
-### 4. Find the bug
+### 9.4 Find the bug
 
 A programmer replaces `"data": data.copy()` with `"data": data` in `save_version`. What will `get_data("r1")` contain after all three saves?
 
 **Answer.** `{'S01': 70, 'S02': 85, 'S03': 90}`. All revisions reference the same dictionary, which was changed in place. Copying only when retrieving cannot repair the already altered history.
 
-### 5. Compare storage choices
+### 9.5 Compare storage choices
 
 A dataset is about 1 GB and has 100 saved states. Each change after the initial state is about 1 MB. Estimate storage for full snapshots and for a base plus 99 deltas. Ignore compression and metadata; use `1 GB = 1,000 MB` for this exercise. Explain one tradeoff.
 
 **Answer.** Full snapshots use approximately `100 GB`. A base plus deltas uses `1,000 + 99 = 1,099 MB`, or approximately `1.099 GB`. Deltas save space under these assumptions, but retrieving a later state may require replaying many changes. A periodic snapshot can reduce that work.
+
 
 ## References
 

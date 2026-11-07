@@ -6,12 +6,17 @@ topic: structures
 summary: Chapter 2 · Linear Data Structures
 prerequisites:
   - source-ds-01
-source: Source/Content/Markdown/Data-Structures/02 linear data structures.md
+source: Source/Content/Markdown/2_Data-Structures/02 linear data structures.md
 ---
 
-# Linear Data Structures
+# Chapter 2: Linear Data Structures
+## Contents
 
-## What are linear data structures?
+- [1. What are linear data structures?](#1-what-are-linear-data-structures)
+- [2. Characteristics](#2-characteristics)
+- [3. Examples of Linear Data Structures](#3-examples-of-linear-data-structures)
+- [References](#references)
+## 1. What are linear data structures?
 
 A linear data structure stores items in a sequence. **Traversal** means visiting the items in a data structure. In a linear structure, you can visit them in sequence.
 
@@ -19,7 +24,7 @@ A simple example is a queue of people waiting to buy tickets. Each person has so
 
 ![Nicky is at the front of the ticket line, Darren is in the middle, and Neil is at the rear.](/materials/Assets/Data%20Structures/Animated/ticket-queue.svg)
 
-## Characteristics
+## 2. Characteristics
 
 Elements are arranged sequentially.
 - A nonempty sequence has a logical first and last element. A circular implementation can link the last element back to the first.
@@ -30,7 +35,7 @@ Elements are arranged sequentially.
 
 ![Items in a linear sequence.](/materials/Assets/Data%20Structures/Static/linear-order.svg)
 
-## Examples of Linear Data Structures
+## 3. Examples of Linear Data Structures
 
 - [Arrays](#lesson=source-ds-03)
 
@@ -47,6 +52,7 @@ Elements are arranged sequentially.
 - [Queues](#lesson=source-ds-06)
 
   ![A queue with Nicky at the front and Darren at the rear.](/materials/Assets/Data%20Structures/Static/queue.svg)
+
 
 ## References
 

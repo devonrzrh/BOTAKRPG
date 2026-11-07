@@ -16,13 +16,17 @@ import {
   activityUnlocked,
 } from "../src/game/investigation";
 import { createBattle, selectSkill, isCorrect } from "../src/game/combat";
+import { renderLessonMarkdown } from "../src/game/markdown";
 const content = validateContent(raw);
 const questions = content.entities.filter(
   (e): e is Question => e.type === "question",
 );
 it("preserves every supplied file byte-for-byte in the distributable archive", async () => {
   expect(manifest.chapters).toHaveLength(31);
-  expect(manifest.files).toHaveLength(405);
+  expect(manifest.files.length).toBeGreaterThanOrEqual(405);
+  expect(new Set(manifest.files.map((file) => file.path)).size).toBe(
+    manifest.files.length,
+  );
   await Promise.all(
     manifest.files.map(async (file) => {
       const bytes = await readFile(`public/materials/${file.path}`);
@@ -31,6 +35,57 @@ it("preserves every supplied file byte-for-byte in the distributable archive", a
       );
     }),
   );
+});
+it("resolves chapter contents anchors and repaired module-guide links", async () => {
+  for (const chapter of manifest.chapters) {
+    const lesson = content.entities.find(
+      (e) => e.type === "lesson" && e.id === chapter.id,
+    )!;
+    if (lesson.type !== "lesson") throw new Error(chapter.id);
+    const rendered = renderLessonMarkdown(lesson.body);
+    const ids = new Set(
+      Array.from(rendered.matchAll(/\sid="([^"]+)"/g), (match) => match[1]),
+    );
+    for (const link of rendered.matchAll(/href="#(?!lesson=)([^"]+)"/g)) {
+      expect(
+        ids.has(decodeURIComponent(link[1])),
+        `${chapter.id}: #${link[1]}`,
+      ).toBe(true);
+    }
+  }
+  const guide = content.entities.find((e) => e.id === "source-guide")!;
+  if (guide.type !== "lesson") throw new Error("Missing guide");
+  expect(guide.body).not.toMatch(
+    /\]\((?:Algorithm|Data-Structures|Connetionist-AI)\//,
+  );
+  for (const match of guide.body.matchAll(/\]\((\/materials\/[^)]+)\)/g))
+    expect((await stat(`public${decodeURI(match[1])}`)).isFile()).toBe(true);
+});
+it("keeps the stable chapter IDs while following the numbered source folders", () => {
+  expect(manifest.chapters.map((chapter) => chapter.id)).toEqual([
+    ...Array.from(
+      { length: 11 },
+      (_, index) => `source-alg-${String(index).padStart(2, "0")}`,
+    ),
+    ...Array.from(
+      { length: 10 },
+      (_, index) => `source-ds-${String(index + 1).padStart(2, "0")}`,
+    ),
+    ...Array.from(
+      { length: 10 },
+      (_, index) => `source-ai-${String(index + 1).padStart(2, "0")}`,
+    ),
+  ]);
+  for (const chapter of manifest.chapters) {
+    const folder = chapter.id.startsWith("source-alg-")
+      ? "1_Algorithm"
+      : chapter.id.startsWith("source-ds-")
+        ? "2_Data-Structures"
+        : "3_Connectionist-AI";
+    expect(chapter.file, chapter.id).toMatch(
+      new RegExp(`^Content/Markdown/${folder}/`),
+    );
+  }
 });
 it("includes every chapter, practice/code section, and resolvable local illustration or lesson link", async () => {
   for (const chapter of manifest.chapters) {

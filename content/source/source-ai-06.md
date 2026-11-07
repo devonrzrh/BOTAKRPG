@@ -6,14 +6,31 @@ topic: ai
 summary: Chapter 6 · Probabilistic Forecasting
 prerequisites:
   - source-ai-05
-source: Source/Content/Markdown/Connetionist-AI/06 probabilistic forecasting.md
+source: Source/Content/Markdown/3_Connectionist-AI/06 probabilistic forecasting.md
 ---
 
 # Chapter 6: Probabilistic Forecasting
 
 **Level:** Beginner to Intermediate | **Reading time:** ~45 minutes
 
-## What you will learn
+## Learning Objectives
+## Contents
+
+- [Learning Objectives](#learning-objectives)
+- [1. Point vs Probabilistic Forecasts](#1-point-vs-probabilistic-forecasts)
+- [2. Where Does Uncertainty Come From?](#2-where-does-uncertainty-come-from)
+- [3. Core Concepts](#3-core-concepts)
+- [4. Three Ways Neural Networks Forecast Probabilistically](#4-three-ways-neural-networks-forecast-probabilistically)
+- [5. The Pinball (Quantile) Loss](#5-the-pinball-quantile-loss)
+- [6. A Gaussian Forecasting Head in PyTorch](#6-a-gaussian-forecasting-head-in-pytorch)
+- [7. Evaluating Probabilistic Forecasts](#7-evaluating-probabilistic-forecasts)
+- [8. Conformal Prediction (Distribution-Free Calibration)](#8-conformal-prediction-distribution-free-calibration)
+- [9. From Probabilistic Forecast to Decision (The Newsvendor Idea)](#9-from-probabilistic-forecast-to-decision-the-newsvendor-idea)
+- [10. Common Pitfalls](#10-common-pitfalls)
+- [Key Takeaways](#key-takeaways)
+- [Practice Questions](#practice-questions)
+- [Answer Key](#answer-key)
+
 - Why a single number is not enough, and what a forecast distribution is
 - Quantiles, prediction intervals and how to read them
 - Three ways neural networks produce probabilistic forecasts
@@ -61,7 +78,7 @@ Further sources: measurement error, unknown future covariates (e.g. tomorrow's w
 
 ![For a normal distribution with mean one hundred and standard deviation ten, P10 is about 87.2 and P90 about 112.8. The interval between them contains eighty percent of probability.](/materials/Assets/Connectionist%20AI/Static/pf-quantiles.svg)
 
-### Intervals for a Gaussian Forecast
+### 3.1 Intervals for a Gaussian Forecast
 If the forecast is Normal with mean μ and standard deviation σ:
 
 | Interval | Range |
@@ -192,7 +209,7 @@ class GaussianForecaster(nn.Module):
 
 A good probabilistic forecast should be **calibrated** and **sharp**.
 
-### Calibration (Reliability)
+### 7.1 Calibration (Reliability)
 Do stated probabilities match reality?
 - If you issue many **80% intervals**, about **80%** of actual values should fall inside. This is the **empirical coverage**.
 - Coverage below target → **overconfident** (intervals too narrow).
@@ -203,12 +220,12 @@ Do stated probabilities match reality?
 
 ![The diagonal represents agreement between nominal and observed interval coverage. An illustrative overconfident model has observed coverage below the diagonal.](/materials/Assets/Connectionist%20AI/Static/pf-reliability.svg)
 
-### Sharpness
+### 7.2 Sharpness
 Among calibrated forecasts, **narrower intervals are better** because they are more informative. For a nonnegative target, an interval from zero to infinity has 100% coverage. It is not a calibrated 80% or 90% interval and is uninformative.
 
 ![Each panel shows ten illustrative prediction intervals and observed values. Both have eight hits and two misses. The narrower intervals therefore achieve the same empirical coverage with greater sharpness in this toy comparison.](/materials/Assets/Connectionist%20AI/Static/pf-sharpness.svg)
 
-### Metrics
+### 7.3 Metrics
 | Metric | What it measures |
 |---|---|
 | **Pinball / quantile loss** | Accuracy of each quantile |

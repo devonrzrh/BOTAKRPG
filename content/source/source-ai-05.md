@@ -6,7 +6,7 @@ topic: ai
 summary: Chapter 5 · Demand Forecasting and Time-Series Forecasting
 prerequisites:
   - source-ai-04
-source: Source/Content/Markdown/Connetionist-AI/05 demand and time series
+source: Source/Content/Markdown/3_Connectionist-AI/05 demand and time series
   forecasting.md
 ---
 
@@ -14,7 +14,26 @@ source: Source/Content/Markdown/Connetionist-AI/05 demand and time series
 
 **Level:** Beginner | **Reading time:** ~50 minutes
 
-## What you will learn
+## Learning Objectives
+## Contents
+
+- [Learning Objectives](#learning-objectives)
+- [1. What Is Time-Series Forecasting?](#1-what-is-time-series-forecasting)
+- [2. Anatomy of a Time Series](#2-anatomy-of-a-time-series)
+- [3. Key Statistical Ideas](#3-key-statistical-ideas)
+- [4. Framing Forecasting as Supervised Learning](#4-framing-forecasting-as-supervised-learning)
+- [5. Forecast Horizon and Multi-Step Strategies](#5-forecast-horizon-and-multi-step-strategies)
+- [6. Models](#6-models)
+- [7. An LSTM Forecaster in PyTorch](#7-an-lstm-forecaster-in-pytorch)
+- [8. Preparing and Splitting Data Correctly](#8-preparing-and-splitting-data-correctly)
+- [9. Evaluation Metrics](#9-evaluation-metrics)
+- [10. Special Situations](#10-special-situations)
+- [11. From Forecast to Decision](#11-from-forecast-to-decision)
+- [12. Common Pitfalls](#12-common-pitfalls)
+- [Key Takeaways](#key-takeaways)
+- [Practice Questions](#practice-questions)
+- [Answer Key](#answer-key)
+
 - What a time series is, and what demand forecasting is for
 - Trend, seasonality, stationarity, autocorrelation
 - How to turn forecasting into a supervised learning problem
@@ -68,7 +87,7 @@ Multiplicative patterns can be made additive by taking the **logarithm**.
 
 ## 3. Key Statistical Ideas
 
-### Stationarity
+### 3.1 Stationarity
 A series is **stationary** if its statistical properties (mean, variance, autocorrelation) don't change over time. Classic models like ARIMA rely on it: the "I" (integrated) step differences the series until it is stationary. Make a series more stationary by:
 - **Differencing:** `y_t − y_(t−1)` (removes trend), or `y_t − y_(t−7)` (removes weekly seasonality)
 - **Log transform:** stabilises growing variance
@@ -77,7 +96,7 @@ Neural networks don't strictly require stationarity but still **train better on 
 
 ![The increasing series 10,12,14,16,18 becomes four constant increments of two when adjacent values are subtracted.](/materials/Assets/Connectionist%20AI/Static/ts-differencing.svg)
 
-### Autocorrelation
+### 3.2 Autocorrelation
 How strongly a series correlates with its own **lagged** values. A strong correlation at lag 7 in daily data signals weekly seasonality. Plotting the **autocorrelation function (ACF)** helps you choose which lags to feed a model.
 
 ![This autocorrelation is calculated from six periods of a seven-day sinusoidal series. Peaks at lags seven and fourteen reflect weekly repetition. Finite-sample autocorrelation peaks decrease with lag.](/materials/Assets/Connectionist%20AI/Static/ts-seasonal-acf.svg)
@@ -111,14 +130,14 @@ X, y = make_windows(np.array([10, 12, 13, 15, 14, 16, 18]), window=3)
 
 ![The three-step input window moves over the exact sequence from the chapter. Each next value, in green, is the one-step target.](/materials/Assets/Connectionist%20AI/Animated/ts-sliding-window.svg)
 
-### Useful Features
+### 4.1 Useful Features
 - **Lag features:** value 1 day ago, 7 days ago, 365 days ago
 - **Rolling statistics:** 7-day mean, 28-day standard deviation
 - **Calendar features:** day of week, month, week of year, holiday flag (often encoded cyclically with sine and cosine)
 - **Known future inputs:** planned promotions, prices, holidays
 - **Static features:** product category, store location, size
 
-### Cyclical Encoding (for features like hour or month)
+### 4.2 Cyclical Encoding (for features like hour or month)
 ```python
 hour_sin = np.sin(2*np.pi*hour/24)
 hour_cos = np.cos(2*np.pi*hour/24)
@@ -161,7 +180,7 @@ This tells the network that hour 23 and hour 0 are close.
 
 > **Honest advice:** for a single short series, simple statistical methods are often as good or better than neural networks. Neural networks win when you have **many related series** (thousands of products or stores) and rich covariates. One **global model** trained across all series can share patterns, handle new products and use the covariates.
 
-### Global vs Local Models
+### 6.1 Global vs Local Models
 - **Local:** one model per series. Flexible but data-hungry per series, and impractical for thousands of series.
 - **Global:** one model for all series, with series identity as an input (often an embedding). Shares strength across series.
 
@@ -215,7 +234,7 @@ train_s, val_s = (train - mu)/sd, (val - mu)/sd
 
 ![On an illustrative stock-out day, observed sales stop at eight available units. Additional desired purchases are unobserved, so sales alone cannot reveal total demand.](/materials/Assets/Connectionist%20AI/Static/ts-stockout.svg)
 
-### Rolling-Origin (Walk-Forward) Validation
+### 8.1 Rolling-Origin (Walk-Forward) Validation
 A single split can be misleading. Instead, repeatedly train on a growing past and test on the next block:
 
 ```
@@ -252,23 +271,23 @@ Example: actual = `[100, 120, 90]`, forecast = `[110, 115, 100]`, errors (foreca
 
 ## 10. Special Situations
 
-### Intermittent (Lumpy) Demand
+### 10.1 Intermittent (Lumpy) Demand
 Spare parts or slow sellers have many zero-sales days. Standard models and MAPE fail. Use **Croston's method** (models demand size and interval separately), count distributions (Poisson, negative binomial), or probabilistic neural models (Chapter 6).
 
 ![Twelve illustrative days contain nine zero-demand days and three nonzero days. Separate gaps and nonzero sizes help explain intermittent demand.](/materials/Assets/Connectionist%20AI/Static/ts-intermittent.svg)
 
-### Hierarchies
+### 10.2 Hierarchies
 Sales roll up: SKU → category → store → region → total. Forecasts at different levels should **add up consistently**. Use **hierarchical reconciliation** (e.g. top-down, bottom-up, MinT).
 
 ![SKU forecasts of ten and twenty sum to category thirty. A second category of forty makes a total of seventy.](/materials/Assets/Connectionist%20AI/Static/ts-hierarchy.svg)
 
-### New Products (Cold Start)
+### 10.3 New Products (Cold Start)
 No history. Use attributes (category, price, brand) and "similar product" histories, or global models with embeddings.
 
-### Promotions and Price Effects
+### 10.4 Promotions and Price Effects
 Include price, discount depth and promo flags as covariates, and consider **cannibalisation** (a promotion on one item reduces others).
 
-### Forecast Value Added (FVA)
+### 10.5 Forecast Value Added (FVA)
 Measure whether each step (statistical model, neural network, human adjustment) actually improves on the previous one. Many manual overrides make forecasts worse.
 
 ## 11. From Forecast to Decision

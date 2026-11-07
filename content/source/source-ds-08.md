@@ -6,24 +6,56 @@ topic: structures
 summary: Chapter 8 · Trees
 prerequisites:
   - source-ds-07
-source: Source/Content/Markdown/Data-Structures/08 trees.md
+source: Source/Content/Markdown/2_Data-Structures/08 trees.md
 ---
 
-# Trees
+# Chapter 8: Trees
 
 A tree is a hierarchical structure made of **nodes** (items) connected by **edges** (links). The top node is the **root**. A node connected below another node is its **child**; the node above it is its **parent**.
 
 Trees can represent a folder system: a folder can contain other folders, and those folders can contain more folders or files. There is one path from the root to each node.
 
 ![A folder tree with the path from Course to notes.md highlighted.](/materials/Assets/Data%20Structures/Animated/folder-tree.svg)
+## Contents
 
-## Binary trees
+- [1. Binary trees](#1-binary-trees)
+- [2. Binary search trees](#2-binary-search-trees)
+- [3. Finding the smallest, largest, and next keys](#3-finding-the-smallest-largest-and-next-keys)
+- [4. Deleting a key](#4-deleting-a-key)
+- [5. Tree traversal](#5-tree-traversal)
+- [6. How tree shape affects performance](#6-how-tree-shape-affects-performance)
+- [7. Choosing a structure](#7-choosing-a-structure)
+- [Practice](#practice)
+- [8. Application](#8-application)
+- [9. Python example](#9-python-example)
+- [References](#references)
+
+## Practice
+
+Start with the original tree in the diagram. Insert `9`, then search for `9` in the updated tree. Which keys do you compare during the search? What order does an inorder traversal produce?
+
+**Expected answer.** Insert `9` as the left child of `10` because `9 > 8` and `9 < 10`. The search compares `8`, `10`, then `9`. The inorder traversal produces `1, 3, 8, 9, 10`.
+
+**Find the error.** Suppose someone adds `12` as the right child of `3` in the original tree. Which node's ordering rule does this break? Where should `12` go?
+
+**Expected answer.** It breaks the rule at `8`. Every key below its left child must be smaller than `8`. Insert `12` to the right of `10`.
+
+**Delete the root.** Start with the tree containing `1, 3, 6, 7, 8, 10` in the deletion example. Delete `8` using its successor. Draw the new tree and give its inorder order.
+
+**Expected answer.** `10` is the only key in `8`'s right subtree, so it becomes the root. The subtree rooted at `3` remains its left subtree. The new root has no right child. Inorder gives `1, 3, 6, 7, 10`.
+
+**Compare insertion orders.** Build one BST by inserting `1, 3, 6, 8, 10` in that order. Build a second BST by inserting `6, 3, 8, 1, 10`. Search for `10` in both. How many keys do you compare?
+
+**Expected answer.** The first tree is a chain, so the search checks all five keys. The second tree checks three keys along `6 → 8 → 10`. Both trees hold the same keys and give the same inorder result.
+
+
+## 1. Binary trees
 
 A **binary tree** is a tree in which each node has at most two children, commonly called the left child and right child.
 
 ![An unordered binary tree has root 8 with left child 10 and right child 3.](/materials/Assets/Data%20Structures/Static/binary-tree-unordered.svg)
 
-## Binary search trees
+## 2. Binary search trees
 
 A **binary search tree** (BST) orders its nodes by **key**, a value used for comparisons, such as a student ID. Each key appears only once in these examples.
 
@@ -47,7 +79,7 @@ Putting `9` to the right of `3` in the diagram would break the rule at `8`. The 
 
    ![Before and after inserting 6 as the right child of 3.](/materials/Assets/Data%20Structures/Animated/bst-insert.svg)
 
-## Finding the smallest, largest, and next keys
+## 3. Finding the smallest, largest, and next keys
 
 - **Smallest key.** Start at the root and follow left links until there is no left child. In this tree, the path ends at `1`.
 
@@ -69,7 +101,7 @@ The **successor** is the next larger key in sorted order.
 
 In the original tree, `3` is the left child of `8` and has no right subtree, so its successor is `8`. The largest key has no successor.
 
-## Deleting a key
+## 4. Deleting a key
 
 First find the node. In the examples below, each deletion starts from the same tree, which extends the original diagram by inserting `6` and then `7`.
 
@@ -87,7 +119,7 @@ For the two-child case, look for the smallest key in `3`'s right subtree. That i
 
 After deleting `3`, `6` takes its place and `7` fills the old position of `6`.
 
-## Tree traversal
+## 5. Tree traversal
 
 **Traversal** means visiting the nodes in a tree. An **inorder traversal** repeats these steps at each node and skips empty links.
 
@@ -99,7 +131,7 @@ In the diagram, the left subtree gives `1, 3`, the root gives `8`, and the right
 
 ![The BST is labeled with visit numbers. Inorder visits 1 first, then 3, then root 8, and finally 10.](/materials/Assets/Data%20Structures/Animated/bst-inorder.svg)
 
-## How tree shape affects performance
+## 6. How tree shape affects performance
 
 A **leaf** is a node with no children. The **height** is the number of nodes on the longest path from the root to a leaf.
 
@@ -109,38 +141,20 @@ Search, insertion, and deletion take `O(h)` time in the worst case, where `h` is
 
 An **AVL tree** is one kind of BST that restores balance after insertions and deletions.
 
-## Choosing a structure
+## 7. Choosing a structure
 
 Imagine a library that stores books by numeric ID.
 
 - **Balanced BST.** Use it when staff often add or remove books. Finding, adding, or removing a book takes `O(log n)` time. Listing all books in ID order takes `O(n)`.
 - **Sorted array.** Use it when the catalog rarely changes and staff often look up books by position. Reading by position takes `O(1)`, and searching by ID takes `O(log n)`. Inserting or deleting in the middle can require shifting `O(n)` entries.
 
-## Practice
-
-Start with the original tree in the diagram. Insert `9`, then search for `9` in the updated tree. Which keys do you compare during the search? What order does an inorder traversal produce?
-
-**Expected answer.** Insert `9` as the left child of `10` because `9 > 8` and `9 < 10`. The search compares `8`, `10`, then `9`. The inorder traversal produces `1, 3, 8, 9, 10`.
-
-**Find the error.** Suppose someone adds `12` as the right child of `3` in the original tree. Which node's ordering rule does this break? Where should `12` go?
-
-**Expected answer.** It breaks the rule at `8`. Every key below its left child must be smaller than `8`. Insert `12` to the right of `10`.
-
-**Delete the root.** Start with the tree containing `1, 3, 6, 7, 8, 10` in the deletion example. Delete `8` using its successor. Draw the new tree and give its inorder order.
-
-**Expected answer.** `10` is the only key in `8`'s right subtree, so it becomes the root. The subtree rooted at `3` remains its left subtree. The new root has no right child. Inorder gives `1, 3, 6, 7, 10`.
-
-**Compare insertion orders.** Build one BST by inserting `1, 3, 6, 8, 10` in that order. Build a second BST by inserting `6, 3, 8, 1, 10`. Search for `10` in both. How many keys do you compare?
-
-**Expected answer.** The first tree is a chain, so the search checks all five keys. The second tree checks three keys along `6 → 8 → 10`. Both trees hold the same keys and give the same inorder result.
-
-## Application
+## 8. Application
 
 Imagine Glen is looking up book `10` in a library catalog. The catalog stores book IDs in a binary search tree. Glen starts at `8` and follows the right branch because `10` is larger. That comparison lets him skip the entire left branch.
 
 ![Look up a library book by ID.](/materials/Assets/Data%20Structures/Animated/application-library.svg)
 
-## Python example
+## 9. Python example
 
 Build the BST from the diagram by inserting one key at a time. Each call to `insert` returns the root of the updated subtree. The inorder function visits the keys in sorted order.
 
@@ -199,6 +213,7 @@ False
 8
 10
 ```
+
 
 ## References
 

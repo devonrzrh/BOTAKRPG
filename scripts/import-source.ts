@@ -1,4 +1,4 @@
-import { readFile, readdir, mkdir, writeFile, cp } from "node:fs/promises";
+import { readFile, readdir, mkdir, writeFile, cp, rm } from "node:fs/promises";
 import { createHash } from "node:crypto";
 import { execFileSync } from "node:child_process";
 import path from "node:path";
@@ -6,11 +6,44 @@ import { stringify } from "yaml";
 
 // Explicit refresh only. Builds consume the committed Markdown snapshot.
 const root = "Source";
-const groups = [
+const groupSpecs = [
   ["Algorithm", "algorithms", "alg"],
   ["Data-Structures", "structures", "ds"],
-  ["Connetionist-AI", "ai", "ai"],
+  ["Connectionist-AI", "ai", "ai"],
 ] as const;
+const folderKey = (name: string) =>
+  name
+    .replace(/^\d+[_ -]+/, "")
+    .toLowerCase()
+    .replace("connetionist", "connectionist");
+const subjectFolders = (
+  await readdir(`${root}/Content/Markdown`, { withFileTypes: true })
+)
+  .filter((entry) => entry.isDirectory())
+  .map((entry) => entry.name);
+const groups = groupSpecs.map(([subject, topic, prefix]) => {
+  const matches = subjectFolders.filter(
+    (folder) => folderKey(folder) === folderKey(subject),
+  );
+  if (matches.length !== 1)
+    throw new Error(
+      `Source/Content/Markdown: expected one folder for ${subject}, found ${matches.length}. Check numbered subject folder names.`,
+    );
+  return [matches[0], topic, prefix] as const;
+});
+const sourcePath = (file: string) =>
+  file.replace(
+    /^(Content\/Markdown\/)([^/]+)(\/)/,
+    (original, base, folder, slash) => {
+      const match = groups.find(
+        ([candidate]) => folderKey(candidate) === folderKey(folder),
+      );
+      return match ? `${base}${match[0]}${slash}` : original;
+    },
+  );
+const previousManifest = JSON.parse(
+  await readFile("content/source-manifest.json", "utf8"),
+) as { files: { path: string }[] };
 export const sourceId = (prefix: string, file: string) =>
   `source-${prefix}-${file.match(/^\d+/)![0]}`;
 await mkdir("content/source", { recursive: true });
@@ -33,16 +66,17 @@ for (const [folder, topic, prefix] of groups) {
     chapters.push({ id, title, topic, file: `${directory}/${file}` });
   }
 }
-for (const chapter of chapters) {
-  let body = await readFile(`${root}/${chapter.file}`, "utf8");
-  body = body.replace(
+function rewriteLinks(body: string, origin: string) {
+  return body.replace(
     /(!?\[[^\]]*\]\()([^\s)]+)(\))/g,
     (_, before, href, after) => {
       if (/^(https?:|#|mailto:)/.test(href)) return before + href + after;
-      const resolved = path.posix.normalize(
-        path.posix.join(
-          path.posix.dirname(chapter.file),
-          decodeURIComponent(href.split("#")[0]),
+      const resolved = sourcePath(
+        path.posix.normalize(
+          path.posix.join(
+            path.posix.dirname(origin),
+            decodeURIComponent(href.split("#")[0]),
+          ),
         ),
       );
       return (
@@ -53,6 +87,12 @@ for (const chapter of chapters) {
         after
       );
     },
+  );
+}
+for (const chapter of chapters) {
+  let body = rewriteLinks(
+    await readFile(`${root}/${chapter.file}`, "utf8"),
+    chapter.file,
   );
   // Correct concrete errors called out by the supplied reviews in the game edition.
   // The downloadable originals stay byte-for-byte intact.
@@ -109,27 +149,36 @@ let outline = await readFile(
   `${root}/Content/Markdown/Module Outline.md`,
   "utf8",
 );
-outline = outline.replace(
-  /(\[[^\]]*\]\()([^\s)]+)(\))/g,
-  (_, before, href, after) => {
-    const target = lookup.get(
-      path.posix.normalize(`Content/Markdown/${decodeURIComponent(href)}`),
-    );
-    return before + (target ? `#lesson=${target}` : href) + after;
-  },
-);
+outline = rewriteLinks(outline, "Content/Markdown/Module Outline.md");
 const supporting: string[] = [];
 for (const [folder] of groups)
   for (const file of (
     await readdir(`${root}/Content/Markdown/${folder}`)
   ).filter((f) => !/^\d/.test(f))) {
     supporting.push(
-      `### ${folder}: ${file.replace(/\.md$/, "")}\n\n${await readFile(`${root}/Content/Markdown/${folder}/${file}`, "utf8")}`,
+      `### ${folder}: ${file.replace(/\.md$/, "")}\n\n${rewriteLinks(await readFile(`${root}/Content/Markdown/${folder}/${file}`, "utf8"), `Content/Markdown/${folder}/${file}`)}`,
     );
   }
+const supplementary: string[] = [];
+for (const directory of [
+  "Content/Videos",
+  "Content/PPT Slides",
+  "Content/Test Bank",
+]) {
+  for (const entry of (
+    await readdir(`${root}/${directory}`, { withFileTypes: true })
+  ).sort((a, b) => a.name.localeCompare(b.name))) {
+    if (!entry.isFile()) continue;
+    const file = `${directory}/${entry.name}`;
+    if (!(await readFile(`${root}/${file}`)).length) continue;
+    supplementary.push(
+      `- [${entry.name.replace(/\.[^.]+$/, "")}](/materials/${encodeURI(file)})`,
+    );
+  }
+}
 await writeFile(
   "content/source/guide.md",
-  `---\n${stringify({ type: "lesson", id: "source-guide", title: "Module guide and review notes", topic: "algorithms", summary: "Curriculum map, source reviews and original resources", source: "Source/Content/Markdown/Module Outline.md" })}---\n\n${outline}\n\n## Reading and running examples\n\nStart with the Python chapter. Maze scripts run in the game's Python worker using its maze API. General examples may use normal Python; PyTorch examples need a separate Python environment with PyTorch installed. The maze worker does not provide PyTorch or arbitrary application data.\n\n[Full test bank](#lesson=source-test-bank)\n\n## Source review notes\n\nThe following are the supplied peer reviews. They are retained as review records; their recommendations are not claims that every source issue has been corrected. Original files are preserved unchanged.\n\n${supporting.join("\n\n")}\n\n## Supplementary folders\n\nThe supplied video, slide and Markdown test-bank indexes contain placeholders rather than additional teaching material.\n\n- [Video index](/materials/Content/Videos/Videos.md)\n- [Slide index](/materials/Content/PPT%20Slides/PPT%20Slides.md)\n- [Test index](/materials/Content/Test%20Bank/Test.md)\n`,
+  `---\n${stringify({ type: "lesson", id: "source-guide", title: "Module guide and review notes", topic: "algorithms", summary: "Curriculum map, source reviews and original resources", source: "Source/Content/Markdown/Module Outline.md" })}---\n\n${outline}\n\n## Reading and running examples\n\nStart with the Python chapter. Maze scripts run in the game's Python worker using its maze API. General examples may use normal Python; PyTorch examples need a separate Python environment with PyTorch installed. The maze worker does not provide PyTorch or arbitrary application data.\n\n[Full test bank](#lesson=source-test-bank)\n\n## Source review notes\n\nThe following are the supplied peer reviews. They are retained as review records; their recommendations are not claims that every source issue has been corrected. Original files are preserved unchanged.\n\n${supporting.join("\n\n")}\n\n## Supplementary materials\n\n${supplementary.join("\n")}\n`,
 );
 
 const pdf = "BOTAK_Stage2_TestBank_V1_Robot_InstantAnswers.pdf";
@@ -302,6 +351,17 @@ async function inventory(dir: string) {
   }
 }
 await inventory("");
+// Remove only obsolete files owned by the previous archive manifest.
+const archiveRoot = path.resolve("public/materials");
+const currentPaths = new Set(files.map((file) => file.path));
+for (const previous of previousManifest.files.filter(
+  (file) => !currentPaths.has(file.path),
+)) {
+  const target = path.resolve(archiveRoot, previous.path);
+  if (!target.startsWith(archiveRoot + path.sep))
+    throw new Error(`Unsafe archive path: ${previous.path}`);
+  await rm(target, { force: true });
+}
 for (const file of files.filter(
   (f) => f.path.includes("/Animated/") && f.path.endsWith(".svg"),
 )) {

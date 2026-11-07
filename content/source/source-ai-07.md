@@ -6,14 +6,32 @@ topic: ai
 summary: Chapter 7 · Online and Incremental Learning
 prerequisites:
   - source-ai-06
-source: Source/Content/Markdown/Connetionist-AI/07 online and incremental learning.md
+source: Source/Content/Markdown/3_Connectionist-AI/07 online and incremental
+  learning.md
 ---
 
 # Chapter 7: Online and Incremental Learning
 
 **Level:** Beginner to Intermediate | **Reading time:** ~40 minutes
 
-## What you will learn
+## Learning Objectives
+## Contents
+
+- [Learning Objectives](#learning-objectives)
+- [1. Three Ways to Learn From Data](#1-three-ways-to-learn-from-data)
+- [2. How an Online Update Works](#2-how-an-online-update-works)
+- [3. Mini-Batch Incremental Updates](#3-mini-batch-incremental-updates)
+- [4. Concept Drift](#4-concept-drift)
+- [5. Catastrophic Forgetting](#5-catastrophic-forgetting)
+- [6. Evaluating Online Models](#6-evaluating-online-models)
+- [7. Code Examples](#7-code-examples)
+- [8. Online Learning in Forecasting and Recommendation](#8-online-learning-in-forecasting-and-recommendation)
+- [9. Practical Design Tips](#9-practical-design-tips)
+- [10. Common Pitfalls](#10-common-pitfalls)
+- [Key Takeaways](#key-takeaways)
+- [Practice Questions](#practice-questions)
+- [Answer Key](#answer-key)
+
 - Batch vs incremental vs online learning, and when each fits
 - How an online update works, with numbers
 - Concept drift: types, detection and adaptation
@@ -35,7 +53,7 @@ The terms overlap. "Online learning" and "incremental learning" are often used l
 
 ![Offline training fits a full dataset then freezes a model. Incremental training updates with chunks. Online training updates with individual incoming examples.](/materials/Assets/Connectionist%20AI/Static/ol-learning-modes.svg)
 
-### Why Learn Online?
+### 1.1 Why Learn Online?
 - **Streaming data:** sensors, clicks, transactions arrive continuously.
 - **Too big for memory:** you process and discard.
 - **Changing world:** patterns shift, so models go stale (Section 4).
@@ -43,7 +61,7 @@ The terms overlap. "Online learning" and "incremental learning" are often used l
 - **Personalisation:** adapt to one user's behaviour.
 - **Lower cost:** avoid retraining everything from scratch.
 
-### Trade-offs
+### 1.2 Trade-offs
 | Pros | Cons |
 |---|---|
 | Adapts quickly | Noisy updates, can be unstable |
@@ -64,7 +82,7 @@ for each new example (x, y):
 
 ![An incoming example is first scored by the existing model. After its target is available, its error is measured and the model is updated for the next example.](/materials/Assets/Connectionist%20AI/Animated/ol-update-sequence.svg)
 
-### Worked Example: Online Linear Regression
+### 2.1 Worked Example: Online Linear Regression
 Model: `ŷ = w·x`, loss `(ŷ − y)²`, gradient `2(ŷ − y)·x`, learning rate 0.1, start `w = 0`.
 
 **Sample 1:** x = 2, y = 4
@@ -83,7 +101,7 @@ The weight moves toward the true value (2) as more data arrives. The model never
 
 ![The chapter starts the linear model weight at zero. Sample one moves it to 1.6. Sample two moves it to 1.68, toward the illustrative underlying slope of two.](/materials/Assets/Connectionist%20AI/Static/ol-weight-updates.svg)
 
-### Streaming Statistics
+### 2.2 Streaming Statistics
 You can't compute a mean over data you don't keep, so update **incrementally**:
 
 ```
@@ -101,7 +119,7 @@ This is how running feature normalisation can adapt to drift.
 
 ![After an observed level jumps from zero to ten, an exponential moving average with alpha 0.5 adapts faster than one with alpha 0.1.](/materials/Assets/Connectionist%20AI/Static/ol-ema.svg)
 
-### Learning Rate in Online Settings
+### 2.3 Learning Rate in Online Settings
 - **Constant, moderate rate:** tracks change but stays noisy.
 - **Decaying rate:** stable but eventually stops adapting. Not ideal if the world keeps changing.
 - **Adaptive optimisers** (Adam, AdaGrad) are common; **Hoeffding trees** and **online linear models** are classic non-neural choices.
@@ -131,7 +149,7 @@ Related terms:
 
 ![Four schematic panels show an abrupt change, a gradual mixture transition, continuous incremental drift, and recurring behavior. Heights represent an illustrative concept statistic.](/materials/Assets/Connectionist%20AI/Static/ol-drift-types.svg)
 
-### Detecting Drift
+### 4.1 Detecting Drift
 1. **Monitor performance** (when true labels arrive): rising error rate.
 2. **Statistical tests on error streams:** **ADWIN** (adaptive windowing), **DDM/EDDM**, **Page-Hinkley**, CUSUM.
 3. **Compare input distributions:** Kolmogorov-Smirnov test, Population Stability Index (PSI), KL/JS divergence between a reference window and a recent window. Useful when labels are delayed.
@@ -141,7 +159,7 @@ Related terms:
 
 ![The input is available and a prediction is recorded before the true label arrives. Evaluation and supervised updating wait until the matching label is available.](/materials/Assets/Connectionist%20AI/Static/ol-delayed-labels.svg)
 
-### Adapting to Drift
+### 4.2 Adapting to Drift
 | Strategy | Idea |
 |---|---|
 | **Sliding window** | Train only on the most recent N samples |
@@ -163,7 +181,7 @@ When a neural network is trained only on new data, it can **overwrite** weights 
 
 ![An illustrative model first learns task A, then trains only on task B. Its task B accuracy increases while task A performance falls.](/materials/Assets/Connectionist%20AI/Static/ol-forgetting.svg)
 
-### Main Techniques
+### 5.1 Main Techniques
 
 | Family | Method | How it helps |
 |---|---|---|
@@ -208,7 +226,7 @@ Also useful:
 
 ## 7. Code Examples
 
-### scikit-learn `partial_fit`
+### 7.1 scikit-learn `partial_fit`
 ```python
 from sklearn.linear_model import SGDClassifier
 import numpy as np
@@ -220,7 +238,7 @@ for X_batch, y_batch in data_stream():            # your stream of mini-batches
     clf.partial_fit(X_batch, y_batch, classes=classes)
 ```
 
-### Prequential loop with `river` (a streaming ML library)
+### 7.2 Prequential loop with `river` (a streaming ML library)
 ```python
 from river import linear_model, preprocessing, metrics
 
@@ -234,7 +252,7 @@ for x, y in stream:                  # x is a dict of features
 print(metric)
 ```
 
-### PyTorch online step with a replay buffer
+### 7.3 PyTorch online step with a replay buffer
 ```python
 import random, torch
 

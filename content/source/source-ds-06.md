@@ -6,18 +6,24 @@ topic: structures
 summary: Chapter 6 · Queue
 prerequisites:
   - source-ds-05
-source: Source/Content/Markdown/Data-Structures/06 queues.md
+source: Source/Content/Markdown/2_Data-Structures/06 queues.md
 ---
 
-# Queue
+# Chapter 6: Queue
 
 A queue is a linear data structure that usually follows the First-In, First-Out (FIFO) rule. The first item added is the first one removed. A line of people waiting for a bus is a familiar example.
 
 ![Nicky is first in line to board the bus.](/materials/Assets/Data%20Structures/Animated/bus-queue.svg)
 
 ![Nicky is at the front and leaves first. Darren is at the rear, where new jobs join.](/materials/Assets/Data%20Structures/Static/queue.svg)
+## Contents
 
-## Operations
+- [1. Operations](#1-operations)
+- [2. Types](#2-types)
+- [3. Application](#3-application)
+- [4. Python example](#4-python-example)
+- [References](#references)
+## 1. Operations
 
 - **Enqueue:** Add an item at the rear.
 
@@ -45,7 +51,7 @@ A queue is a linear data structure that usually follows the First-In, First-Out 
 
 
 
-## Types
+## 2. Types
 
 - **Circular queue:** Treats the ends of an array as connected, so positions freed at the front can be reused.
 
@@ -69,13 +75,13 @@ Queues are useful for tasks such as handling print jobs, processing requests in 
 
 **Expected answer.** It takes Nicky's job first. Darren's job is now at the front.
 
-## Application
+## 3. Application
 
 Nicky and Darren share a printer. Nicky sends a job first, and Darren sends one before the printer is free. The printer takes Nicky's job from the front of the queue. Darren's job is next.
 
 ![Process print jobs in arrival order.](/materials/Assets/Data%20Structures/Animated/application-print-jobs.svg)
 
-## Python example
+## 4. Python example
 
 Use a list and a `front` index. Enqueue adds to the end. Dequeue reads the front item and advances the index, so no items have to shift. This simple version leaves processed entries in the list.
 
@@ -97,6 +103,7 @@ Expected output
 Nicky
 Darren
 ```
+
 
 ## References
 

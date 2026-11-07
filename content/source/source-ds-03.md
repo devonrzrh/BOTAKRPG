@@ -6,25 +6,46 @@ topic: structures
 summary: Chapter 3 · Arrays
 prerequisites:
   - source-ds-02
-source: Source/Content/Markdown/Data-Structures/03 arrays.md
+source: Source/Content/Markdown/2_Data-Structures/03 arrays.md
 ---
 
-# Arrays
+# Chapter 3: Arrays
 
 An array stores elements in an ordered sequence. The arrays described here hold values of one data type.
 
 ![Three scores, 72, 85, and 91, at indexes 0, 1, and 2.](/materials/Assets/Data%20Structures/Static/array.svg)
+## Contents
 
-## Characteristics
+- [1. Characteristics](#1-characteristics)
+- [2. Types](#2-types)
+- [3. Operations](#3-operations)
+- [4. Example: finding a score](#4-example-finding-a-score)
+- [Try it](#try-it)
+- [5. Application](#5-application)
+- [6. Python example](#6-python-example)
+- [References](#references)
+
+## Try it
+
+A list stores the numbers 4, 7, and 9 in that order. Use a linear search to find 7. How many values do you check? What changes if the target is 9?
+
+**Expected answer:** Finding 7 takes two checks: 4, then 7. Finding 9 takes three checks: 4, 7, then 9. The search stops as soon as it finds the target.
+
+**Insertion check.** The array `[72, 85, 91]` has room for one more item. What happens if you insert `80` at index `1`?
+
+**Expected answer.** Shift `91` and then `85` one position to the right. Put `80` in the open slot to get `[72, 80, 85, 91]`.
+
+
+## 1. Characteristics
 
 - Elements are identified by an index, a number that marks a position in the sequence. In many languages, indexes start at `0`.
 - Array elements are commonly stored in adjacent memory locations, meaning one after another in memory.
 - An element can be accessed directly by its index. This is constant time, written `O(1)`: the access takes about the same time as the array grows.
 - An array can have a fixed capacity.
 
-## Types
+## 2. Types
 
-### One-dimensional arrays (1D)
+### 2.1 One-dimensional arrays (1D)
 
 A one-dimensional array is a single sequence of elements.
 
@@ -34,7 +55,7 @@ Example: daily temperatures for one week.
 
 ![A single row with three numbered positions.](/materials/Assets/Data%20Structures/Static/array-1d.svg)
 
-### Two-dimensional arrays (2D)
+### 2.2 Two-dimensional arrays (2D)
 
 A two-dimensional array arranges elements in rows and columns. In some languages it is represented as an array of arrays.
 
@@ -44,13 +65,13 @@ Example: a grid of pixels in an image.
 
 ![A grid with two labeled rows and three labeled columns.](/materials/Assets/Data%20Structures/Static/array-2d.svg)
 
-### Multidimensional arrays
+### 2.3 Multidimensional arrays
 
 An array can have more than two dimensions. A three-dimensional array, for example, can represent a set of 2D grids.
 
 ![Two layers, each containing a two-by-two grid.](/materials/Assets/Data%20Structures/Static/array-3d.svg)
 
-## Operations
+## 3. Operations
 
 - **Access:** Use an index to get an element. For example, in an array containing 72, 85, and 91, the item at index 1 is 85 when indexing starts at zero.
 
@@ -78,27 +99,17 @@ An array can have more than two dimensions. A three-dimensional array, for examp
 
 Arrays are useful when the number of items is known or when items need frequent index-based access. They are less convenient when many insertions and deletions happen in the middle.
 
-## Example: finding a score
+## 4. Example: finding a score
 
 An array stores the scores 72, 85, and 91 in that order. To find 91 with a linear search, first compare 72, then 85, then 91. The third comparison finds the score. If there are `n` scores and the target is last or absent, the search may check all `n` items, so its time grows as `O(n)`.
 
-## Try it
-
-A list stores the numbers 4, 7, and 9 in that order. Use a linear search to find 7. How many values do you check? What changes if the target is 9?
-
-**Expected answer:** Finding 7 takes two checks: 4, then 7. Finding 9 takes three checks: 4, 7, then 9. The search stops as soon as it finds the target.
-
-**Insertion check.** The array `[72, 85, 91]` has room for one more item. What happens if you insert `80` at index `1`?
-
-**Expected answer.** Shift `91` and then `85` one position to the right. Put `80` in the open slot to get `[72, 80, 85, 91]`.
-
-## Application
+## 5. Application
 
 Nicky keeps three quiz scores in the order he took the quizzes. To find his second score, he reads index `1` because indexing starts at zero. The app can jump straight to `85` without checking the first score.
 
 ![Look up a score by position.](/materials/Assets/Data%20Structures/Animated/application-scores.svg)
 
-## Python example
+## 6. Python example
 
 A Python list models an array with one spare slot, marked by `None`. The `-1` step in `range` makes the loop move from right to left, so each score is copied before its slot is overwritten.
 
@@ -119,6 +130,7 @@ Expected output
 85
 [72, 80, 85, 91]
 ```
+
 
 ## References
 
