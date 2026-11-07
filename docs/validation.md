@@ -1,5 +1,13 @@
 # Validation · 2026-11-07
 
+## XP interface
+
+57 tests pass; production build passes. New XP display tests cover starting progress, 99 → 100 XP, partial progress after leveling, and the level-100 cap. Combat now presents a persistent XP meter plus victory XP, animated progress, level-up stat gains, and available skills. Reduced motion skips the progress animation.
+
+Browser checks confirmed level 4, 60/100 XP, and 40 XP needed for level 5 in the HUD. Replaying the sentinel showed “XP already earned” at victory and left progress unchanged. The reward panel and its progress bar remained readable; no browser warnings or errors were recorded. First-clear rewards and stat calculations remain covered by the existing progression tests.
+
+![Battle XP interface](screenshots/battle-xp.jpg)
+
 ## RPG battle composition
 
 56 tests pass; production build passes. Added transition tests distinguish hits, wrong answers, finishing hits, item turns, poison victories, and non-action state changes. Existing combat/progression tests remain unchanged.

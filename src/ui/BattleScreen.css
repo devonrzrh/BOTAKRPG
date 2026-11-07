@@ -124,6 +124,68 @@
   grid-template-columns: 1fr 1fr;
   gap: 8px;
 }
+.battle-xp-hud {
+  position: absolute;
+  left: 339px;
+  bottom: 24px;
+  width: 245px;
+  padding: 12px 14px;
+  background: #101c27ed;
+}
+.xp-meter > div:first-child {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 18px;
+  margin-bottom: 7px;
+}
+.xp-meter strong {
+  font-size: 18px;
+}
+.xp-meter [role="progressbar"] {
+  height: 8px;
+  background: #071118;
+  border: 1px solid #68798a;
+  overflow: hidden;
+}
+.xp-meter i {
+  display: block;
+  height: 100%;
+  background: #c7a36c;
+}
+.xp-next {
+  display: block;
+  font-size: 16px;
+  margin-top: 7px;
+  color: #c5d1d5;
+}
+.battle-xp-reward {
+  margin-top: 18px;
+}
+.battle-decision.quiz-panel:has(.battle-xp-reward) {
+  top: 40%;
+  max-height: calc(100% - 260px);
+}
+.battle-xp-reward > strong {
+  display: block;
+  font:
+    26px Consolas,
+    monospace;
+  color: #f0d09b;
+  margin-bottom: 14px;
+}
+.battle-xp-reward h3 {
+  font-size: 22px;
+  color: #f0d09b;
+  margin: 16px 0 8px;
+}
+@media (max-width: 900px) {
+  .battle-xp-hud {
+    left: 287px;
+    width: 255px;
+    bottom: 16px;
+  }
+}
 .battle-command-menu > span {
   grid-column: 1/-1;
   font:

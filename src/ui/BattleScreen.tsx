@@ -3,6 +3,7 @@ import type { Content, Item, Question, Skill } from "../content/schema";
 import type { Battle } from "../game/combat";
 import { stats, type Save } from "../game/state";
 import { combatMotion } from "../game/combatPresentation";
+import { XpMeter } from "./XpMeter";
 
 interface Props {
   battle: Battle;
@@ -28,6 +29,7 @@ export function BattleScreen(p: Props) {
   const [menu, setMenu] = useState<"skills" | "items" | "inspect" | null>(null);
   const [motion, setMotion] = useState<ReturnType<typeof combatMotion>>(null);
   const previous = useRef(b),
+    startingSave = useRef(save),
     title = useRef<HTMLHeadingElement>(null),
     skillsButton = useRef<HTMLButtonElement>(null);
   useEffect(() => {
@@ -72,6 +74,19 @@ export function BattleScreen(p: Props) {
     </div>
   );
   const activeCard = !motion && (b.phase !== "choose" || menu);
+  const gainedXp = Math.max(
+    0,
+    save.character.xp - startingSave.current.character.xp,
+  );
+  const oldStats = stats(startingSave.current, p.content);
+  const levelGain = save.character.level - startingSave.current.character.level;
+  const newSkills = p.content.entities.filter(
+    (e): e is Skill =>
+      e.type === "skill" &&
+      e.level > startingSave.current.character.level &&
+      e.level <= save.character.level &&
+      (!e.parent || save.character.skills.includes(e.parent)),
+  );
   return (
     <div
       className={`battle-screen phase-${b.phase} ${motion ? `motion-${motion}` : ""}`}
@@ -282,7 +297,46 @@ export function BattleScreen(p: Props) {
                   ? "ECHO-7 contained"
                   : "Sentinel defeated"}
               </h2>
-              <p>{q?.explanation ?? "Evidence recovered."}</p>
+              <div className="battle-xp-reward">
+                <strong role="status">
+                  {gainedXp
+                    ? `+${gainedXp} XP`
+                    : "Practice victory · XP already earned"}
+                </strong>
+                <XpMeter
+                  xp={save.character.xp}
+                  initialXp={startingSave.current.character.xp}
+                  reducedMotion={save.settings.reducedMotion}
+                  label="Victory experience"
+                />
+                {levelGain > 0 && (
+                  <>
+                    <h3>
+                      Level up! {startingSave.current.character.level} →{" "}
+                      {save.character.level}
+                    </h3>
+                    <p>
+                      HP +{limits.maxHp - oldStats.maxHp} · Focus +
+                      {limits.maxFocus - oldStats.maxFocus} · Attack +
+                      {limits.attack - oldStats.attack} · Defense +
+                      {limits.defense - oldStats.defense}
+                    </p>
+                    {newSkills.length > 0 && (
+                      <p>
+                        Available skills:{" "}
+                        {newSkills.map((s) => s.title).join(", ")}. Learn them
+                        at the desk.
+                      </p>
+                    )}
+                  </>
+                )}
+              </div>
+              {q?.explanation && (
+                <details>
+                  <summary>Answer explanation</summary>
+                  <p>{q.explanation}</p>
+                </details>
+              )}
               <footer>
                 <button className="primary" onClick={p.onJournal}>
                   Quest map
@@ -305,7 +359,9 @@ export function BattleScreen(p: Props) {
         </section>
       )}
       <div className="battle-player-hud">
-        <strong>{save.character.name}</strong>
+        <strong>
+          {save.character.name} · Lv {save.character.level}
+        </strong>
         {meter("HP", save.character.hp, limits.maxHp, "health")}
         {meter("Focus", save.character.focus, limits.maxFocus, "focus")}
         <div className="battle-status-effects">
@@ -315,6 +371,12 @@ export function BattleScreen(p: Props) {
               <span key={e.id}>Shield · {e.remaining} turns</span>
             ))}
         </div>
+      </div>
+      <div className="battle-xp-hud">
+        <XpMeter
+          xp={save.character.xp}
+          reducedMotion={save.settings.reducedMotion}
+        />
       </div>
       <nav className="battle-command-menu" aria-label="Battle commands">
         <span>Turn {b.turn}</span>
