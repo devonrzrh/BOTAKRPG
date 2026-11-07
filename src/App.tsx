@@ -2350,6 +2350,7 @@ export default function App() {
         !cutsceneId && (
           <Dialogue
             key={dialogueId}
+            reducedMotion={save.settings.reducedMotion}
             dialogue={dialogueContent.find((d) => d.id === dialogueId)!}
             onAction={(action) => {
               const beat = dialogueContent.find((d) => d.id === dialogueId)!;

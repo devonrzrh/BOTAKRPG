@@ -1,5 +1,13 @@
 # Validation · 2026-11-07
 
+## Typewriter dialogue
+
+78 tests pass; production build validates 269 records. Dialogue now uses a bottom conversation panel, speaker portraits, 22px typewriter text, punctuation pauses and numbered responses. Click or Space reveals the line without choosing a response. Reduced motion displays the complete line immediately; screen readers receive each complete line once.
+
+Browser checks at 1280 × 720 covered partial typing, Space and button reveal, numbered branching, keyboard close during typing, reverse Tab focus, Escape and reduced motion. Choices reserve space while typing, so the panel stays still. The top bar remains visible. The original reduced-motion preference was restored after testing.
+
+![Typewriter dialogue](screenshots/typewriter-dialogue.png)
+
 ## Material-based chapter progression
 
 76 tests pass; production build passes with 269 validated records. Added 31 chapter quests matching all numbered Source chapters, with learning goals, concepts, worked examples, distinct applied practice and explanations. New tests cover complete chapter coverage/order, safe wrong-answer retries, guided evidence versus unaided mastery, save restoration, invalid chapter imports and the chapter maps. A parser regression test preserves Python fences nested in YAML worked examples.

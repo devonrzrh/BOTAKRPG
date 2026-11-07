@@ -1,34 +1,243 @@
+.app .dialogue-backdrop {
+  padding: 24px max(24px, 5vw);
+  background: linear-gradient(transparent 20%, #02080dd9);
+  backdrop-filter: none;
+}
 .app .dialogue-box {
-  max-height: calc(100vh - 100px);
+  width: min(1120px, 100%);
+  max-height: calc(100vh - var(--top-height) - 48px);
   overflow-y: auto;
+  gap: 26px;
+  padding: 24px 28px;
+  border: 1px solid #758b8c;
+  border-top: 3px solid #cfb982;
+  background: #101c26f5;
+  box-shadow:
+    0 14px 60px #000a,
+    inset 0 1px #d9c58c22;
+}
+.app .dialogue-box:focus {
+  outline: none;
+}
+.app .dialogue-portrait {
+  align-self: flex-start;
+  width: 136px;
+  height: 192px;
+  flex-shrink: 0;
+  color: #9fbabd;
+  border: 1px solid #667e80;
+  background: linear-gradient(155deg, #294450, #0c1923);
+  font: inherit;
+  position: relative;
+  overflow: hidden;
+}
+.app .dialogue-portrait.is-robot {
+  color: #d1bb83;
+  background: linear-gradient(155deg, #3a3e33, #101d22);
+}
+.app .dialogue-portrait svg {
+  width: 124px;
+  height: 150px;
+  stroke: currentColor;
+  stroke-width: 2;
+}
+.app .dialogue-portrait .portrait-grid {
+  opacity: 0.12;
+  stroke-width: 1;
+}
+.app .dialogue-portrait .portrait-fill {
+  fill: #071219aa;
+}
+.app .dialogue-portrait .portrait-frame {
+  opacity: 0.6;
+  stroke-width: 1;
+}
+.app .dialogue-portrait span {
+  font:
+    400 16px/1 Consolas,
+    monospace;
+  letter-spacing: 1px;
+  margin: 8px 0 0;
+}
+.app .dialogue-body {
+  min-width: 0;
+}
+.app .dialogue-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 12px;
 }
 .app .dialogue-body h2 {
   font:
-    400 24px/1.4 Consolas,
+    400 26px/1.35 Consolas,
     monospace;
-  margin: 0 0 12px;
+  color: #e4c995;
+  margin: 0;
 }
-.app .dialogue-body p {
-  font-size: 20px;
-  font-weight: 400;
-  line-height: 1.6;
+.app .dialogue-close {
+  background: transparent;
+  color: #bccbc9;
+  border: 1px solid #62797d;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  font:
+    400 28px/1 Consolas,
+    monospace;
+  cursor: pointer;
+}
+.app .dialogue-speech {
+  position: relative;
+  cursor: default;
+}
+.app .line-typing .dialogue-speech {
+  cursor: pointer;
+}
+.app .dialogue-speech p {
+  font:
+    400 22px/1.6 Consolas,
+    "Courier New",
+    monospace;
+  color: #e1e8e2;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  margin: 0 0 20px;
+  min-height: 3.2em;
+}
+.app .dialogue-measure {
+  visibility: hidden;
+}
+.app .dialogue-typed {
+  position: absolute;
+  inset: 0;
+}
+.app .typing-caret {
+  display: inline-block;
+  width: 0.55em;
+  height: 1em;
+  background: #d8c18b;
+  vertical-align: -0.13em;
+  margin-left: 3px;
+  animation: dialogue-caret 700ms steps(2, end) infinite;
+}
+.app .dialogue-accessible {
+  position: absolute;
+  min-height: 0;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.app .dialogue-response-area {
+  position: relative;
 }
 .app .dialogue-choices {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+}
+.app .line-typing .dialogue-choices {
+  visibility: hidden;
 }
 .app .dialogue-choices button {
-  font-size: 18px;
-  font-weight: 400;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  text-align: left;
+  font:
+    400 18px/1.4 Consolas,
+    monospace;
+  padding: 11px 14px;
+  border: 1px solid #526a72;
+  border-radius: 0;
+  background: #1c303b;
+  color: #e0e9e4;
+  cursor: pointer;
+}
+.app .dialogue-choices button:first-child {
+  border-left: 3px solid #cbb57e;
+}
+.app .response-number {
+  display: grid;
+  place-items: center;
+  width: 25px;
+  height: 25px;
+  flex-shrink: 0;
+  border: 1px solid #789194;
+  color: #d9c592;
+  font-size: 16px;
+}
+.app .response-arrow {
+  margin-left: auto;
+  font-size: 24px;
+  color: #cbb57e;
+}
+.app .dialogue-reveal {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font:
+    400 18px/1.4 Consolas,
+    monospace;
+  color: #e3c98d;
+  border: 1px solid #748185;
+  border-radius: 0;
   padding: 12px 16px;
+  background: #20333e;
+}
+.app .dialogue-reveal kbd {
+  font:
+    400 16px Consolas,
+    monospace;
+  padding: 3px 8px;
+  border: 1px solid #819193;
+  color: #cad9d6;
 }
 .app .dialogue-choices button:hover,
-.app .dialogue-choices button:focus-visible {
-  outline: 2px solid #d6c18c;
-  outline-offset: 3px;
+.app .dialogue-choices button:focus-visible,
+.app .dialogue-reveal:hover,
+.app .dialogue-reveal:focus-visible,
+.app .dialogue-close:hover,
+.app .dialogue-close:focus-visible {
+  outline: 2px solid #e5c989;
+  outline-offset: 2px;
+  background: #2b4652;
 }
-.app .dialogue-portrait span {
-  font-size: 16px;
-  letter-spacing: 0;
+@keyframes dialogue-caret {
+  50% {
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .app .typing-caret {
+    animation: none;
+  }
+}
+.reduced-motion .typing-caret {
+  animation: none;
+}
+@media (max-width: 900px) {
+  .app .dialogue-box {
+    gap: 18px;
+    padding: 20px;
+  }
+  .app .dialogue-portrait {
+    width: 104px;
+    height: 160px;
+  }
+  .app .dialogue-portrait svg {
+    width: 96px;
+    height: 120px;
+  }
+  .app .dialogue-speech p {
+    font-size: 20px;
+  }
 }
