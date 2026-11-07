@@ -71,11 +71,25 @@ export const questSchema = z.object({
   type: z.literal("quest"),
   description: z.string(),
   objectives: z.array(id).min(1),
-  xp: z.number().int().positive(),
+  xp: z.number().int().nonnegative(),
   rewards: z.array(id),
-  kind: z.enum(["case", "branch", "finale"]).default("case"),
+  kind: z.enum(["case", "branch", "finale", "chapter"]).default("case"),
   prerequisites: z.array(id).default([]),
   lesson: id.optional(),
+  branch: id.optional(),
+  learning: z
+    .object({
+      goal: z.string().min(1),
+      concept: z.string().min(1),
+      example: z.string().min(1),
+      practice: z.object({
+        prompt: z.string().min(1),
+        options: z.array(z.string().min(1)).min(2),
+        answer: z.number().int().nonnegative(),
+        explanation: z.string().min(1),
+      }),
+    })
+    .optional(),
 });
 export const storySchema = z.object({
   ...base,
@@ -202,6 +216,27 @@ export function validateContent(input: unknown): Content {
       if (entity.effect) ref(entity.id, entity.effect, "effect");
     }
     if (entity.type === "quest") {
+      if (entity.kind === "chapter") {
+        if (!entity.lesson || !entity.branch || !entity.learning)
+          throw new Error(
+            `${entity.id}: chapter needs lesson, branch and learning content`,
+          );
+        ref(entity.id, entity.branch, "quest");
+        const branch = map.get(entity.branch);
+        if (
+          branch?.type !== "quest" ||
+          branch.kind !== "branch" ||
+          entity.objectives.some((id) => !branch.objectives.includes(id))
+        )
+          throw new Error(
+            `${entity.id}: chapter objectives must belong to its branch`,
+          );
+        if (
+          entity.learning.practice.answer >=
+          entity.learning.practice.options.length
+        )
+          throw new Error(`${entity.id}: invalid practice answer index`);
+      }
       entity.prerequisites.forEach((x) => ref(entity.id, x, "quest"));
       entity.objectives.forEach((x) => ref(entity.id, x, "activity"));
       entity.rewards.forEach((x) => ref(entity.id, x, "item"));

@@ -11,7 +11,7 @@ export function parseMarkdown(source: string, filename = "content"): Entity[] {
   const frontmatter = source.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n/);
   if (frontmatter) body = source.slice(frontmatter[0].length);
   body = body.replace(
-    /```(question|entity)\s*\r?\n([\s\S]*?)```/g,
+    /^```(question|entity)[ \t]*\r?\n([\s\S]*?)^```[ \t]*$/gm,
     (_, kind, data) => {
       try {
         entities.push({

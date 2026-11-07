@@ -1,5 +1,15 @@
 # Validation · 2026-11-07
 
+## Material-based chapter progression
+
+76 tests pass; production build passes with 269 validated records. Added 31 chapter quests matching all numbered Source chapters, with learning goals, concepts, worked examples, distinct applied practice and explanations. New tests cover complete chapter coverage/order, safe wrong-answer retries, guided evidence versus unaided mastery, save restoration, invalid chapter imports and the chapter maps. A parser regression test preserves Python fences nested in YAML worked examples.
+
+Browser checks covered the subject overview, Algorithms chapter map, concept and worked-example views, an incorrect practice response with reasoning, a successful retry and entry into the chapter encounter. Completed encounters and XP from the existing journal remained intact. Guided practice did not award XP or consume HP/focus. Chapter maps preserve readable text, pan/zoom, Center, Overview and keyboard controls.
+
+![Chapter quests](screenshots/chapter-quests.jpg)
+
+![Guided practice](screenshots/chapter-practice.jpg)
+
 ## Playable routing and archive stories
 
 70 tests pass; production build passes with 238 validated records. Both branches now have complete model playthroughs from fresh characters, including encounters, dialogue/save restoration, first-clear progression, branch-local reward claims and ending recovery. Routing also traverses the real maze model; Access records completes independently and exercises healing items. Duplicate story triggers and unknown saved dialogue IDs are rejected. Imported saves clear transient conversations and pending cutscenes.

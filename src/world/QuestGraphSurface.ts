@@ -51,7 +51,7 @@ export function drawQuestGraph(
   };
   c.fillStyle = "#0b1b23";
   c.fillRect(0, 0, 1024, 576);
-  text("Quest map", 24, 27, 28, 340);
+  text(graph.title ?? "Quest map", 24, 27, 28, graph.title ? 220 : 340);
   for (const b of buttons.filter((b) => b.id.startsWith("graph-"))) button(b);
   c.save();
   c.beginPath();

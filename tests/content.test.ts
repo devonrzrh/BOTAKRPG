@@ -1,7 +1,20 @@
 import { it, expect } from "vitest";
+import { readFile } from "node:fs/promises";
 import { parseMarkdown } from "../scripts/compile-content";
 import { validateContent } from "../src/content/schema";
 import raw from "../src/generated/content.json";
+it("preserves nested Markdown code fences inside a structured worked example", async () => {
+  const records = parseMarkdown(
+    await readFile("content/11-algorithm-chapters.md", "utf8"),
+  );
+  const first = records[0];
+  expect(first.type === "quest" && first.learning?.example).toContain(
+    "```python",
+  );
+  expect(first.type === "quest" && first.learning?.practice.prompt).toContain(
+    "total",
+  );
+});
 it("rejects missing dialogue targets and ambiguous choices", () => {
   const dialogue = {
     type: "dialogue",

@@ -57,6 +57,13 @@ import {
 } from "./content/schema";
 import { BattleScreen } from "./ui/BattleScreen";
 import { XpMeter } from "./ui/XpMeter";
+import { LearningQuest } from "./ui/LearningQuest";
+import {
+  chapterForActivity,
+  needsGuidedPractice,
+  introduceChapter,
+  practiceChapter,
+} from "./game/chapterQuest";
 import { Cutscene } from "./ui/Cutscene";
 import { Dialogue } from "./ui/Dialogue";
 import { MenuBar } from "./ui/MenuBar";
@@ -66,6 +73,7 @@ import { RoomTurns } from "./ui/RoomTurns";
 import { createOfficeUi, type OfficeAction } from "./game/officeUi";
 import {
   centerGraph,
+  createQuestGraph,
   zoomGraph,
   GRAPH_AREA,
   type GraphView,
@@ -214,6 +222,7 @@ export default function App() {
   const [homeWall, setHomeWall] = useState<HomeWall>("investigation");
   const [homeMoving, setHomeMoving] = useState(false);
   const [dialogueId, setDialogueId] = useState<string | null>(null);
+  const [chapterId, setChapterId] = useState<string | null>(null);
   const [cutsceneId, setCutsceneId] = useState<string | null>(null);
   const [pendingActivity, setPendingActivity] = useState<string | null>(null);
   useEffect(() => {
@@ -443,6 +452,18 @@ export default function App() {
   const open = useCallback(
     (id: string) => {
       if (id === "exit") return;
+      const selectedChapter = content.entities.find(
+        (e): e is Quest =>
+          e.type === "quest" && e.kind === "chapter" && e.id === id,
+      );
+      if (selectedChapter) {
+        generation.current++;
+        runner.current?.reset();
+        setBookOpen(false);
+        setChapterId(id);
+        return;
+      }
+      setChapterId(null);
       const activityId =
         (
           {
@@ -452,6 +473,18 @@ export default function App() {
             echo: "echo-battle",
           } as Record<string, string>
         )[id] ?? id;
+      const chapter = chapterForActivity(content, activityId);
+      if (
+        chapter &&
+        needsGuidedPractice(saveRef.current, chapter) &&
+        activityUnlocked(saveRef.current, activityId, content)
+      ) {
+        generation.current++;
+        runner.current?.reset();
+        setBookOpen(false);
+        setChapterId(chapter.id);
+        return;
+      }
       if (
         saveRef.current.story.networkIntroSeen &&
         activityUnlocked(saveRef.current, activityId, content)
@@ -743,6 +776,7 @@ export default function App() {
       stop();
       updateSave(() => parsed);
       setDialogueId(null);
+      setChapterId(null);
       setCutsceneId(null);
       setPendingActivity(null);
       setPrologueReplay(false);
@@ -822,6 +856,16 @@ export default function App() {
       setQuestSelection(id);
       const graph = officeUi.find((m) => m.id === "quests")!.graph!;
       const node = graph.nodes.find((n) => n.id === id);
+      if (!node) {
+        const next = createQuestGraph(save, content, id);
+        const target = next.nodes.find((n) => n.id === id);
+        if (target)
+          setQuestView(
+            target.y <= GRAPH_AREA.h - 44
+              ? { x: 0, y: 0, zoom: 1 }
+              : centerGraph(target),
+          );
+      }
       if (
         node &&
         (node.x * questView.zoom + questView.x < 100 ||
@@ -834,8 +878,10 @@ export default function App() {
     if (action.kind === "graph-view") {
       const graph = officeUi.find((m) => m.id === "quests")!.graph!;
       if (action.view) setQuestView(action.view);
-      else if (id === "overview") setQuestView({ x: 0, y: 0, zoom: 1 });
-      else if (id === "center")
+      else if (id === "overview") {
+        if (graph.branch) setQuestSelection(graph.branch);
+        setQuestView({ x: 0, y: 0, zoom: 1 });
+      } else if (id === "center")
         setQuestView(
           centerGraph(
             graph.nodes.find((n) => n.id === graph.selected)!,
@@ -1041,6 +1087,7 @@ export default function App() {
               panel === "settings" ||
               !save.story.prologueSeen ||
               prologueReplay ||
+              Boolean(chapterId) ||
               Boolean(dialogueId) ||
               Boolean(cutsceneId)
             }
@@ -1058,6 +1105,7 @@ export default function App() {
               trialExpired ||
               !save.story.prologueSeen ||
               prologueReplay ||
+              Boolean(chapterId) ||
               Boolean(dialogueId) ||
               Boolean(cutsceneId)
             }
@@ -2073,6 +2121,7 @@ export default function App() {
               panel === "settings" ||
               !save.story.prologueSeen ||
               prologueReplay ||
+              Boolean(chapterId) ||
               Boolean(dialogueId) ||
               Boolean(cutsceneId)
             }
@@ -2088,6 +2137,7 @@ export default function App() {
               panel === "settings" ||
               !save.story.prologueSeen ||
               prologueReplay ||
+              Boolean(chapterId) ||
               Boolean(dialogueId) ||
               Boolean(cutsceneId)
             }
@@ -2263,6 +2313,37 @@ export default function App() {
           }}
         />
       )}
+      {chapterId &&
+        (() => {
+          const chapter = content.entities.find(
+            (e): e is Quest =>
+              e.type === "quest" && e.kind === "chapter" && e.id === chapterId,
+          )!;
+          const target = nextObjective(save, chapter);
+          return (
+            <LearningQuest
+              key={chapter.id}
+              chapter={chapter}
+              progress={save.chapterProgress[chapter.id]}
+              unlocked={activityUnlocked(save, target, content)}
+              onClose={() => setChapterId(null)}
+              onRead={() => openLesson(chapter.lesson!)}
+              onIntroduce={() =>
+                updateSave((s) => introduceChapter(s, chapter))
+              }
+              onAnswer={(answer) => {
+                const result = practiceChapter(
+                  saveRef.current,
+                  chapter,
+                  answer,
+                );
+                updateSave(() => result.save);
+                return result.correct;
+              }}
+              onEncounter={() => open(activityDestination(target))}
+            />
+          );
+        })()}
       {dialogueId &&
         save.story.prologueSeen &&
         !prologueReplay &&

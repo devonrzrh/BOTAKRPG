@@ -12,6 +12,15 @@ export const saveSchema = z
   .object({
     version: z.literal(1),
     curriculumVersion: z.union([z.literal(1), z.literal(2)]).default(1),
+    chapterProgress: z
+      .record(
+        z.object({
+          introduced: z.boolean(),
+          practiced: z.boolean(),
+          attempts: z.number().int().nonnegative(),
+        }),
+      )
+      .default({}),
     story: z
       .object({
         prologueSeen: z.boolean(),
@@ -56,6 +65,7 @@ export function initialSave(): Save {
   return {
     version: 1,
     curriculumVersion: 2,
+    chapterProgress: {},
     story: {
       prologueSeen: false,
       briefingSeen: false,
@@ -199,6 +209,13 @@ export function parseSave(input: unknown, content: Content): Save {
   check(Object.keys(save.notes), "lesson");
   check(Object.keys(save.mastery), "lesson");
   check(save.character.skills, "skill");
+  for (const [id, progress] of Object.entries(save.chapterProgress)) {
+    const chapter = content.entities.find((e) => e.id === id);
+    if (chapter?.type !== "quest" || chapter.kind !== "chapter")
+      throw new Error(`Save contains unknown chapter: ${id}`);
+    if (progress.practiced && (!progress.introduced || progress.attempts < 1))
+      throw new Error(`Invalid chapter progress: ${id}`);
+  }
   check(save.story.seenDialogues, "dialogue");
   check(Object.keys(save.inventory), "item");
   for (const quest of content.entities.filter(

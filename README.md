@@ -15,6 +15,8 @@ Open the local URL printed by Vite. `npm run build` validates Markdown, copies t
 
 ## Source curriculum
 
+Quests now follow the material chapters. Choose a subject on the quest screen, then **Chapter quests**. Each chapter introduces a concept, shows a worked example, offers guided practice with explanations, and leads into its encounter check. The full chapter stays available through **Read chapter**. See [chapter learning flow](docs/chapter-learning.md).
+
 All 31 supplied chapters are available through **Bookshelf → open a volume → Contents**. Search covers the full text. Books show the original diagrams, code, tables and exercises, with bookmarks and personal notes. The module guide includes the supplied review records and links to supporting indexes. The test-bank book includes all 95 questions and explanations; its 13 written exercises are self-assessed.
 
 Each of the three clue branches now continues through its subject's chapters and ends at a boss: Route Warden, Archive Keeper or Signal Mimic. The existing maze, sentinel and perceptron activities introduce those branches. **Pursue lead** opens the next unfinished activity; **Materials** opens its chapter. All three branch bosses must be completed to unlock ECHO-7. Chapter encounters grant first-clear XP and supplies; replaying cannot claim them twice.

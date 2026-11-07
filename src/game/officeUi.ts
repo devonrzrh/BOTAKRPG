@@ -2,6 +2,7 @@ import type { Content, Quest, Lesson, Skill, Item } from "../content/schema";
 import { finaleAvailable, questComplete, nextObjective } from "./investigation";
 import { stats, type Save } from "./state";
 import { pendingStory } from "./questStory";
+import { chaptersForBranch } from "./chapterQuest";
 import type { HomeWall } from "../world/Office";
 import {
   createQuestGraph,
@@ -468,6 +469,56 @@ export function createOfficeUi(input: OfficeUiInput): SurfaceModel[] {
           "perceptron-exhibit": "garden",
         } as Record<string, string>
       )[nextObjective(save, branch)] ?? nextObjective(save, branch);
+    const chapters = chaptersForBranch(content, branch.id),
+      current = chapters.find((c) => !questComplete(save, c)) ?? chapters[0];
+    if (current)
+      button(
+        quests,
+        `chapters-${branch.id}`,
+        x,
+        224,
+        310,
+        44,
+        "Chapter quests",
+        "graph-select",
+        current.id,
+      );
+    button(
+      quests,
+      `intro-start-${branch.id}`,
+      x,
+      278,
+      310,
+      44,
+      "Begin orientation",
+      "open",
+      (
+        {
+          "maze-chamber": "maze",
+          "guardian-battle": "battle",
+          "perceptron-exhibit": "garden",
+        } as Record<string, string>
+      )[branch.objectives[0]] ?? branch.objectives[0],
+      !save.story.caseAccepted,
+    );
+    const last = branch.objectives.at(-1)!;
+    button(
+      quests,
+      `boss-start-${branch.id}`,
+      x,
+      278,
+      310,
+      44,
+      pendingStory(save, content, last, "after")
+        ? "Read conclusion"
+        : "Enter boss encounter",
+      "open",
+      last,
+      !save.story.caseAccepted ||
+        !branch.objectives
+          .slice(0, -1)
+          .every((id) => save.completed.includes(id)),
+    );
     button(
       quests,
       `branch-${branch.id}`,
@@ -510,6 +561,32 @@ export function createOfficeUi(input: OfficeUiInput): SurfaceModel[] {
       !done || save.claimed.includes(branch.id),
     );
   });
+  for (const chapter of content.entities.filter(
+    (e): e is Quest => e.type === "quest" && e.kind === "chapter",
+  )) {
+    button(
+      quests,
+      `study-${chapter.id}`,
+      28,
+      278,
+      310,
+      44,
+      "Study chapter",
+      "open",
+      chapter.id,
+    );
+    button(
+      quests,
+      `chapter-book-${chapter.id}`,
+      28,
+      332,
+      310,
+      44,
+      "Reference book",
+      "lesson",
+      chapter.lesson!,
+    );
+  }
   button(
     quests,
     "claim-case",

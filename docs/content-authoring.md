@@ -4,6 +4,8 @@ Run `npm run content` after editing Markdown anywhere under `content/`. Producti
 
 ## Lessons
 
+Material-based chapter quests use `kind: chapter`, a parent `branch`, a `lesson`, existing activity `objectives`, chapter quest `prerequisites`, `xp: 0`, `rewards: []`, and `learning: { goal, concept, example, practice }`. Practice contains a prompt, options, one zero-based answer index and explanation. See `docs/chapter-learning.md` and `content/11-algorithm-chapters.md`. Guided practice prepares the player for the encounter; it is not an automatically completed quest or unaided mastery answer.
+
 Each lesson begins with YAML frontmatter. The Markdown body supports headings, tables, links, and fenced code. Rendered HTML is sanitized with DOMPurify before display.
 
 ```yaml
