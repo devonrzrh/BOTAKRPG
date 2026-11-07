@@ -25,7 +25,7 @@
 - Moving the cursor to a screen edge turns quickly. Prevent repeated turns until the cursor leaves the edge. Keep click and keyboard alternatives.
 - Use regular-weight readable text or a typewriter font. Primary screen text: at least 18px; secondary controls: at least 16px. Check actual projected text size in the 3D view; texture font size alone is insufficient.
 - Never shrink text to fit. Reduce copy, paginate, or reorganize instead.
-- Battle: visible 3D enemy above, clear choices/questions below. Keep HP, focus, effects, and current turn readable.
+- Battle: visible 3D enemy with its HP centered above it; quiz panel in the middle. Player HP/focus stay bottom-left, Skills / Items / Inspect / Retreat bottom-right. Clear the quiz during brief attack transitions; respect reduced motion.
 - Maze: world first, compact controls; open code tools only when selected. AI activity: classify, train, test; advanced settings can be expanded.
 
 ## Foundations

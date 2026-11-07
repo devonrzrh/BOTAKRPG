@@ -1,5 +1,13 @@
 # Validation · 2026-11-07
 
+## RPG battle composition
+
+56 tests pass; production build passes. Added transition tests distinguish hits, wrong answers, finishing hits, item turns, poison victories, and non-action state changes. Existing combat/progression tests remain unchanged.
+
+Browser checks confirmed centered enemy HP, a central quiz, player HP/focus bottom-left, and the four command controls. A correct answer reduced enemy HP from 76 to 56, hid the quiz during the attack, and displayed feedback. Continue resolved the enemy turn. An Integrity patch reduced inventory from six to five, restored HP, and spent a turn. Inspect showed the recent events without spending another turn; Escape returned from its submenu. Retreat returned to the network. Enemy framing shifts during the quiz so its head remains above the panel. Attack transitions respect the saved reduced-motion preference.
+
+![Centered battle interface](screenshots/centered-battle.jpg)
+
 ## Interactive quest graph
 
 54 tests pass; production build passes. New coverage checks node/edge references, hidden evidence, activity completion unlocking the finale independently of reward claims, cursor-anchored zoom, navigation bounds, and centering.

@@ -54,6 +54,7 @@ import {
   type Story,
   type Dialogue as DialogueContent,
 } from "./content/schema";
+import { BattleScreen } from "./ui/BattleScreen";
 import { Cutscene } from "./ui/Cutscene";
 import { Dialogue } from "./ui/Dialogue";
 import { MenuBar } from "./ui/MenuBar";
@@ -971,32 +972,34 @@ export default function App() {
               className={`activity-panel ${realm === "desk" ? `home-panel home-${homeWall}` : ""} ${panel === "maze" ? "maze-panel" : ""} ${panel === "battle" ? "battle-panel" : ""}`}
               aria-label={`${panel} activity`}
             >
-              <header className="panel-header">
-                <div>
-                  <h2>
-                    {
+              {panel !== "battle" && (
+                <header className="panel-header">
+                  <div>
+                    <h2>
                       {
-                        library: "Library",
-                        maze: "Packet labyrinth",
-                        battle: battle.enemyName,
-                        garden: "Perceptron lab",
-                        inventory: "Equipment & skills",
-                        journal: "Quest board",
-                        settings: "Settings",
-                      }[panel]
+                        {
+                          library: "Library",
+                          maze: "Packet labyrinth",
+                          battle: battle.enemyName,
+                          garden: "Perceptron lab",
+                          inventory: "Equipment & skills",
+                          journal: "Quest board",
+                          settings: "Settings",
+                        }[panel]
+                      }
+                    </h2>
+                  </div>
+                  <button
+                    className="icon-button"
+                    aria-label={
+                      realm === "desk" ? "Return to desk" : "Return to network"
                     }
-                  </h2>
-                </div>
-                <button
-                  className="icon-button"
-                  aria-label={
-                    realm === "desk" ? "Return to desk" : "Return to network"
-                  }
-                  onClick={close}
-                >
-                  <X size={21} />
-                </button>
-              </header>
+                    onClick={close}
+                  >
+                    <X size={21} />
+                  </button>
+                </header>
+              )}
               {panel === "library" && (
                 <div className="library-layout">
                   <nav className="library-nav" aria-label="Library lessons">
@@ -1372,281 +1375,67 @@ export default function App() {
                 </div>
               )}
               {panel === "battle" && (
-                <div className="combat-layout">
-                  <div className="enemy-card">
-                    <div className="guardian-portrait">
-                      <div className="guardian-head">
-                        <i />
-                      </div>
-                      <div className="guardian-body" />
-                      <span>✦</span>
-                    </div>
-                    <div className="bar enemy">
-                      <i
-                        style={{
-                          width: `${(battle.hp / battle.maxHp) * 100}%`,
-                        }}
-                      />
-                    </div>
-                    <small>
-                      {battle.hp} / {battle.maxHp} HP
-                    </small>
-                    <div className="effect-list">
-                      {battle.effects.map((effect) => (
-                        <span className="pill" key={effect.id}>
-                          {effect.id} · {effect.remaining}
-                        </span>
-                      ))}
-                    </div>
-                    <div className="combat-log" aria-live="polite">
-                      {battle.log.slice(-5).map((message, i) => (
-                        <p key={`${battle.turn}-${i}`}>{message}</p>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="combat-actions">
-                    <div className="section-eyebrow">
-                      Turn {battle.turn} · HP {save.character.hp}/
-                      {characterStats.maxHp} · Focus {save.character.focus}/
-                      {characterStats.maxFocus}
-                    </div>
-                    {battle.phase === "choose" && (
-                      <>
-                        <h2>Choose a skill</h2>
-                        <div className="skill-list">
-                          {skills
-                            .filter((skill) =>
-                              save.character.skills.includes(skill.id),
-                            )
-                            .map((skill) => (
-                              <button
-                                key={skill.id}
-                                title={skill.description}
-                                disabled={
-                                  save.character.focus < skill.cost ||
-                                  save.character.hp === 0
-                                }
-                                onClick={() => {
-                                  try {
-                                    setBattle(
-                                      selectSkill(
-                                        battle,
-                                        saveRef.current,
-                                        skill,
-                                        questions,
-                                      ),
-                                    );
-                                    setAnswer([]);
-                                    setBattleNotice("");
-                                  } catch (e) {
-                                    notify(String(e));
-                                  }
-                                }}
-                              >
-                                <span className="skill-icon">
-                                  {skill.effect === "shield" ? (
-                                    <Shield size={20} />
-                                  ) : (
-                                    <Sparkles size={20} />
-                                  )}
-                                </span>
-                                <span>
-                                  <strong>{skill.title}</strong>
-                                </span>
-                                <b>{skill.cost} FP</b>
-                              </button>
-                            ))}
-                        </div>
-                        <details className="battle-items">
-                          <summary>Items · uses a turn</summary>
-                          <div className="consumables">
-                            {items
-                              .filter((item) => item.kind !== "equipment")
-                              .map((item) => (
-                                <button
-                                  key={item.id}
-                                  disabled={!save.inventory[item.id]}
-                                  onClick={() => {
-                                    try {
-                                      const result = useItem(
-                                        battle,
-                                        saveRef.current,
-                                        item,
-                                        content,
-                                      );
-                                      applyBattle(result.battle, result.save);
-                                    } catch (e) {
-                                      notify(String(e));
-                                    }
-                                  }}
-                                >
-                                  {item.title}{" "}
-                                  <span>×{save.inventory[item.id] ?? 0}</span>
-                                </button>
-                              ))}
-                          </div>
-                        </details>
-                        {save.character.hp === 0 && (
-                          <button className="primary" onClick={close}>
-                            Return & recover
-                          </button>
-                        )}
-                      </>
-                    )}
-                    {battle.phase === "question" && currentQuestion && (
-                      <>
-                        <h2>{currentQuestion.prompt}</h2>
-                        <p className="muted">
-                          {currentQuestion.format === "ordering"
-                            ? "Select each step in the correct order."
-                            : "Choose one answer."}
-                        </p>
-                        <div className="answer-options">
-                          {currentQuestion.options
-                            .map((text, index) => ({ text, index }))
-                            .sort((a, b) =>
-                              currentQuestion.format === "ordering"
-                                ? ((a.index + 2) %
-                                    currentQuestion.options.length) -
-                                  ((b.index + 2) %
-                                    currentQuestion.options.length)
-                                : a.index - b.index,
-                            )
-                            .map(({ text, index }) => (
-                              <button
-                                key={index}
-                                className={
-                                  answer.includes(index) ? "selected" : ""
-                                }
-                                onClick={() =>
-                                  setAnswer(
-                                    currentQuestion.format === "choice"
-                                      ? [index]
-                                      : answer.includes(index)
-                                        ? answer.filter((x) => x !== index)
-                                        : [...answer, index],
-                                  )
-                                }
-                              >
-                                <span>
-                                  {currentQuestion.format === "ordering"
-                                    ? answer.includes(index)
-                                      ? answer.indexOf(index) + 1
-                                      : "·"
-                                    : String.fromCharCode(65 + index)}
-                                </span>
-                                {text}
-                              </button>
-                            ))}
-                        </div>
-                        <button
-                          className="primary"
-                          disabled={
-                            currentQuestion.format === "choice"
-                              ? answer.length !== 1
-                              : answer.length !== currentQuestion.options.length
-                          }
-                          onClick={submitAnswer}
-                        >
-                          Use skill <ArrowRight size={16} />
-                        </button>
-                        <button
-                          className="text-button"
-                          onClick={() => {
-                            setBattle((b) => ({ ...b, assisted: true }));
-                            setBattleNotice(currentQuestion.explanation);
-                          }}
-                        >
-                          Hint · no mastery credit
-                        </button>
-                        {battleNotice && (
-                          <p className="feedback">{battleNotice}</p>
-                        )}
-                      </>
-                    )}
-                    {battle.phase === "feedback" && (
-                      <>
-                        <span className="result-mark">
-                          <Sparkles />
-                        </span>
-                        <h2>{battleNotice}</h2>
-                        <p className="feedback">
-                          {currentQuestion?.explanation}
-                        </p>
-                        <button
-                          className="text-button"
-                          onClick={() => {
-                            setLessonId(currentQuestion!.lesson);
-                            notify("Lesson saved for review after battle.");
-                          }}
-                        >
-                          Review lesson later
-                        </button>
-                        <button
-                          className="primary"
-                          onClick={() => {
-                            const result = enemyTurn(
-                              battle,
-                              saveRef.current,
-                              content,
-                            );
-                            applyBattle(result.battle, result.save);
-                            setAnswer([]);
-                          }}
-                        >
-                          Enemy turn <ArrowRight size={16} />
-                        </button>
-                      </>
-                    )}
-                    {battle.phase === "won" && (
-                      <div className="result-screen">
-                        <span className="result-mark">
-                          <Check size={30} />
-                        </span>
-                        <h2>
-                          {battle.enemyId === "echo-7"
-                            ? "ECHO-7 contained"
-                            : "Sentinel defeated"}
-                        </h2>
-                        <p>
-                          {battle.enemyId === "echo-7"
-                            ? "Case closed. Your investigation is complete."
-                            : "ECHO-7’s route fragment recovered."}
-                        </p>
-                        <button
-                          className="primary"
-                          onClick={() => open("journal")}
-                        >
-                          Caseboard
-                        </button>
-                        <button onClick={close}>Return to network</button>
-                      </div>
-                    )}
-                    {battle.phase === "lost" && (
-                      <div className="result-screen">
-                        <h2>Connection lost</h2>
-                        <p>Progress saved. Recover before retrying.</p>
-                        <button
-                          className="primary"
-                          onClick={() => {
-                            updateSave((s) => ({
-                              ...s,
-                              character: {
-                                ...s.character,
-                                hp: stats(s).maxHp,
-                                focus: stats(s).maxFocus,
-                              },
-                            }));
-                            close();
-                            notify("Health and focus restored.");
-                          }}
-                        >
-                          Return & recover
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                </div>
+                <BattleScreen
+                  battle={battle}
+                  save={save}
+                  content={content}
+                  question={currentQuestion}
+                  answer={answer}
+                  notice={battleNotice}
+                  onAnswer={setAnswer}
+                  onSkill={(skill) => {
+                    try {
+                      setBattle(
+                        selectSkill(battle, saveRef.current, skill, questions),
+                      );
+                      setAnswer([]);
+                      setBattleNotice("");
+                    } catch (e) {
+                      notify(String(e));
+                    }
+                  }}
+                  onItem={(item) => {
+                    try {
+                      const result = useItem(
+                        battle,
+                        saveRef.current,
+                        item,
+                        content,
+                      );
+                      applyBattle(result.battle, result.save);
+                    } catch (e) {
+                      notify(String(e));
+                    }
+                  }}
+                  onSubmit={submitAnswer}
+                  onHint={() => {
+                    setBattle((b) => ({ ...b, assisted: true }));
+                    setBattleNotice(currentQuestion!.explanation);
+                  }}
+                  onContinue={() => {
+                    const result = enemyTurn(battle, saveRef.current, content);
+                    applyBattle(result.battle, result.save);
+                    setAnswer([]);
+                  }}
+                  onReview={() => {
+                    setLessonId(currentQuestion!.lesson);
+                    notify("Lesson saved for review after battle.");
+                  }}
+                  onRetreat={close}
+                  onJournal={() => open("journal")}
+                  onRecover={() => {
+                    updateSave((s) => ({
+                      ...s,
+                      character: {
+                        ...s.character,
+                        hp: stats(s).maxHp,
+                        focus: stats(s).maxFocus,
+                      },
+                    }));
+                    close();
+                    notify("Health and focus restored.");
+                  }}
+                />
               )}
               {panel === "garden" && (
                 <Suspense fallback={<p>Opening the exhibit…</p>}>
