@@ -2,6 +2,8 @@ import { z } from "zod";
 import type { Content, Quest, Skill } from "../content/schema";
 import { STARTER_CODE } from "./maze";
 import { questUnlocked } from "./investigation";
+import { DEFAULT_PLAYER_NAME, assertPlayerName } from "./player";
+import { TUTORIAL_IDS, type TutorialId } from "./tutorials";
 const masterySchema = z.object({
   correct: z.number().int().nonnegative(),
   attempted: z.number().int().nonnegative(),
@@ -81,6 +83,13 @@ export const saveSchema = z
       renderer: z.enum(["auto", "webgpu", "webgl"]),
       reducedMotion: z.boolean(),
     }),
+    onboarding: z
+      .object({
+        intakeComplete: z.boolean().default(false),
+        tipsEnabled: z.boolean().default(true),
+        seenTips: z.array(z.enum(TUTORIAL_IDS)).default([]),
+      })
+      .default({ intakeComplete: false, tipsEnabled: true, seenTips: [] }),
   })
   .strict()
   .transform(({ inventory: _inventory, character, ...save }) => {
@@ -102,7 +111,7 @@ export function initialSave(): Save {
       seenDialogues: [],
     },
     character: {
-      name: "Detective Vale",
+      name: DEFAULT_PLAYER_NAME,
       level: 1,
       xp: 0,
       hp: 60,
@@ -119,7 +128,44 @@ export function initialSave(): Save {
     seed: 42,
     trialBest: null,
     settings: { renderer: "auto", reducedMotion: false },
+    onboarding: { intakeComplete: false, tipsEnabled: true, seenTips: [] },
   };
+}
+export function needsIntake(save: Save) {
+  return !save.onboarding.intakeComplete && !save.story.prologueSeen;
+}
+export function renamePlayer(save: Save, raw: string): Save {
+  const name = assertPlayerName(raw);
+  return save.character.name === name
+    ? save
+    : { ...save, character: { ...save.character, name } };
+}
+export function finishIntake(save: Save, raw: string): Save {
+  const renamed = renamePlayer(save, raw);
+  return {
+    ...renamed,
+    onboarding: { ...renamed.onboarding, intakeComplete: true },
+  };
+}
+export function markTutorialSeen(save: Save, id: TutorialId): Save {
+  return save.onboarding.seenTips.includes(id)
+    ? save
+    : {
+        ...save,
+        onboarding: {
+          ...save.onboarding,
+          seenTips: [...save.onboarding.seenTips, id],
+        },
+      };
+}
+export function resetTutorials(save: Save): Save {
+  return {
+    ...save,
+    onboarding: { ...save.onboarding, seenTips: [], tipsEnabled: true },
+  };
+}
+export function setTipsEnabled(save: Save, tipsEnabled: boolean): Save {
+  return { ...save, onboarding: { ...save.onboarding, tipsEnabled } };
 }
 export function stats(save: Save, _content?: Content) {
   return {

@@ -6,7 +6,7 @@ start: dispatch
 nodes:
   - id: dispatch
     speaker: Dispatch
-    text: 'The terminal log confirms it: ECHO-7 transferred into the network. We need its location before the trail expires.'
+    text: '{name}, the terminal log confirms it: ECHO-7 transferred into the network. We need its location before the trail expires.'
     choices:
       - label: What blocks the route?
         next: obstacles

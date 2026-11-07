@@ -38,6 +38,7 @@ import {
   Monitor,
   ScanLine,
   FolderSearch,
+  CircleHelp,
 } from "lucide-react";
 import DOMPurify from "dompurify";
 import { renderLessonMarkdown } from "./game/markdown";
@@ -93,14 +94,25 @@ import {
   claimQuest,
   completeActivity,
   evidence,
+  finishIntake,
   initialSave,
+  markTutorialSeen,
+  needsIntake,
   recoverResources,
   parseSave,
   recordAnswer,
+  renamePlayer,
+  resetTutorials,
+  setTipsEnabled,
   stats,
   unlockSkill,
   type Save,
 } from "./game/state";
+import { PLAYER_NAME_LIMIT, playerInitials } from "./game/player";
+import { tutorialById, type TutorialId } from "./game/tutorials";
+import { Onboarding } from "./ui/Onboarding";
+import { TutorialCard } from "./ui/TutorialCard";
+import { FieldManual } from "./ui/FieldManual";
 import {
   answerBattle,
   enemyTurn,
@@ -190,6 +202,7 @@ type Panel =
   | "character"
   | "journal"
   | "settings"
+  | "manual"
   | null;
 const destinations = [
   {
@@ -240,6 +253,9 @@ export default function App() {
   const [chapterId, setChapterId] = useState<string | null>(null);
   const [cutsceneId, setCutsceneId] = useState<string | null>(null);
   const [pendingActivity, setPendingActivity] = useState<string | null>(null);
+  const [tutorialId, setTutorialId] = useState<TutorialId | null>(null);
+  const [renaming, setRenaming] = useState(false);
+  const [renameDraft, setRenameDraft] = useState("");
   useEffect(() => {
     setHomeMoving(true);
     const timer = setTimeout(
@@ -304,6 +320,18 @@ export default function App() {
     saveRef.current = next;
     setSave(next);
   }, []);
+  const tutorialRef = useRef<TutorialId | null>(null);
+  tutorialRef.current = tutorialId;
+  const intakeOpen = booted && needsIntake(save);
+  const closeTutorial = () => {
+    const current = tutorialRef.current;
+    if (current) updateSave((s) => markTutorialSeen(s, current));
+    setTutorialId(null);
+  };
+  const replayTutorial = (id: TutorialId) => {
+    setRenaming(false);
+    setTutorialId(id);
+  };
   const updateMaze = useCallback((next: Maze) => {
     mazeRef.current = next;
     setMaze(next);
@@ -471,6 +499,7 @@ export default function App() {
   const open = useCallback(
     (id: string) => {
       setCombatEvent(null);
+      if (tutorialRef.current) closeTutorial();
       if (id === "exit") return;
       const selectedChapter = content.entities.find(
         (e): e is Quest =>
@@ -674,12 +703,63 @@ export default function App() {
   };
   useEffect(() => {
     const escape = (event: KeyboardEvent) => {
-      if (event.key === "Escape" && !event.target?.toString().includes("SVG"))
-        close();
+      if (event.key !== "Escape" || event.target?.toString().includes("SVG"))
+        return;
+      if (tutorialRef.current) {
+        closeTutorial();
+        return;
+      }
+      close();
     };
     window.addEventListener("keydown", escape);
     return () => window.removeEventListener("keydown", escape);
   }, [realm]);
+  useEffect(() => {
+    if (
+      !booted ||
+      tutorialId ||
+      intakeOpen ||
+      prologueReplay ||
+      !save.onboarding.tipsEnabled ||
+      Boolean(chapterId) ||
+      Boolean(dialogueId) ||
+      Boolean(cutsceneId) ||
+      panel === "settings" ||
+      panel === "character" ||
+      panel === "manual"
+    )
+      return;
+    const next: TutorialId | undefined = bookOpen
+      ? "read"
+      : panel === "maze"
+        ? "maze"
+        : panel === "battle"
+          ? "battle"
+          : panel === "garden"
+            ? "lab"
+            : panel === "journal"
+              ? "quests"
+              : panel === "inventory"
+                ? "ledger"
+                : !panel && realm === "desk" && save.story.caseAccepted
+                  ? "room"
+                  : undefined;
+    if (next && !save.onboarding.seenTips.includes(next)) setTutorialId(next);
+  }, [
+    booted,
+    tutorialId,
+    intakeOpen,
+    prologueReplay,
+    save.onboarding.tipsEnabled,
+    save.onboarding.seenTips,
+    save.story.caseAccepted,
+    panel,
+    bookOpen,
+    realm,
+    chapterId,
+    dialogueId,
+    cutsceneId,
+  ]);
   const manualMove = useCallback(
     (direction: Direction) => {
       if (
@@ -813,6 +893,15 @@ export default function App() {
       notify("Journal imported and saved.");
     } catch (e) {
       notify(`Import rejected. Existing progress is unchanged. ${String(e)}`);
+    }
+  };
+  const submitRename = () => {
+    try {
+      updateSave((s) => renamePlayer(s, renameDraft));
+      setRenaming(false);
+      notify("Detective name updated.");
+    } catch (error) {
+      notify(String(error instanceof Error ? error.message : error));
     }
   };
   const onMetrics = useCallback((value: WorldMetrics) => {
@@ -969,7 +1058,14 @@ export default function App() {
     <div
       className={`app gameplay-${panel ?? "explore"} maze-${mode} ${useWorldUi ? "world-ui-view" : ""} ${realm === "desk" ? "home-view" : "network-view"} ${homeMoving && realm === "desk" ? "home-panning" : ""} ${save.settings.reducedMotion ? "reduced-motion" : ""}`}
     >
-      <header className="topbar">
+      {intakeOpen && (
+        <Onboarding
+          initialName={save.character.name}
+          lessonCount={lessons.length}
+          onComplete={(name) => updateSave((s) => finishIntake(s, name))}
+        />
+      )}
+      <header className="topbar" inert={intakeOpen}>
         <a
           className="brand"
           href="#"
@@ -1003,6 +1099,14 @@ export default function App() {
           </span>
           <button
             className="icon-button"
+            aria-label="Open field manual"
+            title="How to play"
+            onClick={() => open("manual")}
+          >
+            <CircleHelp size={19} />
+          </button>
+          <button
+            className="icon-button"
             aria-label="Open settings"
             onClick={() => open("settings")}
           >
@@ -1013,7 +1117,7 @@ export default function App() {
             aria-label="Open character"
             onClick={() => open("character")}
           >
-            V
+            {playerInitials(save.character.name)}
           </button>
         </div>
       </header>
@@ -1022,7 +1126,11 @@ export default function App() {
           Loading journal…
         </div>
       )}
-      <aside className="rail" aria-label="Investigation navigation">
+      <aside
+        className="rail"
+        aria-label="Investigation navigation"
+        inert={intakeOpen}
+      >
         <button
           className={!panel ? "active" : ""}
           title="Detective's desk"
@@ -1070,6 +1178,7 @@ export default function App() {
       </aside>
       <main
         className="world-shell"
+        inert={intakeOpen}
         onPointerMove={(e) => {
           const r = e.currentTarget.getBoundingClientRect();
           const factor = save.settings.reducedMotion || homeMoving ? 0 : 1;
@@ -1099,6 +1208,7 @@ export default function App() {
             onRendererReady={() => setOfficeFallback(false)}
             homeWall={homeWall}
             homeLookLocked={
+              intakeOpen ||
               panel === "settings" ||
               panel === "character" ||
               !save.story.prologueSeen ||
@@ -1116,6 +1226,7 @@ export default function App() {
             renderer={save.settings.renderer}
             reducedMotion={save.settings.reducedMotion}
             locked={
+              intakeOpen ||
               (panel !== null && panel !== "maze") ||
               busy ||
               (scene === "maze" && mode !== "manual") ||
@@ -1157,7 +1268,8 @@ export default function App() {
         {panel &&
           (!useWorldUi ||
             panel === "settings" ||
-            panel === "character") &&
+            panel === "character" ||
+            panel === "manual") &&
           !(realm === "desk" && homeMoving) && (
             <section
               className={`activity-panel ${realm === "desk" ? `home-panel home-${homeWall}` : ""} ${panel === "maze" ? "maze-panel" : ""} ${panel === "battle" ? "battle-panel" : ""}`}
@@ -1177,6 +1289,7 @@ export default function App() {
                           character: "Detective skills",
                           journal: "Quest board",
                           settings: "Settings",
+                          manual: "Field manual",
                         }[panel]
                       }
                     </h2>
@@ -1894,6 +2007,44 @@ export default function App() {
                         {save.character.xp} total XP ·{" "}
                         {100 - (save.character.xp % 100)} XP to next level
                       </p>
+                      {!renaming ? (
+                        <button
+                          className="text-button"
+                          onClick={() => {
+                            setRenameDraft(save.character.name);
+                            setRenaming(true);
+                          }}
+                        >
+                          Change name
+                        </button>
+                      ) : (
+                        <form
+                          className="rename-form"
+                          onSubmit={(event) => {
+                            event.preventDefault();
+                            submitRename();
+                          }}
+                        >
+                          <input
+                            aria-label="Detective name"
+                            value={renameDraft}
+                            maxLength={PLAYER_NAME_LIMIT}
+                            autoFocus
+                            onChange={(event) =>
+                              setRenameDraft(event.target.value)
+                            }
+                          />
+                          <button type="submit" className="primary">
+                            Save name
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setRenaming(false)}
+                          >
+                            Cancel
+                          </button>
+                        </form>
+                      )}
                     </div>
                   </div>
                   <div className="stat-grid">
@@ -2104,6 +2255,10 @@ export default function App() {
                     camera. Use the destination buttons to travel with a
                     keyboard.
                   </p>
+                  <button onClick={() => open("manual")}>
+                    <CircleHelp size={16} />
+                    Open field manual
+                  </button>
                   <p className="small">
                     Python status:{" "}
                     {crossOriginIsolated
@@ -2112,6 +2267,20 @@ export default function App() {
                     . Block programs run through the same Python worker.
                   </p>
                 </div>
+              )}
+              {panel === "manual" && (
+                <FieldManual
+                  seenTips={save.onboarding.seenTips}
+                  tipsEnabled={save.onboarding.tipsEnabled}
+                  onReplayTip={replayTutorial}
+                  onToggleTips={(enabled) =>
+                    updateSave((s) => setTipsEnabled(s, enabled))
+                  }
+                  onResetTips={() => {
+                    updateSave(resetTutorials);
+                    notify("Field tips reset. They will appear again.");
+                  }}
+                />
               )}
             </section>
           )}
@@ -2178,45 +2347,53 @@ export default function App() {
             onEncounter={() => open(`encounter-${lessonId}`)}
           />
         )}
-        {useWorldUi && !bookOpen && panel !== "character" && (
-          <RoomTurns
-            wall={homeWall}
-            disabled={
-              !booted ||
-              panel === "settings" ||
-              !save.story.prologueSeen ||
-              prologueReplay ||
-              Boolean(chapterId) ||
-              Boolean(dialogueId) ||
-              Boolean(cutsceneId)
-            }
-            allowHover={!noteEditing}
-            onTurn={open}
-          />
-        )}
-        {useWorldUi && !bookOpen && panel !== "character" && (
-          <WorldUiControls
-            model={officeUi.find((m) => m.id === homeWall)!}
-            blocked={
-              !booted ||
-              panel === "settings" ||
-              !save.story.prologueSeen ||
-              prologueReplay ||
-              Boolean(chapterId) ||
-              Boolean(dialogueId) ||
-              Boolean(cutsceneId)
-            }
-            focused={officeFocused}
-            onAction={handleOfficeAction}
-            onFocus={setOfficeFocused}
-            noteEditing={Boolean(noteEditing)}
-            noteDraft={noteDraft}
-            onNoteDraft={setNoteDraft}
-            searchEditing={searchEditing}
-            search={search}
-            onSearch={setSearch}
-          />
-        )}
+        {useWorldUi &&
+          !bookOpen &&
+          panel !== "character" &&
+          panel !== "manual" && (
+            <RoomTurns
+              wall={homeWall}
+              disabled={
+                intakeOpen ||
+                !booted ||
+                panel === "settings" ||
+                !save.story.prologueSeen ||
+                prologueReplay ||
+                Boolean(chapterId) ||
+                Boolean(dialogueId) ||
+                Boolean(cutsceneId)
+              }
+              allowHover={!noteEditing}
+              onTurn={open}
+            />
+          )}
+        {useWorldUi &&
+          !bookOpen &&
+          panel !== "character" &&
+          panel !== "manual" && (
+            <WorldUiControls
+              model={officeUi.find((m) => m.id === homeWall)!}
+              blocked={
+                intakeOpen ||
+                !booted ||
+                panel === "settings" ||
+                !save.story.prologueSeen ||
+                prologueReplay ||
+                Boolean(chapterId) ||
+                Boolean(dialogueId) ||
+                Boolean(cutsceneId)
+              }
+              focused={officeFocused}
+              onAction={handleOfficeAction}
+              onFocus={setOfficeFocused}
+              noteEditing={Boolean(noteEditing)}
+              noteDraft={noteDraft}
+              onNoteDraft={setNoteDraft}
+              searchEditing={searchEditing}
+              search={search}
+              onSearch={setSearch}
+            />
+          )}
         <footer className="world-footer">
           {realm === "desk" ? (
             <span>Move cursor to look · Select a wall from Home</span>
@@ -2233,9 +2410,11 @@ export default function App() {
           </span>
         </footer>
       </main>
-      <aside className="journey-sidebar">
+      <aside className="journey-sidebar" inert={intakeOpen}>
         <div className="profile-mini">
-          <span className="profile-avatar">V</span>
+          <span className="profile-avatar">
+            {playerInitials(save.character.name)}
+          </span>
           <div>
             <strong>{save.character.name}</strong>
             <span>LEVEL {save.character.level} · DETECTIVE</span>
@@ -2337,47 +2516,51 @@ export default function App() {
           </button>
         </div>
       </aside>
-      {booted && (!save.story.prologueSeen || prologueReplay || cutsceneId) && (
-        <Cutscene
-          key={cutsceneId ?? "intro"}
-          story={
-            cutsceneId
-              ? content.entities.find(
-                  (e): e is Story => e.type === "story" && e.id === cutsceneId,
-                )!
-              : story
-          }
-          onFinish={() => {
-            if (cutsceneId) {
-              updateSave((s) => ({
-                ...s,
-                story: { ...s.story, networkIntroSeen: true },
-              }));
-              setCutsceneId(null);
-              setRealm("hub");
-              setScene("hub");
-              setPanel(null);
-              if (pendingActivity) {
-                const id = pendingActivity;
-                setPendingActivity(null);
-                open(id);
-              }
-            } else {
-              updateSave((s) => ({
-                ...s,
-                story: { ...s.story, prologueSeen: true },
-              }));
-              setPrologueReplay(false);
-              setRealm("desk");
-              setScene("desk");
-              setPanel(null);
-              setHomeWall("investigation");
-              if (!saveRef.current.story.briefingSeen)
-                setDialogueId("case-briefing");
+      {booted &&
+        !intakeOpen &&
+        (!save.story.prologueSeen || prologueReplay || cutsceneId) && (
+          <Cutscene
+            key={cutsceneId ?? "intro"}
+            savedName={save.character.name}
+            story={
+              cutsceneId
+                ? content.entities.find(
+                    (e): e is Story =>
+                      e.type === "story" && e.id === cutsceneId,
+                  )!
+                : story
             }
-          }}
-        />
-      )}
+            onFinish={() => {
+              if (cutsceneId) {
+                updateSave((s) => ({
+                  ...s,
+                  story: { ...s.story, networkIntroSeen: true },
+                }));
+                setCutsceneId(null);
+                setRealm("hub");
+                setScene("hub");
+                setPanel(null);
+                if (pendingActivity) {
+                  const id = pendingActivity;
+                  setPendingActivity(null);
+                  open(id);
+                }
+              } else {
+                updateSave((s) => ({
+                  ...s,
+                  story: { ...s.story, prologueSeen: true },
+                }));
+                setPrologueReplay(false);
+                setRealm("desk");
+                setScene("desk");
+                setPanel(null);
+                setHomeWall("investigation");
+                if (!saveRef.current.story.briefingSeen)
+                  setDialogueId("case-briefing");
+              }
+            }}
+          />
+        )}
       {chapterId &&
         (() => {
           const chapter = content.entities.find(
@@ -2415,6 +2598,7 @@ export default function App() {
         !cutsceneId && (
           <Dialogue
             key={dialogueId}
+            savedName={save.character.name}
             reducedMotion={save.settings.reducedMotion}
             dialogue={dialogueContent.find((d) => d.id === dialogueId)!}
             onAction={(action) => {
@@ -2448,6 +2632,18 @@ export default function App() {
             }}
           />
         )}
+      {tutorialId && (
+        <TutorialCard
+          key={tutorialId}
+          tutorial={tutorialById(tutorialId)}
+          onClose={closeTutorial}
+          onSkipAll={() => {
+            updateSave((s) => setTipsEnabled(s, false));
+            setTutorialId(null);
+            notify("Field tips off. Replay them from Game → How to play.");
+          }}
+        />
+      )}
       {toast && (
         <div className="toast" role="status">
           <Sparkles size={18} />

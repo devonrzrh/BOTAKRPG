@@ -8,6 +8,7 @@ import {
 } from "react";
 import type { Dialogue as DialogueContent } from "../content/schema";
 import { typewriterTimeline, revealedCharacters } from "../game/typewriter";
+import { personalizeText, speakerLabel } from "../game/player";
 
 function Portrait({ speaker }: { speaker: string }) {
   const robot = /\b(PATCH|FOLIO|LUMA|Mimic|Warden|Keeper)\b/i.test(speaker);
@@ -51,16 +52,20 @@ function Portrait({ speaker }: { speaker: string }) {
 export function Dialogue({
   dialogue,
   onAction,
+  savedName,
   reducedMotion = false,
 }: {
   dialogue: DialogueContent;
   onAction: (action: "accept-case" | "close" | "continue") => void;
+  savedName?: string;
   reducedMotion?: boolean;
 }) {
   const [nodeId, setNodeId] = useState(dialogue.start),
     root = useRef<HTMLElement>(null),
     speechId = useId();
   const node = dialogue.nodes.find((n) => n.id === nodeId)!;
+  const speaker = speakerLabel(node.speaker, savedName),
+    line = personalizeText(node.text, savedName ?? "");
   const [osReduced, setOsReduced] = useState(
     () => window.matchMedia("(prefers-reduced-motion: reduce)").matches,
   );
@@ -71,7 +76,7 @@ export function Dialogue({
     return () => query.removeEventListener("change", change);
   }, []);
   const instant = reducedMotion || osReduced;
-  const timeline = useMemo(() => typewriterTimeline(node.text), [node.text]);
+  const timeline = useMemo(() => typewriterTimeline(line), [line]);
   const [typing, setTyping] = useState({ node: "", visible: 0 });
   const frame = useRef<number | null>(null);
   const count = instant
@@ -193,7 +198,7 @@ export function Dialogue({
         <Portrait speaker={node.speaker} />
         <div className="dialogue-body">
           <header className="dialogue-header">
-            <h2>{node.speaker}</h2>
+            <h2>{speaker}</h2>
             <button
               className="dialogue-close"
               aria-label="Close dialogue"
@@ -209,7 +214,7 @@ export function Dialogue({
             }}
           >
             <p className="dialogue-measure" aria-hidden="true">
-              {node.text}
+              {line}
             </p>
             <p className="dialogue-typed" aria-hidden="true">
               {timeline.characters.slice(0, count).join("")}
@@ -222,7 +227,7 @@ export function Dialogue({
             aria-live="polite"
             aria-atomic="true"
           >
-            {node.text}
+            {line}
           </p>
           <div className="dialogue-response-area">
             {!complete && (

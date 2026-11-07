@@ -23,6 +23,10 @@ Each of the three clue branches now continues through its subject's chapters and
 
 `content/source/` is the committed, playable Markdown edition. `public/materials/` preserves every supplied file unchanged, and `content/source-manifest.json` records checksums and chapter IDs. Normal builds work without the untracked `Source/` folder or PDF tools. To refresh from an updated `Source/`, install Poppler (`pdftotext` on PATH), then run `npm run source:import`. See [coverage and editorial changes](docs/source-coverage.md).
 
+## Onboarding and field tips
+
+A new journal starts with a two-step intake: sign the case with a detective name, then orient the office. The name appears in the top bar, ledger, and dialogue, and can be changed from the character panel. Seven first-visit field tips cover the office, quest board, reading, labyrinth, encounters, perceptron lab, and clue ledger. Replay them or read every control in **Game → How to play**. See [onboarding](docs/onboarding.md).
+
 ## Orientation activities
 
 **Playable story branches:** choose a lead on the quest board. **Routing trace** follows PATCH through the maze and eleven algorithm encounters to the Route Warden. **Access records** restores FOLIO's erased archive through the sentinel, ten data-structure encounters and the Archive Keeper. Each has dialogue choices, a conclusion and its own evidence reward. Victory continues directly to the next lead. See the [routing walkthrough](docs/routing-branch.md) and [archive walkthrough](docs/access-branch.md).

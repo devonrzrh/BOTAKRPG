@@ -7,6 +7,7 @@ import {
   FileText,
   Gamepad2,
   Globe2,
+  HelpCircle,
   Home as HomeIcon,
   Library,
   NotebookPen,
@@ -26,6 +27,7 @@ const menus = {
     ["Quest board", "quest", Compass],
   ],
   Game: [
+    ["How to play", "manual", HelpCircle],
     ["Replay intro", "intro", BookOpen],
     ["Settings & saves", "settings", Settings2],
   ],

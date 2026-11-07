@@ -13,4 +13,5 @@ import "./ui/Dialogue.css";
 import "./ui/LearningQuest.css";
 import "./investigation.css";
 import "./ui/CombatRevamp.css";
+import "./onboarding.css";
 createRoot(document.getElementById("root")!).render(<App />);

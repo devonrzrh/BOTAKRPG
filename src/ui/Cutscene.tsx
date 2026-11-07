@@ -1,11 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 import { ArrowRight, SkipForward } from "lucide-react";
 import type { Story } from "../content/schema";
+import { personalizeText } from "../game/player";
 export function Cutscene({
   story,
+  savedName = "",
   onFinish,
 }: {
   story: Story;
+  savedName?: string;
   onFinish: () => void;
 }) {
   const [frame, setFrame] = useState(0),
@@ -143,8 +146,8 @@ export function Cutscene({
           <span className="section-eyebrow">
             CASE 007 · {frame + 1} / {story.frames.length}
           </span>
-          <h1>{current.heading}</h1>
-          <p>{current.body}</p>
+          <h1>{personalizeText(current.heading, savedName)}</h1>
+          <p>{personalizeText(current.body, savedName)}</p>
         </div>
         <button className="primary" onClick={advance}>
           {frame + 1 === story.frames.length
