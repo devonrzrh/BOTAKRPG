@@ -48,6 +48,7 @@ interface Props {
   encounter?: boolean;
   combatCue?: BattleCue | null;
   finalBoss?: boolean;
+  enemyId?: string;
   homeWall?: HomeWall;
   homeLookLocked?: boolean;
   maze: Maze;
@@ -310,6 +311,79 @@ function WorldCanvas(props: Props) {
       teal = mat("signal cyan", "#4fb6c2", true),
       wood = mat("walnut", "#655044"),
       red = mat("oxblood", "#a15c58");
+    const enemyId = props.enemyId ?? "sentinel-a-03";
+    const style = {
+      stone: "#344854",
+      light: "#728c94",
+      accent: "#4fb6c2",
+      glow: "#d6a25f",
+      scale: 1,
+      floating: false,
+      horns: false,
+      folios: false,
+      wings: false,
+    };
+    if (enemyId.startsWith("echo")) {
+      Object.assign(style, {
+        stone: "#1d2733",
+        light: "#3c4d5f",
+        accent: "#d94a44",
+        glow: "#ff6a5e",
+        scale: 1.04,
+        wings: true,
+      });
+    } else if (enemyId.includes("warden")) {
+      Object.assign(style, {
+        stone: "#6d4a2a",
+        light: "#b07a45",
+        accent: "#ffcf7a",
+        glow: "#ffb35c",
+        horns: true,
+      });
+    } else if (enemyId.includes("keeper")) {
+      Object.assign(style, {
+        stone: "#4b3f5e",
+        light: "#8b7aa8",
+        accent: "#d9c2ff",
+        glow: "#bda6ff",
+        scale: 1.1,
+        folios: true,
+      });
+    } else if (enemyId.includes("mimic")) {
+      Object.assign(style, {
+        stone: "#24545c",
+        light: "#5fc4c9",
+        accent: "#d7ffff",
+        glow: "#8ef0ff",
+        scale: 0.92,
+        floating: true,
+      });
+    } else if (enemyId.startsWith("guard-source-alg")) {
+      Object.assign(style, {
+        stone: "#5e2a2a",
+        light: "#a15c58",
+        accent: "#ff8a6a",
+        glow: "#ffb08a",
+        scale: 0.72,
+      });
+    } else if (enemyId.startsWith("guard-source-ds")) {
+      Object.assign(style, {
+        stone: "#4b4b52",
+        light: "#a9aab5",
+        accent: "#d8d8e8",
+        glow: "#ffffff",
+        scale: 0.72,
+      });
+    } else if (enemyId.startsWith("guard-source-ai")) {
+      Object.assign(style, {
+        stone: "#2c4f52",
+        light: "#7fd3d3",
+        accent: "#bfffff",
+        glow: "#9ff5ff",
+        scale: 0.68,
+        floating: true,
+      });
+    }
     const box = (
       name: string,
       x: number,
@@ -541,15 +615,69 @@ function WorldCanvas(props: Props) {
         box("leg", 5 + side * 0.43, 0.52, 4, 0.47, 0.6, 0.6, light);
         box("foot", 5 + side * 0.43, 0.28, 3.86, 0.57, 0.2, 0.9, stone);
       }
+      if (style.horns) {
+        box("warden horn", 4.45, 3.28, 4, 0.16, 0.9, 0.16, gold);
+        box("warden horn", 5.55, 3.28, 4, 0.16, 0.9, 0.16, gold);
+        box("warden crest", 5, 2.35, 4.5, 0.18, 1.5, 0.16, gold);
+      }
+      if (style.folios) {
+        box("keeper folio", 3.82, 1.7, 4, 0.24, 2.1, 1.2, stone);
+        box("keeper folio", 6.18, 1.7, 4, 0.24, 2.1, 1.2, stone);
+        box("keeper cartouche", 5, 2.35, 3.42, 0.6, 1.5, 0.12, gold);
+      }
+      if (style.wings) {
+        for (const side of [-1, 1]) {
+          const wing = box(
+            "echo shard",
+            5 + side * 1.45,
+            1.9,
+            4.05,
+            0.5,
+            1.2,
+            0.1,
+            stone,
+          );
+          wing.rotation.z = side * 0.42;
+        }
+      }
+      if (style.floating) {
+        for (const mesh of scene.meshes
+          .slice(firstRobotMesh)
+          .filter((mesh) => /leg|foot/.test(mesh.name)))
+          mesh.dispose();
+        enemyRoot.position.y = 0.45;
+        const halo = MeshBuilder.CreateTorus(
+          "signal halo",
+          { diameter: 3.1, thickness: 0.06, tessellation: 40 },
+          scene,
+        );
+        halo.parent = enemyRoot;
+        halo.position.set(0, 1.35, 0);
+        halo.rotation.x = Math.PI / 2;
+        halo.material = teal;
+      }
+      enemyRoot.scaling.setAll(style.scale);
       const robotMaterials = new Map<StandardMaterial, StandardMaterial>();
       for (const mesh of scene.meshes.slice(firstRobotMesh)) {
         if (!mesh.parent) mesh.setParent(enemyRoot);
         const original = mesh.material as StandardMaterial;
-        if (!robotMaterials.has(original))
-          robotMaterials.set(
-            original,
-            original.clone(`enemy ${original.name}`),
-          );
+        if (!robotMaterials.has(original)) {
+          const clone = original.clone(`enemy ${original.name}`);
+          const color =
+            original === stone
+              ? style.stone
+              : original === light
+                ? style.light
+                : original === teal
+                  ? style.accent
+                  : original === gold || original === red
+                    ? style.glow
+                    : style.stone;
+          clone.diffuseColor = Color3.FromHexString(color);
+          clone.emissiveColor = clone.diffuseColor.scale(0.3);
+          clone.specularColor = new Color3(0.06, 0.06, 0.06);
+          robotMaterials.set(original, clone);
+        }
         mesh.material = robotMaterials.get(original)!;
       }
       disposeBattleEffects = attachBattleEffects(
@@ -815,6 +943,7 @@ function WorldCanvas(props: Props) {
     props.renderer,
     props.encounter,
     props.finalBoss,
+    props.enemyId,
   ]);
   return (
     <>

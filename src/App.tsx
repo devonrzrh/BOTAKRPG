@@ -1250,9 +1250,13 @@ export default function App() {
             }
             encounter={panel === "battle"}
             combatCue={panel === "battle" ? combatEvent : null}
-            finalBoss={["echo-7", "route-warden", "archive-keeper"].includes(
-              battle.enemyId,
-            )}
+            finalBoss={[
+              "echo-7",
+              "route-warden",
+              "archive-keeper",
+              "signal-mimic",
+            ].includes(battle.enemyId)}
+            enemyId={battle.enemyId}
             maze={maze}
             renderer={save.settings.renderer}
             reducedMotion={save.settings.reducedMotion}
@@ -1741,6 +1745,7 @@ export default function App() {
                         saveRef.current,
                         skill,
                         questions,
+                        content,
                       );
                       battleRef.current = next;
                       setBattle(next);
@@ -1780,6 +1785,7 @@ export default function App() {
                         battle,
                         saveRef.current,
                         questions,
+                        content,
                       );
                       battleRef.current = next;
                       setBattle(next);

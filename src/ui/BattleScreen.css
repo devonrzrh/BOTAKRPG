@@ -44,6 +44,51 @@
     monospace;
   margin-bottom: 10px;
 }
+.enemy-name {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+.enemy-sigil {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: 1px solid #6d858c;
+  border-radius: 50%;
+  font-size: 15px;
+  color: #9fd8dd;
+  background: #152832;
+}
+.enemy-echo .enemy-sigil {
+  color: #ff6a5e;
+  border-color: #a34d45;
+}
+.enemy-warden .enemy-sigil {
+  color: #ffcf7a;
+  border-color: #9d7442;
+}
+.enemy-keeper .enemy-sigil {
+  color: #d9c2ff;
+  border-color: #7c6b95;
+}
+.enemy-mimic .enemy-sigil {
+  color: #8ef0ff;
+  border-color: #4e9da4;
+}
+.enemy-interceptor .enemy-sigil {
+  color: #ff8a6a;
+  border-color: #9a4f3f;
+}
+.enemy-drone .enemy-sigil {
+  color: #d8d8e8;
+  border-color: #7e7e8a;
+}
+.enemy-decoy .enemy-sigil {
+  color: #bfffff;
+  border-color: #5b9195;
+}
 .battle-meter > div:first-child {
   display: flex;
   justify-content: space-between;

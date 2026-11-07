@@ -39,6 +39,28 @@ interface Props {
   onRecover: () => void;
   onRetry?: () => void;
 }
+function enemyKind(id: string) {
+  if (id.startsWith("echo")) return "echo";
+  if (id.includes("warden")) return "warden";
+  if (id.includes("keeper")) return "keeper";
+  if (id.includes("mimic")) return "mimic";
+  if (id.startsWith("guard-source-alg")) return "interceptor";
+  if (id.startsWith("guard-source-ds")) return "drone";
+  if (id.startsWith("guard-source-ai")) return "decoy";
+  return "sentinel";
+}
+function enemySigil(id: string) {
+  return {
+    echo: "✦",
+    warden: "▲",
+    keeper: "▣",
+    mimic: "◉",
+    interceptor: "➤",
+    drone: "◇",
+    decoy: "◌",
+    sentinel: "◆",
+  }[enemyKind(id)];
+}
 export function BattleScreen(p: Props) {
   const { battle: b, save, question: q } = p,
     limits = stats(save, p.content);
@@ -256,7 +278,12 @@ export function BattleScreen(p: Props) {
             </strong>
           </div>
         )}
-        <h2>{b.enemyName}</h2>
+        <h2 className={`enemy-name enemy-${enemyKind(b.enemyId)}`}>
+          <span className="enemy-sigil" aria-hidden="true">
+            {enemySigil(b.enemyId)}
+          </span>
+          {b.enemyName}
+        </h2>
         {meter("Enemy HP", b.hp, b.maxHp, "enemy")}
         {b.phase !== "won" && b.phase !== "lost" && (
           <div className={`battle-intent intent-${intent.kind}`} role="status">

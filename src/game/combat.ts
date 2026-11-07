@@ -41,6 +41,7 @@ export interface Battle {
   resolution?: "defeated" | "pacified";
   finisher?: boolean;
   evasion?: number;
+  asked?: string[];
 }
 export function createBattle(
   enemy: {
@@ -74,6 +75,7 @@ export function createBattle(
     effects: [],
     log: [`${enemy.title} encounter started.`],
     assisted: false,
+    asked: [],
     ...(enemy.tactics
       ? {
           tactics: enemy.tactics,
@@ -118,6 +120,7 @@ export function selectFinisher(
   battle: Battle,
   save: Save,
   questions: Question[],
+  content?: Content,
 ): Battle {
   if (
     !battle.tactics ||
@@ -136,13 +139,17 @@ export function selectFinisher(
     cost: 0,
     lesson: battle.lessons?.[0] ?? "stacks-queues",
   };
-  return { ...selectSkill(battle, save, base, questions), finisher: true };
+  return {
+    ...selectSkill(battle, save, base, questions, content),
+    finisher: true,
+  };
 }
 export function selectSkill(
   battle: Battle,
   save: Save,
   skill: Skill,
   questions: Question[],
+  content?: Content,
 ): Battle {
   if (
     battle.phase !== "choose" ||
@@ -153,7 +160,7 @@ export function selectSkill(
   const lessonPools = battle.lessons?.map((lesson) =>
     questions.filter((q) => q.lesson === lesson),
   );
-  const pool = lessonPools
+  let pool = lessonPools
     ? Array.from(
         { length: Math.max(...lessonPools.map((p) => p.length)) },
         (_, i) => lessonPools.flatMap((p) => (p[i] ? [p[i]] : [])),
@@ -161,13 +168,45 @@ export function selectSkill(
     : battle.mixedQuestions
       ? questions
       : questions.filter((q) => q.lesson === skill.lesson);
+  // A single lesson can hold only two or three questions. Widen the pool to
+  // the same subject so a normal encounter cannot repeat the same two prompts.
+  if (content && pool.length < 6) {
+    const lessonIds = new Set(
+      (battle.lessons?.length ? battle.lessons : [skill.lesson]).filter(
+        Boolean,
+      ),
+    );
+    const topics = new Set(
+      content.entities
+        .filter((e) => e.type === "lesson" && lessonIds.has(e.id))
+        .map((e) => (e.type === "lesson" ? e.topic : "")),
+    );
+    const related = questions.filter((q) => {
+      if (pool.some((p) => p.id === q.id)) return false;
+      const lesson = content.entities.find(
+        (e) => e.type === "lesson" && e.id === q.lesson,
+      );
+      return lesson?.type === "lesson" && topics.has(lesson.topic);
+    });
+    pool = [...pool, ...related];
+  }
   if (!pool.length) throw new Error("No questions for this skill");
+  const asked = new Set(battle.asked ?? []);
+  let candidates = pool.filter((q) => !asked.has(q.id));
+  if (!candidates.length) {
+    // Every question in the subject has been asked this encounter. Restart the
+    // cycle but never repeat the prompt that is still on screen.
+    candidates = pool.filter((q) => q.id !== battle.question);
+  }
+  if (!candidates.length) candidates = pool;
+  const chosen = candidates[Math.max(0, battle.turn - 1) % candidates.length];
   return {
     ...battle,
     phase: "question",
     skill: skill.id,
-    question: pool[(battle.turn - 1) % pool.length].id,
+    question: chosen.id,
     assisted: false,
+    asked: [...(battle.asked ?? []), chosen.id],
   };
 }
 export function isCorrect(question: Question, answer: number[]): boolean {
