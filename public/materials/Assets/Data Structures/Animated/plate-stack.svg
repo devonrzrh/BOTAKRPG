@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="560" height="260" viewBox="0 0 560 260" role="img" aria-labelledby="title desc">
+  <title id="title">A stack of porcelain plates</title>
+  <desc id="desc">The green-rimmed plate sits above three blue-rimmed plates and is picked up first.</desc>
+  <defs>
+    <linearGradient id="rim" x2="0" y2="1" gradientUnits="objectBoundingBox">
+      <stop stop-color="#fff"/><stop offset="1" stop-color="#c5d7ed"/>
+    </linearGradient>
+    <radialGradient id="well">
+      <stop stop-color="#fff"/><stop offset=".75" stop-color="#eef5fb"/><stop offset="1" stop-color="#c8d9ea"/>
+    </radialGradient>
+    <g id="plate">
+      <path d="M-120 0 C-117 24-68 39 0 40 C68 39 117 24 120 0Z" fill="url(#rim)" stroke="#54739a" stroke-width="2"/>
+      <ellipse rx="120" ry="32" fill="url(#rim)" stroke="#54739a" stroke-width="2"/>
+      <ellipse rx="107" ry="25" fill="none" stroke="currentColor" stroke-width="2.5"/>
+      <ellipse rx="79" ry="17" fill="url(#well)" stroke="#9ab2cd" stroke-width="1"/>
+      <path d="M-91 -13 C-60-27 16-31 69-23" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+      <path d="M-80 20 C-42 32 42 32 80 20" fill="none" stroke="currentColor" stroke-width="1.5" opacity=".75"/>
+    </g>
+    <marker id="arrow" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0 0 L7 3.5 L0 7Z" fill="#16835e"/></marker>
+  </defs>
+  <style>
+    text { font: 16px system-ui, sans-serif; fill: #0f172a; paint-order: stroke; stroke: #f8fafc; stroke-width: 3px; stroke-linejoin: round; }
+    .caption { text-anchor: middle; }
+    .callout { font-weight: 700; }
+    @media (prefers-color-scheme: dark) { text { fill: #f8fafc; stroke: #111827; } }
+  .lift { animation: lift-plate 6s ease-in-out infinite; }
+@keyframes lift-plate { 0%, 18% { transform: translate(0,0); } 36% { transform: translate(0,-36px); } 65%, 100% { transform: translate(130px,-36px); } }
+@keyframes reveal { 0%, 35% { opacity: 0; } 60%, 100% { opacity: 1; } }
+@keyframes trace-short { 0%, 15% { stroke-dashoffset: 80; opacity: 0; } 18% { opacity: 1; } 55%, 100% { stroke-dashoffset: 0; opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
+  </style>
+  <ellipse cx="221" cy="208" rx="115" ry="13" fill="#64748b" opacity=".18"/>
+  <use href="#plate" x="221" y="168" color="#426694"/>
+  <use href="#plate" x="221" y="145" color="#426694"/>
+  <use href="#plate" x="221" y="122" color="#426694"/>
+  <use class="lift" href="#plate" x="221" y="99" color="#16835e"/>
+  <path d="M386 62 Q368 62 332 81" fill="none" stroke="#16835e" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <text class="callout" x="393" y="66">Pick up first</text>
+  <text class="caption" x="280" y="243">The last plate added is the first plate removed.</text>
+</svg>

@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="243" viewBox="0 0 720 243" role="img" aria-labelledby="title desc">
+  <title id="title">Delayed labels</title>
+  <desc id="desc">The input is available and a prediction is recorded before the true label arrives. Evaluation and supervised updating wait until the matching label is available.</desc>
+  <style>
+    text { font-family: system-ui, sans-serif; text-anchor: middle; fill: #263449; }
+    .title { font-size: 22px; font-weight: 700; fill: #172554; }
+    .label { font-size: 15px; font-weight: 600; }
+    .note { font-size: 13px; }
+    .num { font-size: 20px; font-weight: 700; }
+    .edge { fill: none; stroke: #74849b; stroke-width: 2; }
+    .guide { fill: none; stroke: #94a3b8; stroke-width: 1; stroke-dasharray: 4 5; }
+    .blue { fill: #dbeafe; stroke: #477fc0; }
+    .violet { fill: #ede9fe; stroke: #8864cb; }
+    .green { fill: #d1fae5; stroke: #19936c; }
+    .amber { fill: #ffedd5; stroke: #bd6a26; }
+    .blue, .violet, .green, .amber { stroke-width: 1.5; }
+    .blue-line, .violet-line, .green-line, .amber-line { fill: none; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
+    .blue-line { stroke: #3386c5; }
+    .violet-line { stroke: #9670d2; }
+    .green-line { stroke: #21a47a; }
+    .amber-line { stroke: #ce873a; }
+    @media (prefers-color-scheme: dark) {
+      text { fill: #e2e8f0; }
+      .title { fill: #f1f5ff; }
+      .edge { stroke: #94a3b8; }
+    }
+    .ink { fill: #18243a; }
+
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0 0L8 4L0 8Z" fill="#74849b" />
+    </marker>
+  </defs>
+  <text x="360" y="29" class="title">Delayed labels</text>
+  <path d="M72 177L657 177" class="edge" marker-end="url(#arrow)" />
+  <text x="128" y="208" class="note">Now</text>
+  <text x="588" y="208" class="note">Later</text>
+  <g class="tile">
+    <rect x="47" y="64" width="159" height="38" rx="10" class="blue" />
+    <text x="126.5" y="88" class="label ink">Input arrives</text>
+  </g>
+  <g class="tile">
+    <rect x="47" y="112" width="159" height="38" rx="10" class="violet" />
+    <text x="126.5" y="136" class="label ink">Store prediction</text>
+  </g>
+  <path d="M128 153V174" class="guide" />
+  <g class="tile">
+    <rect x="477" y="64" width="183" height="38" rx="10" class="green" />
+    <text x="568.5" y="88" class="label ink">True label arrives</text>
+  </g>
+  <g class="tile">
+    <rect x="477" y="112" width="183" height="38" rx="10" class="amber" />
+    <text x="568.5" y="136" class="label ink">Score + update</text>
+  </g>
+  <path d="M569 153V174" class="guide" />
+  <path d="M211 131H471" class="edge" marker-end="url(#arrow)" />
+  <text x="346" y="118" class="note">Match by example ID</text>
+</svg>

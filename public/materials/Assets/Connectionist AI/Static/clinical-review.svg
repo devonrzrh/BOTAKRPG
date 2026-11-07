@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="203" viewBox="0 0 720 203" role="img" aria-labelledby="title desc">
+  <title id="title">Model-assisted image review</title>
+  <desc id="desc">The model can mark a region to review. A clinician considers it alongside the original image and other evidence.</desc>
+  <style>
+    text { font-family: system-ui, sans-serif; text-anchor: middle; fill: #263449; }
+    .title { font-size: 22px; font-weight: 700; fill: #172554; }
+    .label { font-size: 15px; font-weight: 600; }
+    .note { font-size: 14px; }
+    .num { font-size: 19px; font-weight: 700; }
+    .tile text { fill: #18243a; }
+    .edge { fill: none; stroke: #74849b; stroke-width: 2; }
+    .guide { fill: none; stroke: #74849b; stroke-width: 1; stroke-dasharray: 4 5; }
+    .blue { fill: #dbeafe; stroke: #477fc0; }
+    .violet { fill: #ede9fe; stroke: #8864cb; }
+    .green { fill: #d1fae5; stroke: #19936c; }
+    .amber { fill: #ffedd5; stroke: #bd6a26; }
+    .blue, .violet, .green, .amber { stroke-width: 1.5; }
+    @media (prefers-color-scheme: dark) {
+      text { fill: #e2e8f0; }
+      .title { fill: #f1f5ff; }
+      .edge { stroke: #94a3b8; }
+    }
+    .blue-line { fill: none; stroke: #3b89ce; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+    .violet-line { fill: none; stroke: #9571d6; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+    .green-line { fill: none; stroke: #22a87e; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+    .amber-line { fill: none; stroke: #d88835; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+    .signal { fill: none; stroke: #bc70ed; stroke-width: 4; stroke-dasharray: 8 14; animation: flow 2s linear infinite; }
+    @keyframes flow { to { stroke-dashoffset: -44; } }
+    @media (prefers-reduced-motion: reduce) { .signal { display: none; } }
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0 0L8 4L0 8Z" fill="#74849b"/>
+    </marker>
+  </defs>
+  <text x="360" y="28" class="title">Model-assisted image review</text>
+  <text x="126" y="62" class="label">Image</text>
+  <rect x="63" y="74" width="126" height="90" rx="7" class="blue"/>
+  <path d="M126 87V146M123 99Q88 86 85 124Q84 152 118 140M129 99Q164 86 167 124Q168 152 134 140" class="violet-line"/>
+  <rect x="141" y="112" width="22" height="23" rx="2" fill="none" stroke="#b66a20" stroke-width="2" stroke-dasharray="4 3"/>
+  <path d="M195 117L243 117" class="edge" marker-end="url(#arrow)"/>
+  <g class="tile">
+    <rect x="249" y="99" width="169" height="36" rx="12" class="violet"/>
+    <text x="333.5" y="122" class="label">Flag candidate region</text>
+  </g>
+  <path d="M425 117L477 117" class="edge" marker-end="url(#arrow)"/>
+  <g class="tile">
+    <rect x="484" y="99" width="194" height="36" rx="12" class="green"/>
+    <text x="581" y="122" class="label">Clinician reviews image</text>
+  </g>
+  <path d="M581 177V142" class="edge" marker-end="url(#arrow)"/>
+  <text x="581" y="196" class="note">Clinical context</text>
+</svg>

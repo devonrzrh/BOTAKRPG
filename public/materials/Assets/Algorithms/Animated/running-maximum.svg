@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="250" viewBox="0 0 640 250" role="img" aria-labelledby="title desc">
+<title id="title">Keep the largest score seen so far</title><desc id="desc">Move the scan position across the six scores. Update the record only for 72, 85, and 100.</desc>
+<style>
+text { font:16px system-ui,sans-serif; text-anchor:middle; fill:#14243a; }
+.label { paint-order:stroke; stroke:#f8fafc; stroke-width:3px; stroke-linejoin:round; }
+.heading { font-size:20px; font-weight:700; }
+.small { font-size:13px; }
+.tile { fill:#dbeafe; stroke:#4169a9; stroke-width:2px; }
+.chosen { fill:#a7f3d0; stroke:#16835e; }
+.edge { fill:none; stroke:#64748b; stroke-width:2.5px; stroke-linecap:round; stroke-linejoin:round; }
+.route { fill:none; stroke:#16835e; stroke-width:4px; stroke-linecap:round; }
+.cursor { fill:#fde68a; stroke:#92630e; stroke-width:2px; }
+.ring { fill:none; stroke:#16835e; stroke-width:3px; }
+.badge { fill:#334155; stroke:#f8fafc; stroke-width:1.5px; }
+.badge-text { fill:#fff; font-size:12px; font-weight:700; }
+@media (prefers-color-scheme:dark) {
+ .label { fill:#f8fafc; stroke:#111827; }
+ .edge { stroke:#b8c7db; }
+ .route,.ring { stroke:#4ade80; }
+}
+
+.scan { transform:translate(545px,91px); animation:scan 10s ease-in-out infinite; } @keyframes scan { 0% { transform:translate(95px,91px); }0% { transform:translate(95px,91px); }14% { transform:translate(185px,91px); }28% { transform:translate(275px,91px); }42% { transform:translate(365px,91px); }56% { transform:translate(455px,91px); }70% { transform:translate(545px,91px); }100% { transform:translate(545px,91px); } }
+.record-0 { visibility:hidden; animation:record-0 10s steps(1,end) infinite; } @keyframes record-0 { 0% { visibility:visible; } 0% { visibility:visible; } 14% { visibility:hidden; } 100% { visibility:hidden; } }.record-1 { visibility:hidden; animation:record-1 10s steps(1,end) infinite; } @keyframes record-1 { 0% { visibility:hidden; } 14% { visibility:visible; } 28% { visibility:hidden; } 100% { visibility:hidden; } }.record-2 { visibility:hidden; animation:record-2 10s steps(1,end) infinite; } @keyframes record-2 { 0% { visibility:hidden; } 28% { visibility:visible; } 42% { visibility:hidden; } 100% { visibility:hidden; } }.record-3 { visibility:hidden; animation:record-3 10s steps(1,end) infinite; } @keyframes record-3 { 0% { visibility:hidden; } 42% { visibility:visible; } 56% { visibility:hidden; } 100% { visibility:hidden; } }.record-4 { visibility:hidden; animation:record-4 10s steps(1,end) infinite; } @keyframes record-4 { 0% { visibility:hidden; } 56% { visibility:visible; } 70% { visibility:hidden; } 100% { visibility:hidden; } }.record-5 { visibility:visible; animation:record-5 10s steps(1,end) infinite; } @keyframes record-5 { 0% { visibility:hidden; } 70% { visibility:visible; } 100% { visibility:visible; } 100% { visibility:visible; } }
+@media (prefers-reduced-motion:reduce) { * { animation:none !important; } }
+</style>
+<text class="label heading" x="320" y="29">Keep the largest score seen so far</text>
+<rect class="tile" x="57.5" y="70" width="75" height="42" rx="7"/><text class="ink" x="95" y="97">72</text><rect class="tile" x="147.5" y="70" width="75" height="42" rx="7"/><text class="ink" x="185" y="97">85</text><rect class="tile" x="237.5" y="70" width="75" height="42" rx="7"/><text class="ink" x="275" y="97">40</text><rect class="tile" x="327.5" y="70" width="75" height="42" rx="7"/><text class="ink" x="365" y="97">29</text><rect class="tile" x="417.5" y="70" width="75" height="42" rx="7"/><text class="ink" x="455" y="97">100</text><rect class="tile" x="507.5" y="70" width="75" height="42" rx="7"/><text class="ink" x="545" y="97">91</text><g class="scan"><path class="ring" d="M-34 22 H34"/></g><text class="label" x="180" y="167">Largest seen so far</text><rect class="tile chosen" x="306" y="143" width="117" height="43" rx="7"/><g class="record-0"><text class="ink" x="365" y="171">72</text></g><g class="record-1"><text class="ink" x="365" y="171">85</text></g><g class="record-2"><text class="ink" x="365" y="171">85</text></g><g class="record-3"><text class="ink" x="365" y="171">85</text></g><g class="record-4"><text class="ink" x="365" y="171">100</text></g><g class="record-5"><text class="ink" x="365" y="171">100</text></g><text class="label small" x="320" y="224">40, 29, and 91 cannot replace the larger value already recorded.</text>
+</svg>

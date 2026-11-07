@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="241" viewBox="0 0 720 241" role="img" aria-labelledby="title desc">
+  <title id="title">Gradient clipping by norm</title>
+  <desc id="desc">A two-component gradient with magnitude five is shortened to magnitude two. Clipping by norm keeps its direction.</desc>
+  <style>
+    text { font-family: system-ui, sans-serif; text-anchor: middle; fill: #263449; }
+    .title { font-size: 22px; font-weight: 700; fill: #172554; }
+    .label { font-size: 15px; font-weight: 600; }
+    .note { font-size: 14px; }
+    .num { font-size: 19px; font-weight: 700; }
+    .tile text { fill: #18243a; }
+    .edge { fill: none; stroke: #74849b; stroke-width: 2; }
+    .guide { fill: none; stroke: #74849b; stroke-width: 1; stroke-dasharray: 4 5; }
+    .blue { fill: #dbeafe; stroke: #477fc0; }
+    .violet { fill: #ede9fe; stroke: #8864cb; }
+    .green { fill: #d1fae5; stroke: #19936c; }
+    .amber { fill: #ffedd5; stroke: #bd6a26; }
+    .blue, .violet, .green, .amber { stroke-width: 1.5; }
+    @media (prefers-color-scheme: dark) {
+      text { fill: #e2e8f0; }
+      .title { fill: #f1f5ff; }
+      .edge { stroke: #94a3b8; }
+    }
+    .blue-line { fill: none; stroke: #3b89ce; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+    .violet-line { fill: none; stroke: #9571d6; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+    .green-line { fill: none; stroke: #22a87e; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+    .amber-line { fill: none; stroke: #d88835; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+    .signal { fill: none; stroke: #bc70ed; stroke-width: 4; stroke-dasharray: 8 14; animation: flow 2s linear infinite; }
+    @keyframes flow { to { stroke-dashoffset: -44; } }
+    @media (prefers-reduced-motion: reduce) { .signal { display: none; } }
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0 0L8 4L0 8Z" fill="#74849b"/>
+    </marker>
+  </defs>
+  <text x="360" y="28" class="title">Gradient clipping by norm</text>
+  <path d="M218 189L532 189" class="edge" marker-end="url(#arrow)"/>
+  <path d="M218 189L218 58" class="edge" marker-end="url(#arrow)"/>
+  <path d="M218 189L422 72" class="guide" marker-end="url(#arrow)"/>
+  <path d="M218 189L300 142" class="violet-line" marker-end="url(#arrow)"/>
+  <text x="451" y="67" class="label">Before · norm 5</text>
+  <text x="334" y="129" class="label">After · norm 2</text>
+  <text x="530" y="211" class="note">Gradient component 1</text>
+  <text x="111" y="66" class="note">Gradient component 2</text>
+  <text x="360" y="226" class="note">Clipping threshold: norm 2</text>
+</svg>

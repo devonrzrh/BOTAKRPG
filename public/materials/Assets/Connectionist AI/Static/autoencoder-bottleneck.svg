@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="235" viewBox="0 0 720 235" role="img" aria-labelledby="title desc">
+  <title id="title">Autoencoder bottleneck</title>
+  <desc id="desc">An encoder turns an input image into a smaller vector. The decoder uses that vector to reconstruct the image. Training compares the reconstruction with the original.</desc>
+  <style>
+    text { font-family: system-ui, sans-serif; text-anchor: middle; fill: #263449; }
+    .title { font-size: 22px; font-weight: 700; fill: #172554; }
+    .label { font-size: 15px; font-weight: 600; }
+    .note { font-size: 14px; }
+    .num { font-size: 19px; font-weight: 700; }
+    .tile text { fill: #18243a; }
+    .edge { fill: none; stroke: #74849b; stroke-width: 2; }
+    .guide { fill: none; stroke: #74849b; stroke-width: 1; stroke-dasharray: 4 5; }
+    .blue { fill: #dbeafe; stroke: #477fc0; }
+    .violet { fill: #ede9fe; stroke: #8864cb; }
+    .green { fill: #d1fae5; stroke: #19936c; }
+    .amber { fill: #ffedd5; stroke: #bd6a26; }
+    .blue, .violet, .green, .amber { stroke-width: 1.5; }
+    @media (prefers-color-scheme: dark) {
+      text { fill: #e2e8f0; }
+      .title { fill: #f1f5ff; }
+      .edge { stroke: #94a3b8; }
+    }
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0 0L8 4L0 8Z" fill="#74849b"/>
+    </marker>
+  </defs>
+  <text x="360" y="28" class="title">Autoencoder bottleneck</text>
+  <text x="123" y="66" class="label">Original</text>
+  <text x="360" y="66" class="label">Smaller latent code</text>
+  <text x="594" y="66" class="label">Reconstruction</text>
+  <rect x="86" y="84" width="17" height="17" rx="2" class="blue"/>
+  <rect x="105" y="84" width="17" height="17" rx="2" class="violet"/>
+  <rect x="124" y="84" width="17" height="17" rx="2" class="violet"/>
+  <rect x="143" y="84" width="17" height="17" rx="2" class="blue"/>
+  <rect x="86" y="103" width="17" height="17" rx="2" class="violet"/>
+  <rect x="105" y="103" width="17" height="17" rx="2" class="blue"/>
+  <rect x="124" y="103" width="17" height="17" rx="2" class="blue"/>
+  <rect x="143" y="103" width="17" height="17" rx="2" class="violet"/>
+  <rect x="86" y="122" width="17" height="17" rx="2" class="violet"/>
+  <rect x="105" y="122" width="17" height="17" rx="2" class="blue"/>
+  <rect x="124" y="122" width="17" height="17" rx="2" class="blue"/>
+  <rect x="143" y="122" width="17" height="17" rx="2" class="violet"/>
+  <rect x="86" y="141" width="17" height="17" rx="2" class="blue"/>
+  <rect x="105" y="141" width="17" height="17" rx="2" class="violet"/>
+  <rect x="124" y="141" width="17" height="17" rx="2" class="violet"/>
+  <rect x="143" y="141" width="17" height="17" rx="2" class="blue"/>
+  <rect x="557" y="84" width="17" height="17" rx="2" class="green"/>
+  <rect x="576" y="84" width="17" height="17" rx="2" class="violet"/>
+  <rect x="595" y="84" width="17" height="17" rx="2" class="violet"/>
+  <rect x="614" y="84" width="17" height="17" rx="2" class="green"/>
+  <rect x="557" y="103" width="17" height="17" rx="2" class="violet"/>
+  <rect x="576" y="103" width="17" height="17" rx="2" class="green"/>
+  <rect x="595" y="103" width="17" height="17" rx="2" class="green"/>
+  <rect x="614" y="103" width="17" height="17" rx="2" class="violet"/>
+  <rect x="557" y="122" width="17" height="17" rx="2" class="violet"/>
+  <rect x="576" y="122" width="17" height="17" rx="2" class="green"/>
+  <rect x="595" y="122" width="17" height="17" rx="2" class="green"/>
+  <rect x="614" y="122" width="17" height="17" rx="2" class="violet"/>
+  <rect x="557" y="141" width="17" height="17" rx="2" class="green"/>
+  <rect x="576" y="141" width="17" height="17" rx="2" class="violet"/>
+  <rect x="595" y="141" width="17" height="17" rx="2" class="violet"/>
+  <rect x="614" y="141" width="17" height="17" rx="2" class="green"/>
+  <path d="M170 120L310 120" class="edge" marker-end="url(#arrow)"/>
+  <path d="M411 120L547 120" class="edge" marker-end="url(#arrow)"/>
+  <text x="242" y="109" class="note">Encode</text>
+  <text x="478" y="109" class="note">Decode</text>
+  <circle cx="332" cy="120" r="9" class="amber"/>
+  <circle cx="360" cy="120" r="9" class="amber"/>
+  <circle cx="388" cy="120" r="9" class="amber"/>
+  <path d="M123 168V193H594V168" class="guide"/>
+  <text x="360" y="217" class="note">Reconstruction loss</text>
+</svg>

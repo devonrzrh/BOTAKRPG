@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="560" height="207" viewBox="0 0 560 207" role="img" aria-labelledby="title">
+  <title id="title">Push B onto the stack shown before and after</title>
+  <style>
+    text { font: 16px system-ui, sans-serif; text-anchor: middle; fill: #0f172a; }
+    .label { paint-order: stroke; stroke: #f8fafc; stroke-width: 3px; stroke-linejoin: round; }
+    .heading { font-size: 19px; font-weight: 700; }
+    .tile { fill: #dbeafe; stroke: #4169a9; stroke-width: 2px; }
+    .changed { fill: #a7f3d0; stroke: #16835e; stroke-width: 2px; }
+    @media (prefers-color-scheme: dark) { .label { fill: #f8fafc; stroke: #111827; } }
+  </style>
+  <text class="label heading" x="280" y="26">Push B onto the stack</text>
+  <text class="label" x="140" y="58">Before push</text>
+  <rect x="94" y="127" width="92" height="36" rx="5" class="tile"/>
+  <text class="" x="140" y="151">A</text>
+  <text class="label" x="140" y="190">Top: A</text>
+  <text class="label" x="420" y="58">After push</text>
+  <rect x="374" y="127" width="92" height="36" rx="5" class="tile"/>
+  <text class="" x="420" y="151">A</text>
+  <rect x="374" y="87" width="92" height="36" rx="5" class="changed"/>
+  <text class="" x="420" y="111">B</text>
+  <text class="label" x="420" y="190">Top: B</text>
+</svg>

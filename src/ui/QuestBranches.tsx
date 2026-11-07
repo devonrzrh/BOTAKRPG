@@ -1,6 +1,10 @@
 import type { Content, Quest } from "../content/schema";
 import type { Save } from "../game/state";
-import { finaleAvailable, questComplete } from "../game/investigation";
+import {
+  finaleAvailable,
+  questComplete,
+  nextObjective,
+} from "../game/investigation";
 export function QuestBranches({
   save,
   content,
@@ -34,7 +38,7 @@ export function QuestBranches({
             <div className="branch-actions">
               <button
                 disabled={!save.story.caseAccepted}
-                onClick={() => onActivity(branch.objectives[0])}
+                onClick={() => onActivity(nextObjective(save, branch))}
               >
                 {done ? "Replay activity" : "Pursue lead"}
               </button>

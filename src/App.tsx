@@ -43,6 +43,7 @@ import {
 } from "lucide-react";
 import DOMPurify from "dompurify";
 import { marked } from "marked";
+import { BookReader } from "./ui/BookReader";
 import rawContent from "./generated/content.json";
 import {
   validateContent,
@@ -70,7 +71,7 @@ import {
   type GraphView,
 } from "./game/questGraph";
 import { QuestBranches, FinaleCard } from "./ui/QuestBranches";
-import { finaleAvailable } from "./game/investigation";
+import { finaleAvailable, activityUnlocked } from "./game/investigation";
 import type { HomeWall } from "./world/Office";
 import { atGoal, move, shortestPath, type Maze } from "./game/maze";
 import {
@@ -136,7 +137,10 @@ const activityDestination = (id: string) =>
     "guardian-battle": "battle",
     "perceptron-exhibit": "garden",
     "echo-battle": "echo",
-  })[id] ?? "quest";
+  })[id] ??
+  (content.entities.some((e) => e.type === "activity" && e.id === id)
+    ? id
+    : "quest");
 const story = content.entities.find(
   (e): e is Story => e.id === "rogue-signal" && e.type === "story",
 )!;
@@ -432,6 +436,23 @@ export default function App() {
   const open = useCallback(
     (id: string) => {
       if (id === "exit") return;
+      const encounter = content.entities.find(
+        (e) => e.type === "activity" && e.template === "battle" && e.id === id,
+      );
+      if (encounter?.type === "activity") {
+        if (!activityUnlocked(saveRef.current, id, content)) {
+          notify("Follow the preceding lead on the quest board first.");
+          return;
+        }
+        setBookOpen(false);
+        setRealm("hub");
+        setScene("hub");
+        setPanel("battle");
+        setBattle(createBattle(encounter.enemy));
+        setAnswer([]);
+        setBattleNotice("");
+        return;
+      }
       setBookOpen(false);
       setNoteEditing(null);
       setSearchEditing(false);
@@ -587,11 +608,29 @@ export default function App() {
   const applyBattle = (nextBattle: Battle, nextSave: Save) => {
     if (nextBattle.phase === "won") {
       const activity =
-        nextBattle.enemyId === "echo-7" ? "echo-battle" : "guardian-battle";
+        content.entities.find(
+          (e) => e.type === "activity" && e.enemy?.id === nextBattle.enemyId,
+        )?.id ?? "guardian-battle";
       const first = !nextSave.completed.includes(activity);
       nextSave = completeActivity(nextSave, activity);
       if (first)
         nextSave = addXp(nextSave, activity === "echo-battle" ? 60 : 20);
+      if (first && activity.startsWith("encounter-")) {
+        nextSave = {
+          ...nextSave,
+          inventory: {
+            ...nextSave.inventory,
+            "healing-draught": Math.min(
+              999,
+              (nextSave.inventory["healing-draught"] ?? 0) + 1,
+            ),
+            "focus-tea": Math.min(
+              999,
+              (nextSave.inventory["focus-tea"] ?? 0) + 1,
+            ),
+          },
+        };
+      }
     }
     setBattle(nextBattle);
     updateSave(() => nextSave);
@@ -1122,11 +1161,15 @@ export default function App() {
                       className="primary"
                       onClick={() =>
                         open(
-                          currentLesson.topic === "ai"
-                            ? "garden"
-                            : currentLesson.topic === "structures"
-                              ? "battle"
-                              : "maze",
+                          currentLesson.source &&
+                            currentLesson.id !== "source-guide" &&
+                            currentLesson.id !== "source-test-bank"
+                            ? `encounter-${currentLesson.id}`
+                            : currentLesson.topic === "ai"
+                              ? "garden"
+                              : currentLesson.topic === "structures"
+                                ? "battle"
+                                : "maze",
                         )
                       }
                     >
@@ -1884,6 +1927,35 @@ export default function App() {
             ))}
           </nav>
         )}
+        {useWorldUi && bookOpen && homeWall === "bookshelf" && !homeMoving && (
+          <BookReader
+            lessons={lessons}
+            lesson={currentLesson}
+            reducedMotion={save.settings.reducedMotion}
+            bookmarked={save.bookmarks.includes(lessonId)}
+            note={save.notes[lessonId] ?? ""}
+            onSelect={setLessonId}
+            onClose={() => {
+              setBookOpen(false);
+              setNoteEditing(null);
+            }}
+            onBookmark={() =>
+              updateSave((s) => ({
+                ...s,
+                bookmarks: s.bookmarks.includes(lessonId)
+                  ? s.bookmarks.filter((id) => id !== lessonId)
+                  : [...s.bookmarks, lessonId],
+              }))
+            }
+            onNote={(value) =>
+              updateSave((s) => ({
+                ...s,
+                notes: { ...s.notes, [lessonId]: value },
+              }))
+            }
+            onEncounter={() => open(`encounter-${lessonId}`)}
+          />
+        )}
         {useWorldUi && !bookOpen && (
           <RoomTurns
             wall={homeWall}
@@ -1899,7 +1971,7 @@ export default function App() {
             onTurn={open}
           />
         )}
-        {useWorldUi && (
+        {useWorldUi && !bookOpen && (
           <WorldUiControls
             model={officeUi.find((m) => m.id === homeWall)!}
             blocked={

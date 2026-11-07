@@ -1,5 +1,5 @@
 import type { Content, Quest, Lesson, Skill, Item } from "../content/schema";
-import { finaleAvailable, questComplete } from "./investigation";
+import { finaleAvailable, questComplete, nextObjective } from "./investigation";
 import { stats, type Save } from "./state";
 import type { HomeWall } from "../world/Office";
 import {
@@ -54,6 +54,7 @@ export interface SurfaceModel {
   books?: { id: string; title: string; topic: string }[];
   bookOpen?: boolean;
   selectedLesson?: string;
+  selectedTopic?: string;
   id: HomeWall;
   title: string;
   theme: "cork" | "paper" | "terminal";
@@ -287,7 +288,7 @@ export function createOfficeUi(input: OfficeUiInput): SurfaceModel[] {
         .includes(input.search.toLowerCase()),
   );
   visible
-    .slice(0, 5)
+    .slice(0, input.search ? 5 : 3)
     .forEach((lesson, index) =>
       button(
         library,
@@ -449,7 +450,7 @@ export function createOfficeUi(input: OfficeUiInput): SurfaceModel[] {
     );
     text(quests, x + 12, 122, branch.title, 21, 295);
     const activity = content.entities.find(
-      (e) => e.type === "activity" && e.id === branch.objectives[0],
+      (e) => e.type === "activity" && e.id === nextObjective(save, branch),
     );
     const description =
       done && activity?.type === "activity" && activity.clue
@@ -458,13 +459,14 @@ export function createOfficeUi(input: OfficeUiInput): SurfaceModel[] {
     wrapLines(description, 27)
       .slice(0, 4)
       .forEach((line, n) => text(quests, x + 12, 169 + n * 23, line, 17, 295));
-    const destination = (
-      {
-        "maze-chamber": "maze",
-        "guardian-battle": "battle",
-        "perceptron-exhibit": "garden",
-      } as Record<string, string>
-    )[branch.objectives[0]];
+    const destination =
+      (
+        {
+          "maze-chamber": "maze",
+          "guardian-battle": "battle",
+          "perceptron-exhibit": "garden",
+        } as Record<string, string>
+      )[nextObjective(save, branch)] ?? nextObjective(save, branch);
     button(
       quests,
       `branch-${branch.id}`,
@@ -486,7 +488,7 @@ export function createOfficeUi(input: OfficeUiInput): SurfaceModel[] {
       44,
       "Materials / tutorial",
       "lesson",
-      branch.lesson!,
+      activity?.type === "activity" ? activity.lesson : branch.lesson!,
     );
     button(
       quests,
@@ -623,20 +625,36 @@ export function createOfficeUi(input: OfficeUiInput): SurfaceModel[] {
         learned || locked,
       );
     });
-  library.books = lessons.map((l) => ({
+  library.books = lessons.slice(0, 3).map((l) => ({
     id: l.id,
     title: l.title,
     topic: l.topic,
   }));
   library.bookOpen = input.bookOpen;
   library.selectedLesson = lesson.id;
+  library.selectedTopic = lesson.topic;
   if (input.bookOpen === false) {
     library.title = "REFERENCE BOOKSHELF";
     library.texts = [{ x: 30, y: 85, text: "Select a volume to open it." }];
     library.buttons = library.buttons.filter(
-      (b) =>
-        b.id.startsWith("lesson-") || b.id === "search" || b.id === "topic",
+      (b) => b.id === "search" || b.id === "topic",
     );
+    // Physical volumes remain subject indexes, including when search finds a chapter.
+    lessons.slice(0, 3).forEach((volume, index) => {
+      const match = visible.find((l) => l.topic === volume.topic);
+      if (match)
+        button(
+          library,
+          `lesson-${volume.id}`,
+          24,
+          187 + index * 58,
+          245,
+          50,
+          match.title,
+          "lesson",
+          match.id,
+        );
+    });
   }
   if (input.bookOpen === true) {
     library.title = lesson.title;

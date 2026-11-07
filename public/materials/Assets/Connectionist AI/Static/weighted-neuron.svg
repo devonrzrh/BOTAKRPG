@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="179" viewBox="0 0 720 179" role="img" aria-labelledby="title desc">
+  <title id="title">Weighted neuron with ReLU</title>
+  <desc id="desc">Two inputs both equal 2. A positive weight of 0.5 contributes 1, and a negative weight of minus 1 contributes minus 2. Adding a bias of 0.5 gives minus 0.5, which ReLU maps to zero.</desc>
+  <style>
+    text { font-family: system-ui, sans-serif; text-anchor: middle; fill: #263449; }
+    .title { font-size: 22px; font-weight: 700; fill: #172554; }
+    .label { font-size: 15px; font-weight: 600; }
+    .note { font-size: 14px; }
+    .num { font-size: 19px; font-weight: 700; }
+    .tile text { fill: #18243a; }
+    .edge { fill: none; stroke: #74849b; stroke-width: 2; }
+    .guide { fill: none; stroke: #74849b; stroke-width: 1; stroke-dasharray: 4 5; }
+    .blue { fill: #dbeafe; stroke: #477fc0; }
+    .violet { fill: #ede9fe; stroke: #8864cb; }
+    .green { fill: #d1fae5; stroke: #19936c; }
+    .amber { fill: #ffedd5; stroke: #bd6a26; }
+    .blue, .violet, .green, .amber { stroke-width: 1.5; }
+    @media (prefers-color-scheme: dark) {
+      text { fill: #e2e8f0; }
+      .title { fill: #f1f5ff; }
+      .edge { stroke: #94a3b8; }
+    }
+    .blue-line { fill: none; stroke: #3b89ce; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+    .violet-line { fill: none; stroke: #9571d6; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+    .green-line { fill: none; stroke: #22a87e; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+    .amber-line { fill: none; stroke: #d88835; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0 0L8 4L0 8Z" fill="#74849b"/>
+    </marker>
+  </defs>
+  <text x="360" y="28" class="title">Weighted neuron with ReLU</text>
+  <g class="tile">
+    <rect x="24" y="66" width="88" height="38" rx="19" class="blue"/>
+    <text x="68" y="90" class="label">Input 2</text>
+  </g>
+  <g class="tile">
+    <rect x="24" y="131" width="88" height="38" rx="19" class="blue"/>
+    <text x="68" y="155" class="label">Input 2</text>
+  </g>
+  <path d="M115 85L241 106" class="edge" marker-end="url(#arrow)"/>
+  <path d="M115 150L241 122" class="edge" marker-end="url(#arrow)"/>
+  <text x="170" y="78" class="label">× 0.5</text>
+  <text x="170" y="163" class="label">× −1</text>
+  <g class="tile">
+    <rect x="247" y="96" width="135" height="38" rx="19" class="violet"/>
+    <text x="314.5" y="120" class="label">Add 1 and −2</text>
+  </g>
+  <path d="M387 115L431 115" class="edge" marker-end="url(#arrow)"/>
+  <g class="tile">
+    <rect x="437" y="96" width="112" height="38" rx="19" class="amber"/>
+    <text x="493" y="120" class="label">Bias +0.5</text>
+  </g>
+  <path d="M554 115L584 115" class="edge" marker-end="url(#arrow)"/>
+  <g class="tile">
+    <rect x="590" y="96" width="107" height="38" rx="19" class="green"/>
+    <text x="643.5" y="120" class="label">ReLU → 0</text>
+  </g>
+</svg>

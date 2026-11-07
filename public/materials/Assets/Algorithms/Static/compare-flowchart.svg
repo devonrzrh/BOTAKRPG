@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="223" viewBox="0 0 640 223" role="img" aria-labelledby="title desc">
+<title id="title">A comparison decides whether to swap</title><desc id="desc">If the left score is larger, swap the neighbors. Otherwise keep them in place.</desc>
+<style>
+text { font: 16px system-ui, sans-serif; text-anchor: middle; fill: #14243a; }
+.label { paint-order: stroke; stroke: #f8fafc; stroke-width: 3px; stroke-linejoin: round; }
+.heading { font-size: 20px; font-weight: 700; }
+.small { font-size: 13px; }
+.tile { fill: #dbeafe; stroke: #4169a9; stroke-width: 2; }
+.focus { fill: #a7f3d0; stroke: #16835e; }
+.muted { fill: #e2e8f0; stroke: #64748b; }
+.edge { stroke: #64748b; stroke-width: 2.5; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.route { stroke: #16835e; stroke-width: 4; fill: none; stroke-linecap: round; }
+.badge { fill: #334155; stroke: #f8fafc; stroke-width: 1.5; }
+.badge-text { fill: #fff; font-size: 12px; font-weight: 700; }
+@media (prefers-color-scheme: dark) {
+  .label { fill: #f8fafc; stroke: #111827; }
+  .edge { stroke: #b8c7db; }
+  .route { stroke: #4ade80; }
+}
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
+
+</style>
+<text class="label heading" x="320" y="29">A comparison decides whether to swap</text>
+<rect class="tile" x="225.0" y="51" width="190" height="40" rx="7"/><text class="ink" x="320" y="77">Compare neighbors</text><path class="tile focus" d="M320 109 L425 151 L320 193 L215 151 Z"/><text class="ink" x="320" y="157">Left &gt; right?</text><path class="edge" d="M320 92 L320 109"/><path class="edge" d="M316.1 100.9 L320 109 L323.9 100.9"/><path class="edge" d="M425 151 L494 151"/><path class="edge" d="M485.9 154.9 L494 151 L485.9 147.1"/><path class="edge" d="M215 151 L146 151"/><path class="edge" d="M154.1 147.1 L146 151 L154.1 154.9"/><rect class="tile" x="498.0" y="131" width="82" height="40" rx="7"/><text class="ink" x="539" y="157">Swap</text><rect class="tile" x="59.0" y="131" width="82" height="40" rx="7"/><text class="ink" x="100" y="157">Keep</text><text class="label small" x="456" y="137">Yes</text><text class="label small" x="182" y="137">No</text>
+</svg>

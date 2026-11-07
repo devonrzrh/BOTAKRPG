@@ -1,0 +1,2250 @@
+{
+  "chapters": [
+    {
+      "id": "source-alg-00",
+      "title": "Introduction to Python Programming",
+      "topic": "algorithms",
+      "file": "Content/Markdown/Algorithm/00 introduction to python programming.md"
+    },
+    {
+      "id": "source-alg-01",
+      "title": "Introduction to Algorithms",
+      "topic": "algorithms",
+      "file": "Content/Markdown/Algorithm/01 introduction to algorithms.md"
+    },
+    {
+      "id": "source-alg-02",
+      "title": "Basic Sorting Algorithms",
+      "topic": "algorithms",
+      "file": "Content/Markdown/Algorithm/02 basic sorting algorithms.md"
+    },
+    {
+      "id": "source-alg-03",
+      "title": "Binary Search, Linear Search, and Big O Notation",
+      "topic": "algorithms",
+      "file": "Content/Markdown/Algorithm/03 binary search linear search and big o notation.md"
+    },
+    {
+      "id": "source-alg-04",
+      "title": "Recursion and Call Stack",
+      "topic": "algorithms",
+      "file": "Content/Markdown/Algorithm/04 recursion and call stack.md"
+    },
+    {
+      "id": "source-alg-05",
+      "title": "Time Complexity Analysis",
+      "topic": "algorithms",
+      "file": "Content/Markdown/Algorithm/05 time complexity analysis.md"
+    },
+    {
+      "id": "source-alg-06",
+      "title": "Graph Searching: BFS, DFS & Routing and Coverage",
+      "topic": "algorithms",
+      "file": "Content/Markdown/Algorithm/06 graph searching routing and coverage.md"
+    },
+    {
+      "id": "source-alg-07",
+      "title": "Greedy Algorithm and Optimization",
+      "topic": "algorithms",
+      "file": "Content/Markdown/Algorithm/07 greedy algorithm and optimization.md"
+    },
+    {
+      "id": "source-alg-08",
+      "title": "Dynamic Programming (DP)",
+      "topic": "algorithms",
+      "file": "Content/Markdown/Algorithm/08 dynamic programming.md"
+    },
+    {
+      "id": "source-alg-09",
+      "title": "Inventory and Uncertainty Management",
+      "topic": "algorithms",
+      "file": "Content/Markdown/Algorithm/09 inventory and uncertainty management.md"
+    },
+    {
+      "id": "source-alg-10",
+      "title": "Sequential Decisions Over Time",
+      "topic": "algorithms",
+      "file": "Content/Markdown/Algorithm/10 sequential decisions over time.md"
+    },
+    {
+      "id": "source-ds-01",
+      "title": "Data Structures",
+      "topic": "structures",
+      "file": "Content/Markdown/Data-Structures/01 introduction to data structures.md"
+    },
+    {
+      "id": "source-ds-02",
+      "title": "Linear Data Structures",
+      "topic": "structures",
+      "file": "Content/Markdown/Data-Structures/02 linear data structures.md"
+    },
+    {
+      "id": "source-ds-03",
+      "title": "Arrays",
+      "topic": "structures",
+      "file": "Content/Markdown/Data-Structures/03 arrays.md"
+    },
+    {
+      "id": "source-ds-04",
+      "title": "Linked List",
+      "topic": "structures",
+      "file": "Content/Markdown/Data-Structures/04 linked lists.md"
+    },
+    {
+      "id": "source-ds-05",
+      "title": "Stack",
+      "topic": "structures",
+      "file": "Content/Markdown/Data-Structures/05 stacks.md"
+    },
+    {
+      "id": "source-ds-06",
+      "title": "Queue",
+      "topic": "structures",
+      "file": "Content/Markdown/Data-Structures/06 queues.md"
+    },
+    {
+      "id": "source-ds-07",
+      "title": "Nonlinear Data Structures",
+      "topic": "structures",
+      "file": "Content/Markdown/Data-Structures/07 nonlinear data structures.md"
+    },
+    {
+      "id": "source-ds-08",
+      "title": "Trees",
+      "topic": "structures",
+      "file": "Content/Markdown/Data-Structures/08 trees.md"
+    },
+    {
+      "id": "source-ds-09",
+      "title": "Graphs",
+      "topic": "structures",
+      "file": "Content/Markdown/Data-Structures/09 graphs.md"
+    },
+    {
+      "id": "source-ds-10",
+      "title": "Data Versioning",
+      "topic": "structures",
+      "file": "Content/Markdown/Data-Structures/10 data versioning.md"
+    },
+    {
+      "id": "source-ai-01",
+      "title": "Introduction to Connectionist AI (Brief)",
+      "topic": "ai",
+      "file": "Content/Markdown/Connetionist-AI/01 introduction to connectionist ai.md"
+    },
+    {
+      "id": "source-ai-02",
+      "title": "Basic Concepts, Terminology and Architectures of Neural Networks",
+      "topic": "ai",
+      "file": "Content/Markdown/Connetionist-AI/02 neural network concepts terminology architectures.md"
+    },
+    {
+      "id": "source-ai-03",
+      "title": "Applications of Neural Networks (Brief)",
+      "topic": "ai",
+      "file": "Content/Markdown/Connetionist-AI/03 applications of neural networks.md"
+    },
+    {
+      "id": "source-ai-04",
+      "title": "Deep Learning and Activation Functions",
+      "topic": "ai",
+      "file": "Content/Markdown/Connetionist-AI/04 deep learning and activation functions.md"
+    },
+    {
+      "id": "source-ai-05",
+      "title": "Demand Forecasting and Time-Series Forecasting",
+      "topic": "ai",
+      "file": "Content/Markdown/Connetionist-AI/05 demand and time series forecasting.md"
+    },
+    {
+      "id": "source-ai-06",
+      "title": "Probabilistic Forecasting",
+      "topic": "ai",
+      "file": "Content/Markdown/Connetionist-AI/06 probabilistic forecasting.md"
+    },
+    {
+      "id": "source-ai-07",
+      "title": "Online and Incremental Learning",
+      "topic": "ai",
+      "file": "Content/Markdown/Connetionist-AI/07 online and incremental learning.md"
+    },
+    {
+      "id": "source-ai-08",
+      "title": "Recommendation Systems (Brief)",
+      "topic": "ai",
+      "file": "Content/Markdown/Connetionist-AI/08 recommendation systems.md"
+    },
+    {
+      "id": "source-ai-09",
+      "title": "Reinforcement Learning",
+      "topic": "ai",
+      "file": "Content/Markdown/Connetionist-AI/09 reinforcement learning.md"
+    },
+    {
+      "id": "source-ai-10",
+      "title": "Model Training and Optimisation",
+      "topic": "ai",
+      "file": "Content/Markdown/Connetionist-AI/10 model training and optimization.md"
+    }
+  ],
+  "questions": 82,
+  "openEnded": 13,
+  "files": [
+    {
+      "path": "Assets/Algorithms/Animated/bfs-code-graph.svg",
+      "sha256": "37ffa65cb24128a56b696f3bb3e3ef7d737f911daf629f2fd6f94217bbd2d56a",
+      "bytes": 7055
+    },
+    {
+      "path": "Assets/Algorithms/Animated/bfs-path.svg",
+      "sha256": "143c2338d41c45eb94dc66f84ab103588092aea9b6a823a6ce842d3eacbd83a0",
+      "bytes": 2816
+    },
+    {
+      "path": "Assets/Algorithms/Animated/bfs-queue.svg",
+      "sha256": "a77626c0b70687fdb88d18ec3eb53dc487d02767f66d1a9777a998f13e2bebb2",
+      "bytes": 9651
+    },
+    {
+      "path": "Assets/Algorithms/Animated/bfs-traversal.svg",
+      "sha256": "64d21e4c7173fd466d8f14289019dae39b66abaf57b75a3414cb0bcdf3f133b4",
+      "bytes": 7060
+    },
+    {
+      "path": "Assets/Algorithms/Animated/binary-search.svg",
+      "sha256": "ffc0b36dae5b04fb4d9040010d29432ad969f06589210ec48a247e9e1f5694d3",
+      "bytes": 4355
+    },
+    {
+      "path": "Assets/Algorithms/Animated/bubble-early-stop.svg",
+      "sha256": "dd3ca3fabf8ccd69bf86f5e74ec638d5f1082ed9b41f0421e0de71bf1114c38d",
+      "bytes": 3715
+    },
+    {
+      "path": "Assets/Algorithms/Animated/bubble-sort.svg",
+      "sha256": "8a99fd3533cc566cb84ba4a167c55101ad5ded4e2fa3d48d0f1a6ce99c6c1ea8",
+      "bytes": 5353
+    },
+    {
+      "path": "Assets/Algorithms/Animated/dfs-traversal.svg",
+      "sha256": "b800b2ba85dc19bb0baaeec1202bee763df1879b71e6e3c478159a5cefee8995",
+      "bytes": 4322
+    },
+    {
+      "path": "Assets/Algorithms/Animated/factorial-calls.svg",
+      "sha256": "b1a92bb15f94b68c755ab2237b93b3100d5ee8a55372629b2622488dd1eddd4c",
+      "bytes": 3196
+    },
+    {
+      "path": "Assets/Algorithms/Animated/factorial-returns.svg",
+      "sha256": "9f0c37653b339b9d29f7d4ba14114cf9a5ab52588af9e182dd13d00354ca6de8",
+      "bytes": 3189
+    },
+    {
+      "path": "Assets/Algorithms/Animated/factorial-stack.svg",
+      "sha256": "6c39434cfb585d0fba42880ffabad7d88e5aea3be93e2905a816fbdc369cf1da",
+      "bytes": 3415
+    },
+    {
+      "path": "Assets/Algorithms/Animated/grade-sort.svg",
+      "sha256": "efcee259cdbc120169bd6ab6958d8601505206520dc2911719e68b7ac33750a2",
+      "bytes": 8396
+    },
+    {
+      "path": "Assets/Algorithms/Animated/graph-search.svg",
+      "sha256": "93642f2d6883685a3d16830ac983387d6dc06bb7dba87d0570e01a8815541630",
+      "bytes": 5548
+    },
+    {
+      "path": "Assets/Algorithms/Animated/greedy-choice.svg",
+      "sha256": "452bcab2d1af0eb8ed27771c73f6dde6cd2ceca40eb7e8784bac9ba44b791d90",
+      "bytes": 3532
+    },
+    {
+      "path": "Assets/Algorithms/Animated/insertion-sort.svg",
+      "sha256": "4864ef9a4d8990ceb1e7ba219b09b74f78b22c71dc640d0c2170526f17153b20",
+      "bytes": 6929
+    },
+    {
+      "path": "Assets/Algorithms/Animated/inventory-demand-six.svg",
+      "sha256": "2098a0b1276afd29c6b6b55a17d16d2da4c47b007e2fe12ae42d90dfa331ce44",
+      "bytes": 6283
+    },
+    {
+      "path": "Assets/Algorithms/Animated/linear-search.svg",
+      "sha256": "beb76ccc94deeefce9a93c26ccd7ea3fc8266490059362c7ff42f9f21de09b1b",
+      "bytes": 3876
+    },
+    {
+      "path": "Assets/Algorithms/Animated/python-for-range.svg",
+      "sha256": "c6cbfc00b2c6e9a733f6c9fc8a64fb61a398a609e70c953bc935a39931c89f3d",
+      "bytes": 4662
+    },
+    {
+      "path": "Assets/Algorithms/Animated/python-function-return.svg",
+      "sha256": "c6e50b246dad74968378cbabb8348e3cc4440ef6cc51db2ccf8f85d2953c3ad4",
+      "bytes": 4213
+    },
+    {
+      "path": "Assets/Algorithms/Animated/python-linear-search.svg",
+      "sha256": "6df54fbb2e8c6591f449197961e10d7404d416f1dc1d4dcd8762e16a5048431d",
+      "bytes": 4223
+    },
+    {
+      "path": "Assets/Algorithms/Animated/python-list-update.svg",
+      "sha256": "e247e9a6c775a456fa79367ccca3ea5612a1e03c7b7b66d6b6e3c8b3ba05d9ee",
+      "bytes": 5014
+    },
+    {
+      "path": "Assets/Algorithms/Animated/running-maximum.svg",
+      "sha256": "5dc31d5fbea969c16564fa6eee80194b6915d9e9784642ad8a6e51cd22e338b4",
+      "bytes": 4465
+    },
+    {
+      "path": "Assets/Algorithms/Animated/selection-sort.svg",
+      "sha256": "3965e642155e565cad95164e20e56b23ca56b7c39204f426dc6af6c451309ed5",
+      "bytes": 5357
+    },
+    {
+      "path": "Assets/Algorithms/Animated/sequential-dp-table.svg",
+      "sha256": "ec44cf3e5d4f02e6b955f69af7f16616e6fc006fb453a8bb082fe36bdc0d9328",
+      "bytes": 6671
+    },
+    {
+      "path": "Assets/Algorithms/Animated/sequential-pass-plans.svg",
+      "sha256": "12bf76e4d56611c223a9eddea0ed3bab05c446fe43f692cc43a0af38c5ae7b28",
+      "bytes": 8281
+    },
+    {
+      "path": "Assets/Algorithms/Static/bfs-code-graph.svg",
+      "sha256": "f6ae5dd22b4db6f9440c15c017fda2fbf2488e014dc09224f455bd7c0f86ad39",
+      "bytes": 3484
+    },
+    {
+      "path": "Assets/Algorithms/Static/bfs-path.svg",
+      "sha256": "0b6d0b3b957c0e2a049551525b95feea1ca5383c0507fe570088954096ab13f3",
+      "bytes": 2735
+    },
+    {
+      "path": "Assets/Algorithms/Static/bfs-queue.svg",
+      "sha256": "8c06ab482b6238865d384c776d9eeac9f8e0bd0fce96c30f3662c394076437ad",
+      "bytes": 2358
+    },
+    {
+      "path": "Assets/Algorithms/Static/bfs-traversal.svg",
+      "sha256": "0c841d9e93513200beffa53afdfc223988156a9dad4a04d377056cca2d5992fd",
+      "bytes": 3419
+    },
+    {
+      "path": "Assets/Algorithms/Static/binary-search.svg",
+      "sha256": "193f1dce8eb238346a884d6954bd9c905c5400cc647f58b48282cd17b05067e1",
+      "bytes": 2670
+    },
+    {
+      "path": "Assets/Algorithms/Static/bubble-early-stop.svg",
+      "sha256": "1ba3292290adb2768c4e50111785fdfa3c200a528e799169a34e7990117b883c",
+      "bytes": 1993
+    },
+    {
+      "path": "Assets/Algorithms/Static/bubble-sort.svg",
+      "sha256": "5b682fa2d3bdfe59e5505f9a9608c706fff1472cf6b099fd2f420369ea83c050",
+      "bytes": 3480
+    },
+    {
+      "path": "Assets/Algorithms/Static/compare-flowchart.svg",
+      "sha256": "7ed8aee47fc4e6295ebb7fcb9324a7ff56d7014300299a503fbddef1bf50191b",
+      "bytes": 2234
+    },
+    {
+      "path": "Assets/Algorithms/Static/complexity-growth.svg",
+      "sha256": "82b137adbe17e1da9785431124f9bda50e5730347c32eca929236a957ee5f29b",
+      "bytes": 5049
+    },
+    {
+      "path": "Assets/Algorithms/Static/dfs-traversal.svg",
+      "sha256": "03accdf12f2ca87ed9217993085fa7bf6b37f8fdc84f1928d969f61024970dbf",
+      "bytes": 3413
+    },
+    {
+      "path": "Assets/Algorithms/Static/directed-graph.svg",
+      "sha256": "242b8f7b27dbef0fa1c5297e4b3e08f8558b2cd74c3f9949fcda01bd70a40210",
+      "bytes": 2102
+    },
+    {
+      "path": "Assets/Algorithms/Static/efficiency-comparisons.svg",
+      "sha256": "56f4b59340cea9fe6de7d6979a4e6fc27a8bb2f4a6b0cf49225a201abfd8e833",
+      "bytes": 1967
+    },
+    {
+      "path": "Assets/Algorithms/Static/factorial-calls.svg",
+      "sha256": "ba222bcb04a0a4d73db0310955dbbeed520032bc73c5811fff279862d0c84420",
+      "bytes": 2660
+    },
+    {
+      "path": "Assets/Algorithms/Static/factorial-returns.svg",
+      "sha256": "386e5949db28db9c3037acff3f2963228028aabb97bc4bc36e5a3a5e662a3946",
+      "bytes": 2448
+    },
+    {
+      "path": "Assets/Algorithms/Static/factorial-stack.svg",
+      "sha256": "ad45839e24ef3575c2145fd76f9adbc04eaad89b0e9e6e5f58a8261da036e270",
+      "bytes": 2051
+    },
+    {
+      "path": "Assets/Algorithms/Static/flowchart-arrow.svg",
+      "sha256": "ec27d024fc46aaed0b2c758945647672ec41407a57654fa2643785a7cc9fe0f0",
+      "bytes": 1420
+    },
+    {
+      "path": "Assets/Algorithms/Static/flowchart-decision.svg",
+      "sha256": "be66c841b1d58437b3161ecbaeb2d91d293e6e04f96fd0d9667a2d90366b5cf1",
+      "bytes": 1355
+    },
+    {
+      "path": "Assets/Algorithms/Static/flowchart-operation.svg",
+      "sha256": "81849cb4e091780ddcb574b522a834ad0071c7a96c7f5623ab5385cb38c94d33",
+      "bytes": 1376
+    },
+    {
+      "path": "Assets/Algorithms/Static/flowchart-start.svg",
+      "sha256": "6f85ad08e8ab91da95df6784b77519583e1d592f76838062f0d8a7c16785e10f",
+      "bytes": 1347
+    },
+    {
+      "path": "Assets/Algorithms/Static/grade-sort.svg",
+      "sha256": "b68e9fdb83c7c7e2cdf653b06fbc1fedee95d20ba70a8349ed0171c12a3f7f38",
+      "bytes": 6320
+    },
+    {
+      "path": "Assets/Algorithms/Static/graph-search.svg",
+      "sha256": "e05c4152d92f11a969a63fc4dd01fef2d8df33636a49882bc66fd4dd8b58577f",
+      "bytes": 3183
+    },
+    {
+      "path": "Assets/Algorithms/Static/greedy-choice.svg",
+      "sha256": "b02378944a1df0477255552e6209044797e09d48c23f3469619d51a22738afa4",
+      "bytes": 2511
+    },
+    {
+      "path": "Assets/Algorithms/Static/input-process-output.svg",
+      "sha256": "8f46af82b15baba91f2cc78cc5c18142c11b4a63eebc3636dd958f0d4b9ca265",
+      "bytes": 2053
+    },
+    {
+      "path": "Assets/Algorithms/Static/insertion-sort.svg",
+      "sha256": "856b5531b07cc31881a0709d4efc08f781408fcc715591f7fbae4018a56a10b3",
+      "bytes": 4651
+    },
+    {
+      "path": "Assets/Algorithms/Static/inventory-carryover.svg",
+      "sha256": "0d5d3eaccd57514e27c53278b8b5a828f7c5d63f54137f7bb9550da72e00afd6",
+      "bytes": 3538
+    },
+    {
+      "path": "Assets/Algorithms/Static/inventory-demand-probabilities.svg",
+      "sha256": "8e109db07e4d21726ef5a64da9c11168cdee3ff83193df5df9acf28f07ecf4fe",
+      "bytes": 2971
+    },
+    {
+      "path": "Assets/Algorithms/Static/inventory-demand-six.svg",
+      "sha256": "6967a41b9546d573709f4bdeb9252e47943ab25b5c3b8314f17da09e87140d69",
+      "bytes": 4024
+    },
+    {
+      "path": "Assets/Algorithms/Static/inventory-expected-cost.svg",
+      "sha256": "fcda0aa0be142f2f5ae7ea1c2cef4874bf7275e098b385e1d6ea4ab19ab7ce81",
+      "bytes": 4112
+    },
+    {
+      "path": "Assets/Algorithms/Static/inventory-stock-balance.svg",
+      "sha256": "d5189c9731fb33f92a8a338d2b7a572e053b557ad572079c53b270067a0e5dc4",
+      "bytes": 7093
+    },
+    {
+      "path": "Assets/Algorithms/Static/inventory-stock-choice.svg",
+      "sha256": "06aab68b0ce18bbebaccee0a585abe7c440fe570c7049285fff11e16aff9cf43",
+      "bytes": 2774
+    },
+    {
+      "path": "Assets/Algorithms/Static/linear-search.svg",
+      "sha256": "ba5190359d244ae2c4805c67633249978cf0dc5d0ce0a438ab05c00d1704b2bb",
+      "bytes": 2163
+    },
+    {
+      "path": "Assets/Algorithms/Static/midpoint.svg",
+      "sha256": "be5d323eecd0aee8cc5932423d002b30bf0b99d626336760a45d2cedb91aa5bd",
+      "bytes": 1703
+    },
+    {
+      "path": "Assets/Algorithms/Static/python-assignment.svg",
+      "sha256": "3cd147f0ab06d455ce8c68c15870dff51eb1b8080743bdd5bbd83f0a1ea66bd6",
+      "bytes": 2931
+    },
+    {
+      "path": "Assets/Algorithms/Static/python-conditional.svg",
+      "sha256": "cc0ef785818bef1ade22ff4c74b23c5dfe3a7a40b5d645fa938025c3350569b9",
+      "bytes": 3119
+    },
+    {
+      "path": "Assets/Algorithms/Static/python-debug-comparison.svg",
+      "sha256": "08f2c96fbf795160a11dd26f56abe7f33711249ed20321e3558f6bfd6e310ba0",
+      "bytes": 3918
+    },
+    {
+      "path": "Assets/Algorithms/Static/python-dictionary-set.svg",
+      "sha256": "5bd0aa94741b81b29be5a812cfd52fe31fb4942da28b83a9e4270eba1a6062a0",
+      "bytes": 3697
+    },
+    {
+      "path": "Assets/Algorithms/Static/python-for-range.svg",
+      "sha256": "ccadabff76abcaa5b62b52bbed454d2a17622667da0baf9ceb2d25380a3e03be",
+      "bytes": 3097
+    },
+    {
+      "path": "Assets/Algorithms/Static/python-function-return.svg",
+      "sha256": "707328283ff0101251b0df4753f350331d286e61a61f1f225bd031f68c677b29",
+      "bytes": 3198
+    },
+    {
+      "path": "Assets/Algorithms/Static/python-linear-search.svg",
+      "sha256": "904a86f35b6a4cea8b21833372bdb325e7241cc2f994d638f0988c4e5241b3ea",
+      "bytes": 3291
+    },
+    {
+      "path": "Assets/Algorithms/Static/python-list-update.svg",
+      "sha256": "563ca29d6b6bc0b8c2361fe02ef4f36803e1c19a471c818975206c9dcb5e64c0",
+      "bytes": 4578
+    },
+    {
+      "path": "Assets/Algorithms/Static/python-logical-entry.svg",
+      "sha256": "9f974f60dfa20c4c3255cbfc4a7b2f7a205460e3b092a45489bbdd5419809e5a",
+      "bytes": 2989
+    },
+    {
+      "path": "Assets/Algorithms/Static/python-while-trace.svg",
+      "sha256": "1da5c1a0747ca760fafb328de0233eae97e13f29051ce09ce5721b452c7ede76",
+      "bytes": 4325
+    },
+    {
+      "path": "Assets/Algorithms/Static/running-maximum.svg",
+      "sha256": "92131c507d1272a7f89964cec6ca9948c63aa4eb47a79f58f8ae95302d4ab8f6",
+      "bytes": 2354
+    },
+    {
+      "path": "Assets/Algorithms/Static/selection-sort.svg",
+      "sha256": "5e04905d74b3fcdd2127eeefb3c3aab8be54bc9f848bb5b4e43bc177a56a66b1",
+      "bytes": 3478
+    },
+    {
+      "path": "Assets/Algorithms/Static/sequential-dp-table.svg",
+      "sha256": "dbcddf664c6c92fe007b7de8e98f04a7fc167dbd226a8db0291f4fe45a3e904a",
+      "bytes": 5574
+    },
+    {
+      "path": "Assets/Algorithms/Static/sequential-inventory-state.svg",
+      "sha256": "7c4d03f027084a66856d16971d73dfbe74900ddf3b6b03d9cfac70ce9b442b61",
+      "bytes": 6454
+    },
+    {
+      "path": "Assets/Algorithms/Static/sequential-memoization.svg",
+      "sha256": "b9d839cfbf529d070913ac64b131f924aff92f5747b4200e3069707814682a59",
+      "bytes": 3468
+    },
+    {
+      "path": "Assets/Algorithms/Static/sequential-pass-plans.svg",
+      "sha256": "c0f24c336bd9c7b7706b2660febe29913ef1639791ad4636bfebf191abab60ec",
+      "bytes": 5901
+    },
+    {
+      "path": "Assets/Algorithms/Static/sequential-uncertainty.svg",
+      "sha256": "a963e7605adaf28997b97fdee8e7d85235aa18a60ee1792d5502713d8e5f7e66",
+      "bytes": 5086
+    },
+    {
+      "path": "Assets/Algorithms/Static/traversal-graph.svg",
+      "sha256": "90b08ad7de4e11c065a0a447881adcd27728759db04c39ebb1f29bd528921176",
+      "bytes": 2688
+    },
+    {
+      "path": "Assets/Algorithms/Static/undirected-graph.svg",
+      "sha256": "2275cbaf59812a4f6a8fd23e0d5e6ff93c7ed1407848911fc2626f3c197f977c",
+      "bytes": 1971
+    },
+    {
+      "path": "Assets/Algorithms/Static/unweighted-graph.svg",
+      "sha256": "87920e12185b211dfecf822f0e5629ed5dab51e1cf468d1b2546eaba98c2a6ce",
+      "bytes": 1990
+    },
+    {
+      "path": "Assets/Algorithms/Static/weighted-graph.svg",
+      "sha256": "9dd19651e60d6b3bba3c73d1bc50d708a7765f8a98e3009fbd6c2c2a28ebecaa",
+      "bytes": 2114
+    },
+    {
+      "path": "Assets/Algorithms/Static/weighted-routes.svg",
+      "sha256": "384cc8536fb02f99c801a9d11c4803a58eddf52e85c77c908853169d77b2a61c",
+      "bytes": 2084
+    },
+    {
+      "path": "Assets/Banner.png",
+      "sha256": "5ca541e09542bc54352213163ae0612072c8ab823ed032ce47442f93f727bb7e",
+      "bytes": 307407
+    },
+    {
+      "path": "Assets/Connectionist AI/Animated/and-neuron.svg",
+      "sha256": "646025dc85723d8a27a1dafd2843d83d37a510e1cc519af72f7c606490da1369",
+      "bytes": 3812
+    },
+    {
+      "path": "Assets/Connectionist AI/Animated/chain-rule-path.svg",
+      "sha256": "546f09c0b01648b5672cc81beeaa95e802d07b9ae5c18b4065d6f471d7450eef",
+      "bytes": 3712
+    },
+    {
+      "path": "Assets/Connectionist AI/Animated/cnn-filter-scan.svg",
+      "sha256": "8a3914e0d0bfa9ad6d90c26db75fa4a7e42e99b19be7a525071f8f96dc728f0f",
+      "bytes": 6516
+    },
+    {
+      "path": "Assets/Connectionist AI/Animated/defect-detection.svg",
+      "sha256": "bcdda729e0fadd960bfe80f2f10b842ed242b0e817ab1e20ba86c26e2196c769",
+      "bytes": 3280
+    },
+    {
+      "path": "Assets/Connectionist AI/Animated/descent-steps.svg",
+      "sha256": "370c90a514b538dbd594ed4e342808a3d07f1c735ec65df87f9c92d164207183",
+      "bytes": 3548
+    },
+    {
+      "path": "Assets/Connectionist AI/Animated/gradient-shrinkage.svg",
+      "sha256": "100b9c4b5d27bcc0d5adba2c6007ad9200efccbf072f1f4312b350a066595b53",
+      "bytes": 3378
+    },
+    {
+      "path": "Assets/Connectionist AI/Animated/next-token-generation.svg",
+      "sha256": "413b6bd8ba39dc0fc1a453897897c42d39dbdf81c2b89fafefb19bd2b088e550",
+      "bytes": 3345
+    },
+    {
+      "path": "Assets/Connectionist AI/Animated/ol-feedback-loop.svg",
+      "sha256": "d9ec9dcd3b3ef5b166070aa4057e75b39642b2771bb04ac7d7d866fcbcac97ad",
+      "bytes": 3037
+    },
+    {
+      "path": "Assets/Connectionist AI/Animated/ol-recent-window.svg",
+      "sha256": "f1ac42bd3e4974f005a00c99002a931c84f9903edcaf50957b3f7a7ef3fc09a1",
+      "bytes": 3829
+    },
+    {
+      "path": "Assets/Connectionist AI/Animated/ol-update-sequence.svg",
+      "sha256": "b3420ab1d38b34806016c0446a6293227f6729d1ed808a4c5f370d6f11d1a26e",
+      "bytes": 3204
+    },
+    {
+      "path": "Assets/Connectionist AI/Animated/pf-sampled-paths.svg",
+      "sha256": "fbd9628b614ddd933e59dacc3cf04e444f3985fa84b9229001da2f6e13770229",
+      "bytes": 4294
+    },
+    {
+      "path": "Assets/Connectionist AI/Animated/rec-negative-sampling.svg",
+      "sha256": "3ff9076fae4ede75c02fcf6bc037a11bde4db2bfe04a8c5548d49f4527a466c1",
+      "bytes": 3363
+    },
+    {
+      "path": "Assets/Connectionist AI/Animated/rec-two-towers.svg",
+      "sha256": "037f5fe45c7e190baaca54bb3c71f84f6e4edd40527e049c4cb066327cdd429f",
+      "bytes": 3648
+    },
+    {
+      "path": "Assets/Connectionist AI/Animated/residual-path.svg",
+      "sha256": "d396df4ff1eb9b35662a72fc6ed3d511f2bc4c29b893578e29de97d86e02c964",
+      "bytes": 3029
+    },
+    {
+      "path": "Assets/Connectionist AI/Animated/rl-corridor.svg",
+      "sha256": "81b7a5ad0174dbedceb6a1e17b9a7a0bd279155f20248b7f0ce1995d9c2f4859",
+      "bytes": 3588
+    },
+    {
+      "path": "Assets/Connectionist AI/Animated/rl-feedback.svg",
+      "sha256": "fa476d76455d7c2726d195c51af06381d47f227acb6eff6ca269e623b1ffb3cc",
+      "bytes": 2950
+    },
+    {
+      "path": "Assets/Connectionist AI/Animated/rnn-state.svg",
+      "sha256": "8ef363fe93b22e6d56328f0e417d170452aabe9e204d9b8fee55c8582a5507d4",
+      "bytes": 3210
+    },
+    {
+      "path": "Assets/Connectionist AI/Animated/train-dropout.svg",
+      "sha256": "4489e37ba464be2270b1e4226a81f0ff23f6ed6eb25d75952334089fde708a4a",
+      "bytes": 3684
+    },
+    {
+      "path": "Assets/Connectionist AI/Animated/train-loop.svg",
+      "sha256": "28445a0cf3a27b8aaac3ff1bfd90db6340b5dc7d4e292dd8fbec70d65c23b7d6",
+      "bytes": 3875
+    },
+    {
+      "path": "Assets/Connectionist AI/Animated/training-step.svg",
+      "sha256": "70fe628c5cb8e0ae6ff370e09bc531e06e3a8ab86647b82a9481789fe8454be4",
+      "bytes": 4363
+    },
+    {
+      "path": "Assets/Connectionist AI/Animated/ts-multistep.svg",
+      "sha256": "7a84a78970f7c3e9d90a6d3b07b617a35a688166941dc065d3f27a59f92755db",
+      "bytes": 3839
+    },
+    {
+      "path": "Assets/Connectionist AI/Animated/ts-sliding-window.svg",
+      "sha256": "fdeda2c385cf7df87ecb88fc14ac3fc0010d922615d1e4066134f83c59ada521",
+      "bytes": 4359
+    },
+    {
+      "path": "Assets/Connectionist AI/Animated/what-is-connectionism.svg",
+      "sha256": "4c7daa78dbcf44b1dca3080efc08a99d606768ed1d8522bc4044b6adbffdd749",
+      "bytes": 4057
+    },
+    {
+      "path": "Assets/Connectionist AI/Animated/worked-network.svg",
+      "sha256": "6097119c2bced110277d77d15d006b6f4ee7157a6e6f132f2b648044d65fb48c",
+      "bytes": 5192
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/accuracy-trap.svg",
+      "sha256": "c98a7d65cceb625c91c5c55219c89667fdff517f9eb2e08e789999c8405d1ab6",
+      "bytes": 6978
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/activation-curves.svg",
+      "sha256": "8a78653aaaaf3cf90c8011373066e54592aede949da80220502c090047849dc5",
+      "bytes": 10672
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/affine-composition.svg",
+      "sha256": "b08c9f8028afe07221d3ce971ab3cf0ca0ad0086fd7455c5c26cf43f7b428e40",
+      "bytes": 2556
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/and-input-space.svg",
+      "sha256": "dc8cb2148731358852fdfef0102ff86d770bb2918f545ec5a9bea52b08b4fbb1",
+      "bytes": 3236
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/and-neuron.svg",
+      "sha256": "77b3a74b269e365f886f0207d3c044783f2bba013f1630b788bdbc84ac61bf14",
+      "bytes": 3415
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/anomaly-threshold.svg",
+      "sha256": "44edc71189de6cdbc2bb4fe2134b54198bd8ec12b56c5fda0c3a2b8b5de404d2",
+      "bytes": 2455
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/attention-mix.svg",
+      "sha256": "e1226b6968b09d7448d7d1e558e7d50be18c319d3a77d82b3ca9b610d039ae72",
+      "bytes": 2958
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/autoencoder-bottleneck.svg",
+      "sha256": "32fb8eacc22b8df6307cb33b4926fe6ac6cd33ab13d78cee017ee93d3c9908ab",
+      "bytes": 4487
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/baseline-compare.svg",
+      "sha256": "ba2e0ccdaf3c4488868abbea86b76ffe7e94021b1db3ff0b148b6ef02ebc827c",
+      "bytes": 2855
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/batches-and-epochs.svg",
+      "sha256": "ab6e77ba9d74fff70820e0e67ee136d2882f26f1999e5d5a34c558773e5da679",
+      "bytes": 3791
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/bias-threshold.svg",
+      "sha256": "9ae633573736d9386ca77daf1c214d8022e99aa39373e91fbde41ea5e48be0ad",
+      "bytes": 3343
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/clinical-review.svg",
+      "sha256": "f40c980113cad94c094a3bab5965d3f50754c4626ad7dd63447a3ed0b776d3d6",
+      "bytes": 3179
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/dataset-split.svg",
+      "sha256": "a17fd46ac980e25e9694213e59ae80738d821036dc5fe0f37c41dfdeee26319f",
+      "bytes": 2586
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/defect-detection.svg",
+      "sha256": "7a94972c41b581e05c4c8fc25a13db2ed4f34fbf80c3aa585b0105133a0ba826",
+      "bytes": 2883
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/depth-and-width.svg",
+      "sha256": "c8ba2c73e004077f340e0ac08ad3860c178cf53428129c1085aa89c733e476f9",
+      "bytes": 4614
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/distributed-patterns.svg",
+      "sha256": "bb3f86ffd824eb9005615d273c90644718c5b7658ad220998fc6f4ca27cc02d0",
+      "bytes": 3950
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/elu-selu.svg",
+      "sha256": "8325bfad0d640f289d9abe17a206b51c9a699a2e738bf1edd458f0e353805d99",
+      "bytes": 6676
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/exploding-gradient.svg",
+      "sha256": "19d6a27c43d4fa4184b7983393a016d30d6b73a391529f7ad7224e1707cdec1e",
+      "bytes": 2937
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/feature-hierarchy.svg",
+      "sha256": "0dffd92f03bf0b370bab3ccfc41c1695f77c215621829a6feda901ada53f024b",
+      "bytes": 4043
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/forecast-window.svg",
+      "sha256": "c768c68dfdd06eefda092f0021f6a6a521dc2cdba8e579d60145c161b095f558",
+      "bytes": 2636
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/fraud-threshold.svg",
+      "sha256": "345cf99634330b6218d87f72864ca8c421d8dbd15f0b3a7f7c33ac1aec09aa4b",
+      "bytes": 3257
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/gan-feedback.svg",
+      "sha256": "7273b7d16b489b2afa752ced36aaf32c91e54c7fe7094c4724c82387fe482970",
+      "bytes": 3233
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/gelu-silu.svg",
+      "sha256": "4b110b4133a8061869a3225d849cf90d97c0c8b9d64c4d68088904271509527a",
+      "bytes": 6573
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/generalisation-example.svg",
+      "sha256": "5b112a7fddb96affe9246e3dd0b42f7c056eead795acc0c3137cf7a226ccd634",
+      "bytes": 3611
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/gradient-clipping.svg",
+      "sha256": "9932471a053c79a173b0263b276e613e753307229dc5cd62446bf2deaeefd527",
+      "bytes": 2806
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/gradient-shrinkage.svg",
+      "sha256": "42694d01cf223b82156703b6641ff5f3f9bfd6b5570f2b656c23beb6631ff248",
+      "bytes": 2934
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/graph-messages.svg",
+      "sha256": "4097b6b1cabdb93c5770ec07ad388dd548c81b66e663c4a07d036c62b39c524b",
+      "bytes": 3350
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/initialisation-symmetry.svg",
+      "sha256": "2b8bffbcaedf01adbb89bd78c3e8ba768c3183cc38b7ffe5844dd5397c68dadb",
+      "bytes": 3346
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/lighting-shift.svg",
+      "sha256": "5f917c5f9b8a8e5ba2e4baa586ba40785760a9ee2b58b18c2124d8d6dcb9ed6f",
+      "bytes": 2704
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/loss-shapes.svg",
+      "sha256": "7ef77c444c7ac1521b0b250ed6fe537b7837d3937b36188a8a074124a7e6a582",
+      "bytes": 2624
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/lstm-gates.svg",
+      "sha256": "76ee1f97a8635e497544fafa50b2ee9f4aad732bcee013c3bbf05f3fe5e417f6",
+      "bytes": 3931
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/matrix-layer.svg",
+      "sha256": "ac1e6f6c0dc85e618daa5e93407e871c820311b93fe1ff8eaebab00e56aa04c2",
+      "bytes": 4261
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/max-pooling.svg",
+      "sha256": "a9dd23866baa1d5b5fb32c4037c056f2a252cc99dc7500e13265a434feab78b5",
+      "bytes": 5544
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/ol-chunk-updates.svg",
+      "sha256": "9aa949bf7510aefc701bd6379a81e274ec80c38f4f7301d35192863228b18544",
+      "bytes": 2929
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/ol-delayed-labels.svg",
+      "sha256": "2846ebecddfa1780483c7c80b29d06940242b73fa11655799f45fa68b633b976",
+      "bytes": 2815
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/ol-drift-types.svg",
+      "sha256": "e5bda2e55471955df3a586294dc2da2790d247bdd68bf50d0e2eddfe6ec4307e",
+      "bytes": 7378
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/ol-ema.svg",
+      "sha256": "0d43dbdc30c1db44f1b5c0011fa140941968be5aa6796ee19e9ae55dbb131afd",
+      "bytes": 2873
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/ol-forgetting.svg",
+      "sha256": "7a8454d7308254e2ccc57376e6027f297ed93e5b91cf11a1da62092e78e7f577",
+      "bytes": 3036
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/ol-learning-modes.svg",
+      "sha256": "2187699f9cdf53806607064807639faf5dc3b6501e9dc11a1b27786c982ddf3d",
+      "bytes": 4506
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/ol-prequential.svg",
+      "sha256": "39141e1ce75c5fc706eafe91253d4b8334b2cc8c5600e242d24860a59f83d2ef",
+      "bytes": 2665
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/ol-replay-buffer.svg",
+      "sha256": "43a605e62655bed3e46d4f08fb0929a2e0518b08da67535b3e605974e05514d9",
+      "bytes": 2920
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/ol-running-mean.svg",
+      "sha256": "fed07188a130d6fb04cf183443136825cc2fb523866359beacee004d28ecdaec",
+      "bytes": 2764
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/ol-weight-updates.svg",
+      "sha256": "e48523f692cc7964f5c7563cf19d906666754174f55cc1b320c296406514480a",
+      "bytes": 2864
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/pf-conformal.svg",
+      "sha256": "dc16a2af8033de94edb17bf8ff660e8fec0ba14e48d55c132f5b3b154dc0c281",
+      "bytes": 5142
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/pf-coverage.svg",
+      "sha256": "d58e1f2119fc9344d429aee8b6f2b730989a089460caf530d105c39751026ad7",
+      "bytes": 3357
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/pf-fan-chart.svg",
+      "sha256": "f3cc575487a3acee8fd190f9f15965c5274773f135e44a6e963ffa0666ccf9df",
+      "bytes": 3289
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/pf-gaussian-intervals.svg",
+      "sha256": "cf1e6aea83e619fcc178b1eba5ab92828f67b142e9e714b0cc8cfdd9914ab3e1",
+      "bytes": 3028
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/pf-newsvendor.svg",
+      "sha256": "05a96f22d76b3562ad12b9ddaab1481de05d398dbb06a5b84bdf12429e83e6fa",
+      "bytes": 3002
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/pf-nll-width.svg",
+      "sha256": "ffe52956b17ba3296f4eecf32c43ea2d10895fca03db0a6b4123cae11bfa6f5b",
+      "bytes": 7034
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/pf-output-heads.svg",
+      "sha256": "95d40715072fac96e41dc5da6da32b9238020920992a99318abcc83f22c39c45",
+      "bytes": 3435
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/pf-pinball.svg",
+      "sha256": "8fcf54618eb332c4a3cdbab35d857d349741f97fb544be1ba70cd46e0e8674ec",
+      "bytes": 3049
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/pf-point-distribution.svg",
+      "sha256": "1f67d3944b6d2c0c5b0e289444b33ae649d66f490157bc042b550a7e8d1a3e17",
+      "bytes": 4226
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/pf-quantiles.svg",
+      "sha256": "f1f0e971073ad42e8e6d7eb6049abf8c8cd36875952c61a361448cf5d757fc64",
+      "bytes": 4604
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/pf-reliability.svg",
+      "sha256": "fa533b289f6df5f04bf0fa5191b07e589d04bf50a7cb9566d57848491de725ba",
+      "bytes": 2953
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/pf-sharpness.svg",
+      "sha256": "59135e260124b73b9091c0f7f2fe780420d545e28de091b4dbc6f49012994c08",
+      "bytes": 4066
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/pf-uncertainty-sources.svg",
+      "sha256": "d8770629697560a4ce2f0aaf25b9b0d85002f6db61df54321edde935ad329c75",
+      "bytes": 6215
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/ranking-scores.svg",
+      "sha256": "21d8c2ec9389aa9b6746ce672edc55852ff9611da83f933de0ca47f89e56db1b",
+      "bytes": 3166
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/rec-ab-test.svg",
+      "sha256": "25c76f8dabefc807fdeb22eac88039a9735cdadc34eca60b6475c7e313fa451a",
+      "bytes": 2698
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/rec-cold-start.svg",
+      "sha256": "5340a83d7aaca5ede58df08a3b9ad16a45cdb9559ecbe5d3869437f5e286eb99",
+      "bytes": 3035
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/rec-content-profile.svg",
+      "sha256": "1bcdf76f29f0334581bd3bc18f4543f60b4ac995ce11ee4cf4a0c257fdc18ea4",
+      "bytes": 2955
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/rec-factor-update.svg",
+      "sha256": "be391a356723266804b8f5fe94447f7e3c0721577d4a4323d8b82da7bb2323be",
+      "bytes": 2480
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/rec-factor-vectors.svg",
+      "sha256": "6a7d8d1b23b0203d8e017b8ad7477b6df699780522412bc56080580170009aff",
+      "bytes": 3230
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/rec-ndcg.svg",
+      "sha256": "c6cee5dd1f7384f00244eb396b9f2b2feb399a5c0ecedf17cb34a4a0ea1af5f0",
+      "bytes": 3321
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/rec-neighbours.svg",
+      "sha256": "b450977835e301a3d2dbcd882f1b06616e098a477bb2201abe72cc9a69678104",
+      "bytes": 3604
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/rec-pipeline.svg",
+      "sha256": "b1a960152a453dddc6b2e927740f57d0866246f6e754c80a817c8b36f81bf120",
+      "bytes": 3249
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/rec-precision-recall.svg",
+      "sha256": "da74ad29b549b0efce78585761f662428bbcd4a550a9abcd8494882cf5e33c1d",
+      "bytes": 4068
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/rec-sparse-matrix.svg",
+      "sha256": "1f41149d2183dc6655e51a0c18a68142fc857360fd86d239d397cb72d43f8e48",
+      "bytes": 5330
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/rec-user-time-split.svg",
+      "sha256": "f2dd22746fe2dc99f491a93e162df7f9f78e4c513c2274e2a6d3e8defefe7978",
+      "bytes": 3255
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/relu-negative-zoom.svg",
+      "sha256": "d412e8a1b0cc7273c95de9260f450d8e437f8ff32fc96f2762cd8945c25122fe",
+      "bytes": 6429
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/rl-actor-critic.svg",
+      "sha256": "f4f6efbf7574be672c19281bc7cfa78c02241a67f006dc4a09b5bf7d02c0c787",
+      "bytes": 2953
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/rl-bellman-target.svg",
+      "sha256": "6f59abfb25ea1d8e9ade13469ca5bd10c91f752fb5cfc154a8ee711849262b97",
+      "bytes": 2380
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/rl-discounted-return.svg",
+      "sha256": "2fee61b4e70033757bc97bae148cb00c8f7ff6e1a07284d634a3eca8d937f8f1",
+      "bytes": 2302
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/rl-dqn-values.svg",
+      "sha256": "88c0ef9d7a8e2e29a499d4101bfd133e4fa1fdb03e8fb7b2aef9fedaf30ade95",
+      "bytes": 2697
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/rl-epsilon-greedy.svg",
+      "sha256": "cd5d99c69ecc0c453a0f39d0a52b0490266464f0822a23250e28f9095ddd594f",
+      "bytes": 2994
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/rl-learning-signals.svg",
+      "sha256": "f9c2d89672d660f3d037a7d13041205582b3302df292722ef0f67a8661655641",
+      "bytes": 3115
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/rl-mdp-transition.svg",
+      "sha256": "a1c5e86c62035ef32963aca721c7456639f118f7eb87ded71452c8b04daf288e",
+      "bytes": 2896
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/rl-on-off-policy.svg",
+      "sha256": "46ec4d08b6ee52d1693ef47ae1de4ec5c9bb8912728145e5141ee4a1ccf9b1c4",
+      "bytes": 2811
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/rl-policy-probabilities.svg",
+      "sha256": "c5b23fd65842cd77602d66753c67c0e9de2e51f5375d18e562c882ab3cf25e4f",
+      "bytes": 2665
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/rl-ppo-clip.svg",
+      "sha256": "f6986fddfcb7c08902f627a858d86459553c88a9e6c6f394a843a6975a472a5c",
+      "bytes": 3188
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/rl-q-update.svg",
+      "sha256": "60a5d913ae3d0cefaf67e17151fee02305d5658eaf0e69a2f5bf1fee72e79aa8",
+      "bytes": 2387
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/rl-replay-target.svg",
+      "sha256": "0ceabde72f0e9f68232ee51abf9ab6b3c53865d89af7da7e9d75b7cdf8e43491",
+      "bytes": 3401
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/rl-reward-loophole.svg",
+      "sha256": "fea0a74be12f11e10a89f565134204fee6f6ad81e3dc89211e88c74aa1c7779c",
+      "bytes": 2388
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/rules-and-weights.svg",
+      "sha256": "c6b792e847166ad96d04cf0ab4295ef49bc1b0539e2470bceb8fb9b650e7c374",
+      "bytes": 2907
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/selected-milestones.svg",
+      "sha256": "ea06a4fd6f262b519d1d00efd0ac9ee653da0163daaf71e8139a912a9eae13eb",
+      "bytes": 2698
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/sigmoid-saturation.svg",
+      "sha256": "9d0212044ee66813f29d8741add28afa8b66b9120e4c483a603291b13fbfac5d",
+      "bytes": 5120
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/simple-units-together.svg",
+      "sha256": "af0e1e8d347db072b305842045b3109640ef43addd5bfbbc2bb5a291e013c33d",
+      "bytes": 4596
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/softmax-scores.svg",
+      "sha256": "6204c265d58b27f5ff30f36f37e20a776ec841a61238223d32c5618202049b30",
+      "bytes": 2690
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/softplus-relu.svg",
+      "sha256": "c7898848c7c4a06114b2b06b722c8c13ec3537acc021ca73154494381095377f",
+      "bytes": 6664
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/speech-to-text.svg",
+      "sha256": "43c5166b1fd9f43de2880c644ca5070dd1e7c1d262f561223faa79c781081921",
+      "bytes": 6577
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/subgroup-evaluation.svg",
+      "sha256": "6c013f4f278ee7e7ca3986440acb0e999fa48ec5b91740ba4e31125a04318c20",
+      "bytes": 2851
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/tanh-zero-centred.svg",
+      "sha256": "a9c66afc1f4319a016d707e722f52ab7286bcb25b6e5a74099c23f92f7e257b9",
+      "bytes": 5249
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/temperature-bars.svg",
+      "sha256": "84e1850361ccc180cbfd11263d1108f02455a4bf7d3af42e555ab8d8fbb6154a",
+      "bytes": 4237
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/text-token-label.svg",
+      "sha256": "f41f7d725eb45f1e0cf0a1c518f29bc30a1835d49b4ac2c10b8e36f409bc2708",
+      "bytes": 3359
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/train-accumulation.svg",
+      "sha256": "57f8109e696b9e8f9d6ba079d1a2d46318f752a9c90e3f5d9cf368a16c893035",
+      "bytes": 3094
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/train-adam.svg",
+      "sha256": "64be3f81289632c016d34a12ec531c6103a1f8859ab730bd8036613c88b4c667",
+      "bytes": 2837
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/train-cross-entropy.svg",
+      "sha256": "681278a509ba9d5fde881c3f394a14a99ab337b41f1bba7f4e8b2bc8c6b40161",
+      "bytes": 4746
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/train-debug-flow.svg",
+      "sha256": "d697aa8934e6260ec5de4796f3b9d975fdb7fbb6aa7c86288f2304c689cf199e",
+      "bytes": 2750
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/train-hyperparameter-search.svg",
+      "sha256": "d5aca72e1a4527dc70c85068af43adadbb4a51b4718613bca9e8bdc9f258e7eb",
+      "bytes": 4079
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/train-learning-rate.svg",
+      "sha256": "155c59e27d5a1a6cff31b33b59a5c58db299f612ef0aee52fbc1119b0b13f1c4",
+      "bytes": 3517
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/train-lr-schedules.svg",
+      "sha256": "2354f505b10f21be31d7726ed712f4af41683e346e87aa4bdd821f5f4da353c3",
+      "bytes": 7388
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/train-momentum.svg",
+      "sha256": "33eae72bd1dbf536bd37ba0cf30bd0b6b621f544add1edf71636c3e97dc558d6",
+      "bytes": 2447
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/train-normalisation-axes.svg",
+      "sha256": "4e94a4e8189fa11310fff110b2625031b4100140b7f7532b8e04aa03fae610a5",
+      "bytes": 5765
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/train-overfitting.svg",
+      "sha256": "add09ec3de97196c02e499512324b3a16e038ae6f4502450e6058a6f94ce5587",
+      "bytes": 4419
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/train-transfer-freeze.svg",
+      "sha256": "b66fd000f9aa52870f6f95860d900e3c894b7aaaa51100709d71cdd46ff73ff9",
+      "bytes": 2908
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/train-vs-use.svg",
+      "sha256": "f1e1770c9b7f54ad10c53cb3deda2e3857be39bce8684a8151944f36bb2b0831",
+      "bytes": 3740
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/training-ingredients.svg",
+      "sha256": "e8efb558547928bb86f7e2740d609a421a4a8ca599e82f37b13ae79fe352b70f",
+      "bytes": 3035
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/training-step.svg",
+      "sha256": "15c5336b584e57198b7a04736e7d8a57b0f8eb6b6ef2a89280cd0645cf02e606",
+      "bytes": 3919
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/ts-components.svg",
+      "sha256": "207d86fdf0d99fc11f86eafaf67573826d78e7531b79fd09a0ef568e71722ae7",
+      "bytes": 4105
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/ts-cyclic-clock.svg",
+      "sha256": "3c366c49a6c88d5d4b9bd80694b8ca811ece9bd06547d6c9df16681f2ca69f0d",
+      "bytes": 3933
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/ts-differencing.svg",
+      "sha256": "b7fd4ef38b5db20b9d0c9aff8c63ded0933c87c133032eb86c0740fc946ee1ff",
+      "bytes": 3868
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/ts-global-local.svg",
+      "sha256": "a668a9eabd727a75f1fd0ab1b7de60e0d6773cf5e8af3c7b0aa8a13ea4b65d06",
+      "bytes": 4020
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/ts-hierarchy.svg",
+      "sha256": "8ac5952270eaf311ff7f0a03a3e8a8dba52cfda40e7a387cfe4e63d572e86eae",
+      "bytes": 3054
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/ts-intermittent.svg",
+      "sha256": "f33423f2ddb860b1a28136738b28f97a417c242e95a37302c7d2b65ef3d2bc79",
+      "bytes": 3134
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/ts-inventory-decision.svg",
+      "sha256": "3f10ac271f1d69c28e339614fb26e12c12b73ec82f9b70b2501c95843ec8d753",
+      "bytes": 2657
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/ts-residuals.svg",
+      "sha256": "b724db0878602042e122576ff2a34571071861fa307a831dfca929359a8c86bd",
+      "bytes": 3201
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/ts-rolling-origin.svg",
+      "sha256": "e702320cef6a5bceae73ea6946138b7bb0de87aef2d92248787c5b8a71ceaaea",
+      "bytes": 2961
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/ts-seasonal-acf.svg",
+      "sha256": "985f4c616ecff33d2378c0cad1a86c7e41dd6035246cafe1705494d24084e633",
+      "bytes": 4086
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/ts-stockout.svg",
+      "sha256": "e2d482fd417ab00f2f526908bf423f5f43e40c97e4cea696ea999a6b4095e8b3",
+      "bytes": 3354
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/ts-time-split.svg",
+      "sha256": "63133fb5284fee2571d0893358c75838ff70914ad343937a7bda27449bcdd923",
+      "bytes": 2484
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/vision-outputs.svg",
+      "sha256": "3602ae6173437e76ebd6bb5a2ed96e006cc6b580f0e843b63d5e2575ffafd2f2",
+      "bytes": 3394
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/weighted-neuron.svg",
+      "sha256": "84e1fde059df4c3bfb872c820bb6ea7752d5e74988dd9d0258426195f8c789f3",
+      "bytes": 3190
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/worked-network.svg",
+      "sha256": "bd94d66e701f81e2e722925fe057faf071f30d680c79a5768b6cd491534b2a0b",
+      "bytes": 3631
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/xor-boundary.svg",
+      "sha256": "eaabf1a2f4668a62aafe5b06fa19c01f365b6c199cd7739b55296c6be3b85c45",
+      "bytes": 2728
+    },
+    {
+      "path": "Assets/Connectionist AI/Static/xor-hidden-layer.svg",
+      "sha256": "279fba1698470a6e2c46fcd3593cc4fbe664443cf8f1536e15a7a93a109e244b",
+      "bytes": 2931
+    },
+    {
+      "path": "Assets/Data Structures/Animated/application-campus-route.svg",
+      "sha256": "b2138afdc5c3d095d60d3858f24fc6504a4c6a6bc82911aa170adb750582b76f",
+      "bytes": 2552
+    },
+    {
+      "path": "Assets/Data Structures/Animated/application-club-announcement.svg",
+      "sha256": "e885f966bf2bb8d4dbb61388117d3d131b37043aa89c6c3fea46592523708b16",
+      "bytes": 4433
+    },
+    {
+      "path": "Assets/Data Structures/Animated/application-library.svg",
+      "sha256": "44b6c77935cb08eae37ddf7f1084bfeeda36f16ae08a9956a878d0e3dab7a96d",
+      "bytes": 2298
+    },
+    {
+      "path": "Assets/Data Structures/Animated/application-playlist.svg",
+      "sha256": "af580342879b5aee770c7a8b6b6aa5aa71bce5340502f231727f4e58c05c4940",
+      "bytes": 2817
+    },
+    {
+      "path": "Assets/Data Structures/Animated/application-print-jobs.svg",
+      "sha256": "05b9b744f4cc4308e620fadb5d48a2aea81142b3eb7c4fa09d0a54962ca4ebc0",
+      "bytes": 3647
+    },
+    {
+      "path": "Assets/Data Structures/Animated/application-scores.svg",
+      "sha256": "2c990595a11b8cbc5b86af69488d0a0af8884e0c7c0465417be240ef9a423bee",
+      "bytes": 2410
+    },
+    {
+      "path": "Assets/Data Structures/Animated/application-undo.svg",
+      "sha256": "f225b0653b21854501832816b3c6d74dd2150ab273bc8cb31e905be946cb17be",
+      "bytes": 2363
+    },
+    {
+      "path": "Assets/Data Structures/Animated/application-versioning.svg",
+      "sha256": "5df48d17975024a28de91b086858c2a9fd4e10c97cb67dbe4a18165bdca69b39",
+      "bytes": 4185
+    },
+    {
+      "path": "Assets/Data Structures/Animated/array-access.svg",
+      "sha256": "53453033bbb3a16a8f9e2953baff1d45923dd18974547d4864387a217967cbfb",
+      "bytes": 1831
+    },
+    {
+      "path": "Assets/Data Structures/Animated/array-binary-search.svg",
+      "sha256": "dd225cf9d9d671fabba1ef0956865b7a35affb4ba7fcc416121eaa86e3562ca6",
+      "bytes": 2458
+    },
+    {
+      "path": "Assets/Data Structures/Animated/array-delete.svg",
+      "sha256": "500cbdd0e0186685405d3267b398e0f40e3bb1d829c508ece724af81ab50dad8",
+      "bytes": 2166
+    },
+    {
+      "path": "Assets/Data Structures/Animated/array-insert.svg",
+      "sha256": "ed058e0505ca9e6a0160123e0b4fdc0c510fc0569362403b15864bd644c79e8d",
+      "bytes": 2526
+    },
+    {
+      "path": "Assets/Data Structures/Animated/array-search.svg",
+      "sha256": "a5dbb2f2456b74527939dd6588dbf00d5a5e03584506b4f36dc7b6e63fe0ddfd",
+      "bytes": 1688
+    },
+    {
+      "path": "Assets/Data Structures/Animated/array-update.svg",
+      "sha256": "d8964661a128456a96354b811983d0f0d73b10935c0ca337e5b7a810e2c87ba2",
+      "bytes": 2017
+    },
+    {
+      "path": "Assets/Data Structures/Animated/bst-delete.svg",
+      "sha256": "dce172ed4e5896ffae58aa51ab67f4db3980cdac184a17c4183b7030aaac092b",
+      "bytes": 4015
+    },
+    {
+      "path": "Assets/Data Structures/Animated/bst-inorder.svg",
+      "sha256": "29c55c0220a554acf4aa37920064d8b1e8feec3df63504a61408c1069710c260",
+      "bytes": 2257
+    },
+    {
+      "path": "Assets/Data Structures/Animated/bst-insert.svg",
+      "sha256": "1617085f8294205425e196130897bcc551999ea1b7308f3d53ea5b96f13290cd",
+      "bytes": 2410
+    },
+    {
+      "path": "Assets/Data Structures/Animated/bst-maximum.svg",
+      "sha256": "c559e0dbe5460cb4a28493669f3a3d41902d18d262f69bf5e1d6f958295aeecd",
+      "bytes": 2568
+    },
+    {
+      "path": "Assets/Data Structures/Animated/bst-minimum.svg",
+      "sha256": "a18695c790706b451764f76d127498716124b3893400ebd527a7a15956cbb9ff",
+      "bytes": 2752
+    },
+    {
+      "path": "Assets/Data Structures/Animated/bst-search.svg",
+      "sha256": "f437acc7303ea394cb91ea81ae7efdf35645c4c9b388baa2f2a83df8328e8bce",
+      "bytes": 2658
+    },
+    {
+      "path": "Assets/Data Structures/Animated/bst-successor-parent.svg",
+      "sha256": "b1eb8fc9657bda3d1500d46c049b20c1c5916fd138a22edd78f1e343e4e6dd32",
+      "bytes": 2651
+    },
+    {
+      "path": "Assets/Data Structures/Animated/bst-successor-right.svg",
+      "sha256": "59dbc2716459498672ad4b20d1e630979b82d67c2bd479c40186ee14f5f72e9b",
+      "bytes": 2794
+    },
+    {
+      "path": "Assets/Data Structures/Animated/bus-queue.svg",
+      "sha256": "b0ea1bb8a022f7ecaeb4a99417ee44b80b8df430d4347645473f1545c13ed43d",
+      "bytes": 3278
+    },
+    {
+      "path": "Assets/Data Structures/Animated/folder-tree.svg",
+      "sha256": "4535602d638124dc1423456ad325b3929dc4e3142f5ffd37bdff599bfc8e0e18",
+      "bytes": 2488
+    },
+    {
+      "path": "Assets/Data Structures/Animated/graph-bfs.svg",
+      "sha256": "f50179b27725f5c24d23b4f033716793a2077b80599b323f21ccd275abfaa3a7",
+      "bytes": 3069
+    },
+    {
+      "path": "Assets/Data Structures/Animated/graph-dfs.svg",
+      "sha256": "cd15507f53247c18648654f779a583498de78f452a1169b4b40b961a723edf3d",
+      "bytes": 3062
+    },
+    {
+      "path": "Assets/Data Structures/Animated/importance-score-lookup.svg",
+      "sha256": "d3278f652c224fc6079f6576415e203f4fc7a8bef03b338b58266ae3e6386b88",
+      "bytes": 2551
+    },
+    {
+      "path": "Assets/Data Structures/Animated/list-access.svg",
+      "sha256": "0b9046b1359c49f2fcdafed32241808cda753d381e43e245eafe806194df9023",
+      "bytes": 2518
+    },
+    {
+      "path": "Assets/Data Structures/Animated/list-delete.svg",
+      "sha256": "6b0de552f14659f801db676642ded727f9ddb508e1961d57d077f1768cfa8c05",
+      "bytes": 3242
+    },
+    {
+      "path": "Assets/Data Structures/Animated/list-insert.svg",
+      "sha256": "3d0f045a4ac462f3bf2788a8ab106df21a56115ce344bbfa93b678e88b00dab4",
+      "bytes": 3249
+    },
+    {
+      "path": "Assets/Data Structures/Animated/list-search.svg",
+      "sha256": "0b44129978c14278e8386ce040a72e62990f1e6bfb58cb73ebe408c8b7bbb76a",
+      "bytes": 2493
+    },
+    {
+      "path": "Assets/Data Structures/Animated/pixel-grid.svg",
+      "sha256": "03ee6457df8f0d0c9d6eb89c8b3c2bcee06c9f1f5bbed489f7d185f569daa833",
+      "bytes": 8645
+    },
+    {
+      "path": "Assets/Data Structures/Animated/plate-stack.svg",
+      "sha256": "564286d67b487aada3d319d2fed13ec7d122380fcf7f8ccbe24b3d7c98a99f52",
+      "bytes": 2868
+    },
+    {
+      "path": "Assets/Data Structures/Animated/queue-dequeue.svg",
+      "sha256": "4caabd76707ed6b3aaf752c32d7f8d81248926fe56405c3b1a20e7bc1abf474c",
+      "bytes": 1359
+    },
+    {
+      "path": "Assets/Data Structures/Animated/queue-empty.svg",
+      "sha256": "e8fc8b044fdc0fd235538f3caf8e44994898faa06831bcb0fe608b66c2d71256",
+      "bytes": 1984
+    },
+    {
+      "path": "Assets/Data Structures/Animated/queue-enqueue.svg",
+      "sha256": "e2d1d4eb51523656de15b5bea82f2c36598470b27b85c3df497f1ae16e3ad25d",
+      "bytes": 1151
+    },
+    {
+      "path": "Assets/Data Structures/Animated/queue-peek.svg",
+      "sha256": "0e5ba74e4cf5316bb27d989b37c19e64b954db79d164cb9e6a702615ea4f538b",
+      "bytes": 2651
+    },
+    {
+      "path": "Assets/Data Structures/Animated/queue-rear.svg",
+      "sha256": "0818e78f8fe9f4e5f6d206603fcd78b86f7853cad89982524053f5ff428445f1",
+      "bytes": 2253
+    },
+    {
+      "path": "Assets/Data Structures/Animated/queue-size.svg",
+      "sha256": "790f42481fda7447e61059708188c0e947e153891f7c4e24cb7fe9802cf379eb",
+      "bytes": 2234
+    },
+    {
+      "path": "Assets/Data Structures/Animated/stack-empty.svg",
+      "sha256": "7753d7ce23063984fae3a0ac398fad7d0ae84ac98fe71d809ee6ba2dccdbbe32",
+      "bytes": 1978
+    },
+    {
+      "path": "Assets/Data Structures/Animated/stack-peek.svg",
+      "sha256": "110af9d9b5994a50eca2f7de1a5e837cbf2bfc0b826a1dd8c15de5fac3ff15c6",
+      "bytes": 2617
+    },
+    {
+      "path": "Assets/Data Structures/Animated/stack-pop.svg",
+      "sha256": "1f4f0356629078351104ed875a7a04766701200a90bca65e8981398a8880b3fc",
+      "bytes": 1391
+    },
+    {
+      "path": "Assets/Data Structures/Animated/stack-push.svg",
+      "sha256": "39f1150a26d14915b6e21ae00e943a1f006b7b2389d1bb493b85b338b370e4e4",
+      "bytes": 1355
+    },
+    {
+      "path": "Assets/Data Structures/Animated/stack-size.svg",
+      "sha256": "02592b1d0f91b706765facfbf289c09790ce7ee69c788ecbf69b832c572ec722",
+      "bytes": 2154
+    },
+    {
+      "path": "Assets/Data Structures/Animated/temperature-array.svg",
+      "sha256": "78acdd82036e5e3d25716a69c0e8d9834b55b46fcf49c6a048909ea1622cd172",
+      "bytes": 3068
+    },
+    {
+      "path": "Assets/Data Structures/Animated/ticket-queue.svg",
+      "sha256": "7fb96b8088b9211d37ce92ef9bdab8b4e454026c99de70a0956567975de16e2c",
+      "bytes": 3286
+    },
+    {
+      "path": "Assets/Data Structures/Animated/versioning-copy-safety.svg",
+      "sha256": "4b52c89297c68101a0578c347975038fccff6b6449c6e56ee803986bdcc3eb1a",
+      "bytes": 4904
+    },
+    {
+      "path": "Assets/Data Structures/Animated/versioning-parent-trace.svg",
+      "sha256": "a874a913733c5a3128a8e0e35362aa2b4bc2102ba0d63f0f09b5aea242ba1f58",
+      "bytes": 3940
+    },
+    {
+      "path": "Assets/Data Structures/Animated/versioning-revisions.svg",
+      "sha256": "de12744e07b83619cdc114b457a130e40296cc4e6cee338603941c89c08ee6d8",
+      "bytes": 5545
+    },
+    {
+      "path": "Assets/Data Structures/Static/application-campus-route.svg",
+      "sha256": "688d7c4895973788f58f28c25ecc7a0e635e04e752a62905957b6ed943ab934c",
+      "bytes": 2041
+    },
+    {
+      "path": "Assets/Data Structures/Static/application-club-announcement.svg",
+      "sha256": "795f1ce383eefe90c424c49b01d9260c07c329c0e9f27b98e2bbd7bca4d0bbf5",
+      "bytes": 2206
+    },
+    {
+      "path": "Assets/Data Structures/Static/application-library.svg",
+      "sha256": "f61051ead5309a76d84f9193e9c5b7c118e1e44297fc5543ced36533feb6083f",
+      "bytes": 1754
+    },
+    {
+      "path": "Assets/Data Structures/Static/application-playlist.svg",
+      "sha256": "2cf160766304b55367e2439c56956b6285bcfe27a9635ddb78ea86b06b1e3ae3",
+      "bytes": 2255
+    },
+    {
+      "path": "Assets/Data Structures/Static/application-print-jobs.svg",
+      "sha256": "0acc80ae11d8ef243afb2b00f4ee33e6b353a92e9efa9bc27e3bce99bd7a7fb5",
+      "bytes": 3091
+    },
+    {
+      "path": "Assets/Data Structures/Static/application-scores.svg",
+      "sha256": "16c90ec0584a5965db4d22b39bb2c7c50bdfe20b60620210aa06323d8975930c",
+      "bytes": 1890
+    },
+    {
+      "path": "Assets/Data Structures/Static/application-undo.svg",
+      "sha256": "5b1b096147a2d5b15f7c52fa3dd61114df8bef43655105db3b4fec213d50f390",
+      "bytes": 1915
+    },
+    {
+      "path": "Assets/Data Structures/Static/application-versioning.svg",
+      "sha256": "cba38d9f47f5f4f9e60754506f6f1e91e9f73067e3c2420212680015a944840c",
+      "bytes": 3770
+    },
+    {
+      "path": "Assets/Data Structures/Static/array-1d.svg",
+      "sha256": "cb8a68de46b19527db6c1eceb136b46f8da54c9fd35d0f723aed0999afed356f",
+      "bytes": 1351
+    },
+    {
+      "path": "Assets/Data Structures/Static/array-2d.svg",
+      "sha256": "e409b92219363991147e00a864e701de2e6258b86efd37fb5e1a097d99821e47",
+      "bytes": 1795
+    },
+    {
+      "path": "Assets/Data Structures/Static/array-3d.svg",
+      "sha256": "55e794fe6d71f1464d837b090bd42ccdbf7b97547a3eb29a967885e200faf20d",
+      "bytes": 1835
+    },
+    {
+      "path": "Assets/Data Structures/Static/array-access.svg",
+      "sha256": "1e0b9000bae0063d0fc5ab9f3224c417f00f5e379d15e4c8ab881615e2583ac9",
+      "bytes": 1459
+    },
+    {
+      "path": "Assets/Data Structures/Static/array-binary-search.svg",
+      "sha256": "b021ca416b97b9a28947add2751bab1bc9265b9bcd75026ad418dd8af2168f24",
+      "bytes": 1939
+    },
+    {
+      "path": "Assets/Data Structures/Static/array-delete.svg",
+      "sha256": "2270a9879bbf1affd02a67392b2028d84f3365357f4c025baf49ea00440e5b81",
+      "bytes": 2081
+    },
+    {
+      "path": "Assets/Data Structures/Static/array-insert.svg",
+      "sha256": "f5cfeae4846f1234f183ff93ccb3491ef8d00a0b361d57aff78fcb4d7b9b091b",
+      "bytes": 2452
+    },
+    {
+      "path": "Assets/Data Structures/Static/array-search.svg",
+      "sha256": "429884f6761c89dc54c17b9027164e66445bd221d49e666d5139c61ae0eec779",
+      "bytes": 1662
+    },
+    {
+      "path": "Assets/Data Structures/Static/array-update.svg",
+      "sha256": "2cdd8850e686f0f2b98e182f3bdc2f8607a82d6c4e0fa47e51433f28008e27ce",
+      "bytes": 1466
+    },
+    {
+      "path": "Assets/Data Structures/Static/array-vs-linked-list.svg",
+      "sha256": "654548e783072e498c8a1fe92a79aa2b28e71064b8e026a6090c11025e1692e4",
+      "bytes": 1710
+    },
+    {
+      "path": "Assets/Data Structures/Static/array.svg",
+      "sha256": "f257729a3d1e53722d50620b8379eeeae3b152b53b4997d208ef514c6c388240",
+      "bytes": 1130
+    },
+    {
+      "path": "Assets/Data Structures/Static/binary-tree-unordered.svg",
+      "sha256": "9030ba1d4a20cdb29d87b32d31f6471c9897935dfc16f9ed98f009db6ad2cc7d",
+      "bytes": 1239
+    },
+    {
+      "path": "Assets/Data Structures/Static/bst-before-deletion.svg",
+      "sha256": "cedb931a65e3c1a357c70e0db316ee5e559e61cc10cc1e2f9b96c03efb29461e",
+      "bytes": 1439
+    },
+    {
+      "path": "Assets/Data Structures/Static/bst-delete.svg",
+      "sha256": "0579ba891f1eda4e0892901d46c961f8d13592fb1680fd47ded6a0308121ce2d",
+      "bytes": 1391
+    },
+    {
+      "path": "Assets/Data Structures/Static/bst-inorder.svg",
+      "sha256": "47d6b945e19f117c999340aca442bdc29ddecfb23ee29afbba861a4cc1d7a7a6",
+      "bytes": 1906
+    },
+    {
+      "path": "Assets/Data Structures/Static/bst-insert.svg",
+      "sha256": "ac905bcc1350aff82c74ae1dbecb7bcbd63b8c0b149985a15e40ec01414854c9",
+      "bytes": 1981
+    },
+    {
+      "path": "Assets/Data Structures/Static/bst-maximum.svg",
+      "sha256": "f7ac7dd3e249bbc528a85d32d82641b6c32a2f1e85b269219e9243f8eab1fccc",
+      "bytes": 2103
+    },
+    {
+      "path": "Assets/Data Structures/Static/bst-minimum.svg",
+      "sha256": "8d9db9183bdd0b2488260cc94f0887e664a03aee9e60f50082259180cd6504f6",
+      "bytes": 2287
+    },
+    {
+      "path": "Assets/Data Structures/Static/bst-search.svg",
+      "sha256": "22aa208dd8cb15b414b8c09c4767391053dabe9f5bcaa0c6c50a092424962c74",
+      "bytes": 2334
+    },
+    {
+      "path": "Assets/Data Structures/Static/bst-shape.svg",
+      "sha256": "0c87c9a49ee3c8cd0ff8bfc703dcd0494a76514b4df8bef7040f4ed6dc635fe5",
+      "bytes": 1246
+    },
+    {
+      "path": "Assets/Data Structures/Static/bst-successor-parent.svg",
+      "sha256": "f3738642dcc929179351abd8e3c638ae8d2a16baa2c73f412981e0a56ce18aa3",
+      "bytes": 2186
+    },
+    {
+      "path": "Assets/Data Structures/Static/bst-successor-right.svg",
+      "sha256": "b2b79863ce812aa0fa261eea229980741d95558b597cdbd0209cc36cd0ef07e4",
+      "bytes": 2329
+    },
+    {
+      "path": "Assets/Data Structures/Static/bus-queue.svg",
+      "sha256": "492950734fcc9a5c8893a241097ff78977453299be84c9bade8682f44ec8a97a",
+      "bytes": 2729
+    },
+    {
+      "path": "Assets/Data Structures/Static/folder-tree.svg",
+      "sha256": "1d62259439244519aadfe2a670b150ff52cc5a0989b40150f9c6199ee692acc0",
+      "bytes": 1937
+    },
+    {
+      "path": "Assets/Data Structures/Static/friendship-adjacency-list.svg",
+      "sha256": "61cfa123b2604edfe3e70b2477d8873f8bde48dbf6102530a550ccff9140abae",
+      "bytes": 2369
+    },
+    {
+      "path": "Assets/Data Structures/Static/friendship-graph.svg",
+      "sha256": "9318fe0ac31c7c58da0ec7a1d83832c9b297eba081923d9197057a4eb9905371",
+      "bytes": 1410
+    },
+    {
+      "path": "Assets/Data Structures/Static/graph-bfs.svg",
+      "sha256": "dc4116722b152a5e61d54b02f9925e4d032ae911042013db2582fef60dbee811",
+      "bytes": 2644
+    },
+    {
+      "path": "Assets/Data Structures/Static/graph-dfs.svg",
+      "sha256": "075fc1e7bd82bc1f1f72f5cd6edd32bb1a55bca835dc20efa955b2f0c999e30b",
+      "bytes": 2637
+    },
+    {
+      "path": "Assets/Data Structures/Static/graph-directed.svg",
+      "sha256": "d581db845715feb4424d8207e63c8c165bf62e831916a1f527e904e76f945432",
+      "bytes": 1203
+    },
+    {
+      "path": "Assets/Data Structures/Static/graph-undirected.svg",
+      "sha256": "723eb8dc2d38cefc71744f063ccd0995a9d1d0a898d30eb659d1f581298d7b23",
+      "bytes": 1188
+    },
+    {
+      "path": "Assets/Data Structures/Static/importance-score-lookup.svg",
+      "sha256": "e60028d959a758fd85502e220ad8bb59c36294cad2c62bfbf2d39df0341a5786",
+      "bytes": 1963
+    },
+    {
+      "path": "Assets/Data Structures/Static/linear-order.svg",
+      "sha256": "b1bbb56f2a1fbff2920b6c3ddb77a319c4c7718b205003f231681dbfcd8e6370",
+      "bytes": 1764
+    },
+    {
+      "path": "Assets/Data Structures/Static/list-access.svg",
+      "sha256": "61e0bfaf58d2ff643f0ec2538366a71dac69e85992f4d17aec437f389ea0064a",
+      "bytes": 2053
+    },
+    {
+      "path": "Assets/Data Structures/Static/list-circular.svg",
+      "sha256": "d868a750817cde59272b296d14e519445d42d9a7b716774f968aad5443963879",
+      "bytes": 1420
+    },
+    {
+      "path": "Assets/Data Structures/Static/list-delete.svg",
+      "sha256": "39d8b8d2975bb3b61ee53719cf67c4b445889234392c999a284e04a601df9159",
+      "bytes": 2278
+    },
+    {
+      "path": "Assets/Data Structures/Static/list-doubly.svg",
+      "sha256": "df12335eabdca450284da28c5376bcaadf576eb0725b5829a4332d16f6ad0ba2",
+      "bytes": 1627
+    },
+    {
+      "path": "Assets/Data Structures/Static/list-insert.svg",
+      "sha256": "4f43bd499e5566bda73679ddd286d85d2d19b3886a386701601a0c0e314a4413",
+      "bytes": 2271
+    },
+    {
+      "path": "Assets/Data Structures/Static/list-search.svg",
+      "sha256": "bb85cc22c41d0878b01dec0a275c49d6a4feb8d6ebc93817f523fa861af347d8",
+      "bytes": 2028
+    },
+    {
+      "path": "Assets/Data Structures/Static/list-singly.svg",
+      "sha256": "8b8abff6ecdda3060bf0cf3fda21a63258bd01f9f34a11ac8d75bf2789aa4471",
+      "bytes": 1460
+    },
+    {
+      "path": "Assets/Data Structures/Static/list-traversal.svg",
+      "sha256": "713b4929c7d4004fb651a0f9fb23e8c0934ff0a243feb1b74177d842d5bd8dc1",
+      "bytes": 1518
+    },
+    {
+      "path": "Assets/Data Structures/Static/pixel-grid.svg",
+      "sha256": "f5680d3521fdd6131b16359319642606d0cea4bd6087a84fae5cc5747a12dcfe",
+      "bytes": 8174
+    },
+    {
+      "path": "Assets/Data Structures/Static/plate-stack.svg",
+      "sha256": "68b750d26d0cd98cda5099628af57af44474ccbec57f49c7335b9ad5e5fafd22",
+      "bytes": 2346
+    },
+    {
+      "path": "Assets/Data Structures/Static/queue-circular.svg",
+      "sha256": "1c2bc41d740a28986b00bd142bec3509ed4c6613cc5bdbb34d7510a334d46bf8",
+      "bytes": 1679
+    },
+    {
+      "path": "Assets/Data Structures/Static/queue-deque.svg",
+      "sha256": "0587b13622f8a97079c208c0e0794b82be47ab461ba67dbbb433180e8986a881",
+      "bytes": 1573
+    },
+    {
+      "path": "Assets/Data Structures/Static/queue-dequeue.svg",
+      "sha256": "cbdc99a753bda4de37bed0fd64c2b84c429d22e777c1df1550d0edc4a8d6468d",
+      "bytes": 1367
+    },
+    {
+      "path": "Assets/Data Structures/Static/queue-empty.svg",
+      "sha256": "cf1cb12899e69f8b54ce93ba2c6c964cbb7be0714b716432a20f43d02db897c9",
+      "bytes": 1519
+    },
+    {
+      "path": "Assets/Data Structures/Static/queue-enqueue.svg",
+      "sha256": "5706cb3f78dffb150ccbbd5672842354858d8d80edd0e7032f0f644fab845590",
+      "bytes": 1358
+    },
+    {
+      "path": "Assets/Data Structures/Static/queue-input-restricted.svg",
+      "sha256": "c96ddf7324bd96c88d4f31bf19179de3e75c2dea1c4dd4c300e9b2861cbb5dcb",
+      "bytes": 1463
+    },
+    {
+      "path": "Assets/Data Structures/Static/queue-output-restricted.svg",
+      "sha256": "7252f12a31de53238f4bb8b3d92fee0382018cf4b5e733781f06a82269a6cb4c",
+      "bytes": 1463
+    },
+    {
+      "path": "Assets/Data Structures/Static/queue-peek.svg",
+      "sha256": "9a4b240e2dfd4383bd6de5e98581740b0a9a95c53001b72fdbfea70c8fffb848",
+      "bytes": 1996
+    },
+    {
+      "path": "Assets/Data Structures/Static/queue-priority.svg",
+      "sha256": "1a58fdbee4f65d14db7bc607c7a9365146f0f5d1d42cb89a149d0c63cee42e61",
+      "bytes": 1473
+    },
+    {
+      "path": "Assets/Data Structures/Static/queue-rear.svg",
+      "sha256": "3f21037461c36e399e8e62e8b49038dbc56cd115e1aa6fe4a4a8fefcf624cf84",
+      "bytes": 1788
+    },
+    {
+      "path": "Assets/Data Structures/Static/queue-size.svg",
+      "sha256": "e4098ec5ce90319d3823fd50f00a2ce7b409aca8f5e2de84a94c75a552ec3914",
+      "bytes": 1769
+    },
+    {
+      "path": "Assets/Data Structures/Static/queue.svg",
+      "sha256": "dfa9c9bbf3d2c6cf915f937ca92fa4ad42ea31cec92402fe5a058b8e42f05ac5",
+      "bytes": 1243
+    },
+    {
+      "path": "Assets/Data Structures/Static/stack-empty.svg",
+      "sha256": "982a6f87f04ecbf4e8bc1d8469e948eb395507dd533a659a1e5b64b1316b9f6c",
+      "bytes": 1513
+    },
+    {
+      "path": "Assets/Data Structures/Static/stack-peek.svg",
+      "sha256": "1d217b02aeaee92d6429558a058781daf5c912d8983eed22938d6971c88f22d5",
+      "bytes": 1962
+    },
+    {
+      "path": "Assets/Data Structures/Static/stack-pop.svg",
+      "sha256": "528fe71ded5b1948d05c7bd28b17a5d362ce8709402e020363a1f12f391a301f",
+      "bytes": 1315
+    },
+    {
+      "path": "Assets/Data Structures/Static/stack-push.svg",
+      "sha256": "ecaa86c411e66795a648ef0c045726ee2fd6f8204b2865a31ec68f493d66bd92",
+      "bytes": 1320
+    },
+    {
+      "path": "Assets/Data Structures/Static/stack-size.svg",
+      "sha256": "25aeb221e9a21e9566da17c2ef56f2da4d3d27537666ac0ef28a8b5542095901",
+      "bytes": 1689
+    },
+    {
+      "path": "Assets/Data Structures/Static/stack.svg",
+      "sha256": "66bfd436281cecf8ac2d7fb385efac56be6806bc5b11d39e9091138fab866c36",
+      "bytes": 1289
+    },
+    {
+      "path": "Assets/Data Structures/Static/temperature-array.svg",
+      "sha256": "9dc09da0335cb7775431d328d2445e9050b91b8f1f216f088e692db8855f5336",
+      "bytes": 2450
+    },
+    {
+      "path": "Assets/Data Structures/Static/ticket-queue.svg",
+      "sha256": "80f3415b6768eb9fd24af0e7fee1f981cb0ccd8d2b87dff852650a42e744be6a",
+      "bytes": 2833
+    },
+    {
+      "path": "Assets/Data Structures/Static/versioning-ai-lineage.svg",
+      "sha256": "eeb0e253e8a64b2c18690c9c6937ff7f23451d066cebc171ea20ae558ba69b0a",
+      "bytes": 2779
+    },
+    {
+      "path": "Assets/Data Structures/Static/versioning-branches.svg",
+      "sha256": "4c60084c14a8db0bb8eff8297e8b24e2904ebe42799aef529696441875bfff56",
+      "bytes": 2930
+    },
+    {
+      "path": "Assets/Data Structures/Static/versioning-checksums.svg",
+      "sha256": "73a19a5d8eef5e89413781a80a3d0b4a996d529263d55ef77577016d73337340",
+      "bytes": 5922
+    },
+    {
+      "path": "Assets/Data Structures/Static/versioning-copy-safety.svg",
+      "sha256": "bff3040c8d6742c6ac3526ee92ef99c031c5e59f45e433fd465624edd511549d",
+      "bytes": 3887
+    },
+    {
+      "path": "Assets/Data Structures/Static/versioning-formats.svg",
+      "sha256": "a975fc5ac75ca196d2fe8dd177d065b247ebb9d69872a2ad6fef5266401c6701",
+      "bytes": 3056
+    },
+    {
+      "path": "Assets/Data Structures/Static/versioning-granularity.svg",
+      "sha256": "4232989c5db1f99e1e5cfda56db182076025fb78bef177f20b719ed79a19a73b",
+      "bytes": 3706
+    },
+    {
+      "path": "Assets/Data Structures/Static/versioning-lookup.svg",
+      "sha256": "5a04347d20f4ee2e7becbbb1b3ecbb063a34438b0c993582035444f8a19bbba1",
+      "bytes": 3057
+    },
+    {
+      "path": "Assets/Data Structures/Static/versioning-overview.svg",
+      "sha256": "cf9bf20fed6f4d8ac6b16a7588828b75e9cf270f224a01f26b5330397c70f621",
+      "bytes": 4339
+    },
+    {
+      "path": "Assets/Data Structures/Static/versioning-parent-trace.svg",
+      "sha256": "26a47c93f51a35c95fa5140f55a8b45f7a72d01c30868f8464eb42e2e5728627",
+      "bytes": 3209
+    },
+    {
+      "path": "Assets/Data Structures/Static/versioning-principles.svg",
+      "sha256": "01cf34a7cfff46f6bdd9b76e60761f4724b52daae8dd582cc8f16ba36973c365",
+      "bytes": 3080
+    },
+    {
+      "path": "Assets/Data Structures/Static/versioning-revisions.svg",
+      "sha256": "8632bb4122fbaeac1c15f46ab5c1a1c2aafd9ba51b823a58dd922e9475b3eef8",
+      "bytes": 4299
+    },
+    {
+      "path": "Assets/Data Structures/Static/versioning-storage.svg",
+      "sha256": "55c5ad02659c12d81fc28ddd7c29cb8dde9258995d136e94056e50fb1d98ee27",
+      "bytes": 3807
+    },
+    {
+      "path": "Assets/Data Structures/Static/versioning-workflow.svg",
+      "sha256": "bf1b389dc85d208675f135469a4da7b2891ae67e637ff27ee776ac136c5f28cf",
+      "bytes": 2788
+    },
+    {
+      "path": "Assets/README/ai.svg",
+      "sha256": "22120e3372d8a4f94f82bd5b34107d2d2b80d357cff3315cc368e4fdf8075bb4",
+      "bytes": 630
+    },
+    {
+      "path": "Assets/README/algorithms.svg",
+      "sha256": "a8e699a99ff0c69ec13a095b555f26df645b5cdedc6172be4219c3f34dd30b4d",
+      "bytes": 646
+    },
+    {
+      "path": "Assets/README/banner.svg",
+      "sha256": "b9266313c8ed9ef0679fd3621962e8c9757bd32783b56c09ee9de55e2eed8937",
+      "bytes": 9719
+    },
+    {
+      "path": "Assets/README/data.svg",
+      "sha256": "1449d97e2b2cf432dcf82e9e08c7a008a929be25c6ea81feef900338a1f6d650",
+      "bytes": 658
+    },
+    {
+      "path": "Assets/README/progress.svg",
+      "sha256": "7874c2fcd7ca51f13a2fc5bf455c1731e6a5d3d8c087042e97b2433f5de39b49",
+      "bytes": 646
+    },
+    {
+      "path": "BOTAK_Stage2_TestBank_V1_Robot_InstantAnswers.pdf",
+      "sha256": "94c21653c6bd7c9ab03bce9525383e046697afd71e995c4b84399a856a1066be",
+      "bytes": 2333235
+    },
+    {
+      "path": "Content/Markdown/Algorithm/00 introduction to python programming.md",
+      "sha256": "31a68feed3633f84e0e1bc9018e31070f92c19256c5fda32cbf8b1c7345ef81c",
+      "bytes": 13114,
+      "lesson": "source-alg-00"
+    },
+    {
+      "path": "Content/Markdown/Algorithm/01 introduction to algorithms.md",
+      "sha256": "20af12d77c40eb0126447680dcbc47d3c8eefbc39cc86bc5dad8c23b896a8a77",
+      "bytes": 5450,
+      "lesson": "source-alg-01"
+    },
+    {
+      "path": "Content/Markdown/Algorithm/02 basic sorting algorithms.md",
+      "sha256": "8defdafb5b58e6dfaaf8324707d2955cdade5e212906e5b8de03f96118d8e084",
+      "bytes": 3798,
+      "lesson": "source-alg-02"
+    },
+    {
+      "path": "Content/Markdown/Algorithm/03 binary search linear search and big o notation.md",
+      "sha256": "661f6f0fb4a9f70864700f1b1d2ed67b453728d7597a5ed1c9a41cefca546305",
+      "bytes": 3977,
+      "lesson": "source-alg-03"
+    },
+    {
+      "path": "Content/Markdown/Algorithm/04 recursion and call stack.md",
+      "sha256": "ee58f0aac8ccc44f45cf202d439c89856f71b1075dff420ec1e91edc37c80507",
+      "bytes": 2906,
+      "lesson": "source-alg-04"
+    },
+    {
+      "path": "Content/Markdown/Algorithm/05 time complexity analysis.md",
+      "sha256": "6abb71375bc7691f8cda2c0e6c5222c23d597e16be63119c1cea2ee3b71cfce6",
+      "bytes": 1025,
+      "lesson": "source-alg-05"
+    },
+    {
+      "path": "Content/Markdown/Algorithm/06 graph searching routing and coverage.md",
+      "sha256": "bc5342601caaad5b26ab8125c146d9950d0df3bc15f4e364186b3160ed5cd41a",
+      "bytes": 7655,
+      "lesson": "source-alg-06"
+    },
+    {
+      "path": "Content/Markdown/Algorithm/07 greedy algorithm and optimization.md",
+      "sha256": "287618330f51c4097751427480549be2cd26d6bceb9e3e6145a3d6b37a03b0f2",
+      "bytes": 7004,
+      "lesson": "source-alg-07"
+    },
+    {
+      "path": "Content/Markdown/Algorithm/08 dynamic programming.md",
+      "sha256": "078921f09d8fc6b0f3639f3eec9bfc403e47656eaa6dd19e9124bd611513d9dd",
+      "bytes": 3042,
+      "lesson": "source-alg-08"
+    },
+    {
+      "path": "Content/Markdown/Algorithm/09 inventory and uncertainty management.md",
+      "sha256": "1b4949c517e9787624a5fa2b938971255eec443e8a9723f2187f3094ffb4699b",
+      "bytes": 8208,
+      "lesson": "source-alg-09"
+    },
+    {
+      "path": "Content/Markdown/Algorithm/10 sequential decisions over time.md",
+      "sha256": "ea3d118551fc5bd56d05cde66d816d06796fec5ab23e7778fd01efb2978fcea0",
+      "bytes": 13801,
+      "lesson": "source-alg-10"
+    },
+    {
+      "path": "Content/Markdown/Algorithm/Reviews.md",
+      "sha256": "a62eeadb6ad80659487bc0697debafd8f66b5c487cfd47afd0939b5d469f3a0a",
+      "bytes": 1101
+    },
+    {
+      "path": "Content/Markdown/Connetionist-AI/01 introduction to connectionist ai.md",
+      "sha256": "8137fb536b63a4bb6dd166551259b76b04d8989d9ae1d89fb38664c2848c580a",
+      "bytes": 9982,
+      "lesson": "source-ai-01"
+    },
+    {
+      "path": "Content/Markdown/Connetionist-AI/02 neural network concepts terminology architectures.md",
+      "sha256": "c3c4aeb340e87cc64988f8ecbf0f40b9db5590e81f314686601cbd93d07ae61a",
+      "bytes": 19964,
+      "lesson": "source-ai-02"
+    },
+    {
+      "path": "Content/Markdown/Connetionist-AI/03 applications of neural networks.md",
+      "sha256": "61fe194747bd06640a921904ca02be686fd5d345ce78c9e4c798a110ae13f7b2",
+      "bytes": 10429,
+      "lesson": "source-ai-03"
+    },
+    {
+      "path": "Content/Markdown/Connetionist-AI/04 deep learning and activation functions.md",
+      "sha256": "0a761e1db2157c3d663088888eb4a41a750fe2c732ada0be1782a957c4de7587",
+      "bytes": 13679,
+      "lesson": "source-ai-04"
+    },
+    {
+      "path": "Content/Markdown/Connetionist-AI/05 demand and time series forecasting.md",
+      "sha256": "cb794e5e439c3a6b2c036d43fc488a3d40eef3623785d6fd3d138b180948f4df",
+      "bytes": 17471,
+      "lesson": "source-ai-05"
+    },
+    {
+      "path": "Content/Markdown/Connetionist-AI/06 probabilistic forecasting.md",
+      "sha256": "5ade6caeccf55d84e6494b4f29e1e5b0523b9c9111eff1603433c4ec35545d52",
+      "bytes": 15583,
+      "lesson": "source-ai-06"
+    },
+    {
+      "path": "Content/Markdown/Connetionist-AI/07 online and incremental learning.md",
+      "sha256": "56f6be4170b3e76970efd59c2a8ba5c6e43ce83c9c7088921ba26a883ac37fb3",
+      "bytes": 15876,
+      "lesson": "source-ai-07"
+    },
+    {
+      "path": "Content/Markdown/Connetionist-AI/08 recommendation systems.md",
+      "sha256": "eaa605a998dc1e2934df4a9f63a4d18c7a6a4a41f5d80387b0ce50a5219e766c",
+      "bytes": 13158,
+      "lesson": "source-ai-08"
+    },
+    {
+      "path": "Content/Markdown/Connetionist-AI/09 reinforcement learning.md",
+      "sha256": "85c465590480b2fd05ae45cbe440e8a1fe01d928c675bf5b047bd7fd40f2c7c7",
+      "bytes": 17904,
+      "lesson": "source-ai-09"
+    },
+    {
+      "path": "Content/Markdown/Connetionist-AI/10 model training and optimization.md",
+      "sha256": "c0e34381bfc0e5916ac58d2b2ca495e2172e6897d8fdbb21806e8d220a29bd39",
+      "bytes": 22191,
+      "lesson": "source-ai-10"
+    },
+    {
+      "path": "Content/Markdown/Connetionist-AI/Review1.md",
+      "sha256": "d75b12104bae0fd87200d07872b4e5b4ac7a3f15a0c9fbadbeebc783ec6a71ed",
+      "bytes": 1975
+    },
+    {
+      "path": "Content/Markdown/Data-Structures/01 introduction to data structures.md",
+      "sha256": "f08e449845a3e59e1367fa4b1439de8c2bb91ce1175d0a6f984d21cd2f9e175b",
+      "bytes": 5190,
+      "lesson": "source-ds-01"
+    },
+    {
+      "path": "Content/Markdown/Data-Structures/02 linear data structures.md",
+      "sha256": "1297e426e3861f14fed6aa1f6a18097488de26705fa22ce4b0e2bdb8f37ea4bb",
+      "bytes": 2030,
+      "lesson": "source-ds-02"
+    },
+    {
+      "path": "Content/Markdown/Data-Structures/03 arrays.md",
+      "sha256": "da83f5ce907ef808a522084f58df140645a63ec5783fcd76de44ba4e7058400c",
+      "bytes": 5239,
+      "lesson": "source-ds-03"
+    },
+    {
+      "path": "Content/Markdown/Data-Structures/04 linked lists.md",
+      "sha256": "14f9328960c42176f261a83197a4470a121252a2bc4911498f48523d78b78048",
+      "bytes": 4021,
+      "lesson": "source-ds-04"
+    },
+    {
+      "path": "Content/Markdown/Data-Structures/05 stacks.md",
+      "sha256": "050a325b8dcace6c8792d097ddca392314496a0554f716fb27d61838d3bdc075",
+      "bytes": 2988,
+      "lesson": "source-ds-05"
+    },
+    {
+      "path": "Content/Markdown/Data-Structures/06 queues.md",
+      "sha256": "1979ce579cf902b090e38cfd9f37876a6bb61ac926e4fb1166a18547fe18aa08",
+      "bytes": 4242,
+      "lesson": "source-ds-06"
+    },
+    {
+      "path": "Content/Markdown/Data-Structures/07 nonlinear data structures.md",
+      "sha256": "f8f5d8fd45f18462d256a0a0817318463235e7d43aa4ecced9a2bf93b11dc6a0",
+      "bytes": 2383,
+      "lesson": "source-ds-07"
+    },
+    {
+      "path": "Content/Markdown/Data-Structures/08 trees.md",
+      "sha256": "8ed2fcce5fedce19e6ff28497ce114d9f0db2ffb674e3355e0aa7b26428334e7",
+      "bytes": 10669,
+      "lesson": "source-ds-08"
+    },
+    {
+      "path": "Content/Markdown/Data-Structures/09 graphs.md",
+      "sha256": "ff0b34f9dfab1894b2489d9d6559a66225fe0d2983e983b5a8561f49d7f14e78",
+      "bytes": 5005,
+      "lesson": "source-ds-09"
+    },
+    {
+      "path": "Content/Markdown/Data-Structures/10 data versioning.md",
+      "sha256": "7063c2f79886f5045089f7aeeb7f357815619e30d9bb4877e81b38cabcdbe11c",
+      "bytes": 21737,
+      "lesson": "source-ds-10"
+    },
+    {
+      "path": "Content/Markdown/Data-Structures/Review2.md",
+      "sha256": "2ab5100095ac4139489ea906ab274fdab5032fedb307642783152e92f65b4d64",
+      "bytes": 887
+    },
+    {
+      "path": "Content/Markdown/Data-Structures/Reviews.md",
+      "sha256": "6060d2a2530a2716c2513455856cf1d78a1208c38db8cea99ecc70ca79364123",
+      "bytes": 1154
+    },
+    {
+      "path": "Content/Markdown/Module Outline.md",
+      "sha256": "98b28cc30b9958365f9f1c07dd89ac980792e09668661b01cbf53c8093b7456c",
+      "bytes": 4210
+    },
+    {
+      "path": "Content/PPT Slides/PPT Slides.md",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "Content/Test Bank/Test.md",
+      "sha256": "182940b3a03b0a08e9418e2de901430e268cf040f1b3cbbeab4a7705abd35f5d",
+      "bytes": 28
+    },
+    {
+      "path": "Content/Videos/Videos.md",
+      "sha256": "e8f1094210d9805ad6751b2d4b4447741776caea59fb183d51ee04a6218b599f",
+      "bytes": 20
+    }
+  ]
+}

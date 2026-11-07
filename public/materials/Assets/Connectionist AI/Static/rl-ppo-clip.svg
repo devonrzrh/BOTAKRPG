@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="285" viewBox="0 0 720 285" role="img" aria-labelledby="title desc">
+  <title id="title">PPO clipped objective · positive advantage</title>
+  <desc id="desc">For positive advantage equal to one and clipping epsilon 0.2, the clipped surrogate equals the probability ratio up to 1.2 and then stays at 1.2.</desc>
+  <style>
+    text { font-family: system-ui, sans-serif; text-anchor: middle; fill: #263449; }
+    .title { font-size: 22px; font-weight: 700; fill: #172554; }
+    .label { font-size: 15px; font-weight: 600; }
+    .note { font-size: 13px; }
+    .num { font-size: 20px; font-weight: 700; }
+    .edge { fill: none; stroke: #74849b; stroke-width: 2; }
+    .guide { fill: none; stroke: #94a3b8; stroke-width: 1; stroke-dasharray: 4 5; }
+    .blue { fill: #dbeafe; stroke: #477fc0; }
+    .violet { fill: #ede9fe; stroke: #8864cb; }
+    .green { fill: #d1fae5; stroke: #19936c; }
+    .amber { fill: #ffedd5; stroke: #bd6a26; }
+    .blue, .violet, .green, .amber { stroke-width: 1.5; }
+    .blue-line, .violet-line, .green-line, .amber-line { fill: none; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
+    .blue-line { stroke: #3386c5; }
+    .violet-line { stroke: #9670d2; }
+    .green-line { stroke: #21a47a; }
+    .amber-line { stroke: #ce873a; }
+    @media (prefers-color-scheme: dark) {
+      text { fill: #e2e8f0; }
+      .title { fill: #f1f5ff; }
+      .edge { stroke: #94a3b8; }
+    }
+    .ink { fill: #18243a; }
+
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0 0L8 4L0 8Z" fill="#74849b" />
+    </marker>
+  </defs>
+  <text x="360" y="29" class="title">PPO clipped objective · positive advantage</text>
+  <path d="M104 195H625" class="guide" />
+  <text x="82" y="199" class="note">0</text>
+  <path d="M104 163H625" class="guide" />
+  <text x="82" y="167" class="note">0.5</text>
+  <path d="M104 131H625" class="guide" />
+  <text x="82" y="135" class="note">1</text>
+  <path d="M104 99H625" class="guide" />
+  <text x="82" y="103" class="note">1.5</text>
+  <path d="M104 67H625" class="guide" />
+  <text x="82" y="71" class="note">2</text>
+  <text x="104" y="214" class="note">0</text>
+  <text x="234.25" y="214" class="note">0.5</text>
+  <text x="364.5" y="214" class="note">1</text>
+  <text x="416.6" y="214" class="note">1.2</text>
+  <text x="494.75" y="214" class="note">1.5</text>
+  <text x="625" y="214" class="note">2</text>
+  <path d="M104 195L634 195" class="edge" marker-end="url(#arrow)" />
+  <path d="M104 195L104 59" class="edge" marker-end="url(#arrow)" />
+  <text x="364.5" y="234" class="note">New / old action probability ratio</text>
+  <text x="94" y="50" class="note">Surrogate objective</text>
+  <path d="M104 195 L625 67" class="blue-line" />
+  <path d="M104 195 L416.6 118.2 L625 118.2" class="violet-line" />
+  <path d="M416.6 63V195" class="guide" />
+  <path d="M60 267h22" class="blue-line" />
+  <text x="220" y="272" class="note">Unclipped</text>
+  <path d="M360 267h22" class="violet-line" />
+  <text x="520" y="272" class="note">Clipped · A = 1, ε = 0.2</text>
+</svg>

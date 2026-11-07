@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="246" viewBox="0 0 720 246" role="img" aria-labelledby="title desc">
+  <title id="title">State, action, and transition probabilities</title>
+  <desc id="desc">An illustrative state-action choice has two possible next states. The transition probabilities 0.7 and 0.3 sum to one. Rewards are attached to transitions.</desc>
+  <style>
+    text { font-family: system-ui, sans-serif; text-anchor: middle; fill: #263449; }
+    .title { font-size: 22px; font-weight: 700; fill: #172554; }
+    .label { font-size: 15px; font-weight: 600; }
+    .note { font-size: 13px; }
+    .num { font-size: 20px; font-weight: 700; }
+    .edge { fill: none; stroke: #74849b; stroke-width: 2; }
+    .guide { fill: none; stroke: #94a3b8; stroke-width: 1; stroke-dasharray: 4 5; }
+    .blue { fill: #dbeafe; stroke: #477fc0; }
+    .violet { fill: #ede9fe; stroke: #8864cb; }
+    .green { fill: #d1fae5; stroke: #19936c; }
+    .amber { fill: #ffedd5; stroke: #bd6a26; }
+    .blue, .violet, .green, .amber { stroke-width: 1.5; }
+    .blue-line, .violet-line, .green-line, .amber-line { fill: none; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
+    .blue-line { stroke: #3386c5; }
+    .violet-line { stroke: #9670d2; }
+    .green-line { stroke: #21a47a; }
+    .amber-line { stroke: #ce873a; }
+    @media (prefers-color-scheme: dark) {
+      text { fill: #e2e8f0; }
+      .title { fill: #f1f5ff; }
+      .edge { stroke: #94a3b8; }
+    }
+    .ink { fill: #18243a; }
+
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0 0L8 4L0 8Z" fill="#74849b" />
+    </marker>
+  </defs>
+  <text x="360" y="29" class="title">State, action, and transition probabilities</text>
+  <g class="tile">
+    <rect x="32" y="103" width="133" height="38" rx="10" class="blue" />
+    <text x="98.5" y="127" class="label ink">State s</text>
+  </g>
+  <path d="M171 122L237 122" class="edge" marker-end="url(#arrow)" />
+  <g class="tile">
+    <rect x="243" y="103" width="145" height="38" rx="10" class="violet" />
+    <text x="315.5" y="127" class="label ink">Action a</text>
+  </g>
+  <path d="M394 122L480 80" class="edge" marker-end="url(#arrow)" />
+  <path d="M394 122L480 177" class="edge" marker-end="url(#arrow)" />
+  <g class="tile">
+    <rect x="486" y="61" width="183" height="38" rx="10" class="green" />
+    <text x="577.5" y="85" class="label ink">Next state s₁</text>
+  </g>
+  <g class="tile">
+    <rect x="486" y="158" width="183" height="38" rx="10" class="amber" />
+    <text x="577.5" y="182" class="label ink">Next state s₂</text>
+  </g>
+  <text x="428" y="71" class="note">P = 0.7</text>
+  <text x="428" y="186" class="note">P = 0.3</text>
+  <text x="578" y="116" class="note">Reward r₁</text>
+  <text x="578" y="212" class="note">Reward r₂</text>
+</svg>

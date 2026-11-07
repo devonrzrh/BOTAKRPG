@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="308" viewBox="0 0 640 308" role="img" aria-labelledby="title desc">
+<title id="title">The cheapest next edge can be a costly choice</title><desc id="desc">Cheapest immediate edge: A → B → D costs 11. A → C → D costs 4.</desc>
+<style>
+text { font: 16px system-ui, sans-serif; text-anchor: middle; fill: #14243a; }
+.label { paint-order: stroke; stroke: #f8fafc; stroke-width: 3px; stroke-linejoin: round; }
+.heading { font-size: 20px; font-weight: 700; }
+.small { font-size: 13px; }
+.tile { fill: #dbeafe; stroke: #4169a9; stroke-width: 2; }
+.focus { fill: #a7f3d0; stroke: #16835e; }
+.muted { fill: #e2e8f0; stroke: #64748b; }
+.edge { stroke: #64748b; stroke-width: 2.5; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.route { stroke: #16835e; stroke-width: 4; fill: none; stroke-linecap: round; }
+.badge { fill: #334155; stroke: #f8fafc; stroke-width: 1.5; }
+.badge-text { fill: #fff; font-size: 12px; font-weight: 700; }
+@media (prefers-color-scheme: dark) {
+  .label { fill: #f8fafc; stroke: #111827; }
+  .edge { stroke: #b8c7db; }
+  .route { stroke: #4ade80; }
+}
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
+
+</style>
+<text class="label heading" x="320" y="29">The cheapest next edge can be a costly choice</text>
+<path class="edge" d="M131.58189168679354 137.04877674697082 L276.54142207957227 83.6426339706839"/><text class="label" x="217.0" y="98.0">2</text><path class="edge" d="M131.58189168679354 152.95122325302918 L276.54142207957227 206.3573660293161"/><text class="label" x="217.0" y="168.0">3</text><path class="edge" d="M321.917292940305 81.97368411736979 L496.1768554996685 137.41990856807632"/><text class="label" x="422.0" y="98.0">9</text><path class="edge" d="M321.917292940305 208.02631588263023 L496.1768554996685 152.58009143192368"/><text class="label" x="422.0" y="168.0">1</text><path class="route" d="M110 145 L300 75"/><path class="route" d="M300 75 L520 145"/><circle class="tile" cx="110" cy="145" r="23"/><text class="ink" x="110" y="151">A</text><circle class="tile" cx="300" cy="75" r="23"/><text class="ink" x="300" y="81">B</text><circle class="tile" cx="300" cy="215" r="23"/><text class="ink" x="300" y="221">C</text><circle class="tile" cx="520" cy="145" r="23"/><text class="ink" x="520" y="151">D</text><text class="label small" x="320" y="286">Cheapest immediate edge: A → B → D costs 11. A → C → D costs 4.</text>
+<style>* { animation: none !important; transition: none !important; }</style></svg>

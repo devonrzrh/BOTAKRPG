@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="192" viewBox="0 0 400 192" role="img" aria-labelledby="title">
+  <title id="title">Binary tree with root 8, children 3 and 10, and 1 below 3</title>
+  <style>
+    .edge { fill: none; stroke: #64748b; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+    .node { fill: #dbeafe; stroke: #4169a9; stroke-width: 2; }
+    .changed { fill: #a7f3d0; stroke: #16835e; }
+    text { font: 17px system-ui, sans-serif; text-anchor: middle; fill: #0f172a; }
+    .label { paint-order: stroke; stroke: #f8fafc; stroke-width: 3; stroke-linejoin: round; }
+    @media (prefers-color-scheme: dark) {
+      .edge { stroke: #b8c7db; }
+      .label { fill: #f8fafc; stroke: #111827; }
+    }
+  </style>
+  <path class="edge" d="M200 36 L140 95"/>
+  <path class="edge" d="M200 36 L260 95"/>
+  <path class="edge" d="M140 95 L97 154"/>
+  <circle class="node" cx="200" cy="36" r="19"/>
+  <text x="200" y="42">8</text>
+  <circle class="node" cx="140" cy="95" r="19"/>
+  <text x="140" y="101">3</text>
+  <circle class="node" cx="260" cy="95" r="19"/>
+  <text x="260" y="101">10</text>
+  <circle class="node" cx="97" cy="154" r="19"/>
+  <text x="97" y="160">1</text>
+</svg>

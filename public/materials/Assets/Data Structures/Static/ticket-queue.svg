@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="560" height="260" viewBox="0 0 560 260" role="img" aria-labelledby="title desc">
+  <title id="title">A line at the ticket booth</title>
+  <desc id="desc">Nicky is at the front and buys a ticket first. Darren stands between Nicky and Neil. Neil is at the rear.</desc>
+  <defs>
+    <g id="person" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+      <circle cy="-39" r="11" fill="#f8fafc"/>
+      <path d="M0-27V6 M-14-12L0-22L14-11 M0 6L-11 28 M0 6L12 28"/>
+    </g>
+    <marker id="arrow" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0 0 L7 3.5 L0 7Z" fill="#16835e"/></marker>
+  </defs>
+  <style>
+    text { font: 16px system-ui, sans-serif; text-anchor: middle; fill: #0f172a; }
+    .label { paint-order: stroke; stroke: #f8fafc; stroke-width: 3px; stroke-linejoin: round; }
+    .heading { font-weight: 700; }
+    .direction { fill: none; stroke: #16835e; stroke-width: 2.5px; marker-end: url(#arrow); }
+    @media (prefers-color-scheme: dark) {
+      .label { fill: #f8fafc; stroke: #111827; }
+      .direction { stroke: #4ade80; }
+      #arrow path { fill: #4ade80; }
+    }
+  </style>
+  <text class="label heading" x="280" y="27">Waiting to buy tickets</text>
+  <path d="M22 188 H538" stroke="#64748b" stroke-width="2" opacity=".6"/>
+  <rect x="40" y="70" width="129" height="117" rx="8" fill="#dbeafe" stroke="#4169a9" stroke-width="2"/>
+  <rect x="51" y="57" width="107" height="28" rx="6" fill="#fde68a" stroke="#92630e" stroke-width="2"/>
+  <text class="heading" x="104" y="77">TICKETS</text>
+  <rect x="57" y="94" width="95" height="53" rx="4" fill="#334155"/>
+  <circle cx="106" cy="109" r="8" fill="#f8fafc"/>
+  <path d="M85 140 Q86 121 106 121 Q126 121 127 140Z" fill="#93c5fd"/>
+  <path d="M53 144 H157" stroke="#4169a9" stroke-width="7" stroke-linecap="round"/>
+  <path class="direction" d="M237 85 H182"/>
+  <text class="label" x="260" y="66">Front</text>
+  <text class="label" x="370" y="66">Between</text>
+  <text class="label" x="480" y="66">Rear</text>
+  <g class="buyer">
+    <use href="#person" x="260" y="153" color="#16835e"/>
+    <text class="label" x="260" y="211">Nicky</text>
+  </g>
+  <use href="#person" x="370" y="153" color="#54739a"/>
+  <use href="#person" x="480" y="153" color="#54739a"/>
+  <text class="label" x="370" y="211">Darren</text>
+  <text class="label" x="480" y="211">Neil</text>
+  <g class="ticket">
+    <path d="M178 132 H198 V137 Q191 140 198 143 V148 H178 V143 Q185 140 178 137Z" fill="#fde68a" stroke="#92630e" stroke-width="1.5"/>
+    <path d="M188 134 V146" stroke="#92630e" stroke-dasharray="2 2"/>
+  </g>
+  <text class="label" x="280" y="241">Darren has one person ahead and one behind.</text>
+</svg>

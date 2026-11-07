@@ -778,7 +778,10 @@ export function attachOfficeSurfaces(
         scene.getEngine().getRenderWidth() /
         scene.getEngine().getRenderHeight(),
       pose = bookPose(progress, bookReadingScale(aspect, camera.fov)),
-      volume = volumes.find((v) => v.id === activeBook) ?? volumes[0],
+      volume =
+        volumes.find((v) => v.id === activeBook) ??
+        volumes.find((v) => books[v.index].topic === library.selectedTopic) ??
+        volumes[0],
       x = volume ? -2.2 + volume.index * 2.2 : 0;
     reading.root.setEnabled(progress > 0.001);
     reading.root.position = Vector3.Lerp(
@@ -794,7 +797,7 @@ export function attachOfficeSurfaces(
     backdropMat.alpha = pose.opening;
     readingBackdrop.setEnabled(s.wall === "bookshelf" && pose.opening > 0.001);
     for (const v of volumes)
-      v.root.setEnabled(v.id !== activeBook || progress < 0.01);
+      v.root.setEnabled(v.id !== volume?.id || progress < 0.01);
     if (library.bookOpen) lastReadingModel = library;
     reading.draw(
       lastReadingModel ?? library,

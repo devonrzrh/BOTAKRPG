@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="330" viewBox="0 0 640 330" role="img" aria-labelledby="title desc">
+<title id="title">Follow the recovered path from A to E</title><desc id="desc">A marker travels from A through B to E using two graph edges.</desc>
+<style>
+text { font:16px system-ui,sans-serif; text-anchor:middle; fill:#14243a; }
+.label { paint-order:stroke; stroke:#f8fafc; stroke-width:3px; stroke-linejoin:round; }
+.heading { font-size:20px; font-weight:700; }
+.small { font-size:13px; }
+.tile { fill:#dbeafe; stroke:#4169a9; stroke-width:2px; }
+.chosen { fill:#a7f3d0; stroke:#16835e; }
+.edge { fill:none; stroke:#64748b; stroke-width:2.5px; stroke-linecap:round; stroke-linejoin:round; }
+.route { fill:none; stroke:#16835e; stroke-width:4px; stroke-linecap:round; }
+.cursor { fill:#fde68a; stroke:#92630e; stroke-width:2px; }
+.ring { fill:none; stroke:#16835e; stroke-width:3px; }
+.badge { fill:#334155; stroke:#f8fafc; stroke-width:1.5px; }
+.badge-text { fill:#fff; font-size:12px; font-weight:700; }
+@media (prefers-color-scheme:dark) {
+ .label { fill:#f8fafc; stroke:#111827; }
+ .edge { stroke:#b8c7db; }
+ .route,.ring { stroke:#4ade80; }
+}
+
+.path-probe { transform:translate(245px,242px); animation:path-probe 8s ease-in-out infinite; } @keyframes path-probe { 0% { transform:translate(320px,78px); }15% { transform:translate(320px,78px); }35% { transform:translate(180px,157px); }48% { transform:translate(180px,157px); }72% { transform:translate(245px,242px); }100% { transform:translate(245px,242px); } }
+
+@media (prefers-reduced-motion:reduce) { * { animation:none !important; } }
+</style>
+<text class="label heading" x="320" y="29">Follow the recovered path from A to E</text>
+<path class="edge" d="M320 78 L180 157"/><path class="edge" d="M320 78 L460 157"/><path class="edge" d="M180 157 L105 242"/><path class="edge" d="M180 157 L245 242"/><path class="edge" d="M460 157 L395 242"/><path class="edge" d="M460 157 L535 242"/><circle class="tile" cx="320" cy="78" r="24"/><text class="ink" x="320" y="84">A</text><circle class="tile" cx="180" cy="157" r="24"/><text class="ink" x="180" y="163">B</text><circle class="tile" cx="460" cy="157" r="24"/><text class="ink" x="460" y="163">C</text><circle class="tile" cx="105" cy="242" r="24"/><text class="ink" x="105" y="248">D</text><circle class="tile" cx="245" cy="242" r="24"/><text class="ink" x="245" y="248">E</text><circle class="tile" cx="395" cy="242" r="24"/><text class="ink" x="395" y="248">F</text><circle class="tile" cx="535" cy="242" r="24"/><text class="ink" x="535" y="248">G</text><g class="path-probe"><circle r="29" style="fill:none;stroke:#c28713;stroke-width:3px"/></g><text class="label small" x="320" y="302">The path follows the actual edges A → B → E.</text>
+</svg>

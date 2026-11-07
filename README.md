@@ -13,7 +13,15 @@ npm run dev
 
 Open the local URL printed by Vite. `npm run build` validates Markdown, copies the installed Python runtime, type-checks, and builds `dist/`. `npm run preview` serves that build with the required runtime headers. `npm test` checks pure models, content validation, save persistence, and worker lifecycle.
 
-## Playable chapter
+## Source curriculum
+
+All 31 supplied chapters are available through **Bookshelf → open a volume → Contents**. Search covers the full text. Books show the original diagrams, code, tables and exercises, with bookmarks and personal notes. The module guide includes the supplied review records and links to supporting indexes. The test-bank book includes all 95 questions and explanations; its 13 written exercises are self-assessed.
+
+Each of the three clue branches now continues through its subject's chapters and ends at a boss: Route Warden, Archive Keeper or Signal Mimic. The existing maze, sentinel and perceptron activities introduce those branches. **Pursue lead** opens the next unfinished activity; **Materials** opens its chapter. All three branch bosses must be completed to unlock ECHO-7. Chapter encounters grant first-clear XP and supplies; replaying cannot claim them twice.
+
+`content/source/` is the committed, playable Markdown edition. `public/materials/` preserves every supplied file unchanged, and `content/source-manifest.json` records checksums and chapter IDs. Normal builds work without the untracked `Source/` folder or PDF tools. To refresh from an updated `Source/`, install Poppler (`pdftotext` on PATH), then run `npm run source:import`. See [coverage and editorial changes](docs/source-coverage.md).
+
+## Orientation activities
 
 1. Complete or skip the short pursuit prologue. Take the case in the briefing. Select **Home → Bookshelf** or the pinned bookshelf note. Read “Finding a way through.” Bookmarks and margin notes save locally.
 2. Enter **Packet labyrinth**. Reach the amber exit manually, with visual blocks, or using Python. The graph-search lesson contains working BFS code; DFS and other valid routes also work. Run resets the maze while retaining your program. Reset retains code and blocks. New seed creates another layout. Completing a maze unlocks an optional 90-second trial.

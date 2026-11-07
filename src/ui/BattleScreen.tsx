@@ -220,6 +220,7 @@ export function BattleScreen(p: Props) {
                   Select the steps in order. Select a step again to remove it.
                 </p>
               )}
+              {q.format === "multiple" && <p>Select all that apply.</p>}
               <div className="battle-answer-options">
                 {q.options
                   .map((text, index) => ({ text, index }))
@@ -261,7 +262,9 @@ export function BattleScreen(p: Props) {
                   disabled={
                     q.format === "choice"
                       ? p.answer.length !== 1
-                      : p.answer.length !== q.options.length
+                      : q.format === "multiple"
+                        ? !p.answer.length
+                        : p.answer.length !== q.options.length
                   }
                   onClick={p.onSubmit}
                 >

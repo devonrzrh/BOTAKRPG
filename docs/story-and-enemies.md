@@ -2,6 +2,8 @@
 
 Status: design plan for expansion. These encounters are not yet implemented. The five questline bosses and ECHO-7 finale are the intended structure; the motive and supporting cast below remain story proposals.
 
+Current curriculum integration uses three subject branches with 31 chapter encounters and three playable bosses (Route Warden, Archive Keeper, Signal Mimic). See `source-coverage.md`. The five questlines below remain a separate narrative expansion proposal.
+
 ## Premise
 
 Detective Vale pursues ECHO-7 through a transit station. The robot escapes through a maintenance terminal. Minutes later, the station records change: the system claims it was never there.

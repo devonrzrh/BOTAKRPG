@@ -91,7 +91,15 @@ it("uses all material topics in the final boss and can complete the case", () =>
     save = reply.save;
   }
   expect(battle.phase).toBe("won");
-  expect(studied.size).toBe(3);
+  expect(
+    new Set(
+      [...studied]
+        .map((id) =>
+          content.entities.find((e) => e.type === "lesson" && e.id === id),
+        )
+        .map((e) => (e?.type === "lesson" ? e.topic : "")),
+    ),
+  ).toEqual(new Set(["algorithms", "structures", "ai"]));
   save = completeActivity(save, "echo-battle");
   save = claimQuest(save, finale, content);
   expect(save.claimed).toContain(finale.id);

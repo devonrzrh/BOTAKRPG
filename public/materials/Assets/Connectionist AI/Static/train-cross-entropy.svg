@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="266" viewBox="0 0 720 266" role="img" aria-labelledby="title desc">
+  <title id="title">Correct-class probability and loss</title>
+  <desc id="desc">Cross-entropy for a correct class equals minus log of its assigned probability. The chapter examples are 0.99 to 0.010, 0.7 to 0.357, and 0.1 to 2.303.</desc>
+  <style>
+    text { font-family: system-ui, sans-serif; text-anchor: middle; fill: #263449; }
+    .title { font-size: 22px; font-weight: 700; fill: #172554; }
+    .label { font-size: 15px; font-weight: 600; }
+    .note { font-size: 13px; }
+    .num { font-size: 20px; font-weight: 700; }
+    .edge { fill: none; stroke: #74849b; stroke-width: 2; }
+    .guide { fill: none; stroke: #94a3b8; stroke-width: 1; stroke-dasharray: 4 5; }
+    .blue { fill: #dbeafe; stroke: #477fc0; }
+    .violet { fill: #ede9fe; stroke: #8864cb; }
+    .green { fill: #d1fae5; stroke: #19936c; }
+    .amber { fill: #ffedd5; stroke: #bd6a26; }
+    .blue, .violet, .green, .amber { stroke-width: 1.5; }
+    .blue-line, .violet-line, .green-line, .amber-line { fill: none; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
+    .blue-line { stroke: #3386c5; }
+    .violet-line { stroke: #9670d2; }
+    .green-line { stroke: #21a47a; }
+    .amber-line { stroke: #ce873a; }
+    @media (prefers-color-scheme: dark) {
+      text { fill: #e2e8f0; }
+      .title { fill: #f1f5ff; }
+      .edge { stroke: #94a3b8; }
+    }
+    .ink { fill: #18243a; }
+
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0 0L8 4L0 8Z" fill="#74849b" />
+    </marker>
+  </defs>
+  <text x="360" y="29" class="title">Correct-class probability and loss</text>
+  <path d="M103 201H626" class="guide" />
+  <text x="81" y="205" class="note">0</text>
+  <path d="M103 174.2H626" class="guide" />
+  <text x="81" y="178.2" class="note">1</text>
+  <path d="M103 147.4H626" class="guide" />
+  <text x="81" y="151.4" class="note">2</text>
+  <path d="M103 120.6H626" class="guide" />
+  <text x="81" y="124.6" class="note">3</text>
+  <path d="M103 93.8H626" class="guide" />
+  <text x="81" y="97.8" class="note">4</text>
+  <path d="M103 67H626" class="guide" />
+  <text x="81" y="71" class="note">5</text>
+  <text x="150.55" y="220" class="note">0.1</text>
+  <text x="256.2" y="220" class="note">0.3</text>
+  <text x="361.86" y="220" class="note">0.5</text>
+  <text x="467.52" y="220" class="note">0.7</text>
+  <text x="573.17" y="220" class="note">0.9</text>
+  <text x="626" y="220" class="note">1</text>
+  <path d="M103 201L635 201" class="edge" marker-end="url(#arrow)" />
+  <path d="M103 201L103 59" class="edge" marker-end="url(#arrow)" />
+  <text x="364.5" y="240" class="note">Probability assigned to correct class</text>
+  <text x="93" y="50" class="note">Cross-entropy</text>
+  <path d="M103 77.58 L108.28 96.16 L113.57 107.02 L118.85 114.73 L124.13 120.71 L129.41 125.6 L134.7 129.73 L139.98 133.31 L145.26 136.47 L150.55 139.29 L155.83 141.85 L161.11 144.18 L166.39 146.32 L171.68 148.31 L176.96 150.16 L182.24 151.89 L187.53 153.51 L192.81 155.04 L198.09 156.49 L203.37 157.87 L208.66 159.17 L213.94 160.42 L219.22 161.61 L224.51 162.75 L229.79 163.85 L235.07 164.9 L240.35 165.91 L245.64 166.88 L250.92 167.82 L256.2 168.73 L261.48 169.61 L266.77 170.46 L272.05 171.29 L277.33 172.09 L282.62 172.86 L287.9 173.62 L293.18 174.35 L298.46 175.07 L303.75 175.76 L309.03 176.44 L314.31 177.11 L319.6 177.75 L324.88 178.38 L330.16 179 L335.44 179.6 L340.73 180.19 L346.01 180.77 L351.29 181.33 L356.58 181.88 L361.86 182.42 L367.14 182.95 L372.42 183.47 L377.71 183.99 L382.99 184.49 L388.27 184.98 L393.56 185.46 L398.84 185.94 L404.12 186.4 L409.4 186.86 L414.69 187.31 L419.97 187.75 L425.25 188.19 L430.54 188.62 L435.82 189.04 L441.1 189.46 L446.38 189.86 L451.67 190.27 L456.95 190.66 L462.23 191.06 L467.52 191.44 L472.8 191.82 L478.08 192.2 L483.36 192.57 L488.65 192.93 L493.93 193.29 L499.21 193.65 L504.49 194 L509.78 194.34 L515.06 194.68 L520.34 195.02 L525.63 195.35 L530.91 195.68 L536.19 196.01 L541.47 196.33 L546.76 196.64 L552.04 196.96 L557.32 197.27 L562.61 197.57 L567.89 197.88 L573.17 198.18 L578.45 198.47 L583.74 198.77 L589.02 199.06 L594.3 199.34 L599.59 199.63 L604.87 199.91 L610.15 200.18 L615.43 200.46 L620.72 200.73 L626 201" class="violet-line" />
+  <circle cx="150.55" cy="139.29" r="5" class="green" />
+  <text x="185.55" y="131.29" class="note">2.303</text>
+  <circle cx="467.52" cy="191.44" r="5" class="green" />
+  <text x="467.52" y="174.44" class="note">0.357</text>
+  <circle cx="620.72" cy="200.73" r="5" class="green" />
+  <text x="603.72" y="183.73" class="note">0.010</text>
+</svg>

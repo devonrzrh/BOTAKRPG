@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="231" viewBox="0 0 720 231" role="img" aria-labelledby="title desc">
+  <title id="title">Content-based recommendations</title>
+  <desc id="desc">A user profile built from liked science-fiction items favors another science-fiction candidate based on its attributes. This does not require ratings from other users.</desc>
+  <style>
+    text { font-family: system-ui, sans-serif; text-anchor: middle; fill: #263449; }
+    .title { font-size: 22px; font-weight: 700; fill: #172554; }
+    .label { font-size: 15px; font-weight: 600; }
+    .note { font-size: 13px; }
+    .num { font-size: 20px; font-weight: 700; }
+    .edge { fill: none; stroke: #74849b; stroke-width: 2; }
+    .guide { fill: none; stroke: #94a3b8; stroke-width: 1; stroke-dasharray: 4 5; }
+    .blue { fill: #dbeafe; stroke: #477fc0; }
+    .violet { fill: #ede9fe; stroke: #8864cb; }
+    .green { fill: #d1fae5; stroke: #19936c; }
+    .amber { fill: #ffedd5; stroke: #bd6a26; }
+    .blue, .violet, .green, .amber { stroke-width: 1.5; }
+    .blue-line, .violet-line, .green-line, .amber-line { fill: none; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
+    .blue-line { stroke: #3386c5; }
+    .violet-line { stroke: #9670d2; }
+    .green-line { stroke: #21a47a; }
+    .amber-line { stroke: #ce873a; }
+    @media (prefers-color-scheme: dark) {
+      text { fill: #e2e8f0; }
+      .title { fill: #f1f5ff; }
+      .edge { stroke: #94a3b8; }
+    }
+    .ink { fill: #18243a; }
+
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0 0L8 4L0 8Z" fill="#74849b" />
+    </marker>
+  </defs>
+  <text x="360" y="29" class="title">Content-based recommendations</text>
+  <text x="117" y="62" class="label">Liked items</text>
+  <g class="tile">
+    <rect x="34" y="77" width="170" height="38" rx="10" class="violet" />
+    <text x="119" y="101" class="label ink">Space film</text>
+  </g>
+  <g class="tile">
+    <rect x="34" y="132" width="170" height="38" rx="10" class="violet" />
+    <text x="119" y="156" class="label ink">Robot novel</text>
+  </g>
+  <path d="M211 97L275 120" class="edge" marker-end="url(#arrow)" />
+  <path d="M211 152L275 132" class="edge" marker-end="url(#arrow)" />
+  <g class="tile">
+    <rect x="282" y="104" width="163" height="38" rx="10" class="green" />
+    <text x="363.5" y="128" class="label ink">Sci-fi profile</text>
+  </g>
+  <path d="M451 123L500 123" class="edge" marker-end="url(#arrow)" />
+  <g class="tile">
+    <rect x="506" y="74" width="182" height="38" rx="10" class="violet" />
+    <text x="597" y="98" class="label ink">Space documentary</text>
+  </g>
+  <g class="tile">
+    <rect x="506" y="137" width="182" height="38" rx="10" class="blue" />
+    <text x="597" y="161" class="label ink">Cooking show</text>
+  </g>
+  <text x="597" y="202" class="note">Match by item features</text>
+</svg>

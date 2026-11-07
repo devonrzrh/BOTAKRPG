@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="184" viewBox="0 0 640 184" role="img" aria-labelledby="title desc">
+<title id="title">Find the largest score without sorting</title><desc id="desc">Keep the largest score seen so far. The final answer is 100.</desc>
+<style>
+text { font: 16px system-ui, sans-serif; text-anchor: middle; fill: #14243a; }
+.label { paint-order: stroke; stroke: #f8fafc; stroke-width: 3px; stroke-linejoin: round; }
+.heading { font-size: 20px; font-weight: 700; }
+.small { font-size: 13px; }
+.tile { fill: #dbeafe; stroke: #4169a9; stroke-width: 2; }
+.focus { fill: #a7f3d0; stroke: #16835e; }
+.muted { fill: #e2e8f0; stroke: #64748b; }
+.edge { stroke: #64748b; stroke-width: 2.5; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.route { stroke: #16835e; stroke-width: 4; fill: none; stroke-linecap: round; }
+.badge { fill: #334155; stroke: #f8fafc; stroke-width: 1.5; }
+.badge-text { fill: #fff; font-size: 12px; font-weight: 700; }
+@media (prefers-color-scheme: dark) {
+  .label { fill: #f8fafc; stroke: #111827; }
+  .edge { stroke: #b8c7db; }
+  .route { stroke: #4ade80; }
+}
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
+
+</style>
+<text class="label heading" x="320" y="29">Find the largest score without sorting</text>
+<rect class="tile focus" x="58.0" y="70" width="76" height="40" rx="7"/><text class="ink" x="96" y="96">72</text><text class="label small" x="96" y="145">Best: 72</text><rect class="tile focus" x="148.0" y="70" width="76" height="40" rx="7"/><text class="ink" x="186" y="96">85</text><text class="label small" x="186" y="145">Best: 85</text><rect class="tile" x="238.0" y="70" width="76" height="40" rx="7"/><text class="ink" x="276" y="96">40</text><text class="label small" x="276" y="145">Best: 85</text><rect class="tile" x="328.0" y="70" width="76" height="40" rx="7"/><text class="ink" x="366" y="96">29</text><text class="label small" x="366" y="145">Best: 85</text><rect class="tile focus" x="418.0" y="70" width="76" height="40" rx="7"/><text class="ink" x="456" y="96">100</text><text class="label small" x="456" y="145">Best: 100</text><rect class="tile" x="508.0" y="70" width="76" height="40" rx="7"/><text class="ink" x="546" y="96">91</text><text class="label small" x="546" y="145">Best: 100</text>
+<style>* { animation: none !important; transition: none !important; }</style></svg>

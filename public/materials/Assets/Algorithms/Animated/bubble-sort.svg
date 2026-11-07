@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="260" viewBox="0 0 640 260" role="img" aria-labelledby="title desc">
+<title id="title">Bubble sort moves larger values right</title><desc id="desc">Start with the unsorted scores Compare 91 and 68, then swap Compare 85 and 68, then swap Compare 72 and 68, then swap</desc>
+<style>
+text { font: 16px system-ui, sans-serif; text-anchor: middle; fill: #14243a; }
+.label { paint-order: stroke; stroke: #f8fafc; stroke-width: 3px; stroke-linejoin: round; }
+.heading { font-size: 20px; font-weight: 700; }
+.small { font-size: 13px; }
+.tile { fill: #dbeafe; stroke: #4169a9; stroke-width: 2; }
+.focus { fill: #a7f3d0; stroke: #16835e; }
+.muted { fill: #e2e8f0; stroke: #64748b; }
+.edge { stroke: #64748b; stroke-width: 2.5; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.route { stroke: #16835e; stroke-width: 4; fill: none; stroke-linecap: round; }
+.badge { fill: #334155; stroke: #f8fafc; stroke-width: 1.5; }
+.badge-text { fill: #fff; font-size: 12px; font-weight: 700; }
+@media (prefers-color-scheme: dark) {
+  .label { fill: #f8fafc; stroke: #111827; }
+  .edge { stroke: #b8c7db; }
+  .route { stroke: #4ade80; }
+}
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
+
+.item-0 { transform:translateX(96.00px); animation:item-0 8s ease-in-out infinite; } @keyframes item-0 { 0.00% { transform:translate(0.00px,0); }3.00% { transform:translate(0.00px,0); }29.33% { transform:translate(0.00px,0); }32.33% { transform:translate(0.00px,0); }58.67% { transform:translate(0.00px,0); }61.67% { transform:translate(0.00px,0); }74.83% { transform:translate(48.00px,-25px); }88.00% { transform:translate(96.00px,0); }100% { transform:translate(96.00px,0); } }
+.item-1 { transform:translateX(96.00px); animation:item-1 8s ease-in-out infinite; } @keyframes item-1 { 0.00% { transform:translate(0.00px,0); }3.00% { transform:translate(0.00px,0); }29.33% { transform:translate(0.00px,0); }32.33% { transform:translate(0.00px,0); }45.50% { transform:translate(48.00px,-25px); }58.67% { transform:translate(96.00px,0); }61.67% { transform:translate(96.00px,0); }88.00% { transform:translate(96.00px,0); }100% { transform:translate(96.00px,0); } }
+.item-2 { transform:translateX(96.00px); animation:item-2 8s ease-in-out infinite; } @keyframes item-2 { 0.00% { transform:translate(0.00px,0); }3.00% { transform:translate(0.00px,0); }16.17% { transform:translate(48.00px,-25px); }29.33% { transform:translate(96.00px,0); }32.33% { transform:translate(96.00px,0); }58.67% { transform:translate(96.00px,0); }61.67% { transform:translate(96.00px,0); }88.00% { transform:translate(96.00px,0); }100% { transform:translate(96.00px,0); } }
+.item-3 { transform:translateX(-288.00px); animation:item-3 8s ease-in-out infinite; } @keyframes item-3 { 0.00% { transform:translate(0.00px,0); }3.00% { transform:translate(0.00px,0); }16.17% { transform:translate(-48.00px,25px); }29.33% { transform:translate(-96.00px,0); }32.33% { transform:translate(-96.00px,0); }45.50% { transform:translate(-144.00px,25px); }58.67% { transform:translate(-192.00px,0); }61.67% { transform:translate(-192.00px,0); }74.83% { transform:translate(-240.00px,25px); }88.00% { transform:translate(-288.00px,0); }100% { transform:translate(-288.00px,0); } }
+.phase-0 { opacity:0; animation:phase-0 8s steps(1,end) infinite; } @keyframes phase-0 { 0.000% { opacity:1; } 3.000% { opacity:0; } 100.000% { opacity:0; } }
+.phase-1 { opacity:0; animation:phase-1 8s steps(1,end) infinite; } @keyframes phase-1 { 0.000% { opacity:0; } 3.000% { opacity:1; } 32.333% { opacity:0; } 100.000% { opacity:0; } }
+.phase-2 { opacity:0; animation:phase-2 8s steps(1,end) infinite; } @keyframes phase-2 { 0.000% { opacity:0; } 32.333% { opacity:1; } 61.667% { opacity:0; } 100.000% { opacity:0; } }
+.phase-3 { opacity:0; animation:phase-3 8s steps(1,end) infinite; } @keyframes phase-3 { 0.000% { opacity:0; } 61.667% { opacity:1; } 100.000% { opacity:1; } }
+</style>
+<text class="label heading" x="320" y="29">Bubble sort moves larger values right</text>
+<text class="label small" x="176.0" y="66">0</text><text class="label small" x="272.0" y="66">1</text><text class="label small" x="368.0" y="66">2</text><text class="label small" x="464.0" y="66">3</text><g class="item-0"><rect class="tile" x="138.0" y="103" width="76" height="40" rx="7"/><text class="ink" x="176.0" y="129">72</text></g><g class="item-1"><rect class="tile" x="234.0" y="103" width="76" height="40" rx="7"/><text class="ink" x="272.0" y="129">85</text></g><g class="item-2"><rect class="tile" x="330.0" y="103" width="76" height="40" rx="7"/><text class="ink" x="368.0" y="129">91</text></g><g class="item-3"><rect class="tile" x="426.0" y="103" width="76" height="40" rx="7"/><text class="ink" x="464.0" y="129">68</text></g><g class="phase-0"><text class="label" x="320" y="204">Start with the unsorted scores</text></g><g class="phase-1"><text class="label" x="320" y="204">Compare 91 and 68, then swap</text></g><g class="phase-2"><text class="label" x="320" y="204">Compare 85 and 68, then swap</text></g><g class="phase-3"><text class="label" x="320" y="204">Compare 72 and 68, then swap</text></g><text class="label small" x="320" y="239">Indexes stay fixed. The value tiles move between positions.</text>
+</svg>

@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="358" viewBox="0 0 640 358" role="img" aria-labelledby="title desc">
+<title id="title">Search for E and stop at the match</title><desc id="desc">Gold signals follow edges from each node to its newly discovered neighbors.</desc>
+<style>
+text { font:16px system-ui,sans-serif; text-anchor:middle; fill:#14243a; }
+.label { paint-order:stroke; stroke:#f8fafc; stroke-width:3px; stroke-linejoin:round; }
+.heading { font-size:20px; font-weight:700; }
+.small { font-size:13px; }
+.tile { fill:#dbeafe; stroke:#4169a9; stroke-width:2px; }
+.chosen { fill:#a7f3d0; stroke:#16835e; }
+.edge { fill:none; stroke:#64748b; stroke-width:2.5px; stroke-linecap:round; stroke-linejoin:round; }
+.route { fill:none; stroke:#16835e; stroke-width:4px; stroke-linecap:round; }
+.cursor { fill:#fde68a; stroke:#92630e; stroke-width:2px; }
+.ring { fill:none; stroke:#16835e; stroke-width:3px; }
+.badge { fill:#334155; stroke:#f8fafc; stroke-width:1.5px; }
+.badge-text { fill:#fff; font-size:12px; font-weight:700; }
+@media (prefers-color-scheme:dark) {
+ .label { fill:#f8fafc; stroke:#111827; }
+ .edge { stroke:#b8c7db; }
+ .route,.ring { stroke:#4ade80; }
+}
+
+.signal-0 { visibility:hidden; animation:signal-0 12s linear infinite; } @keyframes signal-0 { 0%,8% { visibility:hidden;transform:translate(320px,78px); } 8.01% { visibility:visible;transform:translate(320px,78px); } 15% { visibility:visible;transform:translate(180px,157px); } 15.01%,100% { visibility:hidden;transform:translate(180px,157px); } }.arrived-0 { stroke-dasharray:176;stroke-dashoffset:0;animation:ring-0 12s infinite; } @keyframes ring-0 { 0%,15% { stroke-dashoffset:176; } 19%,100% { stroke-dashoffset:0; } }.signal-1 { visibility:hidden; animation:signal-1 12s linear infinite; } @keyframes signal-1 { 0%,18% { visibility:hidden;transform:translate(320px,78px); } 18.01% { visibility:visible;transform:translate(320px,78px); } 25% { visibility:visible;transform:translate(460px,157px); } 25.01%,100% { visibility:hidden;transform:translate(460px,157px); } }.arrived-1 { stroke-dasharray:176;stroke-dashoffset:0;animation:ring-1 12s infinite; } @keyframes ring-1 { 0%,25% { stroke-dashoffset:176; } 29%,100% { stroke-dashoffset:0; } }.signal-2 { visibility:hidden; animation:signal-2 12s linear infinite; } @keyframes signal-2 { 0%,28% { visibility:hidden;transform:translate(180px,157px); } 28.01% { visibility:visible;transform:translate(180px,157px); } 35% { visibility:visible;transform:translate(105px,242px); } 35.01%,100% { visibility:hidden;transform:translate(105px,242px); } }.arrived-2 { stroke-dasharray:176;stroke-dashoffset:0;animation:ring-2 12s infinite; } @keyframes ring-2 { 0%,35% { stroke-dashoffset:176; } 39%,100% { stroke-dashoffset:0; } }.signal-3 { visibility:hidden; animation:signal-3 12s linear infinite; } @keyframes signal-3 { 0%,38% { visibility:hidden;transform:translate(180px,157px); } 38.01% { visibility:visible;transform:translate(180px,157px); } 45% { visibility:visible;transform:translate(245px,242px); } 45.01%,100% { visibility:hidden;transform:translate(245px,242px); } }.arrived-3 { stroke-dasharray:176;stroke-dashoffset:0;animation:ring-3 12s infinite; } @keyframes ring-3 { 0%,45% { stroke-dashoffset:176; } 49%,100% { stroke-dashoffset:0; } }
+@media (prefers-reduced-motion:reduce) { * { animation:none !important; } }
+</style>
+<text class="label heading" x="320" y="29">Search for E and stop at the match</text>
+<path class="edge" d="M320 78 L180 157"/><path class="edge" d="M320 78 L460 157"/><path class="edge" d="M180 157 L105 242"/><path class="edge" d="M180 157 L245 242"/><path class="edge" d="M460 157 L395 242"/><path class="edge" d="M460 157 L535 242"/><circle class="tile" cx="320" cy="78" r="24"/><text class="ink" x="320" y="84">A</text><circle class="badge" cx="342" cy="57" r="11"/><text class="badge-text" x="342" y="61">1</text><circle class="tile" cx="180" cy="157" r="24"/><text class="ink" x="180" y="163">B</text><circle class="badge" cx="202" cy="136" r="11"/><text class="badge-text" x="202" y="140">2</text><circle class="tile" cx="460" cy="157" r="24"/><text class="ink" x="460" y="163">C</text><circle class="badge" cx="482" cy="136" r="11"/><text class="badge-text" x="482" y="140">3</text><circle class="tile" cx="105" cy="242" r="24"/><text class="ink" x="105" y="248">D</text><circle class="badge" cx="127" cy="221" r="11"/><text class="badge-text" x="127" y="225">4</text><circle class="tile" cx="245" cy="242" r="24"/><text class="ink" x="245" y="248">E</text><circle class="badge" cx="267" cy="221" r="11"/><text class="badge-text" x="267" y="225">5</text><circle class="tile" cx="395" cy="242" r="24"/><text class="ink" x="395" y="248">F</text><circle class="tile" cx="535" cy="242" r="24"/><text class="ink" x="535" y="248">G</text><g class="signal-0"><circle class="cursor" r="8"/></g><circle class="ring arrived-0" cx="180" cy="157" r="28"/><g class="signal-1"><circle class="cursor" r="8"/></g><circle class="ring arrived-1" cx="460" cy="157" r="28"/><g class="signal-2"><circle class="cursor" r="8"/></g><circle class="ring arrived-2" cx="105" cy="242" r="28"/><g class="signal-3"><circle class="cursor" r="8"/></g><circle class="ring arrived-3" cx="245" cy="242" r="28"/><circle class="ring" cx="320" cy="78" r="28"/><text class="label small" x="320" y="305">Gold signals follow edges from each node to its newly discovered neighbors.</text><text class="label small" x="320" y="333">Stop as soon as E is reached.</text>
+</svg>

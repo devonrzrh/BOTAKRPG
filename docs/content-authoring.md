@@ -1,6 +1,6 @@
 # Markdown content contract · version 1
 
-Run `npm run content` after editing `content/*.md`. Production builds run this automatically; the development server must be restarted or this command rerun after content edits. The generated `src/generated/content.json` is runtime data, not the authoring source.
+Run `npm run content` after editing Markdown anywhere under `content/`. Production builds run this automatically; the development server must be restarted or this command rerun after content edits. The generated `src/generated/content.json` is runtime data, not the authoring source. Imported chapters are in `content/source/`; refreshing them with `npm run source:import` replaces that snapshot from `Source/`. Put hand-authored checkpoints in `scripts/create-curriculum.ts` or edit `content/08-curriculum.md` if no refresh is planned.
 
 ## Lessons
 
@@ -34,7 +34,9 @@ answer: [0]
 explanation: BFS explores vertices in nondecreasing distance from the start.
 ```
 
-Use `format: ordering` with `answer` containing every option index exactly once in the correct order. Choice questions require exactly one correct index. Indices are zero-based. Quote numeric option text (`'0'`), because YAML otherwise parses it as a number. Every question requires an explanation and an existing lesson reference.
+Use `format: ordering` with `answer` containing every option index exactly once in the correct order. Choice questions require exactly one correct index. `format: multiple` accepts an exact set of correct indices, independent of selection order, with no extra selections. Indices are zero-based. Quote numeric option text (`'0'`), because YAML otherwise parses it as a number. Every question requires an explanation and an existing lesson reference. Questions imported from the PDF use permanent `bank-aN` and `bank-bN` IDs. Open-ended Part C is self-study in the test-bank book, not automatically graded combat.
+
+Battle enemies may set `lessons: [lesson-id, ...]` to select encounter-specific questions independently of the chosen skill. Pools rotate across those lessons. Without this field, legacy skill-linked or mixed questions retain their behavior. Branch objectives are ordered: the quest board opens the next unfinished objective. Chapter encounter entry checks all earlier objectives before starting. The final objective of each branch supplies its revealed clue.
 
 ## Other entities
 

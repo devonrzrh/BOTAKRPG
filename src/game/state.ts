@@ -11,6 +11,7 @@ const masterySchema = z.object({
 export const saveSchema = z
   .object({
     version: z.literal(1),
+    curriculumVersion: z.union([z.literal(1), z.literal(2)]).default(1),
     story: z
       .object({
         prologueSeen: z.boolean(),
@@ -53,6 +54,7 @@ export type Save = z.infer<typeof saveSchema>;
 export function initialSave(): Save {
   return {
     version: 1,
+    curriculumVersion: 2,
     story: {
       prologueSeen: false,
       briefingSeen: false,
@@ -201,7 +203,13 @@ export function parseSave(input: unknown, content: Content): Save {
   )) {
     if (
       quest.objectives.some((id) => save.completed.includes(id)) &&
-      !questUnlocked(save, quest, content)
+      !questUnlocked(save, quest, content) &&
+      !(
+        save.curriculumVersion === 1 &&
+        ["maze-chamber", "guardian-battle", "perceptron-exhibit"].every((id) =>
+          save.completed.includes(id),
+        )
+      )
     )
       throw new Error("Final encounter requires all clue branches");
   }

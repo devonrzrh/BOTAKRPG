@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="275" viewBox="0 0 720 275" role="img" aria-labelledby="title desc">
+  <title id="title">Training and validation cycle</title>
+  <desc id="desc">Each batch clears old gradients, runs a forward pass, computes gradients, and updates parameters. After each epoch, validation decides whether to save a checkpoint or stop.</desc>
+  <style>
+    text { font-family: system-ui, sans-serif; text-anchor: middle; fill: #263449; }
+    .title { font-size: 22px; font-weight: 700; fill: #172554; }
+    .label { font-size: 15px; font-weight: 600; }
+    .note { font-size: 13px; }
+    .num { font-size: 20px; font-weight: 700; }
+    .edge { fill: none; stroke: #74849b; stroke-width: 2; }
+    .guide { fill: none; stroke: #94a3b8; stroke-width: 1; stroke-dasharray: 4 5; }
+    .blue { fill: #dbeafe; stroke: #477fc0; }
+    .violet { fill: #ede9fe; stroke: #8864cb; }
+    .green { fill: #d1fae5; stroke: #19936c; }
+    .amber { fill: #ffedd5; stroke: #bd6a26; }
+    .blue, .violet, .green, .amber { stroke-width: 1.5; }
+    .blue-line, .violet-line, .green-line, .amber-line { fill: none; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
+    .blue-line { stroke: #3386c5; }
+    .violet-line { stroke: #9670d2; }
+    .green-line { stroke: #21a47a; }
+    .amber-line { stroke: #ce873a; }
+    @media (prefers-color-scheme: dark) {
+      text { fill: #e2e8f0; }
+      .title { fill: #f1f5ff; }
+      .edge { stroke: #94a3b8; }
+    }
+    .ink { fill: #18243a; }
+    .focus { animation: focus 6s infinite; }
+    .phase-0 { animation-delay: 0s; }
+    .phase-1 { animation-delay: 1.5s; }
+    .phase-2 { animation-delay: 3s; }
+    .phase-3 { animation-delay: 4.5s; }
+    @keyframes focus { 0%, 25%, 100% { fill: #dbeafe; } 5%, 20% { fill: #f9c8ed; } }
+    @media (prefers-reduced-motion: reduce) { .focus { animation: none; } }
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0 0L8 4L0 8Z" fill="#74849b" />
+    </marker>
+  </defs>
+  <text x="360" y="29" class="title">Training and validation cycle</text>
+  <g class="tile">
+    <rect x="27" y="70" width="133" height="47" rx="7" class="blue focus phase-0" />
+    <text x="93.5" y="99" class="label ink">Clear gradients</text>
+  </g>
+  <g class="tile">
+    <rect x="204" y="70" width="133" height="47" rx="7" class="blue focus phase-1" />
+    <text x="270.5" y="99" class="label ink">Forward + loss</text>
+  </g>
+  <g class="tile">
+    <rect x="381" y="70" width="133" height="47" rx="7" class="blue focus phase-2" />
+    <text x="447.5" y="99" class="label ink">Backward</text>
+  </g>
+  <g class="tile">
+    <rect x="558" y="70" width="133" height="47" rx="7" class="blue focus phase-3" />
+    <text x="624.5" y="99" class="label ink">Optimizer step</text>
+  </g>
+  <path d="M161 94L196 94" class="edge" marker-end="url(#arrow)" />
+  <path d="M338 94L373 94" class="edge" marker-end="url(#arrow)" />
+  <path d="M515 94L550 94" class="edge" marker-end="url(#arrow)" />
+  <path d="M622 120V145H95V120" class="edge" marker-end="url(#arrow)" />
+  <text x="358" y="163" class="note">Repeat for each training batch</text>
+  <g class="tile">
+    <rect x="40" y="192" width="176" height="38" rx="10" class="violet" />
+    <text x="128" y="216" class="label ink">Validate epoch</text>
+  </g>
+  <path d="M222 211L270 211" class="edge" marker-end="url(#arrow)" />
+  <g class="tile">
+    <rect x="276" y="192" width="175" height="38" rx="10" class="green" />
+    <text x="363.5" y="216" class="label ink">Save best checkpoint</text>
+  </g>
+  <path d="M457 211L505 211" class="edge" marker-end="url(#arrow)" />
+  <g class="tile">
+    <rect x="511" y="192" width="179" height="38" rx="10" class="amber" />
+    <text x="600.5" y="216" class="label ink">Continue or stop</text>
+  </g>
+</svg>

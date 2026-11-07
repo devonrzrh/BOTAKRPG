@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "source:import": "tsx scripts/import-source.ts && tsx scripts/create-curriculum.ts && npm run content",
     "content": "tsx scripts/compile-content.ts",
     "runtime": "node scripts/sync-runtime.mjs",
     "predev": "npm run content && npm run runtime",

@@ -10,6 +10,7 @@ export interface Battle {
   enemyName: string;
   attack: number;
   mixedQuestions: boolean;
+  lessons?: string[];
   hp: number;
   maxHp: number;
   turn: number;
@@ -21,7 +22,14 @@ export interface Battle {
   assisted: boolean;
 }
 export function createBattle(
-  enemy = {
+  enemy: {
+    id: string;
+    title: string;
+    hp: number;
+    attack: number;
+    mixedQuestions: boolean;
+    lessons?: string[];
+  } = {
     id: "sentinel",
     title: "Sentinel A-03",
     hp: 76,
@@ -34,6 +42,7 @@ export function createBattle(
     enemyName: enemy.title,
     attack: enemy.attack,
     mixedQuestions: enemy.mixedQuestions,
+    lessons: enemy.lessons,
     hp: enemy.hp,
     maxHp: enemy.hp,
     turn: 1,
@@ -57,9 +66,17 @@ export function selectSkill(
     save.character.focus < skill.cost
   )
     throw new Error("Skill unavailable");
-  const pool = battle.mixedQuestions
-    ? questions
-    : questions.filter((q) => q.lesson === skill.lesson);
+  const lessonPools = battle.lessons?.map((lesson) =>
+    questions.filter((q) => q.lesson === lesson),
+  );
+  const pool = lessonPools
+    ? Array.from(
+        { length: Math.max(...lessonPools.map((p) => p.length)) },
+        (_, i) => lessonPools.flatMap((p) => (p[i] ? [p[i]] : [])),
+      ).flat()
+    : battle.mixedQuestions
+      ? questions
+      : questions.filter((q) => q.lesson === skill.lesson);
   if (!pool.length) throw new Error("No questions for this skill");
   return {
     ...battle,
@@ -70,6 +87,12 @@ export function selectSkill(
   };
 }
 export function isCorrect(question: Question, answer: number[]): boolean {
+  if (question.format === "multiple")
+    return (
+      new Set(answer).size === answer.length &&
+      answer.length === question.answer.length &&
+      question.answer.every((x) => answer.includes(x))
+    );
   return (
     question.answer.length === answer.length &&
     question.answer.every((x, i) => x === answer[i])

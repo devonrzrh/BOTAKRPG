@@ -33,14 +33,19 @@ it("reveals clues and unlocks the finale from completion rather than reward clai
     createQuestGraph(save, content).nodes.find((n) => n.id === "routing-trace")
       ?.status,
   ).toBe("available");
-  save = completeActivity(save, "maze-chamber");
+  const routing = content.entities.find((e) => e.id === "routing-trace");
+  if (routing?.type === "quest")
+    for (const id of routing.objectives) save = completeActivity(save, id);
   let graph = createQuestGraph(save, content);
   expect(
     graph.nodes.find((n) => n.id === "clue-routing-trace")?.description,
   ).toContain("maintenance");
   expect(graph.nodes.find((n) => n.id === "finale")?.status).toBe("locked");
-  for (const id of ["guardian-battle", "perceptron-exhibit"])
-    save = completeActivity(save, id);
+  for (const branch of content.entities.filter(
+    (e) => e.type === "quest" && e.kind === "branch",
+  ))
+    if (branch.type === "quest")
+      for (const id of branch.objectives) save = completeActivity(save, id);
   graph = createQuestGraph(save, content, "finale");
   expect(graph.selected).toBe("finale");
   expect(graph.nodes.find((n) => n.id === "finale")?.status).toBe("available");

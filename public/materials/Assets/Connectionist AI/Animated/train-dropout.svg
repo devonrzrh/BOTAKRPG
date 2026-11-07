@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="247" viewBox="0 0 720 247" role="img" aria-labelledby="title desc">
+  <title id="title">Dropout masks during training</title>
+  <desc id="desc">The training mask alternates between two example subsets of zeroed units. The evaluation layer uses all units. Surviving units are scaled appropriately during inverted dropout training.</desc>
+  <style>
+    text { font-family: system-ui, sans-serif; text-anchor: middle; fill: #263449; }
+    .title { font-size: 22px; font-weight: 700; fill: #172554; }
+    .label { font-size: 15px; font-weight: 600; }
+    .note { font-size: 13px; }
+    .num { font-size: 20px; font-weight: 700; }
+    .edge { fill: none; stroke: #74849b; stroke-width: 2; }
+    .guide { fill: none; stroke: #94a3b8; stroke-width: 1; stroke-dasharray: 4 5; }
+    .blue { fill: #dbeafe; stroke: #477fc0; }
+    .violet { fill: #ede9fe; stroke: #8864cb; }
+    .green { fill: #d1fae5; stroke: #19936c; }
+    .amber { fill: #ffedd5; stroke: #bd6a26; }
+    .blue, .violet, .green, .amber { stroke-width: 1.5; }
+    .blue-line, .violet-line, .green-line, .amber-line { fill: none; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
+    .blue-line { stroke: #3386c5; }
+    .violet-line { stroke: #9670d2; }
+    .green-line { stroke: #21a47a; }
+    .amber-line { stroke: #ce873a; }
+    @media (prefers-color-scheme: dark) {
+      text { fill: #e2e8f0; }
+      .title { fill: #f1f5ff; }
+      .edge { stroke: #94a3b8; }
+    }
+    .ink { fill: #18243a; }
+    .first { opacity: 1; animation: first-mask 6s steps(1,end) infinite; }
+    .second { opacity: 0; animation: second-mask 6s steps(1,end) infinite; }
+    @keyframes first-mask { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+    @keyframes second-mask { 0%, 100% { opacity: 0; } 50% { opacity: 1; } }
+    @media (prefers-reduced-motion: reduce) { .mask { animation: none; } }
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0 0L8 4L0 8Z" fill="#74849b" />
+    </marker>
+  </defs>
+  <text x="360" y="29" class="title">Dropout masks during training</text>
+  <text x="195" y="61" class="label">Training · changing masks</text>
+  <text x="547" y="61" class="label">Evaluation · all units</text>
+  <circle cx="164" cy="92" r="12" class="violet" />
+  <circle cx="226" cy="92" r="12" class="violet" />
+  <circle cx="164" cy="141" r="12" class="violet" />
+  <circle cx="226" cy="141" r="12" class="violet" />
+  <circle cx="164" cy="190" r="12" class="violet" />
+  <circle cx="226" cy="190" r="12" class="violet" />
+  <circle cx="514" cy="92" r="12" class="violet" />
+  <circle cx="576" cy="92" r="12" class="violet" />
+  <circle cx="514" cy="141" r="12" class="violet" />
+  <circle cx="576" cy="141" r="12" class="violet" />
+  <circle cx="514" cy="190" r="12" class="violet" />
+  <circle cx="576" cy="190" r="12" class="violet" />
+  <g class="mask first">
+    <g class="mask-node">
+    <circle cx="226" cy="92" r="12" class="blue" />
+    <path d="M218 84L234 100M218 100L234 84" class="amber-line" />
+  </g>
+    <g class="mask-node">
+    <circle cx="164" cy="190" r="12" class="blue" />
+    <path d="M156 182L172 198M156 198L172 182" class="amber-line" />
+  </g>
+  </g>
+  <g class="mask second">
+    <g class="mask-node">
+    <circle cx="164" cy="141" r="12" class="blue" />
+    <path d="M156 133L172 149M156 149L172 133" class="amber-line" />
+  </g>
+    <g class="mask-node">
+    <circle cx="226" cy="190" r="12" class="blue" />
+    <path d="M218 182L234 198M218 198L234 182" class="amber-line" />
+  </g>
+  </g>
+  <path d="M362 67V224" class="guide" />
+</svg>

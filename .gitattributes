@@ -1,0 +1,4 @@
+# Preserve source archive checksums across Windows and Unix checkouts.
+public/materials/** -text -whitespace
+# Imported Markdown intentionally preserves source hard line breaks.
+content/source/** whitespace=-blank-at-eol

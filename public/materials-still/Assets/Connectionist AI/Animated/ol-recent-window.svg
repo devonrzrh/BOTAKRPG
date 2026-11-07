@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="209" viewBox="0 0 720 209" role="img" aria-labelledby="title desc">
+  <title id="title">Sliding training window</title>
+  <desc id="desc">The window keeps four recent examples. As later examples arrive, the active window shifts right and older examples leave it.</desc>
+  <style>
+    text { font-family: system-ui, sans-serif; text-anchor: middle; fill: #263449; }
+    .title { font-size: 22px; font-weight: 700; fill: #172554; }
+    .label { font-size: 15px; font-weight: 600; }
+    .note { font-size: 13px; }
+    .num { font-size: 20px; font-weight: 700; }
+    .edge { fill: none; stroke: #74849b; stroke-width: 2; }
+    .guide { fill: none; stroke: #94a3b8; stroke-width: 1; stroke-dasharray: 4 5; }
+    .blue { fill: #dbeafe; stroke: #477fc0; }
+    .violet { fill: #ede9fe; stroke: #8864cb; }
+    .green { fill: #d1fae5; stroke: #19936c; }
+    .amber { fill: #ffedd5; stroke: #bd6a26; }
+    .blue, .violet, .green, .amber { stroke-width: 1.5; }
+    .blue-line, .violet-line, .green-line, .amber-line { fill: none; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
+    .blue-line { stroke: #3386c5; }
+    .violet-line { stroke: #9670d2; }
+    .green-line { stroke: #21a47a; }
+    .amber-line { stroke: #ce873a; }
+    @media (prefers-color-scheme: dark) {
+      text { fill: #e2e8f0; }
+      .title { fill: #f1f5ff; }
+      .edge { stroke: #94a3b8; }
+    }
+    .ink { fill: #18243a; }
+    .window-frame { fill: #aa83df; fill-opacity: .12; stroke: #9660d3; stroke-width: 2.5; }
+    .window { animation: recent-window 8s steps(1,end) infinite; }
+    @keyframes recent-window {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(57px); }
+      50% { transform: translateX(114px); }
+      75% { transform: translateX(171px); }
+    }
+    @media (prefers-reduced-motion: reduce) { .window { animation: none; } }
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0 0L8 4L0 8Z" fill="#74849b" />
+    </marker>
+  </defs>
+  <text x="360" y="29" class="title">Sliding training window</text>
+  <g class="tile">
+    <rect x="138" y="93" width="40" height="40" rx="4" class="blue" />
+    <text x="158" y="118" class="label ink">1</text>
+  </g>
+  <g class="tile">
+    <rect x="195" y="93" width="40" height="40" rx="4" class="blue" />
+    <text x="215" y="118" class="label ink">2</text>
+  </g>
+  <g class="tile">
+    <rect x="252" y="93" width="40" height="40" rx="4" class="blue" />
+    <text x="272" y="118" class="label ink">3</text>
+  </g>
+  <g class="tile">
+    <rect x="309" y="93" width="40" height="40" rx="4" class="blue" />
+    <text x="329" y="118" class="label ink">4</text>
+  </g>
+  <g class="tile">
+    <rect x="366" y="93" width="40" height="40" rx="4" class="blue" />
+    <text x="386" y="118" class="label ink">5</text>
+  </g>
+  <g class="tile">
+    <rect x="423" y="93" width="40" height="40" rx="4" class="blue" />
+    <text x="443" y="118" class="label ink">6</text>
+  </g>
+  <g class="tile">
+    <rect x="480" y="93" width="40" height="40" rx="4" class="blue" />
+    <text x="500" y="118" class="label ink">7</text>
+  </g>
+  <g class="tile">
+    <rect x="537" y="93" width="40" height="40" rx="4" class="blue" />
+    <text x="557" y="118" class="label ink">8</text>
+  </g>
+  <g class="tile">
+    <rect x="594" y="93" width="40" height="40" rx="4" class="blue" />
+    <text x="614" y="118" class="label ink">9</text>
+  </g>
+  <g class="window">
+    <rect x="248" y="84" width="219" height="56" rx="7" class="window-frame" />
+    <text x="357.5" y="72" class="note">4 recent examples</text>
+  </g>
+  <text x="185" y="178" class="note">Older examples</text>
+  <text x="596" y="178" class="note">Newer examples</text>
+<style>* { animation: none !important; transition: none !important; }</style></svg>

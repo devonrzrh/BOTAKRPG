@@ -1,5 +1,15 @@
 # Validation · 2026-11-07
 
+## Complete Source curriculum
+
+64 tests pass; production build passes with 211 validated records. Coverage checks verify all 405 archived file checksums, 31 chapter books and their local links, 82 imported objective questions, 13 written exercises with model answers, exact-set scoring, still versions of all 98 animated SVGs, chapter/boss ordering and old-save restoration. Existing maze, worker cancellation, combat, progression, quest graph and IndexedDB checks remain passing.
+
+Browser verification at 1280 × 720 covered opening a physical volume, the searchable chapter contents, full-screen lesson text and tables, diagrams (15 loaded with no broken images in the probabilistic-forecasting chapter), links to prerequisite chapters, all 95 test-bank disclosures, and entry to a Python-specific chapter encounter. The quiz stays centered with the 3D enemy above and persistent top-bar XP. The book uses a light color scheme so the SVGs' dark-mode labels do not disappear on white backgrounds. No browser warnings or errors were recorded. PyTorch examples are external reading examples and were not executed in the maze worker.
+
+![Source book](screenshots/source-book.jpg)
+
+![Chapter encounter](screenshots/source-encounter.jpg)
+
 ## Persistent top-bar XP
 
 57 tests pass; production build passes. Level, XP progress, and XP to next level now appear in the global top bar. Removed the duplicate battle XP box; the victory reward meter remains. Shared XP styles are independent of the battle component. Initial save loading remounts the compact meter so restored XP does not look like a newly earned reward.

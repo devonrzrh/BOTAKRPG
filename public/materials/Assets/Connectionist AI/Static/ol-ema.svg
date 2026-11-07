@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="271" viewBox="0 0 720 271" role="img" aria-labelledby="title desc">
+  <title id="title">EMA response to a new level</title>
+  <desc id="desc">After an observed level jumps from zero to ten, an exponential moving average with alpha 0.5 adapts faster than one with alpha 0.1.</desc>
+  <style>
+    text { font-family: system-ui, sans-serif; text-anchor: middle; fill: #263449; }
+    .title { font-size: 22px; font-weight: 700; fill: #172554; }
+    .label { font-size: 15px; font-weight: 600; }
+    .note { font-size: 13px; }
+    .num { font-size: 20px; font-weight: 700; }
+    .edge { fill: none; stroke: #74849b; stroke-width: 2; }
+    .guide { fill: none; stroke: #94a3b8; stroke-width: 1; stroke-dasharray: 4 5; }
+    .blue { fill: #dbeafe; stroke: #477fc0; }
+    .violet { fill: #ede9fe; stroke: #8864cb; }
+    .green { fill: #d1fae5; stroke: #19936c; }
+    .amber { fill: #ffedd5; stroke: #bd6a26; }
+    .blue, .violet, .green, .amber { stroke-width: 1.5; }
+    .blue-line, .violet-line, .green-line, .amber-line { fill: none; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
+    .blue-line { stroke: #3386c5; }
+    .violet-line { stroke: #9670d2; }
+    .green-line { stroke: #21a47a; }
+    .amber-line { stroke: #ce873a; }
+    @media (prefers-color-scheme: dark) {
+      text { fill: #e2e8f0; }
+      .title { fill: #f1f5ff; }
+      .edge { stroke: #94a3b8; }
+    }
+    .ink { fill: #18243a; }
+
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0 0L8 4L0 8Z" fill="#74849b" />
+    </marker>
+  </defs>
+  <text x="360" y="29" class="title">EMA response to a new level</text>
+  <path d="M96 186H636" class="guide" />
+  <text x="74" y="190" class="note">0</text>
+  <path d="M96 125.5H636" class="guide" />
+  <text x="74" y="129.5" class="note">5</text>
+  <path d="M96 65H636" class="guide" />
+  <text x="74" y="69" class="note">10</text>
+  <text x="96" y="205" class="note">0</text>
+  <text x="276" y="205" class="note">2</text>
+  <text x="456" y="205" class="note">4</text>
+  <text x="636" y="205" class="note">6</text>
+  <path d="M96 186L645 186" class="edge" marker-end="url(#arrow)" />
+  <path d="M96 186L96 57" class="edge" marker-end="url(#arrow)" />
+  <text x="366" y="225" class="note">Steps after change</text>
+  <text x="86" y="48" class="note">Running average</text>
+  <path d="M96 186 L186 173.9 L276 163.01 L366 153.21 L456 144.39 L546 136.45 L636 129.3" class="blue-line" />
+  <path d="M96 186 L186 125.5 L276 95.25 L366 80.13 L456 72.56 L546 68.78 L636 66.89" class="violet-line" />
+  <path d="M60 254h22" class="blue-line" />
+  <text x="220" y="259" class="note">α = 0.1</text>
+  <path d="M360 254h22" class="violet-line" />
+  <text x="520" y="259" class="note">α = 0.5</text>
+</svg>

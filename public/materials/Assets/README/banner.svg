@@ -1,0 +1,92 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="840" height="512" viewBox="70 39 840 512" role="img" aria-labelledby="title">
+  <title id="title">B.O.T.A.K. — Algorithms, Data Structures and Connectionist AI</title>
+  <defs>
+    <linearGradient id="accent">
+      <stop stop-color="#b59aff"/><stop offset="1" stop-color="#77e5ee"/>
+    </linearGradient>
+    <filter id="bloom" x="-150%" y="-150%" width="400%" height="400%">
+      <feGaussianBlur stdDeviation="7"/>
+    </filter>
+    <style>
+      .label, .label-edge { fill: none; stroke-linecap: square; stroke-linejoin: bevel; }
+      .label-edge { stroke: #242342; stroke-width: 7; }
+      .label { stroke: url(#accent); stroke-width: 4.5; }
+      .trace { fill: none; stroke: #6da7fa; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+      .spin, .brain, .glow { transform-box: fill-box; transform-origin: center; }
+      .spin { animation: spin 3s linear infinite; }
+      .reverse { animation-direction: reverse; animation-duration: 2.4s; }
+      .brain { animation: breathe 4.5s ease-in-out infinite; transform-origin: right center; }
+      .glow { animation: bloom 2.4s ease-in-out infinite; }
+      .delay { animation-delay: -.8s; }
+      .late { animation-delay: -1.6s; }
+      @keyframes spin { to { transform: rotate(360deg); } }
+      @keyframes breathe {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.09, 1.05); }
+      }
+      @keyframes bloom {
+        0%, 100% { opacity: .18; transform: scale(.65); }
+        38% { opacity: 1; transform: scale(1.55); }
+      }
+      @media (prefers-reduced-motion: reduce) { .spin, .brain, .glow { animation: none; } }
+    </style>
+  </defs>
+
+  <g transform="translate(90 57)">
+    <rect x="0" y="0" width="161" height="120" rx="12" fill="#171d42" stroke="#6da7fa" stroke-width="2"/>
+    <path d="M1 21H160" stroke="#6da7fa" stroke-width="2"/>
+    <circle cx="13" cy="11" r="3" fill="#b59aff"/><circle cx="24" cy="11" r="3" fill="#77e5ee"/>
+    <path class="trace" d="M80 63V76H36V89 M80 63V89 M80 76H124V89"/>
+    <g fill="#b59aff">
+      <path class="spin" d="m75 41 10 0 2 5 5 2v10l-5 2-2 5H75l-2-5-5-2V48l5-2zm5 7a5 5 0 1 0 0 10 5 5 0 0 0 0-10z" fill-rule="evenodd"/>
+      <rect class="spin reverse" x="28" y="88" width="16" height="16" rx="3"/>
+      <circle cx="80" cy="96" r="8"/>
+      <path class="spin" d="m124 87 9 9-9 9-9-9z"/>
+    </g>
+  </g>
+  <g aria-label="ALGORITHMS"><path class="label-edge" d="M316 135L316 107L323.2 99L335.8 99L343 107L343 135M316 121L343 121M352 99L352 135L379 135M415 99L394.3 99L388 106L388 128L394.3 135L415 135L415 119L403.3 119M430.3 99L444.7 99L451 106L451 128L444.7 135L430.3 135L424 128L424 106L430.3 99M460 135L460 99L481.6 99L487 105L487 114L481.6 120L460 120M475.3 120L487 135M496 99L508.6 99M502.3 99L502.3 135M496 135L508.6 135M519 99L546 99M532.5 99L532.5 135M555 99L555 135M582 99L582 135M555 117L582 117M591 135L591 99L594.6 99L604.5 115L614.4 99L618 99L618 135M654 99L632.4 99L627 105L627 112L632.4 117L648.6 117L654 123L654 129L648.6 135L627 135"/><path class="label" d="M316 135L316 107L323.2 99L335.8 99L343 107L343 135M316 121L343 121M352 99L352 135L379 135M415 99L394.3 99L388 106L388 128L394.3 135L415 135L415 119L403.3 119M430.3 99L444.7 99L451 106L451 128L444.7 135L430.3 135L424 128L424 106L430.3 99M460 135L460 99L481.6 99L487 105L487 114L481.6 120L460 120M475.3 120L487 135M496 99L508.6 99M502.3 99L502.3 135M496 135L508.6 135M519 99L546 99M532.5 99L532.5 135M555 99L555 135M582 99L582 135M555 117L582 117M591 135L591 99L594.6 99L604.5 115L614.4 99L618 99L618 135M654 99L632.4 99L627 105L627 112L632.4 117L648.6 117L654 123L654 129L648.6 135L627 135"/></g>
+
+  <g aria-label="DATA STRUCTURES"><path class="label-edge" d="M90 285L108.9 285L117 294L117 312L108.9 321L90 321L90 285M126 321L126 293L133.2 285L145.8 285L153 293L153 321M126 307L153 307M162 285L189 285M175.5 285L175.5 321M198 321L198 293L205.2 285L217.8 285L225 293L225 321M198 307L225 307M278 285L256.4 285L251 291L251 298L256.4 303L272.6 303L278 309L278 315L272.6 321L251 321M287 285L314 285M300.5 285L300.5 321M323 321L323 285L344.6 285L350 291L350 300L344.6 306L323 306M338.3 306L350 321M359 285L359 314L365.3 321L379.7 321L386 314L386 285M422 285L401.3 285L395 292L395 314L401.3 321L422 321M431 285L458 285M444.5 285L444.5 321M467 285L467 314L473.3 321L487.7 321L494 314L494 285M503 321L503 285L524.6 285L530 291L530 300L524.6 306L503 306M518.3 306L530 321M566 285L539 285L539 321L566 321M539 303L560.6 303M602 285L580.4 285L575 291L575 298L580.4 303L596.6 303L602 309L602 315L596.6 321L575 321"/><path class="label" d="M90 285L108.9 285L117 294L117 312L108.9 321L90 321L90 285M126 321L126 293L133.2 285L145.8 285L153 293L153 321M126 307L153 307M162 285L189 285M175.5 285L175.5 321M198 321L198 293L205.2 285L217.8 285L225 293L225 321M198 307L225 307M278 285L256.4 285L251 291L251 298L256.4 303L272.6 303L278 309L278 315L272.6 321L251 321M287 285L314 285M300.5 285L300.5 321M323 321L323 285L344.6 285L350 291L350 300L344.6 306L323 306M338.3 306L350 321M359 285L359 314L365.3 321L379.7 321L386 314L386 285M422 285L401.3 285L395 292L395 314L401.3 321L422 321M431 285L458 285M444.5 285L444.5 321M467 285L467 314L473.3 321L487.7 321L494 314L494 285M503 321L503 285L524.6 285L530 291L530 300L524.6 306L503 306M518.3 306L530 321M566 285L539 285L539 321L566 321M539 303L560.6 303M602 285L580.4 285L575 291L575 298L580.4 303L596.6 303L602 309L602 315L596.6 321L575 321"/></g>
+  <g transform="translate(647 245)">
+    <path class="trace" d="M112 56h37V30h23 M112 83h37v23h23"/>
+    <circle cx="176" cy="30" r="7" fill="#b59aff"/>
+    <circle cx="176" cy="106" r="7" fill="#77e5ee"/>
+    <g fill="#25469a" stroke="#9580f6" stroke-width="2">
+      <path d="M0 84v22c0 24 116 24 116 0V84z"/>
+      <ellipse cx="58" cy="84" rx="58" ry="15" fill="#9560fb"/>
+      <path d="M0 52v22c0 24 116 24 116 0V52z"/>
+      <ellipse cx="58" cy="52" rx="58" ry="15" fill="#9560fb"/>
+      <path d="M0 20v22c0 24 116 24 116 0V20z"/>
+      <ellipse cx="58" cy="20" rx="58" ry="15" fill="#a378ff"/>
+    </g>
+    <g fill="#65dcff" filter="url(#bloom)">
+      <circle cx="98" cy="46" r="10" class="glow"/>
+      <circle cx="98" cy="78" r="10" class="glow delay"/>
+      <circle cx="98" cy="110" r="10" class="glow late"/>
+      <circle cx="176" cy="30" r="10" class="glow delay"/>
+      <circle cx="176" cy="106" r="10" class="glow late"/>
+    </g>
+    <path d="M92 47l10-2 M92 79l10-2 M92 111l10-2" stroke="#c2f8ff" stroke-width="4" stroke-linecap="round"/>
+  </g>
+
+  <g transform="translate(103 399)">
+    <path class="trace brain" d="M49 26c-12-24-40-11-38 8C-4 41-5 62 7 71c-8 15 2 29 14 30 0 17 19 23 30 12 M19 45q15-9 25 3 M12 74q15-5 24 6 M27 98q-4-10 5-15"/>
+    <defs><path id="circuit" d="M63 43V19L51 8 M78 43V9 M93 43V20l12-12 M106 53h14l15-15 M106 68h34 M106 83h14l15 15 M93 95v18l12 12 M78 95v32 M63 95v18l-12 12"/></defs>
+    <use href="#circuit" class="trace"/>
+    <rect x="49" y="42" width="57" height="54" rx="9" fill="#143656" stroke="#77e5ee" stroke-width="3"/>
+    <g fill="#58ddff" filter="url(#bloom)">
+      <circle cx="78" cy="69" r="18" class="glow"/>
+      <circle cx="135" cy="38" r="9" class="glow delay"/>
+      <circle cx="140" cy="68" r="9" class="glow late"/>
+      <circle cx="135" cy="98" r="9" class="glow delay"/>
+      <circle cx="78" cy="127" r="9" class="glow late"/>
+    </g>
+    <rect x="63" y="56" width="29" height="26" rx="4" fill="#77e5ee"/>
+    <g fill="#77e5ee">
+      <circle cx="51" cy="8" r="4"/><circle cx="78" cy="9" r="4"/><circle cx="105" cy="8" r="4"/>
+      <circle cx="135" cy="38" r="4"/><circle cx="140" cy="68" r="4"/><circle cx="135" cy="98" r="4"/>
+      <circle cx="51" cy="125" r="4"/><circle cx="78" cy="127" r="4"/><circle cx="105" cy="125" r="4"/>
+    </g>
+  </g>
+  <g aria-label="CONNECTIONIST AI"><path class="label-edge" d="M343 447L322.3 447L316 454L316 476L322.3 483L343 483M358.3 447L372.7 447L379 454L379 476L372.7 483L358.3 483L352 476L352 454L358.3 447M388 483L388 447L391.6 447L411.4 483L415 483L415 447M424 483L424 447L427.6 447L447.4 483L451 483L451 447M487 447L460 447L460 483L487 483M460 465L481.6 465M523 447L502.3 447L496 454L496 476L502.3 483L523 483M532 447L559 447M545.5 447L545.5 483M568 447L580.6 447M574.3 447L574.3 483M568 483L580.6 483M597.3 447L611.7 447L618 454L618 476L611.7 483L597.3 483L591 476L591 454L597.3 447M627 483L627 447L630.6 447L650.4 483L654 483L654 447M663 447L675.6 447M669.3 447L669.3 483M663 483L675.6 483M713 447L691.4 447L686 453L686 460L691.4 465L707.6 465L713 471L713 477L707.6 483L686 483M722 447L749 447M735.5 447L735.5 483M775 483L775 455L782.2 447L794.8 447L802 455L802 483M775 469L802 469M811 447L823.6 447M817.3 447L817.3 483M811 483L823.6 483"/><path class="label" d="M343 447L322.3 447L316 454L316 476L322.3 483L343 483M358.3 447L372.7 447L379 454L379 476L372.7 483L358.3 483L352 476L352 454L358.3 447M388 483L388 447L391.6 447L411.4 483L415 483L415 447M424 483L424 447L427.6 447L447.4 483L451 483L451 447M487 447L460 447L460 483L487 483M460 465L481.6 465M523 447L502.3 447L496 454L496 476L502.3 483L523 483M532 447L559 447M545.5 447L545.5 483M568 447L580.6 447M574.3 447L574.3 483M568 483L580.6 483M597.3 447L611.7 447L618 454L618 476L611.7 483L597.3 483L591 476L591 454L597.3 447M627 483L627 447L630.6 447L650.4 483L654 483L654 447M663 447L675.6 447M669.3 447L669.3 483M663 483L675.6 483M713 447L691.4 447L686 453L686 460L691.4 465L707.6 465L713 471L713 477L707.6 483L686 483M722 447L749 447M735.5 447L735.5 483M775 483L775 455L782.2 447L794.8 447L802 455L802 483M775 469L802 469M811 447L823.6 447M817.3 447L817.3 483M811 483L823.6 483"/></g>
+</svg>

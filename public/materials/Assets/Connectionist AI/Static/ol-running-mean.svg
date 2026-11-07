@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="209" viewBox="0 0 720 209" role="img" aria-labelledby="title desc">
+  <title id="title">Updating a running mean</title>
+  <desc id="desc">The mean of three values is ten, giving total thirty. Adding a value of eighteen gives total forty-eight across four values, so the mean becomes twelve.</desc>
+  <style>
+    text { font-family: system-ui, sans-serif; text-anchor: middle; fill: #263449; }
+    .title { font-size: 22px; font-weight: 700; fill: #172554; }
+    .label { font-size: 15px; font-weight: 600; }
+    .note { font-size: 13px; }
+    .num { font-size: 20px; font-weight: 700; }
+    .edge { fill: none; stroke: #74849b; stroke-width: 2; }
+    .guide { fill: none; stroke: #94a3b8; stroke-width: 1; stroke-dasharray: 4 5; }
+    .blue { fill: #dbeafe; stroke: #477fc0; }
+    .violet { fill: #ede9fe; stroke: #8864cb; }
+    .green { fill: #d1fae5; stroke: #19936c; }
+    .amber { fill: #ffedd5; stroke: #bd6a26; }
+    .blue, .violet, .green, .amber { stroke-width: 1.5; }
+    .blue-line, .violet-line, .green-line, .amber-line { fill: none; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
+    .blue-line { stroke: #3386c5; }
+    .violet-line { stroke: #9670d2; }
+    .green-line { stroke: #21a47a; }
+    .amber-line { stroke: #ce873a; }
+    @media (prefers-color-scheme: dark) {
+      text { fill: #e2e8f0; }
+      .title { fill: #f1f5ff; }
+      .edge { stroke: #94a3b8; }
+    }
+    .ink { fill: #18243a; }
+
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0 0L8 4L0 8Z" fill="#74849b" />
+    </marker>
+  </defs>
+  <text x="360" y="29" class="title">Updating a running mean</text>
+  <g class="tile">
+    <rect x="41" y="71" width="149" height="38" rx="10" class="blue" />
+    <text x="115.5" y="95" class="label ink">3 values · mean 10</text>
+  </g>
+  <text x="226" y="96" class="num">+</text>
+  <g class="tile">
+    <rect x="260" y="71" width="151" height="38" rx="10" class="violet" />
+    <text x="335.5" y="95" class="label ink">New value 18</text>
+  </g>
+  <text x="446" y="96" class="num">→</text>
+  <g class="tile">
+    <rect x="487" y="71" width="188" height="38" rx="10" class="green" />
+    <text x="581" y="95" class="label ink">4 values · mean 12</text>
+  </g>
+  <rect x="70" y="131" width="26" height="30" rx="3" class="blue" />
+  <rect x="107" y="131" width="26" height="30" rx="3" class="blue" />
+  <rect x="144" y="131" width="26" height="30" rx="3" class="blue" />
+  <rect x="322" y="116" width="30" height="54" rx="3" class="violet" />
+  <text x="124" y="189" class="note">Previous total 30</text>
+  <text x="578" y="159" class="note">New total 48</text>
+</svg>

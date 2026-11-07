@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="208" viewBox="0 0 720 208" role="img" aria-labelledby="title desc">
+  <title id="title">Training examples and an unseen example</title>
+  <desc id="desc">The left side contains three training examples of handwritten sevens. A new handwritten seven is held out and passed through the trained model on the right.</desc>
+  <style>
+    text { font-family: system-ui, sans-serif; text-anchor: middle; fill: #263449; }
+    .title { font-size: 22px; font-weight: 700; fill: #172554; }
+    .label { font-size: 15px; font-weight: 600; }
+    .note { font-size: 14px; }
+    .num { font-size: 19px; font-weight: 700; }
+    .tile text { fill: #18243a; }
+    .edge { fill: none; stroke: #74849b; stroke-width: 2; }
+    .guide { fill: none; stroke: #74849b; stroke-width: 1; stroke-dasharray: 4 5; }
+    .blue { fill: #dbeafe; stroke: #477fc0; }
+    .violet { fill: #ede9fe; stroke: #8864cb; }
+    .green { fill: #d1fae5; stroke: #19936c; }
+    .amber { fill: #ffedd5; stroke: #bd6a26; }
+    .blue, .violet, .green, .amber { stroke-width: 1.5; }
+    @media (prefers-color-scheme: dark) {
+      text { fill: #e2e8f0; }
+      .title { fill: #f1f5ff; }
+      .edge { stroke: #94a3b8; }
+    }
+    .blue-line { fill: none; stroke: #3b89ce; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+    .violet-line { fill: none; stroke: #9571d6; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+    .green-line { fill: none; stroke: #22a87e; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+    .amber-line { fill: none; stroke: #d88835; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+    .signal { fill: none; stroke: #bc70ed; stroke-width: 4; stroke-dasharray: 8 14; animation: flow 2s linear infinite; }
+    @keyframes flow { to { stroke-dashoffset: -44; } }
+    @media (prefers-reduced-motion: reduce) { .signal { display: none; } }
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0 0L8 4L0 8Z" fill="#74849b"/>
+    </marker>
+  </defs>
+  <text x="360" y="28" class="title">Training examples and an unseen example</text>
+  <text x="153" y="67" class="label">Training set</text>
+  <text x="553" y="67" class="label">Unseen input</text>
+  <g class="glyph">
+    <rect x="60" y="85" width="48" height="49" rx="6" class="blue"/>
+    <path d="M70 101h28l-22 22" class="violet-line"/>
+  </g>
+  <g class="glyph">
+    <rect x="122" y="85" width="48" height="49" rx="6" class="blue"/>
+    <path d="M132 104h28l-22 22" class="violet-line"/>
+  </g>
+  <g class="glyph">
+    <rect x="184" y="85" width="48" height="49" rx="6" class="blue"/>
+    <path d="M194 99h28l-22 22" class="violet-line"/>
+  </g>
+  <g class="glyph">
+    <rect x="463" y="86" width="48" height="49" rx="6" class="blue"/>
+    <path d="M473 106h28l-22 22" class="violet-line"/>
+  </g>
+  <path d="M229 111L290 111" class="edge" marker-end="url(#arrow)"/>
+  <g class="tile">
+    <rect x="297" y="93" width="139" height="36" rx="12" class="violet"/>
+    <text x="366.5" y="116" class="label">Fit model</text>
+  </g>
+  <path d="M512 111L541 111" class="edge" marker-end="url(#arrow)"/>
+  <g class="tile">
+    <rect x="546" y="93" width="145" height="36" rx="12" class="green"/>
+    <text x="618.5" y="116" class="label">Prediction: 7</text>
+  </g>
+  <path d="M367 131V160H620V133" class="guide" marker-end="url(#arrow)"/>
+  <text x="489" y="184" class="note">Frozen trained model</text>
+</svg>

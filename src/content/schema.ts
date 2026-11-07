@@ -9,13 +9,14 @@ export const lessonSchema = z.object({
   prerequisites: z.array(id).default([]),
   summary: z.string(),
   body: z.string().default(""),
+  source: z.string().optional(),
 });
 export const questionSchema = z.object({
   ...base,
   type: z.literal("question"),
   lesson: id,
-  format: z.enum(["choice", "ordering"]),
-  prompt: z.string(),
+  format: z.enum(["choice", "multiple", "ordering"]),
+  prompt: z.string().min(1),
   options: z.array(z.string()).min(2),
   answer: z.array(z.number().int().nonnegative()).min(1),
   explanation: z.string().min(1),
@@ -58,6 +59,7 @@ export const activitySchema = z.object({
       hp: z.number().int().positive(),
       attack: z.number().int().positive(),
       mixedQuestions: z.boolean().default(false),
+      lessons: z.array(id).min(1).optional(),
     })
     .optional(),
   clue: z
@@ -191,6 +193,10 @@ export function validateContent(input: unknown): Content {
       entity.objectives.forEach((x) => ref(entity.id, x, "activity"));
       entity.rewards.forEach((x) => ref(entity.id, x, "item"));
     }
+    if (entity.type === "activity" && entity.enemy?.lessons)
+      entity.enemy.lessons.forEach((lesson) =>
+        ref(entity.id, lesson, "lesson"),
+      );
     if (entity.type === "question") {
       if (
         entity.answer.some((x) => x >= entity.options.length) ||

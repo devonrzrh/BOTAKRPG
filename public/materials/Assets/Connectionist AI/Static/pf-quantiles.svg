@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="270" viewBox="0 0 720 270" role="img" aria-labelledby="title desc">
+  <title id="title">Quantiles and a central 80% interval</title>
+  <desc id="desc">For a normal distribution with mean one hundred and standard deviation ten, P10 is about 87.2 and P90 about 112.8. The interval between them contains eighty percent of probability.</desc>
+  <style>
+    text { font-family: system-ui, sans-serif; text-anchor: middle; fill: #263449; }
+    .title { font-size: 22px; font-weight: 700; fill: #172554; }
+    .label { font-size: 15px; font-weight: 600; }
+    .note { font-size: 13px; }
+    .num { font-size: 20px; font-weight: 700; }
+    .edge { fill: none; stroke: #74849b; stroke-width: 2; }
+    .guide { fill: none; stroke: #94a3b8; stroke-width: 1; stroke-dasharray: 4 5; }
+    .blue { fill: #dbeafe; stroke: #477fc0; }
+    .violet { fill: #ede9fe; stroke: #8864cb; }
+    .green { fill: #d1fae5; stroke: #19936c; }
+    .amber { fill: #ffedd5; stroke: #bd6a26; }
+    .blue, .violet, .green, .amber { stroke-width: 1.5; }
+    .blue-line, .violet-line, .green-line, .amber-line { fill: none; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
+    .blue-line { stroke: #3386c5; }
+    .violet-line { stroke: #9670d2; }
+    .green-line { stroke: #21a47a; }
+    .amber-line { stroke: #ce873a; }
+    @media (prefers-color-scheme: dark) {
+      text { fill: #e2e8f0; }
+      .title { fill: #f1f5ff; }
+      .edge { stroke: #94a3b8; }
+    }
+    .ink { fill: #18243a; }
+
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0 0L8 4L0 8Z" fill="#74849b" />
+    </marker>
+  </defs>
+  <text x="360" y="29" class="title">Quantiles and a central 80% interval</text>
+  <path d="M88 197H639" class="guide" />
+  <text x="66" y="201" class="note">0</text>
+  <path d="M88 139.67H639" class="guide" />
+  <text x="66" y="143.67" class="note">0.02</text>
+  <path d="M88 82.33H639" class="guide" />
+  <text x="66" y="86.33" class="note">0.04</text>
+  <text x="88" y="216" class="note">60</text>
+  <text x="225.75" y="216" class="note">80</text>
+  <text x="363.5" y="216" class="note">100</text>
+  <text x="501.25" y="216" class="note">120</text>
+  <text x="639" y="216" class="note">140</text>
+  <path d="M88 197L648 197" class="edge" marker-end="url(#arrow)" />
+  <path d="M88 197L88 60" class="edge" marker-end="url(#arrow)" />
+  <text x="363.5" y="236" class="note">Demand</text>
+  <text x="78" y="51" class="note">Density</text>
+  <path d="M275.23 197 L275.23 146.69 L275.23 146.69 L282.59 139.64 L289.94 132.34 L297.3 124.95 L304.65 117.61 L312.01 110.52 L319.36 103.86 L326.72 97.83 L334.08 92.61 L341.43 88.36 L348.79 85.22 L356.14 83.29 L363.5 82.64 L370.86 83.29 L378.21 85.22 L385.57 88.36 L392.92 92.61 L400.28 97.83 L407.64 103.86 L414.99 110.52 L422.35 117.61 L429.7 124.95 L437.06 132.34 L444.41 139.64 L451.77 146.69 L451.77 146.69L451.77 197Z" class="violet" fill-opacity=".55" />
+  <path d="M88 196.96 L94.89 196.94 L101.78 196.92 L108.66 196.88 L115.55 196.82 L122.44 196.75 L129.32 196.65 L136.21 196.51 L143.1 196.32 L149.99 196.06 L156.88 195.73 L163.76 195.29 L170.65 194.73 L177.54 194.01 L184.43 193.11 L191.31 191.98 L198.2 190.58 L205.09 188.88 L211.98 186.83 L218.86 184.39 L225.75 181.52 L232.64 178.19 L239.53 174.37 L246.41 170.04 L253.3 165.2 L260.19 159.87 L267.08 154.08 L273.96 147.87 L280.85 141.33 L287.74 134.55 L294.63 127.64 L301.51 120.72 L308.4 113.96 L315.29 107.49 L322.17 101.48 L329.06 96.07 L335.95 91.43 L342.84 87.67 L349.72 84.9 L356.61 83.21 L363.5 82.64 L370.39 83.21 L377.28 84.9 L384.16 87.67 L391.05 91.43 L397.94 96.07 L404.82 101.48 L411.71 107.49 L418.6 113.96 L425.49 120.72 L432.38 127.64 L439.26 134.55 L446.15 141.33 L453.04 147.87 L459.93 154.08 L466.81 159.87 L473.7 165.2 L480.59 170.04 L487.47 174.37 L494.36 178.19 L501.25 181.52 L508.14 184.39 L515.03 186.83 L521.91 188.88 L528.8 190.58 L535.69 191.98 L542.58 193.11 L549.46 194.01 L556.35 194.73 L563.24 195.29 L570.13 195.73 L577.01 196.06 L583.9 196.32 L590.79 196.51 L597.67 196.65 L604.56 196.75 L611.45 196.82 L618.34 196.88 L625.23 196.92 L632.11 196.94 L639 196.96" class="violet-line" />
+  <path d="M275.23 58V197" class="guide" />
+  <text x="275.23" y="51" class="note">P10</text>
+  <path d="M363.5 58V197" class="guide" />
+  <text x="363.5" y="51" class="note">P50</text>
+  <path d="M451.77 58V197" class="guide" />
+  <text x="451.77" y="51" class="note">P90</text>
+  <text x="361" y="260" class="note">Shaded area = 80%</text>
+</svg>

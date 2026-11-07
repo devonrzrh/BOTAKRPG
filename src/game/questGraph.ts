@@ -1,7 +1,7 @@
 import type { Content, Quest } from "../content/schema";
 import type { Save } from "./state";
 import type { SurfaceButton } from "./officeUi";
-import { finaleAvailable, questComplete } from "./investigation";
+import { finaleAvailable, questComplete, nextObjective } from "./investigation";
 
 export interface GraphView {
   x: number;
@@ -78,12 +78,15 @@ export function createQuestGraph(
   branches.forEach((branch, i) => {
     const done = questComplete(save, branch);
     const activity = content.entities.find(
-      (e) => e.type === "activity" && e.id === branch.objectives[0],
+      (e) =>
+        e.type === "activity" &&
+        e.id ===
+          (done ? branch.objectives.at(-1) : nextObjective(save, branch)),
     );
     nodes.push({
       id: branch.id,
       title: branch.title,
-      description: branch.description,
+      description: `${branch.objectives.filter((id) => save.completed.includes(id)).length}/${branch.objectives.length} complete. ${activity?.title ?? branch.description}`,
       x: 320,
       y: 80 + i * 140,
       kind: "activity",

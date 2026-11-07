@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="199" viewBox="0 0 720 199" role="img" aria-labelledby="title desc">
+  <title id="title">Residual connection</title>
+  <desc id="desc">The input goes through the transform F and also follows a direct identity path. Both paths meet at addition, producing F of x plus x.</desc>
+  <style>
+    text { font-family: system-ui, sans-serif; text-anchor: middle; fill: #263449; }
+    .title { font-size: 22px; font-weight: 700; fill: #172554; }
+    .label { font-size: 15px; font-weight: 600; }
+    .note { font-size: 14px; }
+    .num { font-size: 19px; font-weight: 700; }
+    .tile text { fill: #18243a; }
+    .edge { fill: none; stroke: #74849b; stroke-width: 2; }
+    .guide { fill: none; stroke: #74849b; stroke-width: 1; stroke-dasharray: 4 5; }
+    .blue { fill: #dbeafe; stroke: #477fc0; }
+    .violet { fill: #ede9fe; stroke: #8864cb; }
+    .green { fill: #d1fae5; stroke: #19936c; }
+    .amber { fill: #ffedd5; stroke: #bd6a26; }
+    .blue, .violet, .green, .amber { stroke-width: 1.5; }
+    @media (prefers-color-scheme: dark) {
+      text { fill: #e2e8f0; }
+      .title { fill: #f1f5ff; }
+      .edge { stroke: #94a3b8; }
+    }
+    .flow { fill: none; stroke-width: 3; stroke-dasharray: 7 9; opacity: 0; animation: travel 3.8s linear infinite; }
+    .upper { stroke: #9864e2; }
+    .lower { stroke: #12a781; }
+    @keyframes travel { 0%, 100% { opacity: 0; } 15%, 80% { opacity: 1; } to { stroke-dashoffset: -96; } }
+    @media (prefers-reduced-motion: reduce) { .flow { display: none; } }
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0 0L8 4L0 8Z" fill="#74849b"/>
+    </marker>
+  </defs>
+  <text x="360" y="28" class="title">Residual connection</text>
+  <g class="tile">
+    <rect x="24" y="111" width="96" height="38" rx="19" class="blue"/>
+    <text x="72" y="135" class="label">Input x</text>
+  </g>
+  <path d="M121 130H164V82H258" class="edge" marker-end="url(#arrow)"/>
+  <path d="M121 130H164V178H475" class="edge" marker-end="url(#arrow)"/>
+  <g class="tile">
+    <rect x="264" y="63" width="156" height="38" rx="19" class="violet"/>
+    <text x="342" y="87" class="label">Transform F(x)</text>
+  </g>
+  <path d="M421 82H475V111" class="edge" marker-end="url(#arrow)"/>
+  <path d="M475 178V148" class="edge" marker-end="url(#arrow)"/>
+  <circle cx="475" cy="130" r="17" class="amber"/>
+  <g class="tile">
+    <text x="475" y="137" class="num">+</text>
+  </g>
+  <path d="M493 130L547 130" class="edge" marker-end="url(#arrow)"/>
+  <g class="tile">
+    <rect x="554" y="111" width="143" height="38" rx="19" class="green"/>
+    <text x="625.5" y="135" class="label">Output F(x) + x</text>
+  </g>
+  <text x="329" y="166" class="note">Identity path · unchanged x</text>
+  <path d="M121 130H164V82H258 M421 82H475V111" class="flow upper"/>
+  <path d="M121 130H164V178H475V148" class="flow lower"/>
+<style>* { animation: none !important; transition: none !important; }</style></svg>

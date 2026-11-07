@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="560" height="215" viewBox="0 0 560 215" role="img" aria-labelledby="title desc">
+  <title id="title">Neil undoes the last edit</title>
+  <desc id="desc">Undo reverses the edit that added B.</desc>
+  <defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8Z" fill="#16835e"/></marker></defs>
+  <style>
+    text { font: 16px system-ui, sans-serif; text-anchor: middle; fill: #0f172a; }
+    .label { paint-order: stroke; stroke: #f8fafc; stroke-width: 3px; stroke-linejoin: round; }
+    .edge { fill: none; stroke: #64748b; stroke-width: 2px; stroke-linecap: round; }
+    .active { fill: none; stroke: #16835e; stroke-width: 3px; stroke-linecap: round; }
+    @media (prefers-color-scheme: dark) { .label { fill: #f8fafc; stroke: #111827; } .edge { stroke: #b8c7db; } .active { stroke: #4ade80; } }
+  </style>
+  <text x="280" y="26" class="label">Neil undoes the last edit</text>
+  <rect x="56" y="63" width="181" height="103" rx="7" fill="#f8fafc" stroke="#4169a9" stroke-width="2"/>
+  <rect x="68" y="75" width="157" height="61" rx="7" fill="#dbeafe" stroke="#4169a9" stroke-width="2"/>
+  <text x="147" y="112" class="value">AB</text>
+  <path class="edge" d="M131 168h32"/>
+  <text x="147" y="52" class="label">Before Undo</text>
+  <rect x="322" y="63" width="181" height="103" rx="7" fill="#f8fafc" stroke="#4169a9" stroke-width="2"/>
+  <rect x="334" y="75" width="157" height="61" rx="7" fill="#dbeafe" stroke="#4169a9" stroke-width="2"/>
+  <text x="413" y="112" class="value">A</text>
+  <path class="edge" d="M397 168h32"/>
+  <text x="413" y="52" class="label">After Undo</text>
+  <path class="active" d="M242 106H312" marker-end="url(#arrow)"/>
+  <text x="278" y="91" class="label">Undo</text>
+  <text x="280" y="200" class="label">Undo reverses the edit that added B.</text>
+</svg>

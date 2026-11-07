@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="278" viewBox="0 0 720 278" role="img" aria-labelledby="title desc">
+  <title id="title">Sliding inputs and next-step targets</title>
+  <desc id="desc">The three-step input window moves over the exact sequence from the chapter. Each next value, in green, is the one-step target.</desc>
+  <style>
+    text { font-family: system-ui, sans-serif; text-anchor: middle; fill: #263449; }
+    .title { font-size: 22px; font-weight: 700; fill: #172554; }
+    .label { font-size: 15px; font-weight: 600; }
+    .note { font-size: 13px; }
+    .num { font-size: 20px; font-weight: 700; }
+    .edge { fill: none; stroke: #74849b; stroke-width: 2; }
+    .guide { fill: none; stroke: #94a3b8; stroke-width: 1; stroke-dasharray: 4 5; }
+    .blue { fill: #dbeafe; stroke: #477fc0; }
+    .violet { fill: #ede9fe; stroke: #8864cb; }
+    .green { fill: #d1fae5; stroke: #19936c; }
+    .amber { fill: #ffedd5; stroke: #bd6a26; }
+    .blue, .violet, .green, .amber { stroke-width: 1.5; }
+    .blue-line, .violet-line, .green-line, .amber-line { fill: none; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
+    .blue-line { stroke: #3386c5; }
+    .violet-line { stroke: #9670d2; }
+    .green-line { stroke: #21a47a; }
+    .amber-line { stroke: #ce873a; }
+    @media (prefers-color-scheme: dark) {
+      text { fill: #e2e8f0; }
+      .title { fill: #f1f5ff; }
+      .edge { stroke: #94a3b8; }
+    }
+    .ink { fill: #18243a; }
+    .input-window { fill: #a78bfa; fill-opacity: .12; stroke: #9466d2; stroke-width: 2; }
+    .target-window { fill: #34d399; fill-opacity: .18; stroke: #179b70; stroke-width: 2; }
+    .window { animation: window 8s steps(1,end) infinite; }
+    @keyframes window { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(91.33px); } 50% { transform: translateX(182.67px); } 75% { transform: translateX(274px); } }
+    @media (prefers-reduced-motion: reduce) { .window { animation: none; } }
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0 0L8 4L0 8Z" fill="#74849b" />
+    </marker>
+  </defs>
+  <text x="360" y="29" class="title">Sliding inputs and next-step targets</text>
+  <path d="M89 182.5H637" class="guide" />
+  <text x="67" y="186.5" class="note">10</text>
+  <path d="M89 126.25H637" class="guide" />
+  <text x="67" y="130.25" class="note">15</text>
+  <path d="M89 70H637" class="guide" />
+  <text x="67" y="74" class="note">20</text>
+  <text x="89" y="224" class="note">1</text>
+  <text x="180.33" y="224" class="note">2</text>
+  <text x="271.67" y="224" class="note">3</text>
+  <text x="363" y="224" class="note">4</text>
+  <text x="454.33" y="224" class="note">5</text>
+  <text x="545.67" y="224" class="note">6</text>
+  <text x="637" y="224" class="note">7</text>
+  <path d="M89 205L646 205" class="edge" marker-end="url(#arrow)" />
+  <path d="M89 205L89 62" class="edge" marker-end="url(#arrow)" />
+  <text x="363" y="244" class="note">Time step</text>
+  <text x="79" y="53" class="note">Value</text>
+  <path d="M89 182.5 L180.33 160 L271.67 148.75 L363 126.25 L454.33 137.5 L545.67 115 L637 92.5" class="blue-line" />
+  <circle cx="89" cy="182.5" r="4" class="blue" />
+  <text x="89" y="172.5" class="note">10</text>
+  <circle cx="180.33" cy="160" r="4" class="blue" />
+  <text x="180.33" y="150" class="note">12</text>
+  <circle cx="271.67" cy="148.75" r="4" class="blue" />
+  <text x="271.67" y="138.75" class="note">13</text>
+  <circle cx="363" cy="126.25" r="4" class="blue" />
+  <text x="363" y="116.25" class="note">15</text>
+  <circle cx="454.33" cy="137.5" r="4" class="blue" />
+  <text x="454.33" y="127.5" class="note">14</text>
+  <circle cx="545.67" cy="115" r="4" class="blue" />
+  <text x="545.67" y="105" class="note">16</text>
+  <circle cx="637" cy="92.5" r="4" class="blue" />
+  <text x="637" y="82.5" class="note">18</text>
+  <g class="window">
+    <rect x="73" y="58" width="214.67000000000002" height="153" rx="7" class="input-window" />
+    <rect x="347" y="58" width="32" height="153" rx="7" class="target-window" />
+  </g>
+  <path d="M60 263h22" class="violet-line" />
+  <text x="220" y="268" class="note">Input window</text>
+  <path d="M360 263h22" class="green-line" />
+  <text x="520" y="268" class="note">Next target</text>
+<style>* { animation: none !important; transition: none !important; }</style></svg>

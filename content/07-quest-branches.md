@@ -1,47 +1,94 @@
 # Clue branches
 
 ```entity
-type: quest
-kind: branch
 id: routing-trace
 title: Routing trace
-description: Follow the packet route to recover a routing table.
-lesson: graph-search
-objectives: [maze-chamber]
+type: quest
+description: Investigate 11 algorithms chapters, then defeat Route Warden to
+  recover the clue.
+objectives:
+  - maze-chamber
+  - encounter-source-alg-00
+  - encounter-source-alg-01
+  - encounter-source-alg-02
+  - encounter-source-alg-03
+  - encounter-source-alg-04
+  - encounter-source-alg-05
+  - encounter-source-alg-06
+  - encounter-source-alg-07
+  - encounter-source-alg-08
+  - encounter-source-alg-09
+  - encounter-source-alg-10
+  - route-warden
 xp: 20
-rewards: [focus-tea]
+rewards:
+  - focus-tea
+kind: branch
+prerequisites: []
+lesson: graph-search
 ```
 
 ```entity
-type: quest
-kind: branch
 id: access-records
 title: Access records
-description: Get past the sentinel and retrieve the gateway log.
-lesson: stacks-queues
-objectives: [guardian-battle]
+type: quest
+description: Investigate 10 structures chapters, then defeat Archive Keeper to
+  recover the clue.
+objectives:
+  - guardian-battle
+  - encounter-source-ds-01
+  - encounter-source-ds-02
+  - encounter-source-ds-03
+  - encounter-source-ds-04
+  - encounter-source-ds-05
+  - encounter-source-ds-06
+  - encounter-source-ds-07
+  - encounter-source-ds-08
+  - encounter-source-ds-09
+  - encounter-source-ds-10
+  - archive-keeper
 xp: 20
-rewards: [healing-draught]
+rewards:
+  - healing-draught
+kind: branch
+prerequisites: []
+lesson: stacks-queues
 ```
 
 ```entity
-type: quest
-kind: branch
 id: signal-identification
 title: Signal identification
-description: Train a classifier to identify ECHO-7’s outgoing signal.
-lesson: perceptron-basics
-objectives: [perceptron-exhibit]
+type: quest
+description: Investigate 10 connectionist AI chapters, then defeat Signal Mimic
+  to recover the clue.
+objectives:
+  - perceptron-exhibit
+  - encounter-source-ai-01
+  - encounter-source-ai-02
+  - encounter-source-ai-03
+  - encounter-source-ai-04
+  - encounter-source-ai-05
+  - encounter-source-ai-06
+  - encounter-source-ai-07
+  - encounter-source-ai-08
+  - encounter-source-ai-09
+  - encounter-source-ai-10
+  - signal-mimic
 xp: 20
-rewards: [focus-tea]
+rewards:
+  - focus-tea
+kind: branch
+prerequisites: []
+lesson: perceptron-basics
 ```
 
 ```entity
-type: activity
 id: echo-battle
 title: ECHO-7
+type: activity
 template: battle
 lesson: perceptron-basics
+seed: 42
 enemy:
   id: echo-7
   title: ECHO-7
@@ -54,13 +101,18 @@ clue:
 ```
 
 ```entity
-type: quest
-kind: finale
 id: confront-echo
 title: Confront ECHO-7
+type: quest
 description: Combine the three clues to reach the robot in the abandoned subnet.
-prerequisites: [routing-trace, access-records, signal-identification]
-objectives: [echo-battle]
+objectives:
+  - echo-battle
 xp: 100
-rewards: [healing-draught]
+rewards:
+  - healing-draught
+kind: finale
+prerequisites:
+  - routing-trace
+  - access-records
+  - signal-identification
 ```

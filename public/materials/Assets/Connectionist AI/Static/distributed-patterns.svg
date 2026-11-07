@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="229" viewBox="0 0 720 229" role="img" aria-labelledby="title desc">
+  <title id="title">Distributed representations</title>
+  <desc id="desc">A toy hidden layer has five units. Cat and dog inputs activate different patterns with one shared active unit. Purple circles marked 1 indicate active units.</desc>
+  <style>
+    text { font-family: system-ui, sans-serif; text-anchor: middle; fill: #263449; }
+    .title { font-size: 22px; font-weight: 700; fill: #172554; }
+    .label { font-size: 15px; font-weight: 600; }
+    .note { font-size: 14px; }
+    .num { font-size: 19px; font-weight: 700; }
+    .tile text { fill: #18243a; }
+    .edge { fill: none; stroke: #74849b; stroke-width: 2; }
+    .guide { fill: none; stroke: #74849b; stroke-width: 1; stroke-dasharray: 4 5; }
+    .blue { fill: #dbeafe; stroke: #477fc0; }
+    .violet { fill: #ede9fe; stroke: #8864cb; }
+    .green { fill: #d1fae5; stroke: #19936c; }
+    .amber { fill: #ffedd5; stroke: #bd6a26; }
+    .blue, .violet, .green, .amber { stroke-width: 1.5; }
+    @media (prefers-color-scheme: dark) {
+      text { fill: #e2e8f0; }
+      .title { fill: #f1f5ff; }
+      .edge { stroke: #94a3b8; }
+    }
+    .blue-line { fill: none; stroke: #3b89ce; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+    .violet-line { fill: none; stroke: #9571d6; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+    .green-line { fill: none; stroke: #22a87e; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+    .amber-line { fill: none; stroke: #d88835; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0 0L8 4L0 8Z" fill="#74849b"/>
+    </marker>
+  </defs>
+  <text x="360" y="28" class="title">Distributed representations</text>
+  <text x="222" y="67" class="note">Unit 1</text>
+  <text x="313" y="67" class="note">Unit 2</text>
+  <text x="404" y="67" class="note">Unit 3</text>
+  <text x="495" y="67" class="note">Unit 4</text>
+  <text x="586" y="67" class="note">Unit 5</text>
+  <g class="tile">
+    <rect x="24" y="84" width="122" height="38" rx="19" class="blue"/>
+    <text x="85" y="108" class="label">Cat image</text>
+  </g>
+  <g class="tile">
+    <circle cx="222" cy="103" r="16" class="violet"/>
+    <text x="222" y="109" class="label">1</text>
+  </g>
+  <g class="tile">
+    <circle cx="313" cy="103" r="16" class="violet"/>
+    <text x="313" y="109" class="label">1</text>
+  </g>
+  <g class="tile">
+    <circle cx="404" cy="103" r="16" class="blue"/>
+    <text x="404" y="109" class="label">0</text>
+  </g>
+  <g class="tile">
+    <circle cx="495" cy="103" r="16" class="violet"/>
+    <text x="495" y="109" class="label">1</text>
+  </g>
+  <g class="tile">
+    <circle cx="586" cy="103" r="16" class="blue"/>
+    <text x="586" y="109" class="label">0</text>
+  </g>
+  <g class="tile">
+    <rect x="24" y="137" width="122" height="38" rx="19" class="blue"/>
+    <text x="85" y="161" class="label">Dog image</text>
+  </g>
+  <g class="tile">
+    <circle cx="222" cy="156" r="16" class="blue"/>
+    <text x="222" y="162" class="label">0</text>
+  </g>
+  <g class="tile">
+    <circle cx="313" cy="156" r="16" class="violet"/>
+    <text x="313" y="162" class="label">1</text>
+  </g>
+  <g class="tile">
+    <circle cx="404" cy="156" r="16" class="violet"/>
+    <text x="404" y="162" class="label">1</text>
+  </g>
+  <g class="tile">
+    <circle cx="495" cy="156" r="16" class="blue"/>
+    <text x="495" y="162" class="label">0</text>
+  </g>
+  <g class="tile">
+    <circle cx="586" cy="156" r="16" class="violet"/>
+    <text x="586" y="162" class="label">1</text>
+  </g>
+  <text x="360" y="214" class="note">1 = active · 0 = inactive</text>
+</svg>

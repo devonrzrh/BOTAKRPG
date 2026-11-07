@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="190" viewBox="0 0 720 190" role="img" aria-labelledby="title desc">
+  <title id="title">Forecast and safety stock</title>
+  <desc id="desc">A simplified order quantity consists of forecast demand over lead time plus safety stock. The illustration assigns forecast demand one hundred and safety stock twenty.</desc>
+  <style>
+    text { font-family: system-ui, sans-serif; text-anchor: middle; fill: #263449; }
+    .title { font-size: 22px; font-weight: 700; fill: #172554; }
+    .label { font-size: 15px; font-weight: 600; }
+    .note { font-size: 13px; }
+    .num { font-size: 20px; font-weight: 700; }
+    .edge { fill: none; stroke: #74849b; stroke-width: 2; }
+    .guide { fill: none; stroke: #94a3b8; stroke-width: 1; stroke-dasharray: 4 5; }
+    .blue { fill: #dbeafe; stroke: #477fc0; }
+    .violet { fill: #ede9fe; stroke: #8864cb; }
+    .green { fill: #d1fae5; stroke: #19936c; }
+    .amber { fill: #ffedd5; stroke: #bd6a26; }
+    .blue, .violet, .green, .amber { stroke-width: 1.5; }
+    .blue-line, .violet-line, .green-line, .amber-line { fill: none; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
+    .blue-line { stroke: #3386c5; }
+    .violet-line { stroke: #9670d2; }
+    .green-line { stroke: #21a47a; }
+    .amber-line { stroke: #ce873a; }
+    @media (prefers-color-scheme: dark) {
+      text { fill: #e2e8f0; }
+      .title { fill: #f1f5ff; }
+      .edge { stroke: #94a3b8; }
+    }
+    .ink { fill: #18243a; }
+
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0 0L8 4L0 8Z" fill="#74849b" />
+    </marker>
+  </defs>
+  <text x="360" y="29" class="title">Forecast and safety stock</text>
+  <text x="146" y="62" class="label">Forecast demand</text>
+  <text x="428" y="62" class="label">Safety stock</text>
+  <text x="617" y="62" class="label">Order quantity</text>
+  <g class="tile">
+    <rect x="47" y="78" width="199" height="38" rx="10" class="blue" />
+    <text x="146.5" y="102" class="label ink">100 units</text>
+  </g>
+  <text x="281" y="103" class="num">+</text>
+  <g class="tile">
+    <rect x="322" y="78" width="158" height="38" rx="10" class="amber" />
+    <text x="401" y="102" class="label ink">20 units</text>
+  </g>
+  <text x="516" y="103" class="num">=</text>
+  <g class="tile">
+    <rect x="552" y="78" width="138" height="38" rx="10" class="green" />
+    <text x="621" y="102" class="label ink">120 units</text>
+  </g>
+  <text x="146" y="146" class="note">Over lead time</text>
+  <text x="427" y="146" class="note">Uncertainty buffer</text>
+</svg>

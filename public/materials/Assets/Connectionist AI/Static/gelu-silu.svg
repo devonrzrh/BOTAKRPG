@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="294" viewBox="0 0 720 294" role="img" aria-labelledby="title desc">
+  <title id="title">GELU and SiLU near zero</title>
+  <desc id="desc">A close-up shows GELU and SiLU outputting small negative values on the negative side. Their curves dip and then turn upward near zero.</desc>
+  <style>
+    text { font-family: system-ui, sans-serif; text-anchor: middle; fill: #263449; }
+    .title { font-size: 22px; font-weight: 700; fill: #172554; }
+    .label { font-size: 15px; font-weight: 600; }
+    .note { font-size: 14px; }
+    .num { font-size: 19px; font-weight: 700; }
+    .tile text { fill: #18243a; }
+    .edge { fill: none; stroke: #74849b; stroke-width: 2; }
+    .guide { fill: none; stroke: #74849b; stroke-width: 1; stroke-dasharray: 4 5; }
+    .blue { fill: #dbeafe; stroke: #477fc0; }
+    .violet { fill: #ede9fe; stroke: #8864cb; }
+    .green { fill: #d1fae5; stroke: #19936c; }
+    .amber { fill: #ffedd5; stroke: #bd6a26; }
+    .blue, .violet, .green, .amber { stroke-width: 1.5; }
+    @media (prefers-color-scheme: dark) {
+      text { fill: #e2e8f0; }
+      .title { fill: #f1f5ff; }
+      .edge { stroke: #94a3b8; }
+    }
+    .blue-line { fill: none; stroke: #3b89ce; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+    .violet-line { fill: none; stroke: #9571d6; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+    .green-line { fill: none; stroke: #22a87e; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+    .amber-line { fill: none; stroke: #d88835; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+    .signal { fill: none; stroke: #bc70ed; stroke-width: 4; stroke-dasharray: 8 14; animation: flow 2s linear infinite; }
+    @keyframes flow { to { stroke-dashoffset: -44; } }
+    @media (prefers-reduced-motion: reduce) { .signal { display: none; } }
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0 0L8 4L0 8Z" fill="#74849b"/>
+    </marker>
+  </defs>
+  <text x="360" y="28" class="title">GELU and SiLU near zero</text>
+  <text x="52" y="57" class="note">Output</text>
+  <path d="M100 209.62H620" class="guide"/>
+  <text x="79" y="213.624" class="note">-0.25</text>
+  <path d="M100 178.02H620" class="guide"/>
+  <text x="79" y="182.024" class="note">0</text>
+  <path d="M100 146.42H620" class="guide"/>
+  <text x="79" y="150.42399999999998" class="note">0.25</text>
+  <path d="M100 114.82H620" class="guide"/>
+  <text x="79" y="118.824" class="note">0.5</text>
+  <path d="M100 83.22H620" class="guide"/>
+  <text x="79" y="87.22399999999999" class="note">0.75</text>
+  <text x="100" y="241" class="note">-3</text>
+  <text x="230" y="241" class="note">-2</text>
+  <text x="360" y="241" class="note">-1</text>
+  <text x="490" y="241" class="note">0</text>
+  <text x="620" y="241" class="note">1</text>
+  <path d="M100 221L637 221" class="edge" marker-end="url(#arrow)"/>
+  <path d="M100 221L100 54" class="edge" marker-end="url(#arrow)"/>
+  <path d="M100 178.02H620" class="edge"/>
+  <path d="M490.00 63V221" class="edge"/>
+  <path d="M100.00 178.48 L105.20 178.55 L110.40 178.61 L115.60 178.69 L120.80 178.78 L126.00 178.87 L131.20 178.97 L136.40 179.09 L141.60 179.21 L146.80 179.35 L152.00 179.50 L157.20 179.66 L162.40 179.84 L167.60 180.03 L172.80 180.24 L178.00 180.46 L183.20 180.70 L188.40 180.96 L193.60 181.24 L198.80 181.54 L204.00 181.86 L209.20 182.20 L214.40 182.55 L219.60 182.94 L224.80 183.34 L230.00 183.76 L235.20 184.21 L240.40 184.68 L245.60 185.17 L250.80 185.68 L256.00 186.21 L261.20 186.76 L266.40 187.33 L271.60 187.91 L276.80 188.51 L282.00 189.13 L287.20 189.76 L292.40 190.40 L297.60 191.04 L302.80 191.69 L308.00 192.34 L313.20 192.99 L318.40 193.64 L323.60 194.28 L328.80 194.90 L334.00 195.50 L339.20 196.09 L344.40 196.64 L349.60 197.17 L354.80 197.65 L360.00 198.10 L365.20 198.49 L370.40 198.83 L375.60 199.11 L380.80 199.32 L386.00 199.46 L391.20 199.52 L396.40 199.49 L401.60 199.37 L406.80 199.15 L412.00 198.83 L417.20 198.39 L422.40 197.85 L427.60 197.17 L432.80 196.38 L438.00 195.45 L443.20 194.38 L448.40 193.17 L453.60 191.82 L458.80 190.32 L464.00 188.66 L469.20 186.85 L474.40 184.88 L479.60 182.76 L484.80 180.47 L490.00 178.02 L495.20 175.42 L500.40 172.65 L505.60 169.72 L510.80 166.63 L516.00 163.38 L521.20 159.98 L526.40 156.43 L531.60 152.72 L536.80 148.88 L542.00 144.89 L547.20 140.76 L552.40 136.50 L557.60 132.12 L562.80 127.61 L568.00 122.99 L573.20 118.25 L578.40 113.42 L583.60 108.48 L588.80 103.45 L594.00 98.34 L599.20 93.14 L604.40 87.88 L609.60 82.54 L614.80 77.15 L620.00 71.70" class="blue-line"/>
+  <path d="M100.00 196.01 L105.20 196.46 L110.40 196.91 L115.60 197.37 L120.80 197.84 L126.00 198.31 L131.20 198.79 L136.40 199.27 L141.60 199.76 L146.80 200.25 L152.00 200.75 L157.20 201.24 L162.40 201.74 L167.60 202.25 L172.80 202.75 L178.00 203.26 L183.20 203.76 L188.40 204.26 L193.60 204.77 L198.80 205.27 L204.00 205.76 L209.20 206.25 L214.40 206.74 L219.60 207.22 L224.80 207.69 L230.00 208.16 L235.20 208.61 L240.40 209.05 L245.60 209.48 L250.80 209.90 L256.00 210.30 L261.20 210.68 L266.40 211.04 L271.60 211.38 L276.80 211.70 L282.00 212.00 L287.20 212.26 L292.40 212.50 L297.60 212.71 L302.80 212.89 L308.00 213.03 L313.20 213.13 L318.40 213.20 L323.60 213.22 L328.80 213.20 L334.00 213.13 L339.20 213.02 L344.40 212.85 L349.60 212.63 L354.80 212.35 L360.00 212.02 L365.20 211.62 L370.40 211.16 L375.60 210.63 L380.80 210.04 L386.00 209.37 L391.20 208.63 L396.40 207.82 L401.60 206.93 L406.80 205.95 L412.00 204.90 L417.20 203.76 L422.40 202.53 L427.60 201.22 L432.80 199.81 L438.00 198.31 L443.20 196.72 L448.40 195.04 L453.60 193.26 L458.80 191.38 L464.00 189.40 L469.20 187.33 L474.40 185.15 L479.60 182.88 L484.80 180.50 L490.00 178.02 L495.20 175.45 L500.40 172.77 L505.60 169.99 L510.80 167.10 L516.00 164.12 L521.20 161.04 L526.40 157.87 L531.60 154.59 L536.80 151.22 L542.00 147.75 L547.20 144.20 L552.40 140.54 L557.60 136.80 L562.80 132.97 L568.00 129.06 L573.20 125.06 L578.40 120.97 L583.60 116.81 L588.80 112.57 L594.00 108.25 L599.20 103.86 L604.40 99.40 L609.60 94.87 L614.80 90.28 L620.00 85.62" class="violet-line"/>
+  <text x="360" y="257" class="note">Input z</text>
+  <path d="M90 275h22" class="blue-line"/>
+  <text x="235" y="280" class="note">GELU (approx.)</text>
+  <path d="M360 275h22" class="violet-line"/>
+  <text x="505" y="280" class="note">SiLU</text>
+</svg>

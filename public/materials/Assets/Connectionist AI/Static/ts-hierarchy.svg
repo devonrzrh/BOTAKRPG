@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="247" viewBox="0 0 720 247" role="img" aria-labelledby="title desc">
+  <title id="title">Forecast aggregation hierarchy</title>
+  <desc id="desc">SKU forecasts of ten and twenty sum to category thirty. A second category of forty makes a total of seventy.</desc>
+  <style>
+    text { font-family: system-ui, sans-serif; text-anchor: middle; fill: #263449; }
+    .title { font-size: 22px; font-weight: 700; fill: #172554; }
+    .label { font-size: 15px; font-weight: 600; }
+    .note { font-size: 13px; }
+    .num { font-size: 20px; font-weight: 700; }
+    .edge { fill: none; stroke: #74849b; stroke-width: 2; }
+    .guide { fill: none; stroke: #94a3b8; stroke-width: 1; stroke-dasharray: 4 5; }
+    .blue { fill: #dbeafe; stroke: #477fc0; }
+    .violet { fill: #ede9fe; stroke: #8864cb; }
+    .green { fill: #d1fae5; stroke: #19936c; }
+    .amber { fill: #ffedd5; stroke: #bd6a26; }
+    .blue, .violet, .green, .amber { stroke-width: 1.5; }
+    .blue-line, .violet-line, .green-line, .amber-line { fill: none; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
+    .blue-line { stroke: #3386c5; }
+    .violet-line { stroke: #9670d2; }
+    .green-line { stroke: #21a47a; }
+    .amber-line { stroke: #ce873a; }
+    @media (prefers-color-scheme: dark) {
+      text { fill: #e2e8f0; }
+      .title { fill: #f1f5ff; }
+      .edge { stroke: #94a3b8; }
+    }
+    .ink { fill: #18243a; }
+
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0 0L8 4L0 8Z" fill="#74849b" />
+    </marker>
+  </defs>
+  <text x="360" y="29" class="title">Forecast aggregation hierarchy</text>
+  <g class="tile">
+    <rect x="283" y="64" width="154" height="38" rx="10" class="green" />
+    <text x="360" y="88" class="label ink">Total 70</text>
+  </g>
+  <g class="tile">
+    <rect x="96.5" y="127" width="145" height="38" rx="10" class="violet" />
+    <text x="169" y="151" class="label ink">Category 30</text>
+  </g>
+  <g class="tile">
+    <rect x="442.5" y="127" width="145" height="38" rx="10" class="violet" />
+    <text x="515" y="151" class="label ink">Category 40</text>
+  </g>
+  <g class="tile">
+    <rect x="16" y="192" width="124" height="38" rx="10" class="blue" />
+    <text x="78" y="216" class="label ink">SKU 10</text>
+  </g>
+  <g class="tile">
+    <rect x="196" y="192" width="124" height="38" rx="10" class="blue" />
+    <text x="258" y="216" class="label ink">SKU 20</text>
+  </g>
+  <g class="tile">
+    <rect x="442.5" y="192" width="145" height="38" rx="10" class="blue" />
+    <text x="515" y="216" class="label ink">SKU 40</text>
+  </g>
+  <path d="M135 191L169 167" class="edge" marker-end="url(#arrow)" />
+  <path d="M258 191L202 167" class="edge" marker-end="url(#arrow)" />
+  <path d="M515 191L515 167" class="edge" marker-end="url(#arrow)" />
+  <path d="M169 126L313 104" class="edge" marker-end="url(#arrow)" />
+  <path d="M515 126L407 104" class="edge" marker-end="url(#arrow)" />
+</svg>

@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="271" viewBox="0 0 720 271" role="img" aria-labelledby="title desc">
+  <title id="title">Tanh around zero</title>
+  <desc id="desc">Tanh is zero at zero. Equal-magnitude positive and negative inputs have equal-magnitude outputs with opposite signs.</desc>
+  <style>
+    text { font-family: system-ui, sans-serif; text-anchor: middle; fill: #263449; }
+    .title { font-size: 22px; font-weight: 700; fill: #172554; }
+    .label { font-size: 15px; font-weight: 600; }
+    .note { font-size: 14px; }
+    .num { font-size: 19px; font-weight: 700; }
+    .tile text { fill: #18243a; }
+    .edge { fill: none; stroke: #74849b; stroke-width: 2; }
+    .guide { fill: none; stroke: #74849b; stroke-width: 1; stroke-dasharray: 4 5; }
+    .blue { fill: #dbeafe; stroke: #477fc0; }
+    .violet { fill: #ede9fe; stroke: #8864cb; }
+    .green { fill: #d1fae5; stroke: #19936c; }
+    .amber { fill: #ffedd5; stroke: #bd6a26; }
+    .blue, .violet, .green, .amber { stroke-width: 1.5; }
+    @media (prefers-color-scheme: dark) {
+      text { fill: #e2e8f0; }
+      .title { fill: #f1f5ff; }
+      .edge { stroke: #94a3b8; }
+    }
+    .blue-line { fill: none; stroke: #3b89ce; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+    .violet-line { fill: none; stroke: #9571d6; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+    .green-line { fill: none; stroke: #22a87e; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+    .amber-line { fill: none; stroke: #d88835; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+    .signal { fill: none; stroke: #bc70ed; stroke-width: 4; stroke-dasharray: 8 14; animation: flow 2s linear infinite; }
+    @keyframes flow { to { stroke-dashoffset: -44; } }
+    @media (prefers-reduced-motion: reduce) { .signal { display: none; } }
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0 0L8 4L0 8Z" fill="#74849b"/>
+    </marker>
+  </defs>
+  <text x="360" y="28" class="title">Tanh around zero</text>
+  <text x="52" y="57" class="note">Output</text>
+  <path d="M100 210.70H620" class="guide"/>
+  <text x="79" y="214.69565217391306" class="note">-1</text>
+  <path d="M100 176.35H620" class="guide"/>
+  <text x="79" y="180.34782608695653" class="note">-0.5</text>
+  <path d="M100 142.00H620" class="guide"/>
+  <text x="79" y="146" class="note">0</text>
+  <path d="M100 107.65H620" class="guide"/>
+  <text x="79" y="111.65217391304347" class="note">0.5</text>
+  <path d="M100 73.30H620" class="guide"/>
+  <text x="79" y="77.30434782608694" class="note">1</text>
+  <text x="100" y="241" class="note">-3</text>
+  <text x="186.66666666666669" y="241" class="note">-2</text>
+  <text x="273.33333333333337" y="241" class="note">-1</text>
+  <text x="360" y="241" class="note">0</text>
+  <text x="446.6666666666667" y="241" class="note">1</text>
+  <text x="533.3333333333333" y="241" class="note">2</text>
+  <text x="620" y="241" class="note">3</text>
+  <path d="M100 221L637 221" class="edge" marker-end="url(#arrow)"/>
+  <path d="M100 221L100 54" class="edge" marker-end="url(#arrow)"/>
+  <path d="M100 142.00H620" class="edge"/>
+  <path d="M360.00 63V221" class="edge"/>
+  <path d="M100.00 210.36 L105.20 210.31 L110.40 210.26 L115.60 210.21 L120.80 210.15 L126.00 210.08 L131.20 210.00 L136.40 209.91 L141.60 209.81 L146.80 209.70 L152.00 209.57 L157.20 209.43 L162.40 209.27 L167.60 209.09 L172.80 208.89 L178.00 208.67 L183.20 208.41 L188.40 208.13 L193.60 207.80 L198.80 207.44 L204.00 207.04 L209.20 206.59 L214.40 206.08 L219.60 205.52 L224.80 204.89 L230.00 204.18 L235.20 203.39 L240.40 202.52 L245.60 201.54 L250.80 200.46 L256.00 199.27 L261.20 197.95 L266.40 196.49 L271.60 194.89 L276.80 193.13 L282.00 191.21 L287.20 189.11 L292.40 186.84 L297.60 184.38 L302.80 181.73 L308.00 178.89 L313.20 175.87 L318.40 172.65 L323.60 169.27 L328.80 165.71 L334.00 162.01 L339.20 158.18 L344.40 154.23 L349.60 150.20 L354.80 146.12 L360.00 142.00 L365.20 137.88 L370.40 133.80 L375.60 129.77 L380.80 125.82 L386.00 121.99 L391.20 118.29 L396.40 114.73 L401.60 111.35 L406.80 108.13 L412.00 105.11 L417.20 102.27 L422.40 99.62 L427.60 97.16 L432.80 94.89 L438.00 92.79 L443.20 90.87 L448.40 89.11 L453.60 87.51 L458.80 86.05 L464.00 84.73 L469.20 83.54 L474.40 82.46 L479.60 81.48 L484.80 80.61 L490.00 79.82 L495.20 79.11 L500.40 78.48 L505.60 77.92 L510.80 77.41 L516.00 76.96 L521.20 76.56 L526.40 76.20 L531.60 75.87 L536.80 75.59 L542.00 75.33 L547.20 75.11 L552.40 74.91 L557.60 74.73 L562.80 74.57 L568.00 74.43 L573.20 74.30 L578.40 74.19 L583.60 74.09 L588.80 74.00 L594.00 73.92 L599.20 73.85 L604.40 73.79 L609.60 73.74 L614.80 73.69 L620.00 73.64" class="violet-line"/>
+  <circle cx="273.33333333333337" cy="194.3182072352221" r="5" class="blue"/>
+  <text x="231.33333333333337" y="182.3182072352221" class="note">−0.762</text>
+  <circle cx="446.6666666666667" cy="89.68179276477787" r="5" class="green"/>
+  <text x="492.6666666666667" y="103.68179276477787" class="note">+0.762</text>
+  <text x="360" y="257" class="note">Input z</text>
+</svg>

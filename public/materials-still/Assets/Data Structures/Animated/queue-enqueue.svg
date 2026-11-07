@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="560" height="207" viewBox="0 0 560 207" role="img" aria-labelledby="title">
+  <title id="title">Enqueue Darren at the rear shown before and after</title>
+  <style>
+    text { font: 16px system-ui, sans-serif; text-anchor: middle; fill: #0f172a; }
+    .label { paint-order: stroke; stroke: #f8fafc; stroke-width: 3px; stroke-linejoin: round; }
+    .heading { font-size: 19px; font-weight: 700; }
+    .tile { fill: #dbeafe; stroke: #4169a9; stroke-width: 2px; }
+    .changed { fill: #a7f3d0; stroke: #16835e; stroke-width: 2px; }
+    @media (prefers-color-scheme: dark) { .label { fill: #f8fafc; stroke: #111827; } }
+  </style>
+  <text class="label heading" x="280" y="26">Enqueue Darren at the rear</text>
+  <text class="label" x="140" y="58">Before enqueue</text>
+  <rect x="40" y="91" width="96" height="36" rx="5" class="tile"/>
+  <text class="" x="88" y="115">Nicky</text>
+  <text class="label" x="140" y="190">Front: Nicky</text>
+  <text class="label" x="420" y="58">After enqueue</text>
+  <rect x="320" y="91" width="96" height="36" rx="5" class="tile"/>
+  <text class="" x="368" y="115">Nicky</text>
+  <rect x="424" y="91" width="96" height="36" rx="5" class="changed"/>
+  <text class="" x="472" y="115">Darren</text>
+  <text class="label" x="420" y="190">Front: Nicky</text>
+<style>* { animation: none !important; transition: none !important; }</style></svg>

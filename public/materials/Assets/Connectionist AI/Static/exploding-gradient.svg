@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="248" viewBox="0 0 720 248" role="img" aria-labelledby="title desc">
+  <title id="title">Exploding gradients</title>
+  <desc id="desc">In a toy chain, each backward step doubles the gradient. Starting at one, four steps produce two, four, eight, and sixteen.</desc>
+  <style>
+    text { font-family: system-ui, sans-serif; text-anchor: middle; fill: #263449; }
+    .title { font-size: 22px; font-weight: 700; fill: #172554; }
+    .label { font-size: 15px; font-weight: 600; }
+    .note { font-size: 14px; }
+    .num { font-size: 19px; font-weight: 700; }
+    .tile text { fill: #18243a; }
+    .edge { fill: none; stroke: #74849b; stroke-width: 2; }
+    .guide { fill: none; stroke: #74849b; stroke-width: 1; stroke-dasharray: 4 5; }
+    .blue { fill: #dbeafe; stroke: #477fc0; }
+    .violet { fill: #ede9fe; stroke: #8864cb; }
+    .green { fill: #d1fae5; stroke: #19936c; }
+    .amber { fill: #ffedd5; stroke: #bd6a26; }
+    .blue, .violet, .green, .amber { stroke-width: 1.5; }
+    @media (prefers-color-scheme: dark) {
+      text { fill: #e2e8f0; }
+      .title { fill: #f1f5ff; }
+      .edge { stroke: #94a3b8; }
+    }
+    .blue-line { fill: none; stroke: #3b89ce; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+    .violet-line { fill: none; stroke: #9571d6; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+    .green-line { fill: none; stroke: #22a87e; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+    .amber-line { fill: none; stroke: #d88835; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0 0L8 4L0 8Z" fill="#74849b"/>
+    </marker>
+  </defs>
+  <text x="360" y="28" class="title">Exploding gradients</text>
+  <path d="M118 181L658 181" class="edge" marker-end="url(#arrow)"/>
+  <rect x="151" y="174" width="46" height="7" rx="3" class="violet"/>
+  <text x="174" y="165" class="note">1</text>
+  <text x="174" y="203" class="note">0</text>
+  <rect x="248" y="167" width="46" height="14" rx="3" class="violet"/>
+  <text x="271" y="158" class="note">2</text>
+  <text x="271" y="203" class="note">1</text>
+  <rect x="345" y="153" width="46" height="28" rx="3" class="violet"/>
+  <text x="368" y="144" class="note">4</text>
+  <text x="368" y="203" class="note">2</text>
+  <rect x="442" y="125" width="46" height="56" rx="3" class="violet"/>
+  <text x="465" y="116" class="note">8</text>
+  <text x="465" y="203" class="note">3</text>
+  <rect x="539" y="69" width="46" height="112" rx="3" class="amber"/>
+  <text x="562" y="60" class="note">16</text>
+  <text x="562" y="203" class="note">4</text>
+  <text x="360" y="232" class="note">Backward steps from the output · multiplier ×2 per step</text>
+</svg>

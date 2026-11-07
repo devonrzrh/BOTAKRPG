@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="285" viewBox="0 0 720 285" role="img" aria-labelledby="title desc">
+  <title id="title">Forecast fan</title>
+  <desc id="desc">Nested illustrative forecast bands widen with horizon. The inner band represents an eighty percent interval and the outer band a ninety-five percent interval.</desc>
+  <style>
+    text { font-family: system-ui, sans-serif; text-anchor: middle; fill: #263449; }
+    .title { font-size: 22px; font-weight: 700; fill: #172554; }
+    .label { font-size: 15px; font-weight: 600; }
+    .note { font-size: 13px; }
+    .num { font-size: 20px; font-weight: 700; }
+    .edge { fill: none; stroke: #74849b; stroke-width: 2; }
+    .guide { fill: none; stroke: #94a3b8; stroke-width: 1; stroke-dasharray: 4 5; }
+    .blue { fill: #dbeafe; stroke: #477fc0; }
+    .violet { fill: #ede9fe; stroke: #8864cb; }
+    .green { fill: #d1fae5; stroke: #19936c; }
+    .amber { fill: #ffedd5; stroke: #bd6a26; }
+    .blue, .violet, .green, .amber { stroke-width: 1.5; }
+    .blue-line, .violet-line, .green-line, .amber-line { fill: none; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
+    .blue-line { stroke: #3386c5; }
+    .violet-line { stroke: #9670d2; }
+    .green-line { stroke: #21a47a; }
+    .amber-line { stroke: #ce873a; }
+    @media (prefers-color-scheme: dark) {
+      text { fill: #e2e8f0; }
+      .title { fill: #f1f5ff; }
+      .edge { stroke: #94a3b8; }
+    }
+    .ink { fill: #18243a; }
+
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0 0L8 4L0 8Z" fill="#74849b" />
+    </marker>
+  </defs>
+  <text x="360" y="29" class="title">Forecast fan</text>
+  <path d="M90 197H630" class="guide" />
+  <text x="68" y="201" class="note">50</text>
+  <path d="M90 133.5H630" class="guide" />
+  <text x="68" y="137.5" class="note">100</text>
+  <path d="M90 70H630" class="guide" />
+  <text x="68" y="74" class="note">150</text>
+  <text x="90" y="216" class="note">0</text>
+  <text x="270" y="216" class="note">2</text>
+  <text x="450" y="216" class="note">4</text>
+  <text x="630" y="216" class="note">6</text>
+  <path d="M90 197L639 197" class="edge" marker-end="url(#arrow)" />
+  <path d="M90 197L90 62" class="edge" marker-end="url(#arrow)" />
+  <text x="360" y="236" class="note">Forecast horizon</text>
+  <text x="80" y="53" class="note">Demand</text>
+  <path d="M90 133.5L90 133.5 L180 113.18 L270 103.28 L360 95.08 L450 87.78 L540 81.04 L630 74.71L630 161.81 L540 160.56 L450 158.9 L360 156.68 L270 153.56 L180 148.74 L90 133.5Z" class="blue" fill-opacity=".65" />
+  <path d="M90 133.5L90 133.5 L180 120.8 L270 114.05 L360 108.28 L450 103.02 L540 98.08 L630 93.37L630 143.15 L540 143.52 L450 143.66 L360 143.48 L270 142.79 L180 141.12 L90 133.5Z" class="violet" fill-opacity=".65" />
+  <path d="M90 133.5 L180 130.96 L270 128.42 L360 125.88 L450 123.34 L540 120.8 L630 118.26" class="green-line" />
+  <path d="M60 268h22" class="blue-line" />
+  <text x="170" y="273" class="note">95% band</text>
+  <path d="M260 268h22" class="violet-line" />
+  <text x="370" y="273" class="note">80% band</text>
+  <path d="M460 268h22" class="green-line" />
+  <text x="570" y="273" class="note">Median</text>
+</svg>

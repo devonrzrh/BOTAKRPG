@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="259" viewBox="0 0 720 259" role="img" aria-labelledby="title desc">
+  <title id="title">Point forecast and predictive distribution</title>
+  <desc id="desc">A point forecast at one hundred is shown inside a normal predictive distribution with mean one hundred and standard deviation ten. Different widths represent different uncertainty, even for the same point forecast.</desc>
+  <style>
+    text { font-family: system-ui, sans-serif; text-anchor: middle; fill: #263449; }
+    .title { font-size: 22px; font-weight: 700; fill: #172554; }
+    .label { font-size: 15px; font-weight: 600; }
+    .note { font-size: 13px; }
+    .num { font-size: 20px; font-weight: 700; }
+    .edge { fill: none; stroke: #74849b; stroke-width: 2; }
+    .guide { fill: none; stroke: #94a3b8; stroke-width: 1; stroke-dasharray: 4 5; }
+    .blue { fill: #dbeafe; stroke: #477fc0; }
+    .violet { fill: #ede9fe; stroke: #8864cb; }
+    .green { fill: #d1fae5; stroke: #19936c; }
+    .amber { fill: #ffedd5; stroke: #bd6a26; }
+    .blue, .violet, .green, .amber { stroke-width: 1.5; }
+    .blue-line, .violet-line, .green-line, .amber-line { fill: none; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
+    .blue-line { stroke: #3386c5; }
+    .violet-line { stroke: #9670d2; }
+    .green-line { stroke: #21a47a; }
+    .amber-line { stroke: #ce873a; }
+    @media (prefers-color-scheme: dark) {
+      text { fill: #e2e8f0; }
+      .title { fill: #f1f5ff; }
+      .edge { stroke: #94a3b8; }
+    }
+    .ink { fill: #18243a; }
+
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0 0L8 4L0 8Z" fill="#74849b" />
+    </marker>
+  </defs>
+  <text x="360" y="29" class="title">Point forecast and predictive distribution</text>
+  <path d="M98 189H629" class="guide" />
+  <text x="76" y="193" class="note">0</text>
+  <path d="M98 133.89H629" class="guide" />
+  <text x="76" y="137.89" class="note">0.02</text>
+  <path d="M98 78.78H629" class="guide" />
+  <text x="76" y="82.78" class="note">0.04</text>
+  <text x="98" y="208" class="note">50</text>
+  <text x="230.75" y="208" class="note">75</text>
+  <text x="363.5" y="208" class="note">100</text>
+  <text x="496.25" y="208" class="note">125</text>
+  <text x="629" y="208" class="note">150</text>
+  <path d="M98 189L638 189" class="edge" marker-end="url(#arrow)" />
+  <path d="M98 189L98 57" class="edge" marker-end="url(#arrow)" />
+  <text x="363.5" y="228" class="note">Demand</text>
+  <text x="88" y="48" class="note">Density</text>
+  <path d="M98 189 L103.31 189 L108.62 189 L113.93 189 L119.24 189 L124.55 189 L129.86 188.99 L135.17 188.99 L140.48 188.98 L145.79 188.98 L151.1 188.96 L156.41 188.95 L161.72 188.92 L167.03 188.88 L172.34 188.83 L177.65 188.76 L182.96 188.66 L188.27 188.53 L193.58 188.34 L198.89 188.1 L204.2 187.78 L209.51 187.36 L214.82 186.82 L220.13 186.13 L225.44 185.26 L230.75 184.17 L236.06 182.83 L241.37 181.19 L246.68 179.22 L251.99 176.88 L257.3 174.12 L262.61 170.92 L267.92 167.24 L273.23 163.08 L278.54 158.44 L283.85 153.31 L289.16 147.74 L294.47 141.78 L299.78 135.49 L305.09 128.97 L310.4 122.32 L315.71 115.68 L321.02 109.17 L326.33 102.96 L331.64 97.18 L336.95 91.99 L342.26 87.52 L347.57 83.91 L352.88 81.25 L358.19 79.62 L363.5 79.07 L368.81 79.62 L374.12 81.25 L379.43 83.91 L384.74 87.52 L390.05 91.99 L395.36 97.18 L400.67 102.96 L405.98 109.17 L411.29 115.68 L416.6 122.32 L421.91 128.97 L427.22 135.49 L432.53 141.78 L437.84 147.74 L443.15 153.31 L448.46 158.44 L453.77 163.08 L459.08 167.24 L464.39 170.92 L469.7 174.12 L475.01 176.88 L480.32 179.22 L485.63 181.19 L490.94 182.83 L496.25 184.17 L501.56 185.26 L506.87 186.13 L512.18 186.82 L517.49 187.36 L522.8 187.78 L528.11 188.1 L533.42 188.34 L538.73 188.53 L544.04 188.66 L549.35 188.76 L554.66 188.83 L559.97 188.88 L565.28 188.92 L570.59 188.95 L575.9 188.96 L581.21 188.98 L586.52 188.98 L591.83 188.99 L597.14 188.99 L602.45 189 L607.76 189 L613.07 189 L618.38 189 L623.69 189 L629 189" class="violet-line" />
+  <path d="M363.5 189V78.78" class="green-line" />
+  <text x="440.5" y="76" class="note">Point forecast = 100</text>
+</svg>

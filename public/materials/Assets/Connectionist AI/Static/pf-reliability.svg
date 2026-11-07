@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="277" viewBox="0 0 720 277" role="img" aria-labelledby="title desc">
+  <title id="title">Reliability diagram</title>
+  <desc id="desc">The diagonal represents agreement between nominal and observed interval coverage. An illustrative overconfident model has observed coverage below the diagonal.</desc>
+  <style>
+    text { font-family: system-ui, sans-serif; text-anchor: middle; fill: #263449; }
+    .title { font-size: 22px; font-weight: 700; fill: #172554; }
+    .label { font-size: 15px; font-weight: 600; }
+    .note { font-size: 13px; }
+    .num { font-size: 20px; font-weight: 700; }
+    .edge { fill: none; stroke: #74849b; stroke-width: 2; }
+    .guide { fill: none; stroke: #94a3b8; stroke-width: 1; stroke-dasharray: 4 5; }
+    .blue { fill: #dbeafe; stroke: #477fc0; }
+    .violet { fill: #ede9fe; stroke: #8864cb; }
+    .green { fill: #d1fae5; stroke: #19936c; }
+    .amber { fill: #ffedd5; stroke: #bd6a26; }
+    .blue, .violet, .green, .amber { stroke-width: 1.5; }
+    .blue-line, .violet-line, .green-line, .amber-line { fill: none; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
+    .blue-line { stroke: #3386c5; }
+    .violet-line { stroke: #9670d2; }
+    .green-line { stroke: #21a47a; }
+    .amber-line { stroke: #ce873a; }
+    @media (prefers-color-scheme: dark) {
+      text { fill: #e2e8f0; }
+      .title { fill: #f1f5ff; }
+      .edge { stroke: #94a3b8; }
+    }
+    .ink { fill: #18243a; }
+
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0 0L8 4L0 8Z" fill="#74849b" />
+    </marker>
+  </defs>
+  <text x="360" y="29" class="title">Reliability diagram</text>
+  <path d="M102 196H623" class="guide" />
+  <text x="80" y="200" class="note">0</text>
+  <path d="M102 130.5H623" class="guide" />
+  <text x="80" y="134.5" class="note">0.5</text>
+  <path d="M102 91.2H623" class="guide" />
+  <text x="80" y="95.2" class="note">0.8</text>
+  <path d="M102 65H623" class="guide" />
+  <text x="80" y="69" class="note">1</text>
+  <text x="102" y="215" class="note">0</text>
+  <text x="362.5" y="215" class="note">0.5</text>
+  <text x="518.8" y="215" class="note">0.8</text>
+  <text x="623" y="215" class="note">1</text>
+  <path d="M102 196L632 196" class="edge" marker-end="url(#arrow)" />
+  <path d="M102 196L102 57" class="edge" marker-end="url(#arrow)" />
+  <text x="362.5" y="235" class="note">Nominal coverage</text>
+  <text x="92" y="48" class="note">Observed coverage</text>
+  <path d="M102 196 L623 65" class="green-line" />
+  <path d="M102 196 L206.2 180.28 L310.4 160.63 L414.6 139.67 L518.8 116.09 L623 65" class="violet-line" />
+  <path d="M60 260h22" class="green-line" />
+  <text x="220" y="265" class="note">Perfect agreement</text>
+  <path d="M360 260h22" class="violet-line" />
+  <text x="520" y="265" class="note">Illustrative model</text>
+</svg>
