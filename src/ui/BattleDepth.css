@@ -1,0 +1,80 @@
+.battle-stance {
+  position: absolute;
+  right: calc(100% + 18px);
+  top: 20px;
+  width: 210px;
+  padding: 12px;
+  background: #111c24ed;
+  border: 1px solid #54707d;
+  text-align: left;
+  font-size: 16px;
+}
+.battle-stance span,
+.battle-stance strong {
+  display: block;
+  margin: 4px 0;
+  font-weight: 400;
+}
+.battle-stance strong {
+  color: #e8c785;
+  font-size: 18px;
+}
+.battle-special-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 8px;
+}
+.app .battle-skill-tray .battle-special-actions button {
+  display: block;
+  min-height: 44px;
+  padding: 8px 16px;
+  font-size: 18px;
+  flex: 1;
+}
+.battle-special-actions .limit-ready {
+  border-color: #edca79;
+  color: #ffe1a0;
+  background: #49371b;
+}
+.battle-act-options {
+  display: grid;
+  gap: 10px;
+}
+.battle-act-options p {
+  margin: 4px 0;
+}
+.battle-act-options button {
+  text-align: left;
+  min-height: 46px;
+  font-size: 18px;
+}
+.battle-intent button {
+  margin-top: 8px;
+  width: 100%;
+  font-size: 18px;
+  min-height: 42px;
+}
+.app .battle-intent {
+  width: 210px;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+}
+.app .battle-intent button {
+  flex-basis: 100%;
+  margin-top: 4px;
+}
+.battle-screen > .evade {
+  position: absolute;
+  z-index: 8;
+  left: 50%;
+  top: 44%;
+  transform: translate(-50%, -50%);
+  max-height: calc(100% - 225px);
+  overflow: auto;
+}
+@media (max-width: 1000px) {
+  .battle-stance {
+    width: 180px;
+    right: calc(100% + 8px);
+  }
+}

@@ -303,6 +303,60 @@ const records: object[] = checks.map(
     };
   },
 );
+const tacticsFor = (topic: string, index: number, boss = false) => {
+  const patterns = [
+    ["strike", "heavy", "recover"],
+    ["heavy", "strike", "strike", "recover"],
+    ["strike", "recover", "heavy"],
+    ["heavy", "recover", "strike", "heavy"],
+    ["strike", "strike", "recover"],
+  ];
+  const weaknesses = ["insight", "ward"];
+  const subject =
+    topic === "algorithms"
+      ? "route"
+      : topic === "structures"
+        ? "archive"
+        : "signal";
+  const acts =
+    topic === "algorithms"
+      ? [
+          "The courier's route is forged. Which record proves the next hop?",
+          "PATCH is trapped behind a route check. What earns safe passage?",
+          "The relay flags a cycle. What evidence should you present?",
+        ]
+      : topic === "structures"
+        ? [
+            "FOLIO's identity was erased. Which record can restore the audit trail?",
+            "The archive blocks access. Which credential follows its protocol?",
+            "A revision was altered. What evidence verifies its history?",
+          ]
+        : [
+            "LUMA detects a forged signal. What test best verifies its source?",
+            "The handshake is untrusted. Which evidence establishes its origin?",
+            "The model flags a drift. What should be checked before adapting?",
+          ];
+  const options = [
+    "Present the signed record",
+    "Threaten the system",
+    "Guess and proceed",
+  ];
+  const rotation = index % options.length;
+  const rotated = [...options.slice(rotation), ...options.slice(0, rotation)];
+  return {
+    weakness: weaknesses[index % weaknesses.length],
+    pattern: patterns[index % patterns.length],
+    resolve: boss ? 2 : 1,
+    act: {
+      prompt: acts[index % acts.length],
+      options: rotated,
+      answer: (options.length - rotation) % options.length,
+      explanation: `Verified ${subject} evidence satisfies the protocol and avoids harming the protected system.`,
+    },
+    spare: true,
+    boss,
+  };
+};
 const specs = [
   {
     topic: "algorithms",
@@ -336,7 +390,7 @@ for (const spec of specs) {
   const chapters = manifest.chapters.filter(
     (c: { topic: string }) => c.topic === spec.topic,
   );
-  for (const chapter of chapters)
+  for (const [index, chapter] of chapters.entries())
     records.push({
       type: "activity",
       id: `encounter-${chapter.id}`,
@@ -355,6 +409,7 @@ for (const spec of specs) {
         attack: 7,
         mixedQuestions: false,
         lessons: [chapter.id],
+        tactics: tacticsFor(spec.topic, index),
       },
     });
   records.push({
@@ -370,6 +425,11 @@ for (const spec of specs) {
       attack: 10,
       mixedQuestions: false,
       lessons: chapters.map((c: { id: string }) => c.id),
+      tactics: tacticsFor(
+        spec.topic,
+        spec.topic === "structures" ? 1 : 0,
+        true,
+      ),
     },
     clue: { title: spec.clue, text: spec.text },
   });

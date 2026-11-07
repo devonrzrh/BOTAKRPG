@@ -18,6 +18,24 @@ id: guardian-battle
 title: Sentinel A-03
 template: battle
 lesson: stacks-queues
+enemy:
+  id: sentinel-a-03
+  title: Sentinel A-03
+  hp: 76
+  attack: 10
+  mixedQuestions: false
+  lessons: [stacks-queues]
+  tactics:
+    weakness: insight
+    pattern: [strike, heavy, recover, strike]
+    resolve: 1
+    act:
+      prompt: Sentinel A-03 requests authorization. What proves the access path?
+      options: [Present the signed access log, Threaten the sentinel, Guess a port]
+      answer: 0
+      explanation: A signed access log verifies the route without harming the sentinel.
+    spare: true
+    boss: false
 clue:
   title: Access log
   text: The sentinel recorded ECHO-7 leaving through an unlisted port.

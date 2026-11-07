@@ -11,6 +11,7 @@ export interface BattleCue {
   heavy: boolean;
   blocked: boolean;
   defeated: boolean;
+  special?: "weakness" | "break" | "limit" | "pacify" | "evade";
 }
 export const combatCueDuration = (reducedMotion: boolean) =>
   reducedMotion ? 200 : 900;
@@ -23,7 +24,7 @@ export function battleCue(
   afterSave: Save,
   content: Content,
   sequence: number,
-  cause?: "guard" | "item",
+  cause?: "guard" | "item" | "act" | "evade",
 ): BattleCue | null {
   if (before.enemyId !== after.enemyId) return null;
   const base = {
@@ -34,9 +35,28 @@ export function battleCue(
     blocked: false,
     defeated: after.phase === "won",
   };
+  if (
+    after.phase === "won" &&
+    before.phase !== "won" &&
+    after.resolution === "pacified"
+  )
+    return { ...base, kind: "recover", defeated: false, special: "pacify" };
   if (before.phase === "question" && after.phase !== "question") {
     const amount = Math.max(0, before.hp - after.hp);
-    return { ...base, kind: amount ? "player" : "miss", amount };
+    return {
+      ...base,
+      kind: amount ? "player" : "miss",
+      amount,
+      special: amount
+        ? before.finisher
+          ? "limit"
+          : after.breakFresh && !before.breakFresh
+            ? "break"
+            : before.tactics && before.skill === before.tactics.weakness
+              ? "weakness"
+              : undefined
+        : undefined,
+    };
   }
   if (
     after.turn > before.turn ||
@@ -53,12 +73,24 @@ export function battleCue(
       ...base,
       kind: intent.kind === "recover" ? "recover" : "enemy",
       amount:
-        intent.kind === "recover"
-          ? Math.max(0, afterSave.character.focus - beforeSave.character.focus)
-          : intent.damage,
+        cause === "evade"
+          ? Math.max(0, beforeSave.character.hp - afterSave.character.hp)
+          : intent.kind === "recover"
+            ? Math.max(
+                0,
+                afterSave.character.focus - beforeSave.character.focus,
+              )
+            : intent.damage,
       heavy: intent.kind === "heavy",
       blocked:
-        cause === "guard" || before.effects.some((e) => e.id === "shield"),
+        cause === "guard" ||
+        cause === "evade" ||
+        before.effects.some((e) => e.id === "shield"),
+      special: before.breakFresh
+        ? "break"
+        : cause === "evade"
+          ? "evade"
+          : undefined,
     };
   }
   return null;

@@ -187,6 +187,38 @@
       "template": "battle",
       "lesson": "stacks-queues",
       "seed": 42,
+      "enemy": {
+        "id": "sentinel-a-03",
+        "title": "Sentinel A-03",
+        "hp": 76,
+        "attack": 10,
+        "mixedQuestions": false,
+        "lessons": [
+          "stacks-queues"
+        ],
+        "tactics": {
+          "weakness": "insight",
+          "pattern": [
+            "strike",
+            "heavy",
+            "recover",
+            "strike"
+          ],
+          "resolve": 1,
+          "act": {
+            "prompt": "Sentinel A-03 requests authorization. What proves the access path?",
+            "options": [
+              "Present the signed access log",
+              "Threaten the sentinel",
+              "Guess a port"
+            ],
+            "answer": 0,
+            "explanation": "A signed access log verifies the route without harming the sentinel."
+          },
+          "spare": true,
+          "boss": false
+        }
+      },
       "clue": {
         "title": "Access log",
         "text": "The sentinel recorded ECHO-7 leaving through an unlisted port."
@@ -485,7 +517,30 @@
         "title": "ECHO-7",
         "hp": 105,
         "attack": 10,
-        "mixedQuestions": true
+        "mixedQuestions": true,
+        "tactics": {
+          "weakness": "ward",
+          "pattern": [
+            "heavy",
+            "strike",
+            "recover",
+            "heavy",
+            "strike"
+          ],
+          "resolve": 2,
+          "act": {
+            "prompt": "ECHO-7 cites containment protocol. What allows a peaceful surrender?",
+            "options": [
+              "Offer verified containment and a safe channel",
+              "Threaten deletion",
+              "Demand a guessed password"
+            ],
+            "answer": 0,
+            "explanation": "A verified safe channel meets containment protocol and preserves ECHO-7."
+          },
+          "spare": true,
+          "boss": true
+        }
       },
       "clue": {
         "title": "ECHO-7 located",
@@ -1084,7 +1139,28 @@
         "mixedQuestions": false,
         "lessons": [
           "source-alg-00"
-        ]
+        ],
+        "tactics": {
+          "weakness": "insight",
+          "pattern": [
+            "strike",
+            "heavy",
+            "recover"
+          ],
+          "resolve": 1,
+          "act": {
+            "prompt": "The courier's route is forged. Which record proves the next hop?",
+            "options": [
+              "Present the signed record",
+              "Threaten the system",
+              "Guess and proceed"
+            ],
+            "answer": 0,
+            "explanation": "Verified route evidence satisfies the protocol and avoids harming the protected system."
+          },
+          "spare": true,
+          "boss": false
+        }
       }
     },
     {
@@ -1102,7 +1178,29 @@
         "mixedQuestions": false,
         "lessons": [
           "source-alg-01"
-        ]
+        ],
+        "tactics": {
+          "weakness": "ward",
+          "pattern": [
+            "heavy",
+            "strike",
+            "strike",
+            "recover"
+          ],
+          "resolve": 1,
+          "act": {
+            "prompt": "PATCH is trapped behind a route check. What earns safe passage?",
+            "options": [
+              "Threaten the system",
+              "Guess and proceed",
+              "Present the signed record"
+            ],
+            "answer": 2,
+            "explanation": "Verified route evidence satisfies the protocol and avoids harming the protected system."
+          },
+          "spare": true,
+          "boss": false
+        }
       }
     },
     {
@@ -1120,7 +1218,28 @@
         "mixedQuestions": false,
         "lessons": [
           "source-alg-02"
-        ]
+        ],
+        "tactics": {
+          "weakness": "insight",
+          "pattern": [
+            "strike",
+            "recover",
+            "heavy"
+          ],
+          "resolve": 1,
+          "act": {
+            "prompt": "The relay flags a cycle. What evidence should you present?",
+            "options": [
+              "Guess and proceed",
+              "Present the signed record",
+              "Threaten the system"
+            ],
+            "answer": 1,
+            "explanation": "Verified route evidence satisfies the protocol and avoids harming the protected system."
+          },
+          "spare": true,
+          "boss": false
+        }
       }
     },
     {
@@ -1138,7 +1257,29 @@
         "mixedQuestions": false,
         "lessons": [
           "source-alg-03"
-        ]
+        ],
+        "tactics": {
+          "weakness": "ward",
+          "pattern": [
+            "heavy",
+            "recover",
+            "strike",
+            "heavy"
+          ],
+          "resolve": 1,
+          "act": {
+            "prompt": "The courier's route is forged. Which record proves the next hop?",
+            "options": [
+              "Present the signed record",
+              "Threaten the system",
+              "Guess and proceed"
+            ],
+            "answer": 0,
+            "explanation": "Verified route evidence satisfies the protocol and avoids harming the protected system."
+          },
+          "spare": true,
+          "boss": false
+        }
       }
     },
     {
@@ -1156,7 +1297,28 @@
         "mixedQuestions": false,
         "lessons": [
           "source-alg-04"
-        ]
+        ],
+        "tactics": {
+          "weakness": "insight",
+          "pattern": [
+            "strike",
+            "strike",
+            "recover"
+          ],
+          "resolve": 1,
+          "act": {
+            "prompt": "PATCH is trapped behind a route check. What earns safe passage?",
+            "options": [
+              "Threaten the system",
+              "Guess and proceed",
+              "Present the signed record"
+            ],
+            "answer": 2,
+            "explanation": "Verified route evidence satisfies the protocol and avoids harming the protected system."
+          },
+          "spare": true,
+          "boss": false
+        }
       }
     },
     {
@@ -1174,7 +1336,28 @@
         "mixedQuestions": false,
         "lessons": [
           "source-alg-05"
-        ]
+        ],
+        "tactics": {
+          "weakness": "ward",
+          "pattern": [
+            "strike",
+            "heavy",
+            "recover"
+          ],
+          "resolve": 1,
+          "act": {
+            "prompt": "The relay flags a cycle. What evidence should you present?",
+            "options": [
+              "Guess and proceed",
+              "Present the signed record",
+              "Threaten the system"
+            ],
+            "answer": 1,
+            "explanation": "Verified route evidence satisfies the protocol and avoids harming the protected system."
+          },
+          "spare": true,
+          "boss": false
+        }
       }
     },
     {
@@ -1192,7 +1375,29 @@
         "mixedQuestions": false,
         "lessons": [
           "source-alg-06"
-        ]
+        ],
+        "tactics": {
+          "weakness": "insight",
+          "pattern": [
+            "heavy",
+            "strike",
+            "strike",
+            "recover"
+          ],
+          "resolve": 1,
+          "act": {
+            "prompt": "The courier's route is forged. Which record proves the next hop?",
+            "options": [
+              "Present the signed record",
+              "Threaten the system",
+              "Guess and proceed"
+            ],
+            "answer": 0,
+            "explanation": "Verified route evidence satisfies the protocol and avoids harming the protected system."
+          },
+          "spare": true,
+          "boss": false
+        }
       }
     },
     {
@@ -1210,7 +1415,28 @@
         "mixedQuestions": false,
         "lessons": [
           "source-alg-07"
-        ]
+        ],
+        "tactics": {
+          "weakness": "ward",
+          "pattern": [
+            "strike",
+            "recover",
+            "heavy"
+          ],
+          "resolve": 1,
+          "act": {
+            "prompt": "PATCH is trapped behind a route check. What earns safe passage?",
+            "options": [
+              "Threaten the system",
+              "Guess and proceed",
+              "Present the signed record"
+            ],
+            "answer": 2,
+            "explanation": "Verified route evidence satisfies the protocol and avoids harming the protected system."
+          },
+          "spare": true,
+          "boss": false
+        }
       }
     },
     {
@@ -1228,7 +1454,29 @@
         "mixedQuestions": false,
         "lessons": [
           "source-alg-08"
-        ]
+        ],
+        "tactics": {
+          "weakness": "insight",
+          "pattern": [
+            "heavy",
+            "recover",
+            "strike",
+            "heavy"
+          ],
+          "resolve": 1,
+          "act": {
+            "prompt": "The relay flags a cycle. What evidence should you present?",
+            "options": [
+              "Guess and proceed",
+              "Present the signed record",
+              "Threaten the system"
+            ],
+            "answer": 1,
+            "explanation": "Verified route evidence satisfies the protocol and avoids harming the protected system."
+          },
+          "spare": true,
+          "boss": false
+        }
       }
     },
     {
@@ -1246,7 +1494,28 @@
         "mixedQuestions": false,
         "lessons": [
           "source-alg-09"
-        ]
+        ],
+        "tactics": {
+          "weakness": "ward",
+          "pattern": [
+            "strike",
+            "strike",
+            "recover"
+          ],
+          "resolve": 1,
+          "act": {
+            "prompt": "The courier's route is forged. Which record proves the next hop?",
+            "options": [
+              "Present the signed record",
+              "Threaten the system",
+              "Guess and proceed"
+            ],
+            "answer": 0,
+            "explanation": "Verified route evidence satisfies the protocol and avoids harming the protected system."
+          },
+          "spare": true,
+          "boss": false
+        }
       }
     },
     {
@@ -1264,7 +1533,28 @@
         "mixedQuestions": false,
         "lessons": [
           "source-alg-10"
-        ]
+        ],
+        "tactics": {
+          "weakness": "insight",
+          "pattern": [
+            "strike",
+            "heavy",
+            "recover"
+          ],
+          "resolve": 1,
+          "act": {
+            "prompt": "PATCH is trapped behind a route check. What earns safe passage?",
+            "options": [
+              "Threaten the system",
+              "Guess and proceed",
+              "Present the signed record"
+            ],
+            "answer": 2,
+            "explanation": "Verified route evidence satisfies the protocol and avoids harming the protected system."
+          },
+          "spare": true,
+          "boss": false
+        }
       }
     },
     {
@@ -1292,7 +1582,28 @@
           "source-alg-08",
           "source-alg-09",
           "source-alg-10"
-        ]
+        ],
+        "tactics": {
+          "weakness": "insight",
+          "pattern": [
+            "strike",
+            "heavy",
+            "recover"
+          ],
+          "resolve": 2,
+          "act": {
+            "prompt": "The courier's route is forged. Which record proves the next hop?",
+            "options": [
+              "Present the signed record",
+              "Threaten the system",
+              "Guess and proceed"
+            ],
+            "answer": 0,
+            "explanation": "Verified route evidence satisfies the protocol and avoids harming the protected system."
+          },
+          "spare": true,
+          "boss": true
+        }
       },
       "clue": {
         "title": "PATCH's signed receipt",
@@ -1314,7 +1625,28 @@
         "mixedQuestions": false,
         "lessons": [
           "source-ds-01"
-        ]
+        ],
+        "tactics": {
+          "weakness": "insight",
+          "pattern": [
+            "strike",
+            "heavy",
+            "recover"
+          ],
+          "resolve": 1,
+          "act": {
+            "prompt": "FOLIO's identity was erased. Which record can restore the audit trail?",
+            "options": [
+              "Present the signed record",
+              "Threaten the system",
+              "Guess and proceed"
+            ],
+            "answer": 0,
+            "explanation": "Verified archive evidence satisfies the protocol and avoids harming the protected system."
+          },
+          "spare": true,
+          "boss": false
+        }
       }
     },
     {
@@ -1332,7 +1664,29 @@
         "mixedQuestions": false,
         "lessons": [
           "source-ds-02"
-        ]
+        ],
+        "tactics": {
+          "weakness": "ward",
+          "pattern": [
+            "heavy",
+            "strike",
+            "strike",
+            "recover"
+          ],
+          "resolve": 1,
+          "act": {
+            "prompt": "The archive blocks access. Which credential follows its protocol?",
+            "options": [
+              "Threaten the system",
+              "Guess and proceed",
+              "Present the signed record"
+            ],
+            "answer": 2,
+            "explanation": "Verified archive evidence satisfies the protocol and avoids harming the protected system."
+          },
+          "spare": true,
+          "boss": false
+        }
       }
     },
     {
@@ -1350,7 +1704,28 @@
         "mixedQuestions": false,
         "lessons": [
           "source-ds-03"
-        ]
+        ],
+        "tactics": {
+          "weakness": "insight",
+          "pattern": [
+            "strike",
+            "recover",
+            "heavy"
+          ],
+          "resolve": 1,
+          "act": {
+            "prompt": "A revision was altered. What evidence verifies its history?",
+            "options": [
+              "Guess and proceed",
+              "Present the signed record",
+              "Threaten the system"
+            ],
+            "answer": 1,
+            "explanation": "Verified archive evidence satisfies the protocol and avoids harming the protected system."
+          },
+          "spare": true,
+          "boss": false
+        }
       }
     },
     {
@@ -1368,7 +1743,29 @@
         "mixedQuestions": false,
         "lessons": [
           "source-ds-04"
-        ]
+        ],
+        "tactics": {
+          "weakness": "ward",
+          "pattern": [
+            "heavy",
+            "recover",
+            "strike",
+            "heavy"
+          ],
+          "resolve": 1,
+          "act": {
+            "prompt": "FOLIO's identity was erased. Which record can restore the audit trail?",
+            "options": [
+              "Present the signed record",
+              "Threaten the system",
+              "Guess and proceed"
+            ],
+            "answer": 0,
+            "explanation": "Verified archive evidence satisfies the protocol and avoids harming the protected system."
+          },
+          "spare": true,
+          "boss": false
+        }
       }
     },
     {
@@ -1386,7 +1783,28 @@
         "mixedQuestions": false,
         "lessons": [
           "source-ds-05"
-        ]
+        ],
+        "tactics": {
+          "weakness": "insight",
+          "pattern": [
+            "strike",
+            "strike",
+            "recover"
+          ],
+          "resolve": 1,
+          "act": {
+            "prompt": "The archive blocks access. Which credential follows its protocol?",
+            "options": [
+              "Threaten the system",
+              "Guess and proceed",
+              "Present the signed record"
+            ],
+            "answer": 2,
+            "explanation": "Verified archive evidence satisfies the protocol and avoids harming the protected system."
+          },
+          "spare": true,
+          "boss": false
+        }
       }
     },
     {
@@ -1404,7 +1822,28 @@
         "mixedQuestions": false,
         "lessons": [
           "source-ds-06"
-        ]
+        ],
+        "tactics": {
+          "weakness": "ward",
+          "pattern": [
+            "strike",
+            "heavy",
+            "recover"
+          ],
+          "resolve": 1,
+          "act": {
+            "prompt": "A revision was altered. What evidence verifies its history?",
+            "options": [
+              "Guess and proceed",
+              "Present the signed record",
+              "Threaten the system"
+            ],
+            "answer": 1,
+            "explanation": "Verified archive evidence satisfies the protocol and avoids harming the protected system."
+          },
+          "spare": true,
+          "boss": false
+        }
       }
     },
     {
@@ -1422,7 +1861,29 @@
         "mixedQuestions": false,
         "lessons": [
           "source-ds-07"
-        ]
+        ],
+        "tactics": {
+          "weakness": "insight",
+          "pattern": [
+            "heavy",
+            "strike",
+            "strike",
+            "recover"
+          ],
+          "resolve": 1,
+          "act": {
+            "prompt": "FOLIO's identity was erased. Which record can restore the audit trail?",
+            "options": [
+              "Present the signed record",
+              "Threaten the system",
+              "Guess and proceed"
+            ],
+            "answer": 0,
+            "explanation": "Verified archive evidence satisfies the protocol and avoids harming the protected system."
+          },
+          "spare": true,
+          "boss": false
+        }
       }
     },
     {
@@ -1440,7 +1901,28 @@
         "mixedQuestions": false,
         "lessons": [
           "source-ds-08"
-        ]
+        ],
+        "tactics": {
+          "weakness": "ward",
+          "pattern": [
+            "strike",
+            "recover",
+            "heavy"
+          ],
+          "resolve": 1,
+          "act": {
+            "prompt": "The archive blocks access. Which credential follows its protocol?",
+            "options": [
+              "Threaten the system",
+              "Guess and proceed",
+              "Present the signed record"
+            ],
+            "answer": 2,
+            "explanation": "Verified archive evidence satisfies the protocol and avoids harming the protected system."
+          },
+          "spare": true,
+          "boss": false
+        }
       }
     },
     {
@@ -1458,7 +1940,29 @@
         "mixedQuestions": false,
         "lessons": [
           "source-ds-09"
-        ]
+        ],
+        "tactics": {
+          "weakness": "insight",
+          "pattern": [
+            "heavy",
+            "recover",
+            "strike",
+            "heavy"
+          ],
+          "resolve": 1,
+          "act": {
+            "prompt": "A revision was altered. What evidence verifies its history?",
+            "options": [
+              "Guess and proceed",
+              "Present the signed record",
+              "Threaten the system"
+            ],
+            "answer": 1,
+            "explanation": "Verified archive evidence satisfies the protocol and avoids harming the protected system."
+          },
+          "spare": true,
+          "boss": false
+        }
       }
     },
     {
@@ -1476,7 +1980,28 @@
         "mixedQuestions": false,
         "lessons": [
           "source-ds-10"
-        ]
+        ],
+        "tactics": {
+          "weakness": "ward",
+          "pattern": [
+            "strike",
+            "strike",
+            "recover"
+          ],
+          "resolve": 1,
+          "act": {
+            "prompt": "FOLIO's identity was erased. Which record can restore the audit trail?",
+            "options": [
+              "Present the signed record",
+              "Threaten the system",
+              "Guess and proceed"
+            ],
+            "answer": 0,
+            "explanation": "Verified archive evidence satisfies the protocol and avoids harming the protected system."
+          },
+          "spare": true,
+          "boss": false
+        }
       }
     },
     {
@@ -1503,7 +2028,29 @@
           "source-ds-08",
           "source-ds-09",
           "source-ds-10"
-        ]
+        ],
+        "tactics": {
+          "weakness": "ward",
+          "pattern": [
+            "heavy",
+            "strike",
+            "strike",
+            "recover"
+          ],
+          "resolve": 2,
+          "act": {
+            "prompt": "The archive blocks access. Which credential follows its protocol?",
+            "options": [
+              "Threaten the system",
+              "Guess and proceed",
+              "Present the signed record"
+            ],
+            "answer": 2,
+            "explanation": "Verified archive evidence satisfies the protocol and avoids harming the protected system."
+          },
+          "spare": true,
+          "boss": true
+        }
       },
       "clue": {
         "title": "FOLIO's signed audit",
@@ -1525,7 +2072,28 @@
         "mixedQuestions": false,
         "lessons": [
           "source-ai-01"
-        ]
+        ],
+        "tactics": {
+          "weakness": "insight",
+          "pattern": [
+            "strike",
+            "heavy",
+            "recover"
+          ],
+          "resolve": 1,
+          "act": {
+            "prompt": "LUMA detects a forged signal. What test best verifies its source?",
+            "options": [
+              "Present the signed record",
+              "Threaten the system",
+              "Guess and proceed"
+            ],
+            "answer": 0,
+            "explanation": "Verified signal evidence satisfies the protocol and avoids harming the protected system."
+          },
+          "spare": true,
+          "boss": false
+        }
       }
     },
     {
@@ -1543,7 +2111,29 @@
         "mixedQuestions": false,
         "lessons": [
           "source-ai-02"
-        ]
+        ],
+        "tactics": {
+          "weakness": "ward",
+          "pattern": [
+            "heavy",
+            "strike",
+            "strike",
+            "recover"
+          ],
+          "resolve": 1,
+          "act": {
+            "prompt": "The handshake is untrusted. Which evidence establishes its origin?",
+            "options": [
+              "Threaten the system",
+              "Guess and proceed",
+              "Present the signed record"
+            ],
+            "answer": 2,
+            "explanation": "Verified signal evidence satisfies the protocol and avoids harming the protected system."
+          },
+          "spare": true,
+          "boss": false
+        }
       }
     },
     {
@@ -1561,7 +2151,28 @@
         "mixedQuestions": false,
         "lessons": [
           "source-ai-03"
-        ]
+        ],
+        "tactics": {
+          "weakness": "insight",
+          "pattern": [
+            "strike",
+            "recover",
+            "heavy"
+          ],
+          "resolve": 1,
+          "act": {
+            "prompt": "The model flags a drift. What should be checked before adapting?",
+            "options": [
+              "Guess and proceed",
+              "Present the signed record",
+              "Threaten the system"
+            ],
+            "answer": 1,
+            "explanation": "Verified signal evidence satisfies the protocol and avoids harming the protected system."
+          },
+          "spare": true,
+          "boss": false
+        }
       }
     },
     {
@@ -1579,7 +2190,29 @@
         "mixedQuestions": false,
         "lessons": [
           "source-ai-04"
-        ]
+        ],
+        "tactics": {
+          "weakness": "ward",
+          "pattern": [
+            "heavy",
+            "recover",
+            "strike",
+            "heavy"
+          ],
+          "resolve": 1,
+          "act": {
+            "prompt": "LUMA detects a forged signal. What test best verifies its source?",
+            "options": [
+              "Present the signed record",
+              "Threaten the system",
+              "Guess and proceed"
+            ],
+            "answer": 0,
+            "explanation": "Verified signal evidence satisfies the protocol and avoids harming the protected system."
+          },
+          "spare": true,
+          "boss": false
+        }
       }
     },
     {
@@ -1597,7 +2230,28 @@
         "mixedQuestions": false,
         "lessons": [
           "source-ai-05"
-        ]
+        ],
+        "tactics": {
+          "weakness": "insight",
+          "pattern": [
+            "strike",
+            "strike",
+            "recover"
+          ],
+          "resolve": 1,
+          "act": {
+            "prompt": "The handshake is untrusted. Which evidence establishes its origin?",
+            "options": [
+              "Threaten the system",
+              "Guess and proceed",
+              "Present the signed record"
+            ],
+            "answer": 2,
+            "explanation": "Verified signal evidence satisfies the protocol and avoids harming the protected system."
+          },
+          "spare": true,
+          "boss": false
+        }
       }
     },
     {
@@ -1615,7 +2269,28 @@
         "mixedQuestions": false,
         "lessons": [
           "source-ai-06"
-        ]
+        ],
+        "tactics": {
+          "weakness": "ward",
+          "pattern": [
+            "strike",
+            "heavy",
+            "recover"
+          ],
+          "resolve": 1,
+          "act": {
+            "prompt": "The model flags a drift. What should be checked before adapting?",
+            "options": [
+              "Guess and proceed",
+              "Present the signed record",
+              "Threaten the system"
+            ],
+            "answer": 1,
+            "explanation": "Verified signal evidence satisfies the protocol and avoids harming the protected system."
+          },
+          "spare": true,
+          "boss": false
+        }
       }
     },
     {
@@ -1633,7 +2308,29 @@
         "mixedQuestions": false,
         "lessons": [
           "source-ai-07"
-        ]
+        ],
+        "tactics": {
+          "weakness": "insight",
+          "pattern": [
+            "heavy",
+            "strike",
+            "strike",
+            "recover"
+          ],
+          "resolve": 1,
+          "act": {
+            "prompt": "LUMA detects a forged signal. What test best verifies its source?",
+            "options": [
+              "Present the signed record",
+              "Threaten the system",
+              "Guess and proceed"
+            ],
+            "answer": 0,
+            "explanation": "Verified signal evidence satisfies the protocol and avoids harming the protected system."
+          },
+          "spare": true,
+          "boss": false
+        }
       }
     },
     {
@@ -1651,7 +2348,28 @@
         "mixedQuestions": false,
         "lessons": [
           "source-ai-08"
-        ]
+        ],
+        "tactics": {
+          "weakness": "ward",
+          "pattern": [
+            "strike",
+            "recover",
+            "heavy"
+          ],
+          "resolve": 1,
+          "act": {
+            "prompt": "The handshake is untrusted. Which evidence establishes its origin?",
+            "options": [
+              "Threaten the system",
+              "Guess and proceed",
+              "Present the signed record"
+            ],
+            "answer": 2,
+            "explanation": "Verified signal evidence satisfies the protocol and avoids harming the protected system."
+          },
+          "spare": true,
+          "boss": false
+        }
       }
     },
     {
@@ -1669,7 +2387,29 @@
         "mixedQuestions": false,
         "lessons": [
           "source-ai-09"
-        ]
+        ],
+        "tactics": {
+          "weakness": "insight",
+          "pattern": [
+            "heavy",
+            "recover",
+            "strike",
+            "heavy"
+          ],
+          "resolve": 1,
+          "act": {
+            "prompt": "The model flags a drift. What should be checked before adapting?",
+            "options": [
+              "Guess and proceed",
+              "Present the signed record",
+              "Threaten the system"
+            ],
+            "answer": 1,
+            "explanation": "Verified signal evidence satisfies the protocol and avoids harming the protected system."
+          },
+          "spare": true,
+          "boss": false
+        }
       }
     },
     {
@@ -1687,7 +2427,28 @@
         "mixedQuestions": false,
         "lessons": [
           "source-ai-10"
-        ]
+        ],
+        "tactics": {
+          "weakness": "ward",
+          "pattern": [
+            "strike",
+            "strike",
+            "recover"
+          ],
+          "resolve": 1,
+          "act": {
+            "prompt": "LUMA detects a forged signal. What test best verifies its source?",
+            "options": [
+              "Present the signed record",
+              "Threaten the system",
+              "Guess and proceed"
+            ],
+            "answer": 0,
+            "explanation": "Verified signal evidence satisfies the protocol and avoids harming the protected system."
+          },
+          "spare": true,
+          "boss": false
+        }
       }
     },
     {
@@ -1714,7 +2475,28 @@
           "source-ai-08",
           "source-ai-09",
           "source-ai-10"
-        ]
+        ],
+        "tactics": {
+          "weakness": "insight",
+          "pattern": [
+            "strike",
+            "heavy",
+            "recover"
+          ],
+          "resolve": 2,
+          "act": {
+            "prompt": "LUMA detects a forged signal. What test best verifies its source?",
+            "options": [
+              "Present the signed record",
+              "Threaten the system",
+              "Guess and proceed"
+            ],
+            "answer": 0,
+            "explanation": "Verified signal evidence satisfies the protocol and avoids harming the protected system."
+          },
+          "spare": true,
+          "boss": true
+        }
       },
       "clue": {
         "title": "LUMA's verified handshake",

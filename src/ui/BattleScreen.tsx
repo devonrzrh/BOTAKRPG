@@ -1,6 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 import type { Content, Item, Question, Skill } from "../content/schema";
-import { enemyIntent, type Battle } from "../game/combat";
+import {
+  canSpare,
+  previewDamage,
+  enemyIntent,
+  type Battle,
+} from "../game/combat";
+import { Evade } from "./Evade";
+import "./BattleDepth.css";
 import { stats, type Save } from "../game/state";
 import { combatCueDuration, type BattleCue } from "../game/combatPresentation";
 import { XpMeter } from "./XpMeter";
@@ -24,6 +31,11 @@ interface Props {
   onSkill: (skill: Skill) => void;
   onItem: (item: Item) => void;
   onGuard: () => void;
+  onBoost: (amount: number) => void;
+  onFinisher: () => void;
+  onAct: (choice: number) => void;
+  onSpare: () => void;
+  onEvade: (collisions: number) => void;
   onSubmit: () => void;
   onHint: () => void;
   onContinue: () => void;
@@ -37,9 +49,10 @@ interface Props {
 export function BattleScreen(p: Props) {
   const { battle: b, save, question: q } = p,
     limits = stats(save, p.content);
-  const [menu, setMenu] = useState<"skills" | "items" | "inspect" | null>(
-    "skills",
-  );
+  const [menu, setMenu] = useState<
+    "skills" | "items" | "inspect" | "act" | null
+  >("skills");
+  const [evading, setEvading] = useState(false);
   const [reviewing, setReviewing] = useState(false);
   const [impact, setImpact] = useState("");
   const [motion, setMotion] = useState<BattleCue["kind"] | null>(null);
@@ -75,19 +88,29 @@ export function BattleScreen(p: Props) {
     }
     setMotion(cue.kind);
     setImpact(
-      cue.kind === "player"
-        ? `${p.content.entities.find((e) => e.id === cue.skill)?.title ?? "Hit"}`
-        : cue.kind === "poison"
-          ? "Poison"
-          : cue.kind === "miss"
-            ? "Turn spent"
-            : cue.kind === "recover"
-              ? "Opening"
-              : cue.blocked
-                ? "Guard absorbed the hit"
-                : cue.heavy
-                  ? "Heavy strike"
-                  : "Enemy strike",
+      cue.special === "limit"
+        ? "Limit release"
+        : cue.special === "pacify"
+          ? "Target stood down"
+          : cue.special === "break"
+            ? "Stance broken · response skipped"
+            : cue.special === "weakness"
+              ? "Weakness hit"
+              : cue.special === "evade"
+                ? "Dodge resolved"
+                : cue.kind === "player"
+                  ? `${p.content.entities.find((e) => e.id === cue.skill)?.title ?? "Hit"}`
+                  : cue.kind === "poison"
+                    ? "Poison"
+                    : cue.kind === "miss"
+                      ? "Turn spent"
+                      : cue.kind === "recover"
+                        ? "Opening"
+                        : cue.blocked
+                          ? "Guard absorbed the hit"
+                          : cue.heavy
+                            ? "Heavy strike"
+                            : "Enemy strike",
     );
     if (b.phase !== "choose") setMenu(null);
     const timer = setTimeout(
@@ -129,7 +152,9 @@ export function BattleScreen(p: Props) {
     </div>
   );
   const activeCard =
-    !motion && (b.phase !== "choose" || (menu && menu !== "skills"));
+    !evading &&
+    !motion &&
+    (b.phase !== "choose" || (menu && menu !== "skills"));
   const upcomingIntent = enemyIntent(b, save, p.content);
   const intent =
     motion === "enemy" && p.cue
@@ -184,6 +209,7 @@ export function BattleScreen(p: Props) {
     <div
       className={`battle-screen phase-${b.phase} ${motion ? `motion-${motion}` : ""}`}
       onKeyDown={(e) => {
+        if (evading) return;
         if (e.repeat || e.ctrlKey || e.altKey || e.metaKey) return;
         if (e.key === "Escape" && menu) {
           e.preventDefault();
@@ -226,6 +252,20 @@ export function BattleScreen(p: Props) {
       }}
     >
       <div className="battle-enemy-hud">
+        {b.tactics && b.phase !== "won" && b.phase !== "lost" && (
+          <div className="battle-stance">
+            <span>
+              {b.staggered
+                ? "BROKEN · next hit ×1.5"
+                : `Stance ${b.resolve ?? 0} / ${b.tactics.resolve}`}
+            </span>
+            <strong>
+              {b.weaknessKnown
+                ? `Weak: ${skills.find((s) => s.id === b.tactics!.weakness)?.title ?? b.tactics.weakness}`
+                : "Weakness unknown"}
+            </strong>
+          </div>
+        )}
         <h2>{b.enemyName}</h2>
         {meter("Enemy HP", b.hp, b.maxHp, "enemy")}
         {b.phase !== "won" && b.phase !== "lost" && (
@@ -235,9 +275,26 @@ export function BattleScreen(p: Props) {
               {intent.damage
                 ? `${intent.damage} damage`
                 : intent.kind === "recover"
-                  ? "+3 focus"
+                  ? b.breakFresh ||
+                    (motion === "recover" && p.cue?.special === "break")
+                    ? "Response skipped"
+                    : "+3 focus"
                   : "Poison will finish"}
             </strong>
+            {b.tactics &&
+              intent.kind === "heavy" &&
+              b.phase === "choose" &&
+              !motion &&
+              !evading && (
+                <button
+                  onClick={() => {
+                    setMenu(null);
+                    setEvading(true);
+                  }}
+                >
+                  Evade
+                </button>
+              )}
           </div>
         )}
         <div className="battle-status-effects">
@@ -250,6 +307,20 @@ export function BattleScreen(p: Props) {
             ))}
         </div>
       </div>
+      {evading && (
+        <Evade
+          seed={b.turn}
+          reducedMotion={save.settings.reducedMotion}
+          onResolve={(hits) => {
+            setEvading(false);
+            p.onEvade(hits);
+          }}
+          onCancel={() => {
+            setEvading(false);
+            p.onGuard();
+          }}
+        />
+      )}
       {motion && (
         <>
           {motion === "enemy" && !p.cue?.blocked && (
@@ -269,7 +340,11 @@ export function BattleScreen(p: Props) {
               : motion === "recover"
                 ? p.cue?.amount
                   ? `+${p.cue.amount} FP`
-                  : "OPENING"
+                  : p.cue?.special === "break"
+                    ? "BREAK"
+                    : p.cue?.special === "pacify"
+                      ? "STAND DOWN"
+                      : "OPENING"
                 : `${p.cue?.blocked ? "BLOCK " : ""}−${p.cue?.amount ?? 0}`}
           </div>
           <div className="battle-impact" role="status">
@@ -295,7 +370,9 @@ export function BattleScreen(p: Props) {
                     ? "Skills"
                     : menu === "items"
                       ? "Items"
-                      : "Inspect"}
+                      : menu === "act"
+                        ? "ACT"
+                        : "Inspect"}
                 </h2>
                 <button onClick={() => setMenu("skills")}>Back</button>
               </header>
@@ -353,6 +430,46 @@ export function BattleScreen(p: Props) {
                   </div>
                 </>
               )}
+              {menu === "act" && b.tactics && (
+                <div className="battle-act-options">
+                  <p>
+                    {b.analyzed
+                      ? b.tactics.act.explanation
+                      : b.tactics.act.prompt}
+                  </p>
+                  {!b.analyzed && (
+                    <>
+                      <p>
+                        ACT spends a turn. A successful read reveals the
+                        weakness.
+                      </p>
+                      {b.tactics.act.options.map((option, index) => (
+                        <button key={index} onClick={() => p.onAct(index)}>
+                          {option}
+                        </button>
+                      ))}
+                    </>
+                  )}
+                  {b.analyzed && b.tactics.spare && (
+                    <>
+                      <button
+                        className="primary"
+                        disabled={!canSpare(b)}
+                        onClick={p.onSpare}
+                      >
+                        Stand down
+                      </button>
+                      {!canSpare(b) && (
+                        <p>
+                          Land {b.tactics.boss ? 3 : 1} correct attacks and
+                          reduce enemy HP below {b.tactics.boss ? 35 : 65}%. (
+                          {b.correctAnswers ?? 0} correct)
+                        </p>
+                      )}
+                    </>
+                  )}
+                </div>
+              )}
               {menu === "inspect" && (
                 <>
                   <p>
@@ -362,6 +479,8 @@ export function BattleScreen(p: Props) {
                     Guard reduces the next hit and restores 4 focus. A wrong
                     answer spends the turn. Shield and weaken reduce incoming
                     damage; poison damages the enemy.
+                    {b.tactics &&
+                      " Weakness hits break stance, skipping one response and strengthening your next hit. Correct answers and Guard bank Boost; each spent point adds 25% damage. Limit builds from correct answers and taking hits. ACT can reveal a peaceful resolution."}
                   </p>
                   <div
                     className="battle-recent-log"
@@ -410,7 +529,9 @@ export function BattleScreen(p: Props) {
                   disabled={!answerReady}
                   onClick={p.onSubmit}
                 >
-                  Use {skills.find((s) => s.id === b.skill)?.title ?? "skill"}{" "}
+                  {b.finisher
+                    ? "Release Limit"
+                    : `Use ${skills.find((s) => s.id === b.skill)?.title ?? "skill"}`}{" "}
                   <kbd>Enter</kbd>
                 </button>
                 <button onClick={p.onHint}>Hint · no mastery credit</button>
@@ -451,9 +572,11 @@ export function BattleScreen(p: Props) {
           {b.phase === "won" && (
             <>
               <h2 ref={title} tabIndex={-1}>
-                {b.enemyId === "echo-7"
-                  ? "ECHO-7 contained"
-                  : `${b.enemyName} defeated`}
+                {b.resolution === "pacified"
+                  ? `${b.enemyName} stood down`
+                  : b.enemyId === "echo-7"
+                    ? "ECHO-7 contained"
+                    : `${b.enemyName} defeated`}
               </h2>
               <div className="battle-xp-reward">
                 <strong role="status">
@@ -533,8 +656,33 @@ export function BattleScreen(p: Props) {
             ))}
         </div>
       </div>
-      {b.phase === "choose" && !motion && menu === "skills" && (
+      {b.phase === "choose" && !motion && !evading && menu === "skills" && (
         <div className="battle-skill-tray" aria-label="Available skills">
+          {b.tactics && (
+            <div className="battle-special-actions">
+              <button onClick={() => setMenu("act")}>
+                {canSpare(b) ? "ACT · Stand down" : "ACT"}
+              </button>
+              <button
+                disabled={!b.boost}
+                aria-label={`Boost ${b.boostSpend ?? 0} of ${b.boost ?? 0}`}
+                onClick={() =>
+                  p.onBoost(((b.boostSpend ?? 0) + 1) % ((b.boost ?? 0) + 1))
+                }
+                title="Cycle stored Boost. Each point adds 25% damage to your next skill."
+              >
+                Boost {b.boostSpend ?? 0} / {b.boost ?? 0}
+              </button>
+              <button
+                className={b.limit === 100 ? "limit-ready" : ""}
+                disabled={b.limit !== 100}
+                onClick={p.onFinisher}
+                title="At 100%, answer correctly for a triple-power Probe."
+              >
+                Limit {b.limit ?? 0}%
+              </button>
+            </div>
+          )}
           {skills.map((s, index) => (
             <button
               key={s.id}
@@ -549,7 +697,10 @@ export function BattleScreen(p: Props) {
                 <span>{s.cost ? `${s.cost} FP` : "Free"}</span>
               </span>
               <span className="battle-skill-detail">
-                {limits.attack + s.power} damage
+                {previewDamage(b, save, s, p.content)} damage
+                {b.weaknessKnown && b.tactics?.weakness === s.id
+                  ? " · WEAK"
+                  : ""}
                 {s.effect ? ` · ${s.effect}` : ""}
               </span>
             </button>
@@ -562,7 +713,7 @@ export function BattleScreen(p: Props) {
           <button
             key={id}
             aria-expanded={b.phase === "choose" && menu === id}
-            disabled={b.phase !== "choose" || !!motion}
+            disabled={b.phase !== "choose" || !!motion || evading}
             onClick={() => setMenu(menu === id ? null : id)}
           >
             {id === "skills" ? (
@@ -576,14 +727,14 @@ export function BattleScreen(p: Props) {
           </button>
         ))}
         <button
-          disabled={b.phase !== "choose" || !!motion}
+          disabled={b.phase !== "choose" || !!motion || evading}
           onClick={p.onGuard}
           title="Reduce the incoming hit by 70% and restore 4 focus. Spends a turn; no question."
         >
           <ShieldCheck size={22} aria-hidden="true" />
           Guard <span>+4 FP</span>
         </button>
-        <button disabled={!!motion} onClick={p.onRetreat}>
+        <button disabled={!!motion || evading} onClick={p.onRetreat}>
           <LogOut size={22} aria-hidden="true" />
           Retreat
         </button>

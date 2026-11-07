@@ -95,6 +95,25 @@ enemy:
   hp: 105
   attack: 10
   mixedQuestions: true
+  tactics:
+    weakness: ward
+    pattern:
+      - heavy
+      - strike
+      - recover
+      - heavy
+      - strike
+    resolve: 2
+    act:
+      prompt: ECHO-7 cites containment protocol. What allows a peaceful surrender?
+      options:
+        - Offer verified containment and a safe channel
+        - Threaten deletion
+        - Demand a guessed password
+      answer: 0
+      explanation: A verified safe channel meets containment protocol and preserves ECHO-7.
+    spare: true
+    boss: true
 clue:
   title: ECHO-7 located
   text: The robot has been contained in the abandoned subnet. Case closed.

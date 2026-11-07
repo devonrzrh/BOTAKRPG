@@ -135,7 +135,7 @@ export function attachBattleEffects(
   function begin(cue: BattleCue): void {
     if (reduced) return;
     const color =
-      cue.kind === "poison"
+      cue.special === "limit" ? colors.amber : cue.special === "break" ? colors.red : cue.kind === "poison"
         ? colors.green
         : cue.skill === "insight"
           ? colors.cyan
@@ -192,12 +192,13 @@ export function attachBattleEffects(
         const flight = t / contact;
         projectile.mesh.isVisible = true;
         projectile.mesh.position.set(5, 0.8 + flight * 0.8, -3 + flight * 6.5);
-        projectile.mesh.scaling.setAll(0.8 + flight * 0.55);
+        projectile.mesh.scaling.setAll((0.8 + flight * 0.55) * (cue.special === "limit" ? 2 : 1));
       } else projectile.mesh.isVisible = false;
       if (cue.skill === "insight") {
         beam.mesh.isVisible = t <= contact;
         beam.mesh.position.set(5, 1.2, 0.25);
         beam.mesh.scaling.z = 1 + Math.min(1, t / contact) * 5.5;
+        beam.mesh.scaling.x = beam.mesh.scaling.y = cue.special === "limit" ? 3 : 1;
       }
       const impact =
         t >= contact
@@ -206,7 +207,7 @@ export function attachBattleEffects(
       if (cue.amount > 0) {
         ring.mesh.isVisible = impact > 0;
         ring.mesh.position.set(5, 1.6, 3.5);
-        ring.mesh.scaling.setAll(0.45 + (t - contact) * 1.7);
+        ring.mesh.scaling.setAll((0.45 + (t - contact) * 1.7) * (cue.special === "limit" ? 1.8 : 1));
         ring.material.alpha = 0.85 * impact;
         sparks.forEach((s, i) => {
           s.mesh.isVisible = t >= contact && t < contact + 0.45;

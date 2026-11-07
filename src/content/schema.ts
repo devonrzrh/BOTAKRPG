@@ -2,6 +2,22 @@ import { z } from "zod";
 const id = z.string().regex(/^[a-z][a-z0-9-]*$/);
 const base = { id, title: z.string().min(1) };
 const effectId = z.enum(["shield", "poison", "weaken"]);
+export const combatTacticsSchema = z.object({
+  weakness: z.enum(["insight", "ward", "trace", "simplify"]),
+  pattern: z
+    .array(z.enum(["strike", "heavy", "recover"]))
+    .min(2)
+    .max(6),
+  resolve: z.number().int().min(1).max(4),
+  act: z.object({
+    prompt: z.string().min(1),
+    options: z.array(z.string().min(1)).min(2).max(4),
+    answer: z.number().int().nonnegative(),
+    explanation: z.string().min(1),
+  }),
+  spare: z.boolean(),
+  boss: z.boolean(),
+});
 export const lessonSchema = z.object({
   ...base,
   type: z.literal("lesson"),
@@ -60,6 +76,7 @@ export const activitySchema = z.object({
       attack: z.number().int().positive(),
       mixedQuestions: z.boolean().default(false),
       lessons: z.array(id).min(1).optional(),
+      tactics: combatTacticsSchema.optional(),
     })
     .optional(),
   clue: z
@@ -166,6 +183,7 @@ export type Quest = z.infer<typeof questSchema>;
 export type Content = z.infer<typeof contentSchema>;
 export type Story = z.infer<typeof storySchema>;
 export type Dialogue = z.infer<typeof dialogueSchema>;
+export type CombatTactics = z.infer<typeof combatTacticsSchema>;
 
 export function validateContent(input: unknown): Content {
   const content = contentSchema.parse(input);
@@ -245,6 +263,14 @@ export function validateContent(input: unknown): Content {
       entity.enemy.lessons.forEach((lesson) =>
         ref(entity.id, lesson, "lesson"),
       );
+    if (entity.type === "activity" && entity.enemy?.tactics) {
+      const { tactics } = entity.enemy;
+      if (tactics.act.answer >= tactics.act.options.length)
+        throw new Error(
+          `${entity.id}: combat act answer index is out of range`,
+        );
+      ref(entity.id, tactics.weakness, "skill");
+    }
     if (entity.type === "question") {
       if (
         entity.answer.some((x) => x >= entity.options.length) ||

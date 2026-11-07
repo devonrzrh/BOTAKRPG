@@ -1,4 +1,12 @@
-import type { Content, Effect, Item, Question, Skill } from "../content/schema";
+import type {
+  CombatTactics,
+  Content,
+  Effect,
+  Item,
+  Question,
+  Skill,
+} from "../content/schema";
+export type { CombatTactics } from "../content/schema";
 import { stats, type Save } from "./state";
 export interface ActiveEffect {
   id: "shield" | "poison" | "weaken";
@@ -21,6 +29,19 @@ export interface Battle {
   log: string[];
   assisted: boolean;
   guarding?: boolean;
+  tactics?: CombatTactics;
+  resolve?: number;
+  staggered?: boolean;
+  breakFresh?: boolean;
+  boost?: number;
+  boostSpend?: number;
+  limit?: number;
+  correctAnswers?: number;
+  analyzed?: boolean;
+  weaknessKnown?: boolean;
+  resolution?: "defeated" | "pacified";
+  finisher?: boolean;
+  evasion?: number;
 }
 export function createBattle(
   enemy: {
@@ -30,6 +51,7 @@ export function createBattle(
     attack: number;
     mixedQuestions: boolean;
     lessons?: string[];
+    tactics?: CombatTactics;
   } = {
     id: "sentinel",
     title: "Sentinel A-03",
@@ -53,7 +75,69 @@ export function createBattle(
     effects: [],
     log: [`${enemy.title} encounter started.`],
     assisted: false,
+    ...(enemy.tactics
+      ? {
+          tactics: enemy.tactics,
+          resolve: 0,
+          staggered: false,
+          breakFresh: false,
+          boost: 0,
+          boostSpend: 0,
+          limit: 0,
+          correctAnswers: 0,
+          analyzed: false,
+          weaknessKnown: false,
+        }
+      : {}),
   };
+}
+export function selectBoost(battle: Battle, amount: number): Battle {
+  if (
+    !battle.tactics ||
+    battle.phase !== "choose" ||
+    !Number.isInteger(amount) ||
+    amount < 0 ||
+    amount > 3 ||
+    amount > (battle.boost ?? 0)
+  )
+    throw new Error("Boost unavailable");
+  return { ...battle, boostSpend: amount };
+}
+export function previewDamage(
+  battle: Battle,
+  save: Save,
+  skill: Skill,
+  content: Content,
+): number {
+  let damage = stats(save, content).attack + skill.power;
+  damage = Math.floor(damage * (1 + 0.25 * (battle.boostSpend ?? 0)));
+  if (battle.finisher && skill.id === "insight") damage *= 3;
+  if (battle.staggered) damage = Math.floor(damage * 1.5);
+  return damage;
+}
+export function selectFinisher(
+  battle: Battle,
+  save: Save,
+  questions: Question[],
+): Battle {
+  if (
+    !battle.tactics ||
+    battle.phase !== "choose" ||
+    battle.limit !== 100 ||
+    !save.character.skills.includes("insight")
+  )
+    throw new Error("Finisher unavailable");
+  const base: Skill = {
+    type: "skill",
+    id: "insight",
+    title: "Limit release",
+    description: "",
+    level: 1,
+    power: 5,
+    cost: 0,
+    lesson: battle.lessons?.[0] ?? "stacks-queues",
+  };
+  return { ...selectSkill(battle, save, base, questions), finisher: true };
 }
 export function selectSkill(
   battle: Battle,
@@ -117,7 +201,31 @@ export function answerBattle(
     player = structuredClone(save);
   player.character.focus -= skill.cost;
   if (correct) {
-    const damage = stats(save, content).attack + skill.power;
+    let damage = stats(save, content).attack + skill.power;
+    const spends = next.tactics ? (next.boostSpend ?? 0) : 0;
+    damage = Math.floor(damage * (1 + 0.25 * spends));
+    if (next.tactics && next.finisher) damage *= 3;
+    const consumedStagger = Boolean(next.tactics && next.staggered);
+    if (consumedStagger) {
+      damage = Math.floor(damage * 1.5);
+      next.staggered = false;
+      next.resolve = 0;
+    }
+    const matching = Boolean(
+      next.tactics && skill.id === next.tactics.weakness,
+    );
+    if (next.tactics) {
+      next.correctAnswers = (next.correctAnswers ?? 0) + 1;
+      next.limit = Math.min(100, (next.limit ?? 0) + 20 + (matching ? 10 : 0));
+      if (matching) next.weaknessKnown = true;
+      if (!consumedStagger && !next.staggered && matching) {
+        next.resolve = (next.resolve ?? 0) + 1;
+        if (next.resolve >= next.tactics.resolve) {
+          next.staggered = true;
+          next.breakFresh = true;
+        }
+      }
+    }
     next.hp = Math.max(0, next.hp - damage);
     next.log.push(`${skill.title} deals ${damage} damage.`);
     if (skill.effect) {
@@ -131,9 +239,22 @@ export function answerBattle(
         magnitude: def.magnitude,
       });
     }
-  } else next.log.push("Incorrect answer. Turn spent.");
+  } else {
+    next.log.push("Incorrect answer. Turn spent.");
+  }
+  if (next.tactics) {
+    next.boost = Math.min(
+      3,
+      Math.max(0, (next.boost ?? 0) - (next.boostSpend ?? 0)) +
+        (correct ? 1 : 0),
+    );
+    next.boostSpend = 0;
+    if (next.finisher) next.limit = 0;
+    next.finisher = false;
+  }
   next.log.push(question.explanation);
   next.phase = next.hp === 0 ? "won" : "feedback";
+  if (next.tactics && next.hp === 0) next.resolution = "defeated";
   return { battle: next, save: player, correct };
 }
 export function enemyTurn(
@@ -154,8 +275,25 @@ export function enemyTurn(
     next.guarding = false;
     return { battle: next, save: player };
   }
+  if (next.tactics && next.breakFresh) {
+    next.breakFresh = false;
+    next.log.push(`${battle.enemyName} is Broken and loses its response.`);
+    next.effects = next.effects
+      .map((e) => ({ ...e, remaining: e.remaining - 1 }))
+      .filter((e) => e.remaining > 0);
+    next.turn++;
+    next.phase = "choose";
+    next.guarding = false;
+    next.skill = null;
+    next.question = null;
+    next.evasion = undefined;
+    return { battle: next, save: player };
+  }
   const intent = enemyIntent(battle, player, content);
-  const incoming = intent.damage;
+  const incoming = Math.max(
+    0,
+    Math.floor(intent.damage * (1 - (next.evasion ?? 0))),
+  );
   if (intent.kind === "recover") {
     player.character.focus = Math.min(
       stats(player, content).maxFocus,
@@ -164,6 +302,8 @@ export function enemyTurn(
     next.log.push(`${battle.enemyName} pauses. You recover 3 focus.`);
   } else {
     player.character.hp = Math.max(0, player.character.hp - incoming);
+    if (next.tactics)
+      next.limit = Math.min(100, (next.limit ?? 0) + (incoming > 0 ? 10 : 0));
     next.log.push(
       `${battle.enemyName} ${intent.kind === "heavy" ? "unleashes a heavy strike" : "strikes"} for ${incoming} damage.`,
     );
@@ -176,6 +316,7 @@ export function enemyTurn(
   next.guarding = false;
   next.skill = null;
   next.question = null;
+  next.evasion = undefined;
   return { battle: next, save: player };
 }
 
@@ -192,7 +333,17 @@ export function enemyIntent(
   save: Save,
   content: Content,
 ): EnemyIntent {
-  const kind = (["strike", "heavy", "recover"] as const)[(battle.turn - 1) % 3];
+  if (battle.tactics && battle.breakFresh)
+    return {
+      kind: "recover",
+      label: "Broken",
+      description: "The enemy loses this response.",
+      damage: 0,
+    };
+  const kind =
+    battle.tactics?.pattern[
+      (battle.turn - 1) % battle.tactics.pattern.length
+    ] ?? (["strike", "heavy", "recover"] as const)[(battle.turn - 1) % 3];
   const poisonedToDeath =
     battle.effects.some((e) => e.id === "poison") &&
     battle.effects.find((e) => e.id === "poison")!.magnitude >= battle.hp;
@@ -214,7 +365,7 @@ export function enemyIntent(
   return {
     kind,
     label: kind === "heavy" ? "Heavy Strike" : "Strike",
-    description: `${battle.enemyName} will ${kind === "heavy" ? "unleash a heavy strike" : "strike"} for ${damage} damage.`,
+    description: `${battle.enemyName} will ${kind === "heavy" ? "unleash a heavy strike" : "strike"} for ${damage} damage${battle.guarding ? " (guarding)" : ""}${battle.evasion !== undefined ? ` (${Math.round(battle.evasion * 100)}% evasion)` : ""}.`,
     damage,
   };
 }
@@ -233,11 +384,94 @@ export function guardTurn(
     log: [...battle.log, "You brace for the incoming attack."],
   };
   const player = structuredClone(save);
+  if (battle.tactics) guarded.boost = Math.min(3, (battle.boost ?? 0) + 1);
   player.character.focus = Math.min(
     stats(save, content).maxFocus,
     player.character.focus + 4,
   );
   return enemyTurn(guarded, player, content);
+}
+export function analyzeBattle(
+  battle: Battle,
+  save: Save,
+  content: Content,
+  choice: number,
+): { battle: Battle; save: Save; correct: boolean } {
+  if (!battle.tactics || battle.phase !== "choose" || battle.analyzed)
+    throw new Error("Analysis unavailable");
+  const act = battle.tactics.act;
+  if (!Number.isInteger(choice) || choice < 0 || choice >= act.options.length)
+    throw new Error("Invalid analysis choice");
+  const correct = choice === act.answer;
+  const analyzed = {
+    ...battle,
+    phase: "feedback" as const,
+    analyzed: correct,
+    weaknessKnown: battle.weaknessKnown || correct,
+    limit: Math.min(100, (battle.limit ?? 0) + (correct ? 20 : 0)),
+    log: [
+      ...battle.log,
+      correct
+        ? `Analysis reveals ${act.prompt}`
+        : "Analysis failed. Turn spent.",
+      act.explanation,
+    ],
+  };
+  return { ...enemyTurn(analyzed, save, content), correct };
+}
+export function canSpare(battle: Battle): boolean {
+  return Boolean(
+    battle.tactics?.spare &&
+    battle.analyzed &&
+    (battle.correctAnswers ?? 0) >= (battle.tactics.boss ? 3 : 1) &&
+    battle.phase === "choose" &&
+    battle.hp <= battle.maxHp * (battle.tactics.boss ? 0.35 : 0.65),
+  );
+}
+export function spareBattle(
+  battle: Battle,
+  save: Save,
+): { battle: Battle; save: Save } {
+  if (!canSpare(battle)) throw new Error("Cannot spare this enemy");
+  return {
+    battle: {
+      ...battle,
+      phase: "won",
+      resolution: "pacified",
+      log: [...battle.log, `${battle.enemyName} powers down peacefully.`],
+    },
+    save,
+  };
+}
+export function evadeTurn(
+  battle: Battle,
+  save: Save,
+  content: Content,
+  collisions: number,
+): { battle: Battle; save: Save } {
+  if (
+    battle.phase !== "choose" ||
+    !battle.tactics ||
+    !Number.isInteger(collisions) ||
+    collisions < 0 ||
+    collisions > 3 ||
+    enemyIntent(battle, save, content).kind !== "heavy"
+  )
+    throw new Error("Evade unavailable");
+  const fraction = [0.8, 0.6, 0.3, 0][collisions];
+  return enemyTurn(
+    {
+      ...battle,
+      phase: "feedback",
+      evasion: fraction,
+      log: [
+        ...battle.log,
+        `Evade attempt: ${Math.round(fraction * 100)}% reduction.`,
+      ],
+    },
+    save,
+    content,
+  );
 }
 export function useItem(
   battle: Battle,

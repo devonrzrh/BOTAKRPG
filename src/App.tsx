@@ -105,6 +105,12 @@ import {
   answerBattle,
   enemyTurn,
   guardTurn,
+  selectBoost,
+  selectFinisher,
+  analyzeBattle,
+  canSpare,
+  spareBattle,
+  evadeTurn,
   selectSkill,
   useItem,
   type Battle,
@@ -125,7 +131,16 @@ const Garden = lazy(() =>
 const content = validateContent(rawContent);
 const createMaze = activityTemplates.maze.create;
 const mazeCommand = activityTemplates.maze.command;
-const createBattle = activityTemplates.battle.create;
+const createBattle = (
+  enemy?: Parameters<typeof activityTemplates.battle.create>[0],
+) => {
+  const guardian = content.entities.find(
+    (e) => e.type === "activity" && e.id === "guardian-battle",
+  );
+  return activityTemplates.battle.create(
+    enemy ?? (guardian?.type === "activity" ? guardian.enemy : undefined),
+  );
+};
 const initialSeed = content.entities.find(
   (e) => e.type === "activity" && e.template === "maze",
 );
@@ -719,7 +734,7 @@ export default function App() {
   const applyBattle = (
     nextBattle: Battle,
     nextSave: Save,
-    cause?: "guard" | "item",
+    cause?: "guard" | "item" | "act" | "evade",
   ) => {
     const cue = battleCue(
       battleRef.current,
@@ -1632,6 +1647,67 @@ export default function App() {
                         content,
                       );
                       applyBattle(result.battle, result.save, "guard");
+                    } catch (e) {
+                      notify(String(e));
+                    }
+                  }}
+                  onBoost={(amount) => {
+                    if (battleRef.current !== battle) return;
+                    try {
+                      const next = selectBoost(battle, amount);
+                      battleRef.current = next;
+                      setBattle(next);
+                    } catch (e) {
+                      notify(String(e));
+                    }
+                  }}
+                  onFinisher={() => {
+                    if (battleRef.current !== battle) return;
+                    try {
+                      const next = selectFinisher(
+                        battle,
+                        saveRef.current,
+                        questions,
+                      );
+                      battleRef.current = next;
+                      setBattle(next);
+                      setAnswer([]);
+                      setBattleNotice("");
+                    } catch (e) {
+                      notify(String(e));
+                    }
+                  }}
+                  onAct={(choice) => {
+                    if (battleRef.current !== battle) return;
+                    try {
+                      const result = analyzeBattle(
+                        battle,
+                        saveRef.current,
+                        content,
+                        choice,
+                      );
+                      applyBattle(result.battle, result.save, "act");
+                      notify(battle.tactics!.act.explanation);
+                    } catch (e) {
+                      notify(String(e));
+                    }
+                  }}
+                  onSpare={() => {
+                    if (battleRef.current !== battle || !canSpare(battle))
+                      return;
+                    const result = spareBattle(battle, saveRef.current);
+                    applyBattle(result.battle, result.save);
+                  }}
+                  onEvade={(collisions) => {
+                    if (battleRef.current !== battle) return;
+                    try {
+                      const result = evadeTurn(
+                        battle,
+                        saveRef.current,
+                        content,
+                        collisions,
+                      );
+                      applyBattle(result.battle, result.save, "evade");
                     } catch (e) {
                       notify(String(e));
                     }

@@ -215,3 +215,10 @@ Ten-second captures began in Settings and continued through maze opening, Python
 The measured difference is too small to establish a performance advantage. Capture statistics aggregate individual frame intervals. Rendering stayed responsive while Python executed in its worker.
 
 ![Battle layout](screenshots/battle.jpg)
+## Expanded combat checks
+
+117 tests pass. Coverage includes authored tactics on all 36 encounters, invalid ACT answers and missing weakness references, one-response breaks, stagger consumption, Boost spending and caps, Limit question pools and damage, stand-down gates, deterministic dodge simulation, and accurate visual cues.
+
+Browser verification at 1280 × 720: ACT revealed ECHO-7's weakness; Guard banked Boost; selecting Boost updated damage previews; two matching hits broke stance and skipped the response; a charged Limit attack won without duplicate practice XP. The timed dodge completed and reduced incoming damage. Forced WebGL2 rendered correctly, and reduced motion offered an immediate assisted dodge. Automatic rendering and motion preferences were restored afterward. Peaceful completion gates are verified by model tests; that route was not played through in this browser pass.
+
+![Combat depth](screenshots/combat-depth.png)

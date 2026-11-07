@@ -1,0 +1,143 @@
+.evade {
+  width: min(100%, 620px);
+  margin: 0 auto;
+  padding: 22px;
+  color: #d8e2e5;
+  background: #10191f;
+  border: 1px solid #3c505a;
+  border-radius: 8px;
+  font:
+    18px/1.45 ui-monospace,
+    SFMono-Regular,
+    Consolas,
+    monospace;
+}
+.evade button {
+  min-height: 46px;
+  padding: 9px 16px;
+  border: 1px solid #627781;
+  border-radius: 5px;
+  background: #1c2b33;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+.evade button:hover,
+.evade button:focus-visible,
+.evade-arena:focus-visible {
+  outline: 3px solid #71d9e5;
+  outline-offset: 3px;
+}
+.evade-intro {
+  text-align: center;
+}
+.evade-intro p {
+  margin: 4px 0 22px;
+}
+.evade-actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.evade .evade-primary {
+  border-color: #66c9d5;
+  background: #17434a;
+}
+.evade-status {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 9px;
+  font-size: 16px;
+  letter-spacing: 0.04em;
+}
+.evade-track {
+  height: 5px;
+  margin-bottom: 12px;
+  overflow: hidden;
+  background: #2a3b43;
+}
+.evade-track span {
+  display: block;
+  width: 100%;
+  height: 100%;
+  transform-origin: left;
+  background: #71d9e5;
+}
+.evade-arena {
+  display: block;
+  width: 100%;
+  border: 1px solid #3c505a;
+  border-radius: 5px;
+  touch-action: none;
+}
+.evade-player-line {
+  stroke: #7bb7bd;
+  stroke-width: 1;
+  stroke-dasharray: 5 5;
+  opacity: 0.55;
+}
+.evade-hazard line {
+  stroke: #e08b63;
+  stroke-width: 1;
+  stroke-dasharray: 3 5;
+  opacity: 0.65;
+}
+.evade-hazard path {
+  fill: #ffb17e;
+  stroke: #ffe0bf;
+  stroke-width: 1.5;
+  filter: drop-shadow(0 0 4px #fa855a);
+}
+.evade-hazard.resolved {
+  opacity: 0.22;
+}
+.evade-player {
+  fill: #50d9e8;
+  stroke: #c5fbff;
+  stroke-width: 2;
+  filter: drop-shadow(0 0 7px #50d9e8);
+}
+.evade-player-core {
+  fill: #10242b;
+}
+.evade-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 12px;
+}
+.evade-controls span {
+  color: #a9bbc1;
+  font-size: 16px;
+  text-align: center;
+}
+.evade .evade-guard {
+  display: block;
+  min-height: 40px;
+  margin: 10px auto 0;
+  padding-block: 5px;
+  color: #c0cccf;
+  font-size: 16px;
+}
+@media (max-width: 480px) {
+  .evade {
+    padding: 14px;
+  }
+  .evade-controls {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .evade-controls span {
+    order: 1;
+    flex-basis: 100%;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .evade *,
+  .evade *::before,
+  .evade *::after {
+    scroll-behavior: auto !important;
+  }
+}

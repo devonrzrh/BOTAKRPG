@@ -4,7 +4,7 @@ The first revamp targets repeated inputs and unreadable consequences. A normal c
 
 ## Tactics
 
-Enemies share a deterministic three-turn pattern for this foundation:
+Enemies use individually authored deterministic patterns composed of these actions:
 
 | Intent | Resolution |
 | --- | --- |
@@ -22,9 +22,9 @@ The enemy HP remains centered above the enemy. Intent sits beside it, the quiz s
 
 Victory retains its XP and level summary. It does not auto-advance into another encounter. Quest rewards and practice XP rules are unchanged. Stale rendered callbacks are rejected so repeated clicks cannot resolve the same turn twice.
 
-## Further design work
+## Combat depth
 
-Individual enemy patterns, boss phase changes and sound can build on these intent and action interfaces. Enemies currently share the pattern above; their chapter question pools and existing combat effects remain distinct content.
+All 36 authored encounters have weakness, stance, ACT, and attack-pattern profiles. [Combat mechanics](combat-mechanics.md) documents Boost, Limit release, stand-down requirements, and optional heavy-attack dodging. Chapter question pools and first-completion rewards remain in force. Boss phase changes and sound remain future work.
 
 ## Attack presentation
 

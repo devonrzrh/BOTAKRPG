@@ -568,6 +568,24 @@ enemy:
   mixedQuestions: false
   lessons:
     - source-alg-00
+  tactics:
+    weakness: insight
+    pattern:
+      - strike
+      - heavy
+      - recover
+    resolve: 1
+    act:
+      prompt: The courier's route is forged. Which record proves the next hop?
+      options:
+        - Present the signed record
+        - Threaten the system
+        - Guess and proceed
+      answer: 0
+      explanation: Verified route evidence satisfies the protocol and avoids harming
+        the protected system.
+    spare: true
+    boss: false
 ```
 
 ```entity
@@ -584,6 +602,25 @@ enemy:
   mixedQuestions: false
   lessons:
     - source-alg-01
+  tactics:
+    weakness: ward
+    pattern:
+      - heavy
+      - strike
+      - strike
+      - recover
+    resolve: 1
+    act:
+      prompt: PATCH is trapped behind a route check. What earns safe passage?
+      options:
+        - Threaten the system
+        - Guess and proceed
+        - Present the signed record
+      answer: 2
+      explanation: Verified route evidence satisfies the protocol and avoids harming
+        the protected system.
+    spare: true
+    boss: false
 ```
 
 ```entity
@@ -600,6 +637,24 @@ enemy:
   mixedQuestions: false
   lessons:
     - source-alg-02
+  tactics:
+    weakness: insight
+    pattern:
+      - strike
+      - recover
+      - heavy
+    resolve: 1
+    act:
+      prompt: The relay flags a cycle. What evidence should you present?
+      options:
+        - Guess and proceed
+        - Present the signed record
+        - Threaten the system
+      answer: 1
+      explanation: Verified route evidence satisfies the protocol and avoids harming
+        the protected system.
+    spare: true
+    boss: false
 ```
 
 ```entity
@@ -616,6 +671,25 @@ enemy:
   mixedQuestions: false
   lessons:
     - source-alg-03
+  tactics:
+    weakness: ward
+    pattern:
+      - heavy
+      - recover
+      - strike
+      - heavy
+    resolve: 1
+    act:
+      prompt: The courier's route is forged. Which record proves the next hop?
+      options:
+        - Present the signed record
+        - Threaten the system
+        - Guess and proceed
+      answer: 0
+      explanation: Verified route evidence satisfies the protocol and avoids harming
+        the protected system.
+    spare: true
+    boss: false
 ```
 
 ```entity
@@ -632,6 +706,24 @@ enemy:
   mixedQuestions: false
   lessons:
     - source-alg-04
+  tactics:
+    weakness: insight
+    pattern:
+      - strike
+      - strike
+      - recover
+    resolve: 1
+    act:
+      prompt: PATCH is trapped behind a route check. What earns safe passage?
+      options:
+        - Threaten the system
+        - Guess and proceed
+        - Present the signed record
+      answer: 2
+      explanation: Verified route evidence satisfies the protocol and avoids harming
+        the protected system.
+    spare: true
+    boss: false
 ```
 
 ```entity
@@ -648,6 +740,24 @@ enemy:
   mixedQuestions: false
   lessons:
     - source-alg-05
+  tactics:
+    weakness: ward
+    pattern:
+      - strike
+      - heavy
+      - recover
+    resolve: 1
+    act:
+      prompt: The relay flags a cycle. What evidence should you present?
+      options:
+        - Guess and proceed
+        - Present the signed record
+        - Threaten the system
+      answer: 1
+      explanation: Verified route evidence satisfies the protocol and avoids harming
+        the protected system.
+    spare: true
+    boss: false
 ```
 
 ```entity
@@ -664,6 +774,25 @@ enemy:
   mixedQuestions: false
   lessons:
     - source-alg-06
+  tactics:
+    weakness: insight
+    pattern:
+      - heavy
+      - strike
+      - strike
+      - recover
+    resolve: 1
+    act:
+      prompt: The courier's route is forged. Which record proves the next hop?
+      options:
+        - Present the signed record
+        - Threaten the system
+        - Guess and proceed
+      answer: 0
+      explanation: Verified route evidence satisfies the protocol and avoids harming
+        the protected system.
+    spare: true
+    boss: false
 ```
 
 ```entity
@@ -680,6 +809,24 @@ enemy:
   mixedQuestions: false
   lessons:
     - source-alg-07
+  tactics:
+    weakness: ward
+    pattern:
+      - strike
+      - recover
+      - heavy
+    resolve: 1
+    act:
+      prompt: PATCH is trapped behind a route check. What earns safe passage?
+      options:
+        - Threaten the system
+        - Guess and proceed
+        - Present the signed record
+      answer: 2
+      explanation: Verified route evidence satisfies the protocol and avoids harming
+        the protected system.
+    spare: true
+    boss: false
 ```
 
 ```entity
@@ -696,6 +843,25 @@ enemy:
   mixedQuestions: false
   lessons:
     - source-alg-08
+  tactics:
+    weakness: insight
+    pattern:
+      - heavy
+      - recover
+      - strike
+      - heavy
+    resolve: 1
+    act:
+      prompt: The relay flags a cycle. What evidence should you present?
+      options:
+        - Guess and proceed
+        - Present the signed record
+        - Threaten the system
+      answer: 1
+      explanation: Verified route evidence satisfies the protocol and avoids harming
+        the protected system.
+    spare: true
+    boss: false
 ```
 
 ```entity
@@ -712,6 +878,24 @@ enemy:
   mixedQuestions: false
   lessons:
     - source-alg-09
+  tactics:
+    weakness: ward
+    pattern:
+      - strike
+      - strike
+      - recover
+    resolve: 1
+    act:
+      prompt: The courier's route is forged. Which record proves the next hop?
+      options:
+        - Present the signed record
+        - Threaten the system
+        - Guess and proceed
+      answer: 0
+      explanation: Verified route evidence satisfies the protocol and avoids harming
+        the protected system.
+    spare: true
+    boss: false
 ```
 
 ```entity
@@ -728,6 +912,24 @@ enemy:
   mixedQuestions: false
   lessons:
     - source-alg-10
+  tactics:
+    weakness: insight
+    pattern:
+      - strike
+      - heavy
+      - recover
+    resolve: 1
+    act:
+      prompt: PATCH is trapped behind a route check. What earns safe passage?
+      options:
+        - Threaten the system
+        - Guess and proceed
+        - Present the signed record
+      answer: 2
+      explanation: Verified route evidence satisfies the protocol and avoids harming
+        the protected system.
+    spare: true
+    boss: false
 ```
 
 ```entity
@@ -754,6 +956,24 @@ enemy:
     - source-alg-08
     - source-alg-09
     - source-alg-10
+  tactics:
+    weakness: insight
+    pattern:
+      - strike
+      - heavy
+      - recover
+    resolve: 2
+    act:
+      prompt: The courier's route is forged. Which record proves the next hop?
+      options:
+        - Present the signed record
+        - Threaten the system
+        - Guess and proceed
+      answer: 0
+      explanation: Verified route evidence satisfies the protocol and avoids harming
+        the protected system.
+    spare: true
+    boss: true
 clue:
   title: PATCH's signed receipt
   text: "Receipt: ECHO-7 entered maintenance relay R-17 at 02:14."
@@ -773,6 +993,24 @@ enemy:
   mixedQuestions: false
   lessons:
     - source-ds-01
+  tactics:
+    weakness: insight
+    pattern:
+      - strike
+      - heavy
+      - recover
+    resolve: 1
+    act:
+      prompt: FOLIO's identity was erased. Which record can restore the audit trail?
+      options:
+        - Present the signed record
+        - Threaten the system
+        - Guess and proceed
+      answer: 0
+      explanation: Verified archive evidence satisfies the protocol and avoids harming
+        the protected system.
+    spare: true
+    boss: false
 ```
 
 ```entity
@@ -789,6 +1027,25 @@ enemy:
   mixedQuestions: false
   lessons:
     - source-ds-02
+  tactics:
+    weakness: ward
+    pattern:
+      - heavy
+      - strike
+      - strike
+      - recover
+    resolve: 1
+    act:
+      prompt: The archive blocks access. Which credential follows its protocol?
+      options:
+        - Threaten the system
+        - Guess and proceed
+        - Present the signed record
+      answer: 2
+      explanation: Verified archive evidence satisfies the protocol and avoids harming
+        the protected system.
+    spare: true
+    boss: false
 ```
 
 ```entity
@@ -805,6 +1062,24 @@ enemy:
   mixedQuestions: false
   lessons:
     - source-ds-03
+  tactics:
+    weakness: insight
+    pattern:
+      - strike
+      - recover
+      - heavy
+    resolve: 1
+    act:
+      prompt: A revision was altered. What evidence verifies its history?
+      options:
+        - Guess and proceed
+        - Present the signed record
+        - Threaten the system
+      answer: 1
+      explanation: Verified archive evidence satisfies the protocol and avoids harming
+        the protected system.
+    spare: true
+    boss: false
 ```
 
 ```entity
@@ -821,6 +1096,25 @@ enemy:
   mixedQuestions: false
   lessons:
     - source-ds-04
+  tactics:
+    weakness: ward
+    pattern:
+      - heavy
+      - recover
+      - strike
+      - heavy
+    resolve: 1
+    act:
+      prompt: FOLIO's identity was erased. Which record can restore the audit trail?
+      options:
+        - Present the signed record
+        - Threaten the system
+        - Guess and proceed
+      answer: 0
+      explanation: Verified archive evidence satisfies the protocol and avoids harming
+        the protected system.
+    spare: true
+    boss: false
 ```
 
 ```entity
@@ -837,6 +1131,24 @@ enemy:
   mixedQuestions: false
   lessons:
     - source-ds-05
+  tactics:
+    weakness: insight
+    pattern:
+      - strike
+      - strike
+      - recover
+    resolve: 1
+    act:
+      prompt: The archive blocks access. Which credential follows its protocol?
+      options:
+        - Threaten the system
+        - Guess and proceed
+        - Present the signed record
+      answer: 2
+      explanation: Verified archive evidence satisfies the protocol and avoids harming
+        the protected system.
+    spare: true
+    boss: false
 ```
 
 ```entity
@@ -853,6 +1165,24 @@ enemy:
   mixedQuestions: false
   lessons:
     - source-ds-06
+  tactics:
+    weakness: ward
+    pattern:
+      - strike
+      - heavy
+      - recover
+    resolve: 1
+    act:
+      prompt: A revision was altered. What evidence verifies its history?
+      options:
+        - Guess and proceed
+        - Present the signed record
+        - Threaten the system
+      answer: 1
+      explanation: Verified archive evidence satisfies the protocol and avoids harming
+        the protected system.
+    spare: true
+    boss: false
 ```
 
 ```entity
@@ -869,6 +1199,25 @@ enemy:
   mixedQuestions: false
   lessons:
     - source-ds-07
+  tactics:
+    weakness: insight
+    pattern:
+      - heavy
+      - strike
+      - strike
+      - recover
+    resolve: 1
+    act:
+      prompt: FOLIO's identity was erased. Which record can restore the audit trail?
+      options:
+        - Present the signed record
+        - Threaten the system
+        - Guess and proceed
+      answer: 0
+      explanation: Verified archive evidence satisfies the protocol and avoids harming
+        the protected system.
+    spare: true
+    boss: false
 ```
 
 ```entity
@@ -885,6 +1234,24 @@ enemy:
   mixedQuestions: false
   lessons:
     - source-ds-08
+  tactics:
+    weakness: ward
+    pattern:
+      - strike
+      - recover
+      - heavy
+    resolve: 1
+    act:
+      prompt: The archive blocks access. Which credential follows its protocol?
+      options:
+        - Threaten the system
+        - Guess and proceed
+        - Present the signed record
+      answer: 2
+      explanation: Verified archive evidence satisfies the protocol and avoids harming
+        the protected system.
+    spare: true
+    boss: false
 ```
 
 ```entity
@@ -901,6 +1268,25 @@ enemy:
   mixedQuestions: false
   lessons:
     - source-ds-09
+  tactics:
+    weakness: insight
+    pattern:
+      - heavy
+      - recover
+      - strike
+      - heavy
+    resolve: 1
+    act:
+      prompt: A revision was altered. What evidence verifies its history?
+      options:
+        - Guess and proceed
+        - Present the signed record
+        - Threaten the system
+      answer: 1
+      explanation: Verified archive evidence satisfies the protocol and avoids harming
+        the protected system.
+    spare: true
+    boss: false
 ```
 
 ```entity
@@ -917,6 +1303,24 @@ enemy:
   mixedQuestions: false
   lessons:
     - source-ds-10
+  tactics:
+    weakness: ward
+    pattern:
+      - strike
+      - strike
+      - recover
+    resolve: 1
+    act:
+      prompt: FOLIO's identity was erased. Which record can restore the audit trail?
+      options:
+        - Present the signed record
+        - Threaten the system
+        - Guess and proceed
+      answer: 0
+      explanation: Verified archive evidence satisfies the protocol and avoids harming
+        the protected system.
+    spare: true
+    boss: false
 ```
 
 ```entity
@@ -942,6 +1346,25 @@ enemy:
     - source-ds-08
     - source-ds-09
     - source-ds-10
+  tactics:
+    weakness: ward
+    pattern:
+      - heavy
+      - strike
+      - strike
+      - recover
+    resolve: 2
+    act:
+      prompt: The archive blocks access. Which credential follows its protocol?
+      options:
+        - Threaten the system
+        - Guess and proceed
+        - Present the signed record
+      answer: 2
+      explanation: Verified archive evidence satisfies the protocol and avoids harming
+        the protected system.
+    spare: true
+    boss: true
 clue:
   title: FOLIO's signed audit
   text: "Signed audit: ECHO-7 used M-04, then erased its gateway entry."
@@ -961,6 +1384,24 @@ enemy:
   mixedQuestions: false
   lessons:
     - source-ai-01
+  tactics:
+    weakness: insight
+    pattern:
+      - strike
+      - heavy
+      - recover
+    resolve: 1
+    act:
+      prompt: LUMA detects a forged signal. What test best verifies its source?
+      options:
+        - Present the signed record
+        - Threaten the system
+        - Guess and proceed
+      answer: 0
+      explanation: Verified signal evidence satisfies the protocol and avoids harming
+        the protected system.
+    spare: true
+    boss: false
 ```
 
 ```entity
@@ -977,6 +1418,25 @@ enemy:
   mixedQuestions: false
   lessons:
     - source-ai-02
+  tactics:
+    weakness: ward
+    pattern:
+      - heavy
+      - strike
+      - strike
+      - recover
+    resolve: 1
+    act:
+      prompt: The handshake is untrusted. Which evidence establishes its origin?
+      options:
+        - Threaten the system
+        - Guess and proceed
+        - Present the signed record
+      answer: 2
+      explanation: Verified signal evidence satisfies the protocol and avoids harming
+        the protected system.
+    spare: true
+    boss: false
 ```
 
 ```entity
@@ -993,6 +1453,24 @@ enemy:
   mixedQuestions: false
   lessons:
     - source-ai-03
+  tactics:
+    weakness: insight
+    pattern:
+      - strike
+      - recover
+      - heavy
+    resolve: 1
+    act:
+      prompt: The model flags a drift. What should be checked before adapting?
+      options:
+        - Guess and proceed
+        - Present the signed record
+        - Threaten the system
+      answer: 1
+      explanation: Verified signal evidence satisfies the protocol and avoids harming
+        the protected system.
+    spare: true
+    boss: false
 ```
 
 ```entity
@@ -1009,6 +1487,25 @@ enemy:
   mixedQuestions: false
   lessons:
     - source-ai-04
+  tactics:
+    weakness: ward
+    pattern:
+      - heavy
+      - recover
+      - strike
+      - heavy
+    resolve: 1
+    act:
+      prompt: LUMA detects a forged signal. What test best verifies its source?
+      options:
+        - Present the signed record
+        - Threaten the system
+        - Guess and proceed
+      answer: 0
+      explanation: Verified signal evidence satisfies the protocol and avoids harming
+        the protected system.
+    spare: true
+    boss: false
 ```
 
 ```entity
@@ -1025,6 +1522,24 @@ enemy:
   mixedQuestions: false
   lessons:
     - source-ai-05
+  tactics:
+    weakness: insight
+    pattern:
+      - strike
+      - strike
+      - recover
+    resolve: 1
+    act:
+      prompt: The handshake is untrusted. Which evidence establishes its origin?
+      options:
+        - Threaten the system
+        - Guess and proceed
+        - Present the signed record
+      answer: 2
+      explanation: Verified signal evidence satisfies the protocol and avoids harming
+        the protected system.
+    spare: true
+    boss: false
 ```
 
 ```entity
@@ -1041,6 +1556,24 @@ enemy:
   mixedQuestions: false
   lessons:
     - source-ai-06
+  tactics:
+    weakness: ward
+    pattern:
+      - strike
+      - heavy
+      - recover
+    resolve: 1
+    act:
+      prompt: The model flags a drift. What should be checked before adapting?
+      options:
+        - Guess and proceed
+        - Present the signed record
+        - Threaten the system
+      answer: 1
+      explanation: Verified signal evidence satisfies the protocol and avoids harming
+        the protected system.
+    spare: true
+    boss: false
 ```
 
 ```entity
@@ -1057,6 +1590,25 @@ enemy:
   mixedQuestions: false
   lessons:
     - source-ai-07
+  tactics:
+    weakness: insight
+    pattern:
+      - heavy
+      - strike
+      - strike
+      - recover
+    resolve: 1
+    act:
+      prompt: LUMA detects a forged signal. What test best verifies its source?
+      options:
+        - Present the signed record
+        - Threaten the system
+        - Guess and proceed
+      answer: 0
+      explanation: Verified signal evidence satisfies the protocol and avoids harming
+        the protected system.
+    spare: true
+    boss: false
 ```
 
 ```entity
@@ -1073,6 +1625,24 @@ enemy:
   mixedQuestions: false
   lessons:
     - source-ai-08
+  tactics:
+    weakness: ward
+    pattern:
+      - strike
+      - recover
+      - heavy
+    resolve: 1
+    act:
+      prompt: The handshake is untrusted. Which evidence establishes its origin?
+      options:
+        - Threaten the system
+        - Guess and proceed
+        - Present the signed record
+      answer: 2
+      explanation: Verified signal evidence satisfies the protocol and avoids harming
+        the protected system.
+    spare: true
+    boss: false
 ```
 
 ```entity
@@ -1089,6 +1659,25 @@ enemy:
   mixedQuestions: false
   lessons:
     - source-ai-09
+  tactics:
+    weakness: insight
+    pattern:
+      - heavy
+      - recover
+      - strike
+      - heavy
+    resolve: 1
+    act:
+      prompt: The model flags a drift. What should be checked before adapting?
+      options:
+        - Guess and proceed
+        - Present the signed record
+        - Threaten the system
+      answer: 1
+      explanation: Verified signal evidence satisfies the protocol and avoids harming
+        the protected system.
+    spare: true
+    boss: false
 ```
 
 ```entity
@@ -1105,6 +1694,24 @@ enemy:
   mixedQuestions: false
   lessons:
     - source-ai-10
+  tactics:
+    weakness: ward
+    pattern:
+      - strike
+      - strike
+      - recover
+    resolve: 1
+    act:
+      prompt: LUMA detects a forged signal. What test best verifies its source?
+      options:
+        - Present the signed record
+        - Threaten the system
+        - Guess and proceed
+      answer: 0
+      explanation: Verified signal evidence satisfies the protocol and avoids harming
+        the protected system.
+    spare: true
+    boss: false
 ```
 
 ```entity
@@ -1130,7 +1737,26 @@ enemy:
     - source-ai-08
     - source-ai-09
     - source-ai-10
+  tactics:
+    weakness: insight
+    pattern:
+      - strike
+      - heavy
+      - recover
+    resolve: 2
+    act:
+      prompt: LUMA detects a forged signal. What test best verifies its source?
+      options:
+        - Present the signed record
+        - Threaten the system
+        - Guess and proceed
+      answer: 0
+      explanation: Verified signal evidence satisfies the protocol and avoids harming
+        the protected system.
+    spare: true
+    boss: true
 clue:
   title: LUMA's verified handshake
-  text: 'Verified handshake: M-04 forwarded ECHO-7 from relay R-17 to the abandoned subnet.'
+  text: "Verified handshake: M-04 forwarded ECHO-7 from relay R-17 to the
+    abandoned subnet."
 ```
