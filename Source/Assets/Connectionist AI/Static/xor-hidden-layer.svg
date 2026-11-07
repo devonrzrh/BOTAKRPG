@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="201" viewBox="0 0 720 201" role="img" aria-labelledby="title desc">
+  <title id="title">XOR with two hidden units</title>
+  <desc id="desc">One hidden unit detects at least one active input, while the other detects both. The output is one only when the first detector fires without the second.</desc>
+  <style>
+    text { font-family: system-ui, sans-serif; text-anchor: middle; fill: #263449; }
+    .title { font-size: 22px; font-weight: 700; fill: #172554; }
+    .label { font-size: 15px; font-weight: 600; }
+    .note { font-size: 14px; }
+    .num { font-size: 19px; font-weight: 700; }
+    .tile text { fill: #18243a; }
+    .edge { fill: none; stroke: #74849b; stroke-width: 2; }
+    .guide { fill: none; stroke: #74849b; stroke-width: 1; stroke-dasharray: 4 5; }
+    .blue { fill: #dbeafe; stroke: #477fc0; }
+    .violet { fill: #ede9fe; stroke: #8864cb; }
+    .green { fill: #d1fae5; stroke: #19936c; }
+    .amber { fill: #ffedd5; stroke: #bd6a26; }
+    .blue, .violet, .green, .amber { stroke-width: 1.5; }
+    @media (prefers-color-scheme: dark) {
+      text { fill: #e2e8f0; }
+      .title { fill: #f1f5ff; }
+      .edge { stroke: #94a3b8; }
+    }
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0 0L8 4L0 8Z" fill="#74849b"/>
+    </marker>
+  </defs>
+  <text x="360" y="28" class="title">XOR with two hidden units</text>
+  <text x="77" y="71" class="label">Inputs</text>
+  <text x="343" y="71" class="label">Hidden detectors</text>
+  <text x="614" y="71" class="label">Output</text>
+  <path d="M140 108L225 103" class="edge" marker-end="url(#arrow)"/>
+  <path d="M140 108L225 164" class="edge" marker-end="url(#arrow)"/>
+  <path d="M140 164L225 108" class="edge" marker-end="url(#arrow)"/>
+  <path d="M140 164L225 168" class="edge" marker-end="url(#arrow)"/>
+  <path d="M459 104L530 131" class="edge" marker-end="url(#arrow)"/>
+  <path d="M459 167L530 139" class="edge" marker-end="url(#arrow)"/>
+  <g class="tile">
+    <rect x="24" y="89" width="116" height="38" rx="19" class="blue"/>
+    <text x="82" y="113" class="label">x₁ = 1</text>
+  </g>
+  <g class="tile">
+    <rect x="24" y="145" width="116" height="38" rx="19" class="blue"/>
+    <text x="82" y="169" class="label">x₂ = 0</text>
+  </g>
+  <g class="tile">
+    <rect x="230" y="85" width="229" height="38" rx="19" class="violet"/>
+    <text x="344.5" y="109" class="label">At least one? Yes (1)</text>
+  </g>
+  <g class="tile">
+    <rect x="230" y="148" width="229" height="38" rx="19" class="violet"/>
+    <text x="344.5" y="172" class="label">Both? No (0)</text>
+  </g>
+  <g class="tile">
+    <rect x="536" y="116" width="155" height="38" rx="19" class="green"/>
+    <text x="613.5" y="140" class="label">Exactly one (1)</text>
+  </g>
+</svg>

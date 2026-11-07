@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="560" height="156" viewBox="0 0 560 156" role="img" aria-labelledby="title desc">
+  <title id="title">Read the rear of the queue</title>
+  <desc id="desc">The rear item is Darren. Both jobs stay in place.</desc>
+  <defs><marker id="arrow" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0 0 L7 3.5 L0 7Z" fill="#16835e"/></marker></defs>
+  <style>
+    text { font: 16px system-ui, sans-serif; text-anchor: middle; fill: #0f172a; }
+    .label { paint-order: stroke; stroke: #f8fafc; stroke-width: 3px; stroke-linejoin: round; }
+    .heading { font-weight: 700; font-size: 19px; }
+    .tile { fill: #dbeafe; stroke: #4169a9; stroke-width: 2px; }
+    .mark { fill: #a7f3d0; stroke: #16835e; }
+    .edge, .route { fill: none; stroke: #64748b; stroke-width: 2px; stroke-linecap: round; }
+    .route { stroke: #16835e; stroke-width: 3px; }
+    
+    @media (prefers-color-scheme: dark) {
+      .label, .result { fill: #f8fafc; stroke: #111827; }
+      .edge { stroke: #b8c7db; }
+      .route { stroke: #4ade80; }
+      #arrow path { fill: #4ade80; }
+    }
+    .result { paint-order: stroke; stroke: #f8fafc; stroke-width: 3px; }
+  </style>
+  <text class="label heading" x="280" y="27">Read the rear of the queue</text>
+  <rect class="tile" x="129.5" y="63" width="133" height="36" rx="6"/>
+  <text class="ink" x="196" y="86">Nicky</text>
+  <rect class="tile mark" style="--delay:0s" x="297.5" y="63" width="133" height="36" rx="6"/>
+  <text class="ink" x="364" y="86">Darren</text>
+  <text class="label" x="196" y="50">Front</text>
+  <text class="label" x="364" y="50">Rear</text>
+  <text class="label answer" x="280" y="140">The rear item is Darren. Both jobs stay in place.</text>
+</svg>

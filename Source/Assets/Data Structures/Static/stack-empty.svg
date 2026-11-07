@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="560" height="151" viewBox="0 0 560 151" role="img" aria-labelledby="title desc">
+  <title id="title">Check whether a stack is empty</title>
+  <desc id="desc">There are no items, so the result is true.</desc>
+  <defs><marker id="arrow" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0 0 L7 3.5 L0 7Z" fill="#16835e"/></marker></defs>
+  <style>
+    text { font: 16px system-ui, sans-serif; text-anchor: middle; fill: #0f172a; }
+    .label { paint-order: stroke; stroke: #f8fafc; stroke-width: 3px; stroke-linejoin: round; }
+    .heading { font-weight: 700; font-size: 19px; }
+    .tile { fill: #dbeafe; stroke: #4169a9; stroke-width: 2px; }
+    .mark { fill: #a7f3d0; stroke: #16835e; }
+    .edge, .route { fill: none; stroke: #64748b; stroke-width: 2px; stroke-linecap: round; }
+    .route { stroke: #16835e; stroke-width: 3px; }
+    
+    @media (prefers-color-scheme: dark) {
+      .label, .result { fill: #f8fafc; stroke: #111827; }
+      .edge { stroke: #b8c7db; }
+      .route { stroke: #4ade80; }
+      #arrow path { fill: #4ade80; }
+    }
+    .result { paint-order: stroke; stroke: #f8fafc; stroke-width: 3px; }
+  </style>
+  <text class="label heading" x="280" y="27">Check whether a stack is empty</text>
+  <text class="result" x="280" y="75">Empty stack</text>
+  <path class="edge" d="M205 90 H355"/>
+  <text class="label answer" x="280" y="135">There are no items, so the result is true.</text>
+</svg>

@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="241" viewBox="0 0 720 241" role="img" aria-labelledby="title desc">
+  <title id="title">Gradient accumulation</title>
+  <desc id="desc">Four micro-batches produce four gradient contributions. These are averaged before one optimizer update, giving an effective batch of sixty-four for four micro-batches of sixteen.</desc>
+  <style>
+    text { font-family: system-ui, sans-serif; text-anchor: middle; fill: #263449; }
+    .title { font-size: 22px; font-weight: 700; fill: #172554; }
+    .label { font-size: 15px; font-weight: 600; }
+    .note { font-size: 13px; }
+    .num { font-size: 20px; font-weight: 700; }
+    .edge { fill: none; stroke: #74849b; stroke-width: 2; }
+    .guide { fill: none; stroke: #94a3b8; stroke-width: 1; stroke-dasharray: 4 5; }
+    .blue { fill: #dbeafe; stroke: #477fc0; }
+    .violet { fill: #ede9fe; stroke: #8864cb; }
+    .green { fill: #d1fae5; stroke: #19936c; }
+    .amber { fill: #ffedd5; stroke: #bd6a26; }
+    .blue, .violet, .green, .amber { stroke-width: 1.5; }
+    .blue-line, .violet-line, .green-line, .amber-line { fill: none; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
+    .blue-line { stroke: #3386c5; }
+    .violet-line { stroke: #9670d2; }
+    .green-line { stroke: #21a47a; }
+    .amber-line { stroke: #ce873a; }
+    @media (prefers-color-scheme: dark) {
+      text { fill: #e2e8f0; }
+      .title { fill: #f1f5ff; }
+      .edge { stroke: #94a3b8; }
+    }
+    .ink { fill: #18243a; }
+
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0 0L8 4L0 8Z" fill="#74849b" />
+    </marker>
+  </defs>
+  <text x="360" y="29" class="title">Gradient accumulation</text>
+  <g class="tile">
+    <rect x="27" y="64" width="151" height="38" rx="10" class="blue" />
+    <text x="102.5" y="88" class="label ink">16 examples · batch 1</text>
+  </g>
+  <path d="M103 108L358 152" class="edge" marker-end="url(#arrow)" />
+  <g class="tile">
+    <rect x="204" y="64" width="151" height="38" rx="10" class="blue" />
+    <text x="279.5" y="88" class="label ink">16 examples · batch 2</text>
+  </g>
+  <path d="M280 108L358 152" class="edge" marker-end="url(#arrow)" />
+  <g class="tile">
+    <rect x="381" y="64" width="151" height="38" rx="10" class="blue" />
+    <text x="456.5" y="88" class="label ink">16 examples · batch 3</text>
+  </g>
+  <path d="M457 108L358 152" class="edge" marker-end="url(#arrow)" />
+  <g class="tile">
+    <rect x="558" y="64" width="151" height="38" rx="10" class="blue" />
+    <text x="633.5" y="88" class="label ink">16 examples · batch 4</text>
+  </g>
+  <path d="M634 108L358 152" class="edge" marker-end="url(#arrow)" />
+  <g class="tile">
+    <rect x="247" y="157" width="225" height="38" rx="10" class="violet" />
+    <text x="359.5" y="181" class="label ink">Accumulate + average</text>
+  </g>
+  <path d="M360 200L360 211" class="edge" marker-end="url(#arrow)" />
+  <text x="360" y="232" class="label">One update · effective batch size 64</text>
+</svg>

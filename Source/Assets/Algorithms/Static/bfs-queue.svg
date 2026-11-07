@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="285" viewBox="0 0 640 285" role="img" aria-labelledby="title desc">
+<title id="title">BFS takes the oldest waiting node first</title><desc id="desc">The front of the queue is the next node to visit.</desc>
+<style>
+text { font: 16px system-ui, sans-serif; text-anchor: middle; fill: #14243a; }
+.label { paint-order: stroke; stroke: #f8fafc; stroke-width: 3px; stroke-linejoin: round; }
+.heading { font-size: 20px; font-weight: 700; }
+.small { font-size: 13px; }
+.tile { fill: #dbeafe; stroke: #4169a9; stroke-width: 2; }
+.focus { fill: #a7f3d0; stroke: #16835e; }
+.muted { fill: #e2e8f0; stroke: #64748b; }
+.edge { stroke: #64748b; stroke-width: 2.5; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.route { stroke: #16835e; stroke-width: 4; fill: none; stroke-linecap: round; }
+.badge { fill: #334155; stroke: #f8fafc; stroke-width: 1.5; }
+.badge-text { fill: #fff; font-size: 12px; font-weight: 700; }
+@media (prefers-color-scheme: dark) {
+  .label { fill: #f8fafc; stroke: #111827; }
+  .edge { stroke: #b8c7db; }
+  .route { stroke: #4ade80; }
+}
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
+
+</style>
+<text class="label heading" x="320" y="29">BFS takes the oldest waiting node first</text>
+<text class="label" x="320" y="53">Start with A</text><rect class="tile focus" x="214.0" y="62" width="72" height="40" rx="7"/><text class="ink" x="250" y="88">A</text><text class="label small" x="142" y="87">Front →</text><text class="label" x="320" y="131">Take A, add B and C</text><rect class="tile focus" x="214.0" y="140" width="72" height="40" rx="7"/><text class="ink" x="250" y="166">B</text><rect class="tile" x="299.0" y="140" width="72" height="40" rx="7"/><text class="ink" x="335" y="166">C</text><text class="label small" x="142" y="165">Front →</text><text class="label" x="320" y="209">Take B, add D and E</text><rect class="tile focus" x="214.0" y="218" width="72" height="40" rx="7"/><text class="ink" x="250" y="244">C</text><rect class="tile" x="299.0" y="218" width="72" height="40" rx="7"/><text class="ink" x="335" y="244">D</text><rect class="tile" x="384.0" y="218" width="72" height="40" rx="7"/><text class="ink" x="420" y="244">E</text><text class="label small" x="142" y="243">Front →</text>
+</svg>

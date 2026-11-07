@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="283" viewBox="0 0 720 283" role="img" aria-labelledby="title desc">
+  <title id="title">Forecast errors</title>
+  <desc id="desc">For actual values 100,120,90 and forecasts 110,115,100, the vertical gaps are plus ten, minus five, and plus ten units.</desc>
+  <style>
+    text { font-family: system-ui, sans-serif; text-anchor: middle; fill: #263449; }
+    .title { font-size: 22px; font-weight: 700; fill: #172554; }
+    .label { font-size: 15px; font-weight: 600; }
+    .note { font-size: 13px; }
+    .num { font-size: 20px; font-weight: 700; }
+    .edge { fill: none; stroke: #74849b; stroke-width: 2; }
+    .guide { fill: none; stroke: #94a3b8; stroke-width: 1; stroke-dasharray: 4 5; }
+    .blue { fill: #dbeafe; stroke: #477fc0; }
+    .violet { fill: #ede9fe; stroke: #8864cb; }
+    .green { fill: #d1fae5; stroke: #19936c; }
+    .amber { fill: #ffedd5; stroke: #bd6a26; }
+    .blue, .violet, .green, .amber { stroke-width: 1.5; }
+    .blue-line, .violet-line, .green-line, .amber-line { fill: none; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
+    .blue-line { stroke: #3386c5; }
+    .violet-line { stroke: #9670d2; }
+    .green-line { stroke: #21a47a; }
+    .amber-line { stroke: #ce873a; }
+    @media (prefers-color-scheme: dark) {
+      text { fill: #e2e8f0; }
+      .title { fill: #f1f5ff; }
+      .edge { stroke: #94a3b8; }
+    }
+    .ink { fill: #18243a; }
+
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0 0L8 4L0 8Z" fill="#74849b" />
+    </marker>
+  </defs>
+  <text x="360" y="29" class="title">Forecast errors</text>
+  <path d="M110 198H623" class="guide" />
+  <text x="88" y="202" class="note">80</text>
+  <path d="M110 146.4H623" class="guide" />
+  <text x="88" y="150.4" class="note">100</text>
+  <path d="M110 94.8H623" class="guide" />
+  <text x="88" y="98.8" class="note">120</text>
+  <text x="110" y="217" class="note">1</text>
+  <text x="366.5" y="217" class="note">2</text>
+  <text x="623" y="217" class="note">3</text>
+  <path d="M110 198L632 198" class="edge" marker-end="url(#arrow)" />
+  <path d="M110 198L110 61" class="edge" marker-end="url(#arrow)" />
+  <text x="366.5" y="237" class="note">Observation</text>
+  <text x="100" y="52" class="note">Units</text>
+  <path d="M110 146.4V120.6" class="amber-line" />
+  <circle cx="110" cy="146.4" r="5" class="blue" />
+  <circle cx="110" cy="120.6" r="5" class="violet" />
+  <text x="136" y="137.5" class="note">+10</text>
+  <path d="M366.5 94.8V107.7" class="amber-line" />
+  <circle cx="366.5" cy="94.8" r="5" class="blue" />
+  <circle cx="366.5" cy="107.7" r="5" class="violet" />
+  <text x="392.5" y="105.25" class="note">−5</text>
+  <path d="M623 172.2V146.4" class="amber-line" />
+  <circle cx="623" cy="172.2" r="5" class="blue" />
+  <circle cx="623" cy="146.4" r="5" class="violet" />
+  <text x="649" y="163.3" class="note">+10</text>
+  <path d="M60 267h22" class="blue-line" />
+  <text x="220" y="272" class="note">Actual</text>
+  <path d="M360 267h22" class="violet-line" />
+  <text x="520" y="272" class="note">Forecast</text>
+</svg>

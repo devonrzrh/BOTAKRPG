@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="280" viewBox="0 0 720 280" role="img" aria-labelledby="title desc">
+  <title id="title">Training and validation loss</title>
+  <desc id="desc">Illustrative training loss continues falling while validation loss reaches its lowest point and then rises. The lowest-validation checkpoint is marked.</desc>
+  <style>
+    text { font-family: system-ui, sans-serif; text-anchor: middle; fill: #263449; }
+    .title { font-size: 22px; font-weight: 700; fill: #172554; }
+    .label { font-size: 15px; font-weight: 600; }
+    .note { font-size: 13px; }
+    .num { font-size: 20px; font-weight: 700; }
+    .edge { fill: none; stroke: #74849b; stroke-width: 2; }
+    .guide { fill: none; stroke: #94a3b8; stroke-width: 1; stroke-dasharray: 4 5; }
+    .blue { fill: #dbeafe; stroke: #477fc0; }
+    .violet { fill: #ede9fe; stroke: #8864cb; }
+    .green { fill: #d1fae5; stroke: #19936c; }
+    .amber { fill: #ffedd5; stroke: #bd6a26; }
+    .blue, .violet, .green, .amber { stroke-width: 1.5; }
+    .blue-line, .violet-line, .green-line, .amber-line { fill: none; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
+    .blue-line { stroke: #3386c5; }
+    .violet-line { stroke: #9670d2; }
+    .green-line { stroke: #21a47a; }
+    .amber-line { stroke: #ce873a; }
+    @media (prefers-color-scheme: dark) {
+      text { fill: #e2e8f0; }
+      .title { fill: #f1f5ff; }
+      .edge { stroke: #94a3b8; }
+    }
+    .ink { fill: #18243a; }
+
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0 0L8 4L0 8Z" fill="#74849b" />
+    </marker>
+  </defs>
+  <text x="360" y="29" class="title">Training and validation loss</text>
+  <path d="M97 196H626" class="guide" />
+  <text x="75" y="200" class="note">0</text>
+  <path d="M97 132.5H626" class="guide" />
+  <text x="75" y="136.5" class="note">0.5</text>
+  <path d="M97 69H626" class="guide" />
+  <text x="75" y="73" class="note">1</text>
+  <text x="97" y="215" class="note">0</text>
+  <text x="202.8" y="215" class="note">2</text>
+  <text x="308.6" y="215" class="note">4</text>
+  <text x="414.4" y="215" class="note">6</text>
+  <text x="520.2" y="215" class="note">8</text>
+  <text x="626" y="215" class="note">10</text>
+  <path d="M97 196L635 196" class="edge" marker-end="url(#arrow)" />
+  <path d="M97 196L97 61" class="edge" marker-end="url(#arrow)" />
+  <text x="361.5" y="235" class="note">Epoch</text>
+  <text x="87" y="52" class="note">Loss</text>
+  <path d="M97 90.59 L107.58 98.21 L118.16 105.24 L128.74 111.73 L139.32 117.72 L149.9 123.25 L160.48 128.35 L171.06 133.07 L181.64 137.42 L192.22 141.43 L202.8 145.14 L213.38 148.56 L223.96 151.72 L234.54 154.64 L245.12 157.33 L255.7 159.81 L266.28 162.11 L276.86 164.23 L287.44 166.18 L298.02 167.98 L308.6 169.65 L319.18 171.19 L329.76 172.61 L340.34 173.92 L350.92 175.13 L361.5 176.24 L372.08 177.27 L382.66 178.23 L393.24 179.1 L403.82 179.92 L414.4 180.66 L424.98 181.35 L435.56 181.99 L446.14 182.58 L456.72 183.12 L467.3 183.63 L477.88 184.09 L488.46 184.52 L499.04 184.91 L509.62 185.28 L520.2 185.61 L530.78 185.92 L541.36 186.21 L551.94 186.47 L562.52 186.72 L573.1 186.94 L583.68 187.15 L594.26 187.34 L604.84 187.52 L615.42 187.68 L626 187.84" class="blue-line" />
+  <path d="M97 91.86 L107.58 98.96 L118.16 105.46 L128.74 111.39 L139.32 116.82 L149.9 121.77 L160.48 126.3 L171.06 130.44 L181.64 134.23 L192.22 137.69 L202.8 140.85 L213.38 143.74 L223.96 146.38 L234.54 148.79 L245.12 150.99 L255.7 153.01 L266.28 154.85 L276.86 156.53 L287.44 158.07 L298.02 159.48 L308.6 160.76 L319.18 161.88 L329.76 162.77 L340.34 163.44 L350.92 163.91 L361.5 164.19 L372.08 164.26 L382.66 164.16 L393.24 163.87 L403.82 163.4 L414.4 162.77 L424.98 161.96 L435.56 161 L446.14 159.87 L456.72 158.59 L467.3 157.16 L477.88 155.57 L488.46 153.84 L499.04 151.96 L509.62 149.94 L520.2 147.77 L530.78 145.47 L541.36 143.02 L551.94 140.44 L562.52 137.72 L573.1 134.87 L583.68 131.89 L594.26 128.77 L604.84 125.52 L615.42 122.14 L626 118.63" class="violet-line" />
+  <path d="M371.02 64V196" class="guide" />
+  <text x="444.02" y="59" class="note">Best checkpoint</text>
+  <path d="M60 261h22" class="blue-line" />
+  <text x="220" y="266" class="note">Training</text>
+  <path d="M360 261h22" class="violet-line" />
+  <text x="520" y="266" class="note">Validation</text>
+</svg>

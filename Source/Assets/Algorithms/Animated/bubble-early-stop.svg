@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="243" viewBox="0 0 640 243" role="img" aria-labelledby="title desc">
+<title id="title">Stop after a complete pass with no swaps</title><desc id="desc">The comparison bracket checks four neighboring pairs without moving any value.</desc>
+<style>
+text { font:16px system-ui,sans-serif; text-anchor:middle; fill:#14243a; }
+.label { paint-order:stroke; stroke:#f8fafc; stroke-width:3px; stroke-linejoin:round; }
+.heading { font-size:20px; font-weight:700; }
+.small { font-size:13px; }
+.tile { fill:#dbeafe; stroke:#4169a9; stroke-width:2px; }
+.chosen { fill:#a7f3d0; stroke:#16835e; }
+.edge { fill:none; stroke:#64748b; stroke-width:2.5px; stroke-linecap:round; stroke-linejoin:round; }
+.route { fill:none; stroke:#16835e; stroke-width:4px; stroke-linecap:round; }
+.cursor { fill:#fde68a; stroke:#92630e; stroke-width:2px; }
+.ring { fill:none; stroke:#16835e; stroke-width:3px; }
+.badge { fill:#334155; stroke:#f8fafc; stroke-width:1.5px; }
+.badge-text { fill:#fff; font-size:12px; font-weight:700; }
+@media (prefers-color-scheme:dark) {
+ .label { fill:#f8fafc; stroke:#111827; }
+ .edge { stroke:#b8c7db; }
+ .route,.ring { stroke:#4ade80; }
+}
+
+.pair { transform:translate(430px,91px); animation:pair 8s ease-in-out infinite; } @keyframes pair { 0% { transform:translate(100px,91px); }12% { transform:translate(100px,91px); }25% { transform:translate(210px,91px); }37% { transform:translate(210px,91px); }50% { transform:translate(320px,91px); }62% { transform:translate(320px,91px); }75% { transform:translate(430px,91px); }100% { transform:translate(430px,91px); } }
+.status-0 { visibility:hidden; animation:status-0 8s steps(1,end) infinite; } @keyframes status-0 { 0% { visibility:visible; }25% { visibility:hidden; }100% { visibility:hidden; } }
+.status-1 { visibility:hidden; animation:status-1 8s steps(1,end) infinite; } @keyframes status-1 { 0% { visibility:hidden; }25% { visibility:visible; }50% { visibility:hidden; }100% { visibility:hidden; } }
+.status-2 { visibility:hidden; animation:status-2 8s steps(1,end) infinite; } @keyframes status-2 { 0% { visibility:hidden; }50% { visibility:visible; }75% { visibility:hidden; }100% { visibility:hidden; } }
+.status-3 { visibility:visible; animation:status-3 8s steps(1,end) infinite; } @keyframes status-3 { 0% { visibility:hidden; }75% { visibility:visible; }100% { visibility:visible; } }
+
+@media (prefers-reduced-motion:reduce) { * { animation:none !important; } }
+</style>
+<text class="label heading" x="320" y="29">Stop after a complete pass with no swaps</text>
+<rect class="tile" x="57.0" y="70" width="86" height="42" rx="7"/><text class="ink" x="100" y="97">55</text><rect class="tile" x="167.0" y="70" width="86" height="42" rx="7"/><text class="ink" x="210" y="97">65</text><rect class="tile" x="277.0" y="70" width="86" height="42" rx="7"/><text class="ink" x="320" y="97">75</text><rect class="tile" x="387.0" y="70" width="86" height="42" rx="7"/><text class="ink" x="430" y="97">85</text><rect class="tile" x="497.0" y="70" width="86" height="42" rx="7"/><text class="ink" x="540" y="97">95</text><g class="pair"><path class="ring" d="M-45 28 V36 H155 V28"/></g><g class="status-0"><text class="label" x="320" y="183">55 ≤ 65. No swap.</text></g><g class="status-1"><text class="label" x="320" y="183">65 ≤ 75. No swap.</text></g><g class="status-2"><text class="label" x="320" y="183">75 ≤ 85. No swap.</text></g><g class="status-3"><text class="label" x="320" y="183">85 ≤ 95. The whole pass made no swaps. Stop.</text></g><text class="label small" x="320" y="218">The values never move because every neighboring pair is ordered.</text>
+</svg>

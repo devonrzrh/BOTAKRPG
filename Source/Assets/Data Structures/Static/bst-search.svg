@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="560" height="285" viewBox="0 0 560 285" role="img" aria-labelledby="title desc">
+  <title id="title">Search the binary search tree for key 1</title>
+  <desc id="desc">Compare 1 with 8 and go left. Compare 1 with 3 and go left again. The next node matches 1. The right branch containing 10 is skipped.</desc>
+  <style>
+    text { font: 16px system-ui, sans-serif; text-anchor: middle; fill: #0f172a; }
+    .label { paint-order: stroke; stroke: #f8fafc; stroke-width: 3px; stroke-linejoin: round; }
+    .heading { font-size: 20px; font-weight: 700; }
+    .edge { fill: none; stroke: #64748b; stroke-width: 2px; stroke-linecap: round; }
+    .route { fill: none; stroke: #16835e; stroke-width: 4px; stroke-linecap: round; marker-end: url(#arrow); }
+    .node { fill: #dbeafe; stroke: #4169a9; stroke-width: 2px; }
+    .found { fill: #a7f3d0; stroke: #16835e; }
+    @media (prefers-color-scheme: dark) {
+      .label { fill: #f8fafc; stroke: #111827; }
+      .edge { stroke: #b8c7db; }
+      .route { stroke: #4ade80; }
+      #arrow path { fill: #4ade80; }
+    }
+  </style>
+  <defs><marker id="arrow" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0 0 L7 3.5 L0 7Z" fill="#16835e"/></marker></defs>
+  <text class="label heading" x="280" y="28">Search for 1</text>
+  <path class="edge" d="M275 76 L167 147 L101 217 M275 76 L383 147"/>
+  <g class="first">
+    <path class="route" d="M249 93 L193 130"/>
+    <text class="label" x="127" y="95">1 &lt; 8, go left</text>
+  </g>
+  <g class="second">
+    <path class="route" d="M146 169 L120 197"/>
+    <text class="label" x="236" y="199">1 &lt; 3, go left</text>
+  </g>
+  <circle class="node root" cx="275" cy="76" r="22"/>
+  <text x="275" y="82">8</text>
+  <circle class="node branch" cx="167" cy="147" r="22"/>
+  <text x="167" y="153">3</text>
+  <circle class="node skipped" cx="383" cy="147" r="22"/>
+  <text x="383" y="153">10</text>
+  <circle class="node " cx="101" cy="217" r="22"/>
+  <text x="101" y="223">1</text>
+  <g class="match">
+    <circle class="node found" cx="101" cy="217" r="22"/>
+    <text x="101" y="223">1</text>
+    <text class="label" x="186" y="248">1 = 1, found</text>
+  </g>
+  <text class="label" x="429" y="186">Right branch skipped</text>
+</svg>

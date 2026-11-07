@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="259" viewBox="0 0 720 259" role="img" aria-labelledby="title desc">
+  <title id="title">Sampled future trajectories</title>
+  <desc id="desc">Six illustrative future trajectories start from the same history and diverge over time. Their spread can be summarized as forecast quantiles.</desc>
+  <style>
+    text { font-family: system-ui, sans-serif; text-anchor: middle; fill: #263449; }
+    .title { font-size: 22px; font-weight: 700; fill: #172554; }
+    .label { font-size: 15px; font-weight: 600; }
+    .note { font-size: 13px; }
+    .num { font-size: 20px; font-weight: 700; }
+    .edge { fill: none; stroke: #74849b; stroke-width: 2; }
+    .guide { fill: none; stroke: #94a3b8; stroke-width: 1; stroke-dasharray: 4 5; }
+    .blue { fill: #dbeafe; stroke: #477fc0; }
+    .violet { fill: #ede9fe; stroke: #8864cb; }
+    .green { fill: #d1fae5; stroke: #19936c; }
+    .amber { fill: #ffedd5; stroke: #bd6a26; }
+    .blue, .violet, .green, .amber { stroke-width: 1.5; }
+    .blue-line, .violet-line, .green-line, .amber-line { fill: none; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
+    .blue-line { stroke: #3386c5; }
+    .violet-line { stroke: #9670d2; }
+    .green-line { stroke: #21a47a; }
+    .amber-line { stroke: #ce873a; }
+    @media (prefers-color-scheme: dark) {
+      text { fill: #e2e8f0; }
+      .title { fill: #f1f5ff; }
+      .edge { stroke: #94a3b8; }
+    }
+    .ink { fill: #18243a; }
+    .phase { animation: paths 6s infinite; opacity: .35; }
+    .phase-0 { animation-delay: 0s; }
+    .phase-1 { animation-delay: 0.7s; }
+    .phase-2 { animation-delay: 1.4s; }
+    .phase-3 { animation-delay: 2.0999999999999996s; }
+    .phase-4 { animation-delay: 2.8s; }
+    .phase-5 { animation-delay: 3.5s; }
+    @keyframes paths { 10%, 25% { opacity: 1; } 40%, 100% { opacity: .35; } }
+    @media (prefers-reduced-motion: reduce) { .phase { animation: none; opacity: 1; } }
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0 0L8 4L0 8Z" fill="#74849b" />
+    </marker>
+  </defs>
+  <text x="360" y="29" class="title">Sampled future trajectories</text>
+  <path d="M90 183.38H630" class="guide" />
+  <text x="68" y="187.38" class="note">80</text>
+  <path d="M90 150.13H630" class="guide" />
+  <text x="68" y="154.13" class="note">100</text>
+  <path d="M90 116.88H630" class="guide" />
+  <text x="68" y="120.88" class="note">120</text>
+  <path d="M90 83.63H630" class="guide" />
+  <text x="68" y="87.63" class="note">140</text>
+  <text x="90" y="219" class="note">0</text>
+  <text x="198" y="219" class="note">1</text>
+  <text x="306" y="219" class="note">2</text>
+  <text x="414" y="219" class="note">3</text>
+  <text x="522" y="219" class="note">4</text>
+  <text x="630" y="219" class="note">5</text>
+  <path d="M90 200L639 200" class="edge" marker-end="url(#arrow)" />
+  <path d="M90 200L90 59" class="edge" marker-end="url(#arrow)" />
+  <text x="360" y="239" class="note">Future step</text>
+  <text x="80" y="50" class="note">Demand</text>
+  <path d="M90 150.13 L198 150.49 L306 151.4 L414 161.67 L522 176.08 L630 178.48" class="blue-line" />
+  <path d="M90 150.13 L198 147.25 L306 150.51 L414 159.26 L522 160.4 L630 146.55" class="violet-line" />
+  <path d="M90 150.13 L198 146.66 L306 149.27 L414 148.45 L522 135.27 L630 117.91" class="blue-line" />
+  <path d="M90 150.13 L198 146.2 L306 142.7 L414 130.01 L522 111.57 L630 103.6" class="violet-line" />
+  <path d="M90 150.13 L198 143.23 L306 130.73 L414 111.72 L522 98.86 L630 101.5" class="blue-line" />
+  <path d="M90 150.13 L198 137.43 L306 118.25 L414 101.23 L522 96.6 L630 98.25" class="violet-line" />
+  <g class="phase phase-0">
+    <circle cx="630" cy="178.48" r="5" class="green" />
+  </g>
+  <g class="phase phase-1">
+    <circle cx="630" cy="146.55" r="5" class="green" />
+  </g>
+  <g class="phase phase-2">
+    <circle cx="630" cy="117.91" r="5" class="green" />
+  </g>
+  <g class="phase phase-3">
+    <circle cx="630" cy="103.6" r="5" class="green" />
+  </g>
+  <g class="phase phase-4">
+    <circle cx="630" cy="101.5" r="5" class="green" />
+  </g>
+  <g class="phase phase-5">
+    <circle cx="630" cy="98.25" r="5" class="green" />
+  </g>
+</svg>

@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="413" viewBox="0 0 640 413" role="img" aria-labelledby="title desc">
+<title id="title">Selection sort chooses the next minimum</title><desc id="desc">Start at the first unsorted position Put minimum 68 at index 0 Put minimum 72 at index 1 Put minimum 85 at index 2</desc>
+<style>
+text { font: 16px system-ui, sans-serif; text-anchor: middle; fill: #14243a; }
+.label { paint-order: stroke; stroke: #f8fafc; stroke-width: 3px; stroke-linejoin: round; }
+.heading { font-size: 20px; font-weight: 700; }
+.small { font-size: 13px; }
+.tile { fill: #dbeafe; stroke: #4169a9; stroke-width: 2; }
+.focus { fill: #a7f3d0; stroke: #16835e; }
+.muted { fill: #e2e8f0; stroke: #64748b; }
+.edge { stroke: #64748b; stroke-width: 2.5; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.route { stroke: #16835e; stroke-width: 4; fill: none; stroke-linecap: round; }
+.badge { fill: #334155; stroke: #f8fafc; stroke-width: 1.5; }
+.badge-text { fill: #fff; font-size: 12px; font-weight: 700; }
+@media (prefers-color-scheme: dark) {
+  .label { fill: #f8fafc; stroke: #111827; }
+  .edge { stroke: #b8c7db; }
+  .route { stroke: #4ade80; }
+}
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
+
+</style>
+<text class="label heading" x="320" y="29">Selection sort chooses the next minimum</text>
+<text class="label" x="320" y="58">Start at the first unsorted position</text><rect class="tile" x="138.0" y="69" width="76" height="40" rx="7"/><text class="ink" x="176.0" y="95">72</text><rect class="tile" x="234.0" y="69" width="76" height="40" rx="7"/><text class="ink" x="272.0" y="95">85</text><rect class="tile" x="330.0" y="69" width="76" height="40" rx="7"/><text class="ink" x="368.0" y="95">91</text><rect class="tile" x="426.0" y="69" width="76" height="40" rx="7"/><text class="ink" x="464.0" y="95">68</text><text class="label" x="320" y="145">Put minimum 68 at index 0</text><rect class="tile" x="138.0" y="156" width="76" height="40" rx="7"/><text class="ink" x="176.0" y="182">68</text><rect class="tile" x="234.0" y="156" width="76" height="40" rx="7"/><text class="ink" x="272.0" y="182">85</text><rect class="tile" x="330.0" y="156" width="76" height="40" rx="7"/><text class="ink" x="368.0" y="182">91</text><rect class="tile" x="426.0" y="156" width="76" height="40" rx="7"/><text class="ink" x="464.0" y="182">72</text><text class="label" x="320" y="232">Put minimum 72 at index 1</text><rect class="tile" x="138.0" y="243" width="76" height="40" rx="7"/><text class="ink" x="176.0" y="269">68</text><rect class="tile" x="234.0" y="243" width="76" height="40" rx="7"/><text class="ink" x="272.0" y="269">72</text><rect class="tile" x="330.0" y="243" width="76" height="40" rx="7"/><text class="ink" x="368.0" y="269">91</text><rect class="tile" x="426.0" y="243" width="76" height="40" rx="7"/><text class="ink" x="464.0" y="269">85</text><text class="label" x="320" y="319">Put minimum 85 at index 2</text><rect class="tile" x="138.0" y="330" width="76" height="40" rx="7"/><text class="ink" x="176.0" y="356">68</text><rect class="tile" x="234.0" y="330" width="76" height="40" rx="7"/><text class="ink" x="272.0" y="356">72</text><rect class="tile" x="330.0" y="330" width="76" height="40" rx="7"/><text class="ink" x="368.0" y="356">85</text><rect class="tile" x="426.0" y="330" width="76" height="40" rx="7"/><text class="ink" x="464.0" y="356">91</text>
+</svg>

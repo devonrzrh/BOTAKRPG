@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="219" viewBox="0 0 720 219" role="img" aria-labelledby="title desc">
+  <title id="title">Fraud score and review threshold</title>
+  <desc id="desc">Example transaction scores run from low risk to high risk. Transactions beyond the review threshold are sent to review; the score is not a verdict.</desc>
+  <style>
+    text { font-family: system-ui, sans-serif; text-anchor: middle; fill: #263449; }
+    .title { font-size: 22px; font-weight: 700; fill: #172554; }
+    .label { font-size: 15px; font-weight: 600; }
+    .note { font-size: 14px; }
+    .num { font-size: 19px; font-weight: 700; }
+    .tile text { fill: #18243a; }
+    .edge { fill: none; stroke: #74849b; stroke-width: 2; }
+    .guide { fill: none; stroke: #74849b; stroke-width: 1; stroke-dasharray: 4 5; }
+    .blue { fill: #dbeafe; stroke: #477fc0; }
+    .violet { fill: #ede9fe; stroke: #8864cb; }
+    .green { fill: #d1fae5; stroke: #19936c; }
+    .amber { fill: #ffedd5; stroke: #bd6a26; }
+    .blue, .violet, .green, .amber { stroke-width: 1.5; }
+    @media (prefers-color-scheme: dark) {
+      text { fill: #e2e8f0; }
+      .title { fill: #f1f5ff; }
+      .edge { stroke: #94a3b8; }
+    }
+    .blue-line { fill: none; stroke: #3b89ce; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+    .violet-line { fill: none; stroke: #9571d6; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+    .green-line { fill: none; stroke: #22a87e; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+    .amber-line { fill: none; stroke: #d88835; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+    .signal { fill: none; stroke: #bc70ed; stroke-width: 4; stroke-dasharray: 8 14; animation: flow 2s linear infinite; }
+    @keyframes flow { to { stroke-dashoffset: -44; } }
+    @media (prefers-reduced-motion: reduce) { .signal { display: none; } }
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0 0L8 4L0 8Z" fill="#74849b"/>
+    </marker>
+  </defs>
+  <text x="360" y="28" class="title">Fraud score and review threshold</text>
+  <path d="M74 142L653 142" class="edge" marker-end="url(#arrow)"/>
+  <path d="M474 65V155" class="guide"/>
+  <text x="474" y="57" class="label">Review threshold</text>
+  <circle cx="107" cy="121" r="6" class="blue"/>
+  <circle cx="182" cy="114" r="6" class="blue"/>
+  <circle cx="245" cy="124" r="6" class="blue"/>
+  <circle cx="310" cy="112" r="6" class="blue"/>
+  <circle cx="389" cy="125" r="6" class="blue"/>
+  <circle cx="452" cy="103" r="6" class="blue"/>
+  <circle cx="501" cy="121" r="6" class="amber"/>
+  <circle cx="551" cy="108" r="6" class="amber"/>
+  <circle cx="615" cy="123" r="6" class="amber"/>
+  <g class="tile">
+    <rect x="101" y="160" width="145" height="36" rx="12" class="blue"/>
+    <text x="173.5" y="183" class="label">Routine flow</text>
+  </g>
+  <g class="tile">
+    <rect x="484" y="160" width="146" height="36" rx="12" class="amber"/>
+    <text x="557" y="183" class="label">Send to review</text>
+  </g>
+  <text x="354" y="191" class="note">Risk score →</text>
+</svg>

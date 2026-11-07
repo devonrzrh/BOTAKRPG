@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="195" viewBox="0 0 720 195" role="img" aria-labelledby="title desc">
+  <title id="title">Softmax probabilities</title>
+  <desc id="desc">Logits of 2, 1, and 0 for classes A, B, and C become approximate probabilities 0.665, 0.245, and 0.090. The highest score stays highest and the probabilities sum to one.</desc>
+  <style>
+    text { font-family: system-ui, sans-serif; text-anchor: middle; fill: #263449; }
+    .title { font-size: 22px; font-weight: 700; fill: #172554; }
+    .label { font-size: 15px; font-weight: 600; }
+    .note { font-size: 14px; }
+    .num { font-size: 19px; font-weight: 700; }
+    .tile text { fill: #18243a; }
+    .edge { fill: none; stroke: #74849b; stroke-width: 2; }
+    .guide { fill: none; stroke: #74849b; stroke-width: 1; stroke-dasharray: 4 5; }
+    .blue { fill: #dbeafe; stroke: #477fc0; }
+    .violet { fill: #ede9fe; stroke: #8864cb; }
+    .green { fill: #d1fae5; stroke: #19936c; }
+    .amber { fill: #ffedd5; stroke: #bd6a26; }
+    .blue, .violet, .green, .amber { stroke-width: 1.5; }
+    @media (prefers-color-scheme: dark) {
+      text { fill: #e2e8f0; }
+      .title { fill: #f1f5ff; }
+      .edge { stroke: #94a3b8; }
+    }
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0 0L8 4L0 8Z" fill="#74849b"/>
+    </marker>
+  </defs>
+  <text x="360" y="28" class="title">Softmax probabilities</text>
+  <text x="157" y="65" class="label">Raw scores</text>
+  <text x="491" y="65" class="label">Probability per class</text>
+  <path d="M275 132L328 132" class="edge" marker-end="url(#arrow)"/>
+  <text x="67" y="98" class="label">A</text>
+  <g class="tile">
+    <rect x="104" y="81" width="108" height="25" rx="8" class="blue"/>
+    <text x="158" y="98" class="label">2</text>
+  </g>
+  <rect x="365" y="81" width="239.4" height="25" rx="4" class="green"/>
+  <text x="640.4" y="99" class="note">66.5%</text>
+  <text x="67" y="134" class="label">B</text>
+  <g class="tile">
+    <rect x="104" y="117" width="108" height="25" rx="8" class="blue"/>
+    <text x="158" y="134" class="label">1</text>
+  </g>
+  <rect x="365" y="117" width="88.2" height="25" rx="4" class="green"/>
+  <text x="489.2" y="135" class="note">24.5%</text>
+  <text x="67" y="170" class="label">C</text>
+  <g class="tile">
+    <rect x="104" y="153" width="108" height="25" rx="8" class="blue"/>
+    <text x="158" y="170" class="label">0</text>
+  </g>
+  <rect x="365" y="153" width="32.4" height="25" rx="4" class="green"/>
+  <text x="433.4" y="171" class="note">9.0%</text>
+</svg>

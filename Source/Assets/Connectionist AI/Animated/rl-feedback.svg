@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="202" viewBox="0 0 720 202" role="img" aria-labelledby="title desc">
+  <title id="title">Reinforcement learning loop</title>
+  <desc id="desc">A game agent acts in the environment. The environment sends a reward and next observation back to the agent. The cycle repeats.</desc>
+  <style>
+    text { font-family: system-ui, sans-serif; text-anchor: middle; fill: #263449; }
+    .title { font-size: 22px; font-weight: 700; fill: #172554; }
+    .label { font-size: 15px; font-weight: 600; }
+    .note { font-size: 14px; }
+    .num { font-size: 19px; font-weight: 700; }
+    .tile text { fill: #18243a; }
+    .edge { fill: none; stroke: #74849b; stroke-width: 2; }
+    .guide { fill: none; stroke: #74849b; stroke-width: 1; stroke-dasharray: 4 5; }
+    .blue { fill: #dbeafe; stroke: #477fc0; }
+    .violet { fill: #ede9fe; stroke: #8864cb; }
+    .green { fill: #d1fae5; stroke: #19936c; }
+    .amber { fill: #ffedd5; stroke: #bd6a26; }
+    .blue, .violet, .green, .amber { stroke-width: 1.5; }
+    @media (prefers-color-scheme: dark) {
+      text { fill: #e2e8f0; }
+      .title { fill: #f1f5ff; }
+      .edge { stroke: #94a3b8; }
+    }
+    .blue-line { fill: none; stroke: #3b89ce; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+    .violet-line { fill: none; stroke: #9571d6; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+    .green-line { fill: none; stroke: #22a87e; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+    .amber-line { fill: none; stroke: #d88835; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+    .signal { fill: none; stroke: #bc70ed; stroke-width: 4; stroke-dasharray: 8 14; animation: flow 2s linear infinite; }
+    @keyframes flow { to { stroke-dashoffset: -44; } }
+    @media (prefers-reduced-motion: reduce) { .signal { display: none; } }
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0 0L8 4L0 8Z" fill="#74849b"/>
+    </marker>
+  </defs>
+  <text x="360" y="28" class="title">Reinforcement learning loop</text>
+  <g class="tile">
+    <rect x="53" y="93" width="146" height="38" rx="19" class="violet"/>
+    <text x="126" y="117" class="label">Game agent</text>
+  </g>
+  <g class="tile">
+    <rect x="521" y="93" width="146" height="38" rx="19" class="green"/>
+    <text x="594" y="117" class="label">Environment</text>
+  </g>
+  <path d="M204 102H257V69H463V102H516" class="edge" marker-end="url(#arrow)"/>
+  <text x="360" y="59" class="note">Action: move right</text>
+  <path d="M516 122H463V162H257V122H204" class="edge" marker-end="url(#arrow)"/>
+  <text x="360" y="185" class="note">Next observation and reward</text>
+  <path d="M204 102H257V69H463V102H516" class="signal"/>
+  <path d="M516 122H463V162H257V122H204" class="signal"/>
+</svg>

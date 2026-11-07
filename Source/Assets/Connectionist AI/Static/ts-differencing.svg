@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="207" viewBox="0 0 720 207" role="img" aria-labelledby="title desc">
+  <title id="title">First differences</title>
+  <desc id="desc">The increasing series 10,12,14,16,18 becomes four constant increments of two when adjacent values are subtracted.</desc>
+  <style>
+    text { font-family: system-ui, sans-serif; text-anchor: middle; fill: #263449; }
+    .title { font-size: 22px; font-weight: 700; fill: #172554; }
+    .label { font-size: 15px; font-weight: 600; }
+    .note { font-size: 13px; }
+    .num { font-size: 20px; font-weight: 700; }
+    .edge { fill: none; stroke: #74849b; stroke-width: 2; }
+    .guide { fill: none; stroke: #94a3b8; stroke-width: 1; stroke-dasharray: 4 5; }
+    .blue { fill: #dbeafe; stroke: #477fc0; }
+    .violet { fill: #ede9fe; stroke: #8864cb; }
+    .green { fill: #d1fae5; stroke: #19936c; }
+    .amber { fill: #ffedd5; stroke: #bd6a26; }
+    .blue, .violet, .green, .amber { stroke-width: 1.5; }
+    .blue-line, .violet-line, .green-line, .amber-line { fill: none; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
+    .blue-line { stroke: #3386c5; }
+    .violet-line { stroke: #9670d2; }
+    .green-line { stroke: #21a47a; }
+    .amber-line { stroke: #ce873a; }
+    @media (prefers-color-scheme: dark) {
+      text { fill: #e2e8f0; }
+      .title { fill: #f1f5ff; }
+      .edge { stroke: #94a3b8; }
+    }
+    .ink { fill: #18243a; }
+
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0 0L8 4L0 8Z" fill="#74849b" />
+    </marker>
+  </defs>
+  <text x="360" y="29" class="title">First differences</text>
+  <text x="112" y="80" class="label">Original series</text>
+  <text x="112" y="166" class="label">First difference</text>
+  <g class="tile">
+    <rect x="220" y="58" width="63" height="38" rx="10" class="blue" />
+    <text x="251.5" y="82" class="label ink">10</text>
+  </g>
+  <path d="M284 77L304 77" class="edge" marker-end="url(#arrow)" />
+  <g class="tile">
+    <rect x="308" y="58" width="63" height="38" rx="10" class="blue" />
+    <text x="339.5" y="82" class="label ink">12</text>
+  </g>
+  <path d="M372 77L392 77" class="edge" marker-end="url(#arrow)" />
+  <g class="tile">
+    <rect x="396" y="58" width="63" height="38" rx="10" class="blue" />
+    <text x="427.5" y="82" class="label ink">14</text>
+  </g>
+  <path d="M460 77L480 77" class="edge" marker-end="url(#arrow)" />
+  <g class="tile">
+    <rect x="484" y="58" width="63" height="38" rx="10" class="blue" />
+    <text x="515.5" y="82" class="label ink">16</text>
+  </g>
+  <path d="M548 77L568 77" class="edge" marker-end="url(#arrow)" />
+  <g class="tile">
+    <rect x="572" y="58" width="63" height="38" rx="10" class="blue" />
+    <text x="603.5" y="82" class="label ink">18</text>
+  </g>
+  <g class="tile">
+    <rect x="264" y="145" width="63" height="38" rx="10" class="green" />
+    <text x="295.5" y="169" class="label ink">+2</text>
+  </g>
+  <path d="M252 100L293 137" class="guide" />
+  <path d="M340 100L293 137" class="guide" />
+  <g class="tile">
+    <rect x="352" y="145" width="63" height="38" rx="10" class="green" />
+    <text x="383.5" y="169" class="label ink">+2</text>
+  </g>
+  <path d="M340 100L381 137" class="guide" />
+  <path d="M428 100L381 137" class="guide" />
+  <g class="tile">
+    <rect x="440" y="145" width="63" height="38" rx="10" class="green" />
+    <text x="471.5" y="169" class="label ink">+2</text>
+  </g>
+  <path d="M428 100L469 137" class="guide" />
+  <path d="M516 100L469 137" class="guide" />
+  <g class="tile">
+    <rect x="528" y="145" width="63" height="38" rx="10" class="green" />
+    <text x="559.5" y="169" class="label ink">+2</text>
+  </g>
+  <path d="M516 100L557 137" class="guide" />
+  <path d="M604 100L557 137" class="guide" />
+</svg>

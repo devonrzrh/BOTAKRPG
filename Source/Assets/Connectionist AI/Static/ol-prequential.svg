@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="195" viewBox="0 0 720 195" role="img" aria-labelledby="title desc">
+  <title id="title">Prequential evaluation order</title>
+  <desc id="desc">For each arriving example, the model predicts before that example is used for training. The metric is updated with that prediction, then learning takes place.</desc>
+  <style>
+    text { font-family: system-ui, sans-serif; text-anchor: middle; fill: #263449; }
+    .title { font-size: 22px; font-weight: 700; fill: #172554; }
+    .label { font-size: 15px; font-weight: 600; }
+    .note { font-size: 13px; }
+    .num { font-size: 20px; font-weight: 700; }
+    .edge { fill: none; stroke: #74849b; stroke-width: 2; }
+    .guide { fill: none; stroke: #94a3b8; stroke-width: 1; stroke-dasharray: 4 5; }
+    .blue { fill: #dbeafe; stroke: #477fc0; }
+    .violet { fill: #ede9fe; stroke: #8864cb; }
+    .green { fill: #d1fae5; stroke: #19936c; }
+    .amber { fill: #ffedd5; stroke: #bd6a26; }
+    .blue, .violet, .green, .amber { stroke-width: 1.5; }
+    .blue-line, .violet-line, .green-line, .amber-line { fill: none; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
+    .blue-line { stroke: #3386c5; }
+    .violet-line { stroke: #9670d2; }
+    .green-line { stroke: #21a47a; }
+    .amber-line { stroke: #ce873a; }
+    @media (prefers-color-scheme: dark) {
+      text { fill: #e2e8f0; }
+      .title { fill: #f1f5ff; }
+      .edge { stroke: #94a3b8; }
+    }
+    .ink { fill: #18243a; }
+
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0 0L8 4L0 8Z" fill="#74849b" />
+    </marker>
+  </defs>
+  <text x="360" y="29" class="title">Prequential evaluation order</text>
+  <g class="tile">
+    <rect x="35" y="85" width="145" height="38" rx="10" class="blue" />
+    <text x="107.5" y="109" class="label ink">Receive example</text>
+  </g>
+  <g class="tile">
+    <rect x="213" y="85" width="145" height="38" rx="10" class="violet" />
+    <text x="285.5" y="109" class="label ink">Test prediction</text>
+  </g>
+  <g class="tile">
+    <rect x="391" y="85" width="145" height="38" rx="10" class="amber" />
+    <text x="463.5" y="109" class="label ink">Record error</text>
+  </g>
+  <g class="tile">
+    <rect x="569" y="85" width="130" height="38" rx="10" class="green" />
+    <text x="634" y="109" class="label ink">Train on example</text>
+  </g>
+  <path d="M181 104L207 104" class="edge" marker-end="url(#arrow)" />
+  <path d="M359 104L385 104" class="edge" marker-end="url(#arrow)" />
+  <path d="M537 104L563 104" class="edge" marker-end="url(#arrow)" />
+</svg>

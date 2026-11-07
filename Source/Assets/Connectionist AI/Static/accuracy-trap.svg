@@ -1,0 +1,140 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="232" viewBox="0 0 720 232" role="img" aria-labelledby="title desc">
+  <title id="title">All-OK baseline</title>
+  <desc id="desc">Of 100 representative bottles, 98 are sound and two are defective. Predicting OK for every bottle correctly identifies 98 of 100, while detecting zero of two defects.</desc>
+  <style>
+    text { font-family: system-ui, sans-serif; text-anchor: middle; fill: #263449; }
+    .title { font-size: 22px; font-weight: 700; fill: #172554; }
+    .label { font-size: 15px; font-weight: 600; }
+    .note { font-size: 14px; }
+    .num { font-size: 19px; font-weight: 700; }
+    .tile text { fill: #18243a; }
+    .edge { fill: none; stroke: #74849b; stroke-width: 2; }
+    .guide { fill: none; stroke: #74849b; stroke-width: 1; stroke-dasharray: 4 5; }
+    .blue { fill: #dbeafe; stroke: #477fc0; }
+    .violet { fill: #ede9fe; stroke: #8864cb; }
+    .green { fill: #d1fae5; stroke: #19936c; }
+    .amber { fill: #ffedd5; stroke: #bd6a26; }
+    .blue, .violet, .green, .amber { stroke-width: 1.5; }
+    @media (prefers-color-scheme: dark) {
+      text { fill: #e2e8f0; }
+      .title { fill: #f1f5ff; }
+      .edge { stroke: #94a3b8; }
+    }
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0 0L8 4L0 8Z" fill="#74849b"/>
+    </marker>
+  </defs>
+  <text x="360" y="28" class="title">All-OK baseline</text>
+  <circle cx="45" cy="70" r="6" class="blue"/>
+  <circle cx="66" cy="70" r="6" class="blue"/>
+  <circle cx="87" cy="70" r="6" class="blue"/>
+  <circle cx="108" cy="70" r="6" class="blue"/>
+  <circle cx="129" cy="70" r="6" class="blue"/>
+  <circle cx="150" cy="70" r="6" class="blue"/>
+  <circle cx="171" cy="70" r="6" class="blue"/>
+  <circle cx="192" cy="70" r="6" class="blue"/>
+  <circle cx="213" cy="70" r="6" class="blue"/>
+  <circle cx="234" cy="70" r="6" class="blue"/>
+  <circle cx="255" cy="70" r="6" class="blue"/>
+  <circle cx="276" cy="70" r="6" class="blue"/>
+  <circle cx="297" cy="70" r="6" class="blue"/>
+  <circle cx="318" cy="70" r="6" class="blue"/>
+  <circle cx="339" cy="70" r="6" class="blue"/>
+  <circle cx="360" cy="70" r="6" class="blue"/>
+  <circle cx="381" cy="70" r="6" class="blue"/>
+  <circle cx="402" cy="70" r="6" class="blue"/>
+  <circle cx="423" cy="70" r="6" class="blue"/>
+  <circle cx="444" cy="70" r="6" class="blue"/>
+  <circle cx="45" cy="93" r="6" class="blue"/>
+  <circle cx="66" cy="93" r="6" class="blue"/>
+  <circle cx="87" cy="93" r="6" class="blue"/>
+  <circle cx="108" cy="93" r="6" class="blue"/>
+  <circle cx="129" cy="93" r="6" class="blue"/>
+  <circle cx="150" cy="93" r="6" class="blue"/>
+  <circle cx="171" cy="93" r="6" class="blue"/>
+  <circle cx="192" cy="93" r="6" class="blue"/>
+  <circle cx="213" cy="93" r="6" class="blue"/>
+  <circle cx="234" cy="93" r="6" class="blue"/>
+  <circle cx="255" cy="93" r="6" class="blue"/>
+  <circle cx="276" cy="93" r="6" class="blue"/>
+  <circle cx="297" cy="93" r="6" class="blue"/>
+  <circle cx="318" cy="93" r="6" class="blue"/>
+  <circle cx="339" cy="93" r="6" class="blue"/>
+  <circle cx="360" cy="93" r="6" class="blue"/>
+  <circle cx="381" cy="93" r="6" class="blue"/>
+  <circle cx="402" cy="93" r="6" class="blue"/>
+  <circle cx="423" cy="93" r="6" class="blue"/>
+  <circle cx="444" cy="93" r="6" class="blue"/>
+  <circle cx="45" cy="116" r="6" class="blue"/>
+  <circle cx="66" cy="116" r="6" class="blue"/>
+  <circle cx="87" cy="116" r="6" class="blue"/>
+  <circle cx="108" cy="116" r="6" class="blue"/>
+  <circle cx="129" cy="116" r="6" class="blue"/>
+  <circle cx="150" cy="116" r="6" class="blue"/>
+  <circle cx="171" cy="116" r="6" class="blue"/>
+  <circle cx="192" cy="116" r="6" class="blue"/>
+  <circle cx="213" cy="116" r="6" class="blue"/>
+  <circle cx="234" cy="116" r="6" class="blue"/>
+  <circle cx="255" cy="116" r="6" class="blue"/>
+  <circle cx="276" cy="116" r="6" class="blue"/>
+  <circle cx="297" cy="116" r="6" class="blue"/>
+  <circle cx="318" cy="116" r="6" class="blue"/>
+  <circle cx="339" cy="116" r="6" class="blue"/>
+  <circle cx="360" cy="116" r="6" class="blue"/>
+  <circle cx="381" cy="116" r="6" class="blue"/>
+  <circle cx="402" cy="116" r="6" class="blue"/>
+  <circle cx="423" cy="116" r="6" class="blue"/>
+  <circle cx="444" cy="116" r="6" class="blue"/>
+  <circle cx="45" cy="139" r="6" class="blue"/>
+  <circle cx="66" cy="139" r="6" class="blue"/>
+  <circle cx="87" cy="139" r="6" class="blue"/>
+  <circle cx="108" cy="139" r="6" class="blue"/>
+  <circle cx="129" cy="139" r="6" class="blue"/>
+  <circle cx="150" cy="139" r="6" class="blue"/>
+  <circle cx="171" cy="139" r="6" class="blue"/>
+  <circle cx="192" cy="139" r="6" class="blue"/>
+  <circle cx="213" cy="139" r="6" class="blue"/>
+  <circle cx="234" cy="139" r="6" class="blue"/>
+  <circle cx="255" cy="139" r="6" class="blue"/>
+  <circle cx="276" cy="139" r="6" class="blue"/>
+  <circle cx="297" cy="139" r="6" class="blue"/>
+  <circle cx="318" cy="139" r="6" class="blue"/>
+  <circle cx="339" cy="139" r="6" class="blue"/>
+  <circle cx="360" cy="139" r="6" class="blue"/>
+  <circle cx="381" cy="139" r="6" class="blue"/>
+  <circle cx="402" cy="139" r="6" class="blue"/>
+  <circle cx="423" cy="139" r="6" class="blue"/>
+  <circle cx="444" cy="139" r="6" class="blue"/>
+  <circle cx="45" cy="162" r="6" class="blue"/>
+  <circle cx="66" cy="162" r="6" class="blue"/>
+  <circle cx="87" cy="162" r="6" class="blue"/>
+  <circle cx="108" cy="162" r="6" class="blue"/>
+  <circle cx="129" cy="162" r="6" class="blue"/>
+  <circle cx="150" cy="162" r="6" class="blue"/>
+  <circle cx="171" cy="162" r="6" class="blue"/>
+  <circle cx="192" cy="162" r="6" class="blue"/>
+  <circle cx="213" cy="162" r="6" class="blue"/>
+  <circle cx="234" cy="162" r="6" class="blue"/>
+  <circle cx="255" cy="162" r="6" class="blue"/>
+  <circle cx="276" cy="162" r="6" class="blue"/>
+  <circle cx="297" cy="162" r="6" class="blue"/>
+  <circle cx="318" cy="162" r="6" class="blue"/>
+  <circle cx="339" cy="162" r="6" class="blue"/>
+  <circle cx="360" cy="162" r="6" class="blue"/>
+  <circle cx="381" cy="162" r="6" class="blue"/>
+  <circle cx="402" cy="162" r="6" class="blue"/>
+  <circle cx="423" cy="162" r="6" class="amber"/>
+  <circle cx="444" cy="162" r="6" class="amber"/>
+  <circle cx="70" cy="207" r="6" class="blue"/>
+  <text x="140" y="212" class="label">98 sound</text>
+  <circle cx="230" cy="207" r="6" class="amber"/>
+  <text x="312" y="212" class="label">2 defective</text>
+  <g class="tile">
+    <rect x="481" y="66" width="211" height="49" rx="8" class="blue"/>
+    <text x="586" y="97" class="num">98 / 100 correct</text>
+    <rect x="481" y="126" width="211" height="49" rx="8" class="amber"/>
+    <text x="586" y="157" class="num">0 / 2 defects caught</text>
+  </g>
+</svg>

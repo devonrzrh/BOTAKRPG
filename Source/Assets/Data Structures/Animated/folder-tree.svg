@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="560" height="265" viewBox="0 0 560 265" role="img" aria-labelledby="title">
+  <title id="title">A folder tree with the path from Course to notes.md highlighted</title>
+  <style>
+    text { font: 16px system-ui, sans-serif; text-anchor: middle; fill: #0f172a; }
+    .label { paint-order: stroke; stroke: #f8fafc; stroke-width: 3px; stroke-linejoin: round; }
+    .tile { fill: #dbeafe; stroke: #4169a9; stroke-width: 2px; }
+    .focus { fill: #a7f3d0; stroke: #16835e; stroke-width: 2px; }
+    .edge { fill: none; stroke: #64748b; stroke-width: 2.5px; stroke-linecap: round; stroke-linejoin: round; }
+    .active { stroke: #16835e; }
+    @media (prefers-color-scheme: dark) {
+      .label { fill: #f8fafc; stroke: #111827; }
+      .edge { stroke: #b8c7db; }
+      .active { stroke: #4ade80; }
+    }
+  .path-leg { stroke-dasharray: 220; animation: trace-folder 6s infinite backwards; }
+.second-leg { animation-delay: 1.3s; }
+@keyframes trace-folder { 0%, 8% { stroke-dashoffset: 220; } 43%, 100% { stroke-dashoffset: 0; } }
+@keyframes reveal { 0%, 35% { opacity: 0; } 60%, 100% { opacity: 1; } }
+@keyframes trace-short { 0%, 15% { stroke-dashoffset: 80; opacity: 0; } 18% { opacity: 1; } 55%, 100% { stroke-dashoffset: 0; opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
+  </style>
+  <path class="edge active path-leg" d="M280 58 V76 H145 V101"/>
+  <path class="edge" d="M280 76 H415 V101"/>
+  <path class="edge active path-leg second-leg" d="M145 137 V155 H97 V185"/>
+  <path class="edge" d="M145 155 H217 V185"/>
+  <path class="edge" d="M415 137 V185"/>
+  <path class="focus" d="M223 58 v-33 h29 l8 8 h77 v25 Z"/>
+  <text class="ink" x="280" y="52">Course</text>
+  <path class="focus" d="M88 137 v-33 h29 l8 8 h77 v25 Z"/>
+  <text class="ink" x="145" y="131">Lessons</text>
+  <path class="tile" d="M358 137 v-33 h29 l8 8 h77 v25 Z"/>
+  <text class="ink" x="415" y="131">Assets</text>
+  <rect class="focus" x="41" y="187" width="112" height="33" rx="5"/>
+  <text class="ink" x="97" y="209">notes.md</text>
+  <rect class="tile" x="161" y="187" width="112" height="33" rx="5"/>
+  <text class="ink" x="217" y="209">quiz.md</text>
+  <rect class="tile" x="359" y="187" width="112" height="33" rx="5"/>
+  <text class="ink" x="415" y="209">diagram.svg</text>
+  <text class="label" x="280" y="248">One path to notes.md: Course → Lessons → notes.md</text>
+</svg>

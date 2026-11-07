@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="128" viewBox="0 0 480 128" role="img" aria-labelledby="title">
+  <title id="title">Nicky is at the front and Darren is at the rear of the queue</title>
+  <style>
+    text { paint-order: stroke; stroke: #f8fafc; stroke-width: 2.5px; stroke-linejoin: round; }
+  </style>
+  <defs>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+      <path d="M0 0 L8 4 L0 8 Z" fill="#334155"/>
+    </marker>
+  </defs>
+  <g font-family="system-ui, sans-serif" font-size="17" fill="#0f172a" text-anchor="middle">
+    <text x="155" y="33">Front</text>
+    <text x="295" y="33">Rear</text>
+    <rect x="98" y="49" width="114" height="44" rx="4" fill="#dbeafe" stroke="#1e40af" />
+    <text x="155" y="77">Nicky</text>
+    <rect x="226" y="49" width="138" height="44" rx="4" fill="#dbeafe" stroke="#1e40af" />
+    <text x="295" y="77">Darren</text>
+    <path d="M95 71 H32" fill="none" stroke="#334155" stroke-width="2" marker-end="url(#arrow)"/>
+    <path d="M446 71 H371" fill="none" stroke="#334155" stroke-width="2" marker-end="url(#arrow)"/>
+    <text x="56" y="112">Dequeue</text>
+    <text x="414" y="112">Enqueue</text>
+  </g>
+</svg>

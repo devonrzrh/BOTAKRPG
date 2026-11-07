@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="265" viewBox="0 0 720 265" role="img" aria-labelledby="title desc">
+  <title id="title">Batch, incremental, and online updates</title>
+  <desc id="desc">Offline training fits a full dataset then freezes a model. Incremental training updates with chunks. Online training updates with individual incoming examples.</desc>
+  <style>
+    text { font-family: system-ui, sans-serif; text-anchor: middle; fill: #263449; }
+    .title { font-size: 22px; font-weight: 700; fill: #172554; }
+    .label { font-size: 15px; font-weight: 600; }
+    .note { font-size: 13px; }
+    .num { font-size: 20px; font-weight: 700; }
+    .edge { fill: none; stroke: #74849b; stroke-width: 2; }
+    .guide { fill: none; stroke: #94a3b8; stroke-width: 1; stroke-dasharray: 4 5; }
+    .blue { fill: #dbeafe; stroke: #477fc0; }
+    .violet { fill: #ede9fe; stroke: #8864cb; }
+    .green { fill: #d1fae5; stroke: #19936c; }
+    .amber { fill: #ffedd5; stroke: #bd6a26; }
+    .blue, .violet, .green, .amber { stroke-width: 1.5; }
+    .blue-line, .violet-line, .green-line, .amber-line { fill: none; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
+    .blue-line { stroke: #3386c5; }
+    .violet-line { stroke: #9670d2; }
+    .green-line { stroke: #21a47a; }
+    .amber-line { stroke: #ce873a; }
+    @media (prefers-color-scheme: dark) {
+      text { fill: #e2e8f0; }
+      .title { fill: #f1f5ff; }
+      .edge { stroke: #94a3b8; }
+    }
+    .ink { fill: #18243a; }
+
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0 0L8 4L0 8Z" fill="#74849b" />
+    </marker>
+  </defs>
+  <text x="360" y="29" class="title">Batch, incremental, and online updates</text>
+  <text x="91" y="91" class="label">Batch</text>
+  <rect x="174" y="71" width="20" height="29" rx="3" class="blue" />
+  <rect x="201" y="71" width="20" height="29" rx="3" class="blue" />
+  <rect x="228" y="71" width="20" height="29" rx="3" class="blue" />
+  <rect x="255" y="71" width="20" height="29" rx="3" class="blue" />
+  <rect x="282" y="71" width="20" height="29" rx="3" class="blue" />
+  <rect x="309" y="71" width="20" height="29" rx="3" class="blue" />
+  <rect x="336" y="71" width="20" height="29" rx="3" class="blue" />
+  <rect x="363" y="71" width="20" height="29" rx="3" class="blue" />
+  <path d="M395 87L437 87" class="edge" marker-end="url(#arrow)" />
+  <g class="tile">
+    <rect x="444" y="68" width="223" height="38" rx="10" class="green" />
+    <text x="555.5" y="92" class="label ink">Fit → frozen model</text>
+  </g>
+  <text x="91" y="156" class="label">Incremental</text>
+  <rect x="174" y="136" width="20" height="29" rx="3" class="blue" />
+  <rect x="201" y="136" width="20" height="29" rx="3" class="blue" />
+  <rect x="228" y="136" width="20" height="29" rx="3" class="blue" />
+  <rect x="255" y="136" width="20" height="29" rx="3" class="blue" />
+  <rect x="282" y="136" width="20" height="29" rx="3" class="violet" />
+  <rect x="309" y="136" width="20" height="29" rx="3" class="violet" />
+  <rect x="336" y="136" width="20" height="29" rx="3" class="violet" />
+  <rect x="363" y="136" width="20" height="29" rx="3" class="violet" />
+  <path d="M395 152L437 152" class="edge" marker-end="url(#arrow)" />
+  <g class="tile">
+    <rect x="444" y="133" width="223" height="38" rx="10" class="green" />
+    <text x="555.5" y="157" class="label ink">Update per chunk</text>
+  </g>
+  <text x="91" y="221" class="label">Online</text>
+  <rect x="174" y="201" width="20" height="29" rx="3" class="blue" />
+  <rect x="201" y="201" width="20" height="29" rx="3" class="violet" />
+  <rect x="228" y="201" width="20" height="29" rx="3" class="green" />
+  <rect x="255" y="201" width="20" height="29" rx="3" class="amber" />
+  <rect x="282" y="201" width="20" height="29" rx="3" class="blue" />
+  <rect x="309" y="201" width="20" height="29" rx="3" class="violet" />
+  <rect x="336" y="201" width="20" height="29" rx="3" class="green" />
+  <rect x="363" y="201" width="20" height="29" rx="3" class="amber" />
+  <path d="M395 217L437 217" class="edge" marker-end="url(#arrow)" />
+  <g class="tile">
+    <rect x="444" y="198" width="223" height="38" rx="10" class="green" />
+    <text x="555.5" y="222" class="label ink">Update per example</text>
+  </g>
+  <path d="M171 109h107v-5" class="guide" />
+  <path d="M279 109h107v-5" class="guide" />
+  <path d="M170 106H385" class="guide" />
+</svg>

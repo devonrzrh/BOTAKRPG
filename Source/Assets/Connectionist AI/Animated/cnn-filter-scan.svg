@@ -1,0 +1,119 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="242" viewBox="0 0 720 242" role="img" aria-labelledby="title desc">
+  <title id="title">CNN filter scan</title>
+  <desc id="desc">A 2 by 2 filter moves over a 4 by 4 image. With stride one and no padding, each patch produces one entry in the 3 by 3 feature map. Positive and negative scores indicate opposite edge directions.</desc>
+  <style>
+    text { font-family: system-ui, sans-serif; text-anchor: middle; fill: #263449; }
+    .title { font-size: 22px; font-weight: 700; fill: #172554; }
+    .label { font-size: 15px; font-weight: 600; }
+    .note { font-size: 14px; }
+    .num { font-size: 19px; font-weight: 700; }
+    .tile text { fill: #18243a; }
+    .edge { fill: none; stroke: #74849b; stroke-width: 2; }
+    .guide { fill: none; stroke: #74849b; stroke-width: 1; stroke-dasharray: 4 5; }
+    .blue { fill: #dbeafe; stroke: #477fc0; }
+    .violet { fill: #ede9fe; stroke: #8864cb; }
+    .green { fill: #d1fae5; stroke: #19936c; }
+    .amber { fill: #ffedd5; stroke: #bd6a26; }
+    .blue, .violet, .green, .amber { stroke-width: 1.5; }
+    @media (prefers-color-scheme: dark) {
+      text { fill: #e2e8f0; }
+      .title { fill: #f1f5ff; }
+      .edge { stroke: #94a3b8; }
+    }
+    .window { fill: none; stroke: #d14985; stroke-width: 3; }
+    .scan { animation: scan 9s steps(1, end) infinite; }
+    @keyframes scan {
+      0% { transform: translate(0px, 0px); }
+      10% { transform: translate(32px, 0px); }
+      20% { transform: translate(64px, 0px); }
+      30% { transform: translate(0px, 32px); }
+      40% { transform: translate(32px, 32px); }
+      50% { transform: translate(64px, 32px); }
+      60% { transform: translate(0px, 64px); }
+      70% { transform: translate(32px, 64px); }
+      80% { transform: translate(64px, 64px); }
+      100% { transform: translate(64px, 64px); }
+    }
+    @media (prefers-reduced-motion: reduce) { .scan { animation: none; } }
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0 0L8 4L0 8Z" fill="#74849b"/>
+    </marker>
+  </defs>
+  <text x="360" y="28" class="title">CNN filter scan</text>
+  <text x="129" y="63" class="label">Image</text>
+  <text x="354" y="63" class="label">Same filter every time</text>
+  <text x="588" y="63" class="label">Feature map</text>
+  <g class="tile">
+    <rect x="66" y="80" width="29" height="29" rx="4" class="violet"/>
+    <text x="80.5" y="100" class="label">0</text>
+    <rect x="98" y="80" width="29" height="29" rx="4" class="blue"/>
+    <text x="112.5" y="100" class="label">1</text>
+    <rect x="130" y="80" width="29" height="29" rx="4" class="violet"/>
+    <text x="144.5" y="100" class="label">0</text>
+    <rect x="162" y="80" width="29" height="29" rx="4" class="blue"/>
+    <text x="176.5" y="100" class="label">1</text>
+    <rect x="66" y="112" width="29" height="29" rx="4" class="violet"/>
+    <text x="80.5" y="132" class="label">0</text>
+    <rect x="98" y="112" width="29" height="29" rx="4" class="blue"/>
+    <text x="112.5" y="132" class="label">1</text>
+    <rect x="130" y="112" width="29" height="29" rx="4" class="violet"/>
+    <text x="144.5" y="132" class="label">0</text>
+    <rect x="162" y="112" width="29" height="29" rx="4" class="blue"/>
+    <text x="176.5" y="132" class="label">1</text>
+    <rect x="66" y="144" width="29" height="29" rx="4" class="violet"/>
+    <text x="80.5" y="164" class="label">0</text>
+    <rect x="98" y="144" width="29" height="29" rx="4" class="blue"/>
+    <text x="112.5" y="164" class="label">1</text>
+    <rect x="130" y="144" width="29" height="29" rx="4" class="blue"/>
+    <text x="144.5" y="164" class="label">1</text>
+    <rect x="162" y="144" width="29" height="29" rx="4" class="blue"/>
+    <text x="176.5" y="164" class="label">1</text>
+    <rect x="66" y="176" width="29" height="29" rx="4" class="blue"/>
+    <text x="80.5" y="196" class="label">1</text>
+    <rect x="98" y="176" width="29" height="29" rx="4" class="blue"/>
+    <text x="112.5" y="196" class="label">1</text>
+    <rect x="130" y="176" width="29" height="29" rx="4" class="violet"/>
+    <text x="144.5" y="196" class="label">0</text>
+    <rect x="162" y="176" width="29" height="29" rx="4" class="blue"/>
+    <text x="176.5" y="196" class="label">1</text>
+  </g>
+  <g class="tile">
+    <rect x="323" y="105" width="29" height="29" rx="4" class="amber"/>
+    <text x="337.5" y="125" class="label">−1</text>
+    <rect x="355" y="105" width="29" height="29" rx="4" class="blue"/>
+    <text x="369.5" y="125" class="label">1</text>
+    <rect x="323" y="137" width="29" height="29" rx="4" class="amber"/>
+    <text x="337.5" y="157" class="label">−1</text>
+    <rect x="355" y="137" width="29" height="29" rx="4" class="blue"/>
+    <text x="369.5" y="157" class="label">1</text>
+  </g>
+  <g class="tile">
+    <rect x="542" y="96" width="29" height="29" rx="4" class="blue"/>
+    <text x="556.5" y="116" class="label">2</text>
+    <rect x="574" y="96" width="29" height="29" rx="4" class="amber"/>
+    <text x="588.5" y="116" class="label">−2</text>
+    <rect x="606" y="96" width="29" height="29" rx="4" class="blue"/>
+    <text x="620.5" y="116" class="label">2</text>
+    <rect x="542" y="128" width="29" height="29" rx="4" class="blue"/>
+    <text x="556.5" y="148" class="label">2</text>
+    <rect x="574" y="128" width="29" height="29" rx="4" class="amber"/>
+    <text x="588.5" y="148" class="label">−1</text>
+    <rect x="606" y="128" width="29" height="29" rx="4" class="blue"/>
+    <text x="620.5" y="148" class="label">1</text>
+    <rect x="542" y="160" width="29" height="29" rx="4" class="blue"/>
+    <text x="556.5" y="180" class="label">1</text>
+    <rect x="574" y="160" width="29" height="29" rx="4" class="amber"/>
+    <text x="588.5" y="180" class="label">−1</text>
+    <rect x="606" y="160" width="29" height="29" rx="4" class="blue"/>
+    <text x="620.5" y="180" class="label">1</text>
+  </g>
+  <path d="M214 137L296 137" class="edge" marker-end="url(#arrow)"/>
+  <path d="M410 137L516 137" class="edge" marker-end="url(#arrow)"/>
+  <g class="scan">
+    <rect x="64" y="78" width="65" height="65" rx="4" class="window"/>
+    <rect x="540" y="94" width="33" height="33" rx="4" class="window"/>
+  </g>
+  <text x="360" y="226" class="note">Stride 1 · no padding · no bias</text>
+</svg>

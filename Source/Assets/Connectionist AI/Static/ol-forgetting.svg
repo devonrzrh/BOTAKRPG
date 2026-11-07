@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="274" viewBox="0 0 720 274" role="img" aria-labelledby="title desc">
+  <title id="title">Catastrophic forgetting</title>
+  <desc id="desc">An illustrative model first learns task A, then trains only on task B. Its task B accuracy increases while task A performance falls.</desc>
+  <style>
+    text { font-family: system-ui, sans-serif; text-anchor: middle; fill: #263449; }
+    .title { font-size: 22px; font-weight: 700; fill: #172554; }
+    .label { font-size: 15px; font-weight: 600; }
+    .note { font-size: 13px; }
+    .num { font-size: 20px; font-weight: 700; }
+    .edge { fill: none; stroke: #74849b; stroke-width: 2; }
+    .guide { fill: none; stroke: #94a3b8; stroke-width: 1; stroke-dasharray: 4 5; }
+    .blue { fill: #dbeafe; stroke: #477fc0; }
+    .violet { fill: #ede9fe; stroke: #8864cb; }
+    .green { fill: #d1fae5; stroke: #19936c; }
+    .amber { fill: #ffedd5; stroke: #bd6a26; }
+    .blue, .violet, .green, .amber { stroke-width: 1.5; }
+    .blue-line, .violet-line, .green-line, .amber-line { fill: none; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
+    .blue-line { stroke: #3386c5; }
+    .violet-line { stroke: #9670d2; }
+    .green-line { stroke: #21a47a; }
+    .amber-line { stroke: #ce873a; }
+    @media (prefers-color-scheme: dark) {
+      text { fill: #e2e8f0; }
+      .title { fill: #f1f5ff; }
+      .edge { stroke: #94a3b8; }
+    }
+    .ink { fill: #18243a; }
+
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0 0L8 4L0 8Z" fill="#74849b" />
+    </marker>
+  </defs>
+  <text x="360" y="29" class="title">Catastrophic forgetting</text>
+  <path d="M102 193H638" class="guide" />
+  <text x="80" y="197" class="note">0</text>
+  <path d="M102 130H638" class="guide" />
+  <text x="80" y="134" class="note">0.5</text>
+  <path d="M102 67H638" class="guide" />
+  <text x="80" y="71" class="note">1</text>
+  <text x="102" y="212" class="note">0</text>
+  <text x="370" y="212" class="note">5</text>
+  <text x="638" y="212" class="note">10</text>
+  <path d="M102 193L647 193" class="edge" marker-end="url(#arrow)" />
+  <path d="M102 193L102 59" class="edge" marker-end="url(#arrow)" />
+  <text x="370" y="232" class="note">Training progress</text>
+  <text x="92" y="50" class="note">Accuracy</text>
+  <path d="M102 167.8 L155.6 117.4 L209.2 92.2 L262.8 78.34 L316.4 74.56 L370 74.56 L423.6 104.8 L477.2 130 L530.8 147.64 L584.4 161.5 L638 164.02" class="blue-line" />
+  <path d="M102 174.1 L155.6 172.84 L209.2 174.1 L262.8 171.58 L316.4 171.58 L370 170.32 L423.6 123.7 L477.2 102.28 L530.8 88.42 L584.4 82.12 L638 78.34" class="violet-line" />
+  <path d="M370 60V193" class="guide" />
+  <text x="370" y="54" class="note">Start task B</text>
+  <path d="M60 258h22" class="blue-line" />
+  <text x="220" y="263" class="note">Task A</text>
+  <path d="M360 258h22" class="violet-line" />
+  <text x="520" y="263" class="note">Task B</text>
+</svg>

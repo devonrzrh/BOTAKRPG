@@ -6,6 +6,7 @@
 - Implement requests, verify behavior, then commit completed changes to Git.
 - Stage only task-owned changes. Preserve user files and `References/PythonWeb`.
 - Run `npm test` and `npm run build` for gameplay/rendering changes. Verify visual changes in the browser.
+- Be brief and direct. Avoid narration, filler, and repeated summaries. Preserve technical accuracy and important warnings. Show only relevant code and test results. Explain decisions only when non-obvious.
 
 ## Game direction
 
@@ -13,6 +14,7 @@
 - Treat this as a game. Learning happens through exploration, books, puzzles, and combat.
 - No marketing taglines, filler copy, dashboard clutter, or constant instructional panels.
 - Keep the top menu bar visible. Show only controls needed for the current action; put extra tools behind explicit controls.
+- Treat this like a game. Implement good game design. Do think about aesthetics as well. 
 
 ## Interface and room
 
@@ -36,3 +38,21 @@
 - Preserve manual/Blockly/Python parity, bounded worker execution, cancellation, and stale-message rejection.
 - Preserve progression, rewards claimed once, local IndexedDB saves, and validated JSON import/export.
 - Keep keyboard navigation and readable renderer-failure fallbacks.
+
+
+## Subagent delegation
+
+Use subagents proactively when parallel work would
+materially improve speed, quality, or coverage.
+
+- Delegate independent research, codebase exploration,
+  debugging hypotheses, testing, and reviews.
+- Prefer a single agent for small or sequential tasks.
+- Avoid multiple agents editing the same files.
+- Give each subagent a clearly bounded assignment.
+- Keep the main agent responsible for integration,
+  final verification, and reporting.
+- Do not spawn agents when coordination would cost
+  more than the expected benefit.
+- Prefer Luna if the task suffices.
+  

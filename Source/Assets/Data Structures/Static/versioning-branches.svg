@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="760" height="450" viewBox="0 0 760 450" role="img" aria-labelledby="title desc">
+<title id="title">Branches and a merge form a DAG</title><desc id="desc">b1 branches into b2, which corrects S02, and b3, which adds S03. b4 merges both changes and has two parents.</desc>
+<style>
+text { font: 16px Arial, sans-serif; text-anchor: middle; fill: #0f172a; }
+.heading { font-size: 21px; font-weight: 650; }
+.small { font-size: 14px; }
+.label { fill: #334155; }
+.node { fill: #dbeafe; stroke: #4169a9; stroke-width: 1.7; }
+.green { fill: #d1fae5; stroke: #16835e; }
+.white { fill: #f8fafc; stroke: #94a3b8; }
+.edge { fill: none; stroke: #64748b; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.tip { fill: #64748b; }
+.halo { fill: none; stroke: #16835e; stroke-width: 4; opacity: 0; }
+.pulse1 { animation: pulse 9s infinite; }
+.pulse2 { animation: pulse 9s 3s infinite; }
+.pulse3 { animation: pulse 9s 6s infinite; }
+@keyframes pulse { 0%, 30% { opacity: 1; } 34%, 100% { opacity: 0; } }
+@media (prefers-color-scheme: dark) {
+.label { fill: #e2e8f0; }
+.edge { stroke: #b8c7db; }
+.tip { fill: #b8c7db; }
+.halo { stroke: #34d399; }
+}
+@media (prefers-reduced-motion: reduce) { .halo { animation: none; opacity: 1; stroke-width: 2; } }
+</style>
+<defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path class="tip" d="M0 0 L8 4 L0 8 Z"/></marker></defs>
+<text x="380" y="30" class="heading label">Two branches can merge into one revision</text><path class="edge" d="M185 190 L271 109" marker-end="url(#arrow)"/><path class="edge" d="M185 230 L271 311" marker-end="url(#arrow)"/><path class="edge" d="M468 109 L563 190" marker-end="url(#arrow)"/><path class="edge" d="M468 311 L563 230" marker-end="url(#arrow)"/><rect x="20" y="165" width="160" height="90" rx="8" class="node"/><text x="100.0" y="192.0" class="">b1: initial</text><text x="100.0" y="216.0" class="">S01: 70</text><text x="100.0" y="240.0" class="">S02: 80</text><rect x="280" y="65" width="180" height="90" rx="8" class="node"/><text x="370.0" y="92.0" class="">b2: correction</text><text x="370.0" y="116.0" class="">S01: 70</text><text x="370.0" y="140.0" class="">S02: 85</text><rect x="280" y="265" width="180" height="114" rx="8" class="node"/><text x="370.0" y="292.0" class="">b3: addition</text><text x="370.0" y="316.0" class="">S01: 70</text><text x="370.0" y="340.0" class="">S02: 80</text><text x="370.0" y="364.0" class="">S03: 90</text><rect x="575" y="150" width="165" height="114" rx="8" class="node green"/><text x="657.5" y="177.0" class="">b4: merge</text><text x="657.5" y="201.0" class="">S01: 70</text><text x="657.5" y="225.0" class="">S02: 85</text><text x="657.5" y="249.0" class="">S03: 90</text><text x="380" y="425" class="small label">Arrows point from parent to child. b4 has two parents: b2 and b3.</text>
+</svg>

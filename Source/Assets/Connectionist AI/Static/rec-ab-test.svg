@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="234" viewBox="0 0 720 234" role="img" aria-labelledby="title desc">
+  <title id="title">Online A/B evaluation</title>
+  <desc id="desc">Users are assigned at random to model A or B. The two groups' observed outcomes are compared over the same measurement period.</desc>
+  <style>
+    text { font-family: system-ui, sans-serif; text-anchor: middle; fill: #263449; }
+    .title { font-size: 22px; font-weight: 700; fill: #172554; }
+    .label { font-size: 15px; font-weight: 600; }
+    .note { font-size: 13px; }
+    .num { font-size: 20px; font-weight: 700; }
+    .edge { fill: none; stroke: #74849b; stroke-width: 2; }
+    .guide { fill: none; stroke: #94a3b8; stroke-width: 1; stroke-dasharray: 4 5; }
+    .blue { fill: #dbeafe; stroke: #477fc0; }
+    .violet { fill: #ede9fe; stroke: #8864cb; }
+    .green { fill: #d1fae5; stroke: #19936c; }
+    .amber { fill: #ffedd5; stroke: #bd6a26; }
+    .blue, .violet, .green, .amber { stroke-width: 1.5; }
+    .blue-line, .violet-line, .green-line, .amber-line { fill: none; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
+    .blue-line { stroke: #3386c5; }
+    .violet-line { stroke: #9670d2; }
+    .green-line { stroke: #21a47a; }
+    .amber-line { stroke: #ce873a; }
+    @media (prefers-color-scheme: dark) {
+      text { fill: #e2e8f0; }
+      .title { fill: #f1f5ff; }
+      .edge { stroke: #94a3b8; }
+    }
+    .ink { fill: #18243a; }
+
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0 0L8 4L0 8Z" fill="#74849b" />
+    </marker>
+  </defs>
+  <text x="360" y="29" class="title">Online A/B evaluation</text>
+  <g class="tile">
+    <rect x="33" y="95" width="140" height="38" rx="10" class="blue" />
+    <text x="103" y="119" class="label ink">Users</text>
+  </g>
+  <path d="M179 114L242 114" class="edge" marker-end="url(#arrow)" />
+  <g class="tile">
+    <rect x="249" y="95" width="145" height="38" rx="10" class="violet" />
+    <text x="321.5" y="119" class="label ink">Random split</text>
+  </g>
+  <path d="M401 113L463 78" class="edge" marker-end="url(#arrow)" />
+  <path d="M401 114L463 169" class="edge" marker-end="url(#arrow)" />
+  <g class="tile">
+    <rect x="470" y="59" width="178" height="38" rx="10" class="blue" />
+    <text x="559" y="83" class="label ink">Model A</text>
+  </g>
+  <g class="tile">
+    <rect x="470" y="150" width="178" height="38" rx="10" class="green" />
+    <text x="559" y="174" class="label ink">Model B</text>
+  </g>
+  <text x="560" y="119" class="note">Compare engagement</text>
+  <path d="M664 80H690V171H664" class="guide" />
+</svg>

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#748af9" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+  <style>
+    .pulse { fill: #79dce9; animation: pulse 2.8s ease-in-out infinite; }
+    .delay { animation-delay: -.9s; }
+    @keyframes pulse { 50% { opacity: .35; } }
+    @media (prefers-reduced-motion: reduce) { .pulse { animation: none; } }
+  </style>
+  <path d="M12 6v5m0 0H5v5m7-5h7v5"/><rect x="9" y="2" width="6" height="5" rx="1" fill="#ad95ff"/><circle cx="5" cy="19" r="3" class="pulse"/><circle cx="19" cy="19" r="3" class="pulse delay"/>
+</svg>

@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="130" viewBox="0 0 480 130" role="img" aria-labelledby="title">
+  <title id="title">Circular queue wraps from slot 3 to slot 0</title>
+  <style>
+    text { font: 16px system-ui, sans-serif; text-anchor: middle; fill: #0f172a; }
+    .label { paint-order: stroke; stroke: #f8fafc; stroke-width: 3px; stroke-linejoin: round; }
+    rect, circle { fill: #dbeafe; stroke: #4169a9; stroke-width: 1.5px; }
+    .edge { fill: none; stroke: #64748b; stroke-width: 2px; stroke-linecap: round; }
+    .tip { fill: #64748b; }
+    @media (prefers-color-scheme: dark) {
+      .label { fill: #f8fafc; stroke: #111827; }
+      .edge { stroke: #b8c7db; }
+      .tip { fill: #b8c7db; }
+    }
+  </style>
+  <defs><marker id="arrow" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto-start-reverse"><path class="tip" d="M0 0 L7 3.5 L0 7 Z"/></marker></defs>
+  <text class="label" x="240" y="27">The next slot after 3 is 0</text>
+  <rect x="87" y="44" width="56" height="35" rx="5"/><text class="value" x="115" y="66.5">0</text>
+  <rect x="170" y="44" width="56" height="35" rx="5"/><text class="value" x="198" y="66.5">1</text>
+  <rect x="253" y="44" width="56" height="35" rx="5"/><text class="value" x="281" y="66.5">2</text>
+  <rect x="336" y="44" width="56" height="35" rx="5"/><text class="value" x="364" y="66.5">3</text>
+  <path class="edge" d="M147 61 H166" marker-end="url(#arrow)"/>
+  <path class="edge" d="M230 61 H249" marker-end="url(#arrow)"/>
+  <path class="edge" d="M313 61 H332" marker-end="url(#arrow)"/>
+  <path class="edge" d="M364 84 V108 H115 V84" marker-end="url(#arrow)"/>
+</svg>

@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="276" viewBox="0 0 720 276" role="img" aria-labelledby="title desc">
+  <title id="title">Learning rate on L = w²</title>
+  <desc id="desc">On this toy quadratic, rate 0.02 converges slowly, 0.2 converges quickly, and 1.005 diverges. All losses are divided by the starting loss.</desc>
+  <style>
+    text { font-family: system-ui, sans-serif; text-anchor: middle; fill: #263449; }
+    .title { font-size: 22px; font-weight: 700; fill: #172554; }
+    .label { font-size: 15px; font-weight: 600; }
+    .note { font-size: 13px; }
+    .num { font-size: 20px; font-weight: 700; }
+    .edge { fill: none; stroke: #74849b; stroke-width: 2; }
+    .guide { fill: none; stroke: #94a3b8; stroke-width: 1; stroke-dasharray: 4 5; }
+    .blue { fill: #dbeafe; stroke: #477fc0; }
+    .violet { fill: #ede9fe; stroke: #8864cb; }
+    .green { fill: #d1fae5; stroke: #19936c; }
+    .amber { fill: #ffedd5; stroke: #bd6a26; }
+    .blue, .violet, .green, .amber { stroke-width: 1.5; }
+    .blue-line, .violet-line, .green-line, .amber-line { fill: none; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
+    .blue-line { stroke: #3386c5; }
+    .violet-line { stroke: #9670d2; }
+    .green-line { stroke: #21a47a; }
+    .amber-line { stroke: #ce873a; }
+    @media (prefers-color-scheme: dark) {
+      text { fill: #e2e8f0; }
+      .title { fill: #f1f5ff; }
+      .edge { stroke: #94a3b8; }
+    }
+    .ink { fill: #18243a; }
+
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0 0L8 4L0 8Z" fill="#74849b" />
+    </marker>
+  </defs>
+  <text x="360" y="29" class="title">Learning rate on L = w²</text>
+  <path d="M100 192H629" class="guide" />
+  <text x="78" y="196" class="note">0</text>
+  <path d="M100 156.29H629" class="guide" />
+  <text x="78" y="160.29" class="note">0.4</text>
+  <path d="M100 120.57H629" class="guide" />
+  <text x="78" y="124.57" class="note">0.8</text>
+  <path d="M100 84.86H629" class="guide" />
+  <text x="78" y="88.86" class="note">1.2</text>
+  <text x="100" y="211" class="note">0</text>
+  <text x="276.33" y="211" class="note">4</text>
+  <text x="452.67" y="211" class="note">8</text>
+  <text x="629" y="211" class="note">12</text>
+  <path d="M100 192L638 192" class="edge" marker-end="url(#arrow)" />
+  <path d="M100 192L100 59" class="edge" marker-end="url(#arrow)" />
+  <text x="364.5" y="231" class="note">Update step</text>
+  <text x="90" y="50" class="note">Loss / initial loss</text>
+  <path d="M100 102.71 L144.08 109.71 L188.17 116.17 L232.25 122.11 L276.33 127.59 L320.42 132.64 L364.5 137.29 L408.58 141.58 L452.67 145.54 L496.75 149.18 L540.83 152.54 L584.92 155.63 L629 158.48" class="blue-line" />
+  <path d="M100 102.71 L144.08 159.86 L188.17 180.43 L232.25 187.83 L276.33 190.5 L320.42 191.46 L364.5 191.81 L408.58 191.93 L452.67 191.97 L496.75 191.99 L540.83 192 L584.92 192 L629 192" class="green-line" />
+  <path d="M100 102.71 L144.08 100.92 L188.17 99.09 L232.25 97.22 L276.33 95.32 L320.42 93.37 L364.5 91.39 L408.58 89.37 L452.67 87.31 L496.75 85.2 L540.83 83.05 L584.92 80.86 L629 78.63" class="amber-line" />
+  <path d="M60 258h22" class="blue-line" />
+  <text x="170" y="263" class="note">η = 0.02</text>
+  <path d="M260 258h22" class="green-line" />
+  <text x="370" y="263" class="note">η = 0.2</text>
+  <path d="M460 258h22" class="amber-line" />
+  <text x="570" y="263" class="note">η = 1.005</text>
+</svg>

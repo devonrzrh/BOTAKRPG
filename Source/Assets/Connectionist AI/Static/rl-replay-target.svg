@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="265" viewBox="0 0 720 265" role="img" aria-labelledby="title desc">
+  <title id="title">DQN replay and target network</title>
+  <desc id="desc">Transitions are stored in replay memory, then sampled into training batches. A separate slowly updated target network supplies bootstrap values, while the online network is trained against those targets.</desc>
+  <style>
+    text { font-family: system-ui, sans-serif; text-anchor: middle; fill: #263449; }
+    .title { font-size: 22px; font-weight: 700; fill: #172554; }
+    .label { font-size: 15px; font-weight: 600; }
+    .note { font-size: 13px; }
+    .num { font-size: 20px; font-weight: 700; }
+    .edge { fill: none; stroke: #74849b; stroke-width: 2; }
+    .guide { fill: none; stroke: #94a3b8; stroke-width: 1; stroke-dasharray: 4 5; }
+    .blue { fill: #dbeafe; stroke: #477fc0; }
+    .violet { fill: #ede9fe; stroke: #8864cb; }
+    .green { fill: #d1fae5; stroke: #19936c; }
+    .amber { fill: #ffedd5; stroke: #bd6a26; }
+    .blue, .violet, .green, .amber { stroke-width: 1.5; }
+    .blue-line, .violet-line, .green-line, .amber-line { fill: none; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
+    .blue-line { stroke: #3386c5; }
+    .violet-line { stroke: #9670d2; }
+    .green-line { stroke: #21a47a; }
+    .amber-line { stroke: #ce873a; }
+    @media (prefers-color-scheme: dark) {
+      text { fill: #e2e8f0; }
+      .title { fill: #f1f5ff; }
+      .edge { stroke: #94a3b8; }
+    }
+    .ink { fill: #18243a; }
+
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0 0L8 4L0 8Z" fill="#74849b" />
+    </marker>
+  </defs>
+  <text x="360" y="29" class="title">DQN replay and target network</text>
+  <g class="tile">
+    <rect x="28" y="62" width="164" height="38" rx="10" class="blue" />
+    <text x="110" y="86" class="label ink">Transitions</text>
+  </g>
+  <path d="M198 81L237 81" class="edge" marker-end="url(#arrow)" />
+  <g class="tile">
+    <rect x="243" y="62" width="185" height="38" rx="10" class="violet" />
+    <text x="335.5" y="86" class="label ink">Replay buffer</text>
+  </g>
+  <path d="M434 81L488 81" class="edge" marker-end="url(#arrow)" />
+  <g class="tile">
+    <rect x="494" y="62" width="198" height="38" rx="10" class="green" />
+    <text x="593" y="86" class="label ink">Random mini-batch</text>
+  </g>
+  <path d="M590 104V133H124V155" class="edge" marker-end="url(#arrow)" />
+  <path d="M590 104V133H367V155" class="edge" marker-end="url(#arrow)" />
+  <g class="tile">
+    <rect x="39" y="160" width="170" height="38" rx="10" class="blue" />
+    <text x="124" y="184" class="label ink">Online network</text>
+  </g>
+  <g class="tile">
+    <rect x="282" y="160" width="170" height="38" rx="10" class="violet" />
+    <text x="367" y="184" class="label ink">Target network</text>
+  </g>
+  <g class="tile">
+    <rect x="523" y="160" width="170" height="38" rx="10" class="amber" />
+    <text x="608" y="184" class="label ink">TD loss</text>
+  </g>
+  <path d="M214 179H232V145H508V169H517" class="edge" marker-end="url(#arrow)" />
+  <path d="M457 179L517 179" class="edge" marker-end="url(#arrow)" />
+  <text x="360" y="241" class="note">Target copy updated slowly</text>
+  <path d="M123 201V223H367V201" class="guide" marker-end="url(#arrow)" />
+</svg>

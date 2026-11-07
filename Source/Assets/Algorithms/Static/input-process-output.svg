@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="180" viewBox="0 0 640 180" role="img" aria-labelledby="title desc">
+<title id="title">An algorithm turns input into output</title><desc id="desc">The sorting algorithm transforms the original scores into ascending order.</desc>
+<style>
+text { font: 16px system-ui, sans-serif; text-anchor: middle; fill: #14243a; }
+.label { paint-order: stroke; stroke: #f8fafc; stroke-width: 3px; stroke-linejoin: round; }
+.heading { font-size: 20px; font-weight: 700; }
+.small { font-size: 13px; }
+.tile { fill: #dbeafe; stroke: #4169a9; stroke-width: 2; }
+.focus { fill: #a7f3d0; stroke: #16835e; }
+.muted { fill: #e2e8f0; stroke: #64748b; }
+.edge { stroke: #64748b; stroke-width: 2.5; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.route { stroke: #16835e; stroke-width: 4; fill: none; stroke-linecap: round; }
+.badge { fill: #334155; stroke: #f8fafc; stroke-width: 1.5; }
+.badge-text { fill: #fff; font-size: 12px; font-weight: 700; }
+@media (prefers-color-scheme: dark) {
+  .label { fill: #f8fafc; stroke: #111827; }
+  .edge { stroke: #b8c7db; }
+  .route { stroke: #4ade80; }
+}
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
+
+</style>
+<text class="label heading" x="320" y="29">An algorithm turns input into output</text>
+<rect class="tile" x="47.5" y="80" width="125" height="40" rx="7"/><text class="ink" x="110" y="106">Input</text><rect class="tile focus" x="230.0" y="80" width="180" height="40" rx="7"/><text class="ink" x="320" y="106">Compare and swap</text><rect class="tile" x="467.5" y="80" width="125" height="40" rx="7"/><text class="ink" x="530" y="106">Output</text><path class="edge" d="M176 100 L223 100"/><path class="edge" d="M214.9 103.9 L223 100 L214.9 96.1"/><path class="edge" d="M414 100 L463 100"/><path class="edge" d="M454.9 103.9 L463 100 L454.9 96.1"/><text class="label small" x="110" y="146">72, 85, 40, 29, 100, 91</text><text class="label small" x="530" y="146">29, 40, 72, 85, 91, 100</text>
+</svg>

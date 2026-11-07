@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="225" viewBox="0 0 720 225" role="img" aria-labelledby="title desc">
+  <title id="title">Q-learning and SARSA next-action targets</title>
+  <desc id="desc">For a next-state estimate with left value two and right value five, Q-learning bootstraps from five. SARSA uses the value of the actual next action, which is two if exploration selects left.</desc>
+  <style>
+    text { font-family: system-ui, sans-serif; text-anchor: middle; fill: #263449; }
+    .title { font-size: 22px; font-weight: 700; fill: #172554; }
+    .label { font-size: 15px; font-weight: 600; }
+    .note { font-size: 13px; }
+    .num { font-size: 20px; font-weight: 700; }
+    .edge { fill: none; stroke: #74849b; stroke-width: 2; }
+    .guide { fill: none; stroke: #94a3b8; stroke-width: 1; stroke-dasharray: 4 5; }
+    .blue { fill: #dbeafe; stroke: #477fc0; }
+    .violet { fill: #ede9fe; stroke: #8864cb; }
+    .green { fill: #d1fae5; stroke: #19936c; }
+    .amber { fill: #ffedd5; stroke: #bd6a26; }
+    .blue, .violet, .green, .amber { stroke-width: 1.5; }
+    .blue-line, .violet-line, .green-line, .amber-line { fill: none; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
+    .blue-line { stroke: #3386c5; }
+    .violet-line { stroke: #9670d2; }
+    .green-line { stroke: #21a47a; }
+    .amber-line { stroke: #ce873a; }
+    @media (prefers-color-scheme: dark) {
+      text { fill: #e2e8f0; }
+      .title { fill: #f1f5ff; }
+      .edge { stroke: #94a3b8; }
+    }
+    .ink { fill: #18243a; }
+
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0 0L8 4L0 8Z" fill="#74849b" />
+    </marker>
+  </defs>
+  <text x="360" y="29" class="title">Q-learning and SARSA next-action targets</text>
+  <text x="177" y="62" class="label">Next-state action values</text>
+  <g class="tile">
+    <rect x="61" y="78" width="105" height="38" rx="10" class="blue" />
+    <text x="113.5" y="102" class="label ink">Left: 2</text>
+  </g>
+  <g class="tile">
+    <rect x="188" y="78" width="105" height="38" rx="10" class="green" />
+    <text x="240.5" y="102" class="label ink">Right: 5</text>
+  </g>
+  <path d="M298 97H358V77H423" class="edge" marker-end="url(#arrow)" />
+  <g class="tile">
+    <rect x="429" y="58" width="251" height="38" rx="10" class="violet" />
+    <text x="554.5" y="82" class="label ink">Q-learning → max value 5</text>
+  </g>
+  <path d="M113 121V170H423" class="edge" marker-end="url(#arrow)" />
+  <g class="tile">
+    <rect x="429" y="151" width="251" height="38" rx="10" class="amber" />
+    <text x="554.5" y="175" class="label ink">SARSA → chosen left value 2</text>
+  </g>
+  <text x="180" y="209" class="note">Illustrative next action: left</text>
+</svg>

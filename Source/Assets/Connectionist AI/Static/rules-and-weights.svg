@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="178" viewBox="0 0 720 178" role="img" aria-labelledby="title desc">
+  <title id="title">Symbolic and connectionist AI</title>
+  <desc id="desc">A person writes a rule before it is applied. For a learned system, labelled examples and training produce the weights before prediction.</desc>
+  <style>
+    text { font-family: system-ui, sans-serif; text-anchor: middle; fill: #263449; }
+    .title { font-size: 22px; font-weight: 700; fill: #172554; }
+    .label { font-size: 15px; font-weight: 600; }
+    .note { font-size: 14px; }
+    .num { font-size: 19px; font-weight: 700; }
+    .tile text { fill: #18243a; }
+    .edge { fill: none; stroke: #74849b; stroke-width: 2; }
+    .guide { fill: none; stroke: #74849b; stroke-width: 1; stroke-dasharray: 4 5; }
+    .blue { fill: #dbeafe; stroke: #477fc0; }
+    .violet { fill: #ede9fe; stroke: #8864cb; }
+    .green { fill: #d1fae5; stroke: #19936c; }
+    .amber { fill: #ffedd5; stroke: #bd6a26; }
+    .blue, .violet, .green, .amber { stroke-width: 1.5; }
+    @media (prefers-color-scheme: dark) {
+      text { fill: #e2e8f0; }
+      .title { fill: #f1f5ff; }
+      .edge { stroke: #94a3b8; }
+    }
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0 0L8 4L0 8Z" fill="#74849b"/>
+    </marker>
+  </defs>
+  <text x="360" y="28" class="title">Symbolic and connectionist AI</text>
+  <text x="89" y="64" class="label">Symbolic AI</text>
+  <text x="89" y="146" class="label">Connectionist AI</text>
+  <path d="M320 61L374 61" class="edge" marker-end="url(#arrow)"/>
+  <path d="M507 61L553 61" class="edge" marker-end="url(#arrow)"/>
+  <path d="M320 143L374 143" class="edge" marker-end="url(#arrow)"/>
+  <path d="M507 143L553 143" class="edge" marker-end="url(#arrow)"/>
+  <g class="tile">
+    <rect x="182" y="42" width="138" height="38" rx="19" class="blue"/>
+    <text x="251" y="66" class="label">Expert writes rule</text>
+  </g>
+  <g class="tile">
+    <rect x="379" y="42" width="128" height="38" rx="19" class="violet"/>
+    <text x="443" y="66" class="label">Stored rule</text>
+  </g>
+  <g class="tile">
+    <rect x="558" y="42" width="143" height="38" rx="19" class="green"/>
+    <text x="629.5" y="66" class="label">Apply to new case</text>
+  </g>
+  <g class="tile">
+    <rect x="182" y="124" width="138" height="38" rx="19" class="blue"/>
+    <text x="251" y="148" class="label">Labelled examples</text>
+  </g>
+  <g class="tile">
+    <rect x="379" y="124" width="128" height="38" rx="19" class="violet"/>
+    <text x="443" y="148" class="label">Fit weights</text>
+  </g>
+  <g class="tile">
+    <rect x="558" y="124" width="143" height="38" rx="19" class="green"/>
+    <text x="629.5" y="148" class="label">Predict new case</text>
+  </g>
+</svg>
