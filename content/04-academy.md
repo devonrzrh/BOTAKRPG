@@ -29,9 +29,6 @@ id: perceptron-exhibit
 title: Perceptron lab
 template: perceptron
 lesson: perceptron-basics
-clue:
-  title: Signal match
-  text: The outgoing signal points to the abandoned subnet.
 ```
 
 ```entity

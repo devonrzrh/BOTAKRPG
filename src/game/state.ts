@@ -8,10 +8,33 @@ const masterySchema = z.object({
   evidence: z.array(z.string()),
   answered: z.array(z.string()),
 });
+const finite = z.number().finite();
+const signalSampleSchema = z.object({
+  x: finite.min(-1).max(1),
+  y: finite.min(-1).max(1),
+  label: z.union([z.literal(0), z.literal(1)]),
+});
+const signalNetworkSchema = z.object({
+  weights: z.tuple([finite, finite]),
+  bias: finite,
+  epochs: z.number().int().min(0).max(1_000_000),
+});
+const signalExperimentSchema = z
+  .object({
+    samples: z.array(signalSampleSchema).max(200),
+    network: signalNetworkSchema,
+    rate: finite.gt(0).max(1),
+    epochs: z.number().int().min(1).max(100),
+    label: z.union([z.literal(0), z.literal(1)]),
+    tested: z.boolean(),
+  })
+  .nullable()
+  .default(null);
 export const saveSchema = z
   .object({
     version: z.literal(1),
     curriculumVersion: z.union([z.literal(1), z.literal(2)]).default(1),
+    signalExperiment: signalExperimentSchema,
     chapterProgress: z
       .record(
         z.object({
@@ -65,6 +88,7 @@ export function initialSave(): Save {
   return {
     version: 1,
     curriculumVersion: 2,
+    signalExperiment: null,
     chapterProgress: {},
     story: {
       prologueSeen: false,

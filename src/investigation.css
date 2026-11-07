@@ -231,6 +231,8 @@
 /* Chapter briefs retain a compact progress route and a single reading column. */
 .app .learning-quest {
   width: min(1040px, 100%);
+  max-height: calc(100dvh - var(--top-height) - 48px);
+  min-height: 0;
   background: #14232d;
   border: 1px solid #698183;
   border-top: 3px solid #cfb37a;
@@ -284,6 +286,8 @@
   color: #5a727a;
 }
 .app .learning-quest main {
+  min-height: 0;
+  flex: 1 1 auto;
   background: radial-gradient(ellipse at top right, #44616726, transparent 70%);
   padding: 26px 36px;
 }
@@ -295,6 +299,7 @@
   color: #eee5d1;
 }
 .app .learning-quest footer {
+  flex-shrink: 0;
   border-top: 1px solid #4a6169;
   background: #0c1a23;
 }

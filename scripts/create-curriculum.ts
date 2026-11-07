@@ -325,8 +325,8 @@ const specs = [
     branch: "signal-identification",
     boss: "signal-mimic",
     title: "Signal Mimic",
-    clue: "Signal signature",
-    text: "The model separates ECHO-7's signal from the decoy traffic.",
+    clue: "LUMA's verified handshake",
+    text: "Verified handshake: M-04 forwarded ECHO-7 from relay R-17 to the abandoned subnet.",
   },
 ];
 const branches = parseMarkdown(
@@ -385,7 +385,7 @@ for (const spec of specs) {
         ? "Find the trapped courier PATCH. Trace ECHO-7's forged routes and recover its signed delivery receipt from the Route Warden."
         : spec.topic === "structures"
           ? "Restore the archivist FOLIO's identity, reconstruct the erased gateway log and confront the Archive Keeper."
-          : `Investigate ${chapters.length} ${spec.topic === "ai" ? "connectionist AI" : spec.topic} chapters, then defeat ${spec.title} to recover the clue.`;
+          : "Help LUMA isolate a forged signal, test the evidence across ten AI chapters and recover a verified handshake from Signal Mimic.";
   }
 }
 await writeFile(

@@ -1,5 +1,19 @@
 # Validation · 2026-11-07
 
+## Signal identification branch
+
+84 tests pass; production build validates 282 records. Three Luna subagents authored the signal narrative, added branch playthrough tests, and audited integration plus experiment persistence. Signal identification now has LUMA, twelve introductory scenes, ten chapter-aligned opponents, Signal Mimic, and a recoverable ending. Its independently verified handshake identifies M-04, R-17 and the abandoned subnet. The story supports pursuing this branch before the other two.
+
+The lab now offers Continue investigation after successful calibration. Samples, weights, training settings and test state persist through IndexedDB and JSON exports. Missing experiment data in older saves defaults to null; malformed imported experiments are rejected. A long chapter brief now keeps its footer within the viewport.
+
+Browser playthrough completed the lab with four examples and ten epochs, obtained 6/6 held-out matches, restored the trained experiment after reload, completed all ten guided chapters and encounters, earned two levels, defeated Signal Mimic, reloaded before filing, resumed Read conclusion, and claimed the signal reward once. The quest screen displayed Reward claimed and ECHO-7 became available alongside the two previously completed branches. The original reduced-motion setting was restored. Tests also cover a fresh independent branch, healing, defeat/retry, chapter mastery, reward duplication and final unlock requirements.
+
+![Signal lab](screenshots/signal-lab.png)
+
+![Signal resolution](screenshots/signal-ending.png)
+
+![Three clues recovered](screenshots/signal-complete.png)
+
 ## Investigation interface pass
 
 78 tests pass; production build passes with 269 validated records. Added a shared slate, teal and brass treatment across menus, chapter briefs, combat, settings and activity tools. The physical quest display now has a grid, connection sockets, framed nodes and clearer selected states. Text wraps at measured word boundaries. The desk ledger has printed equipment rows and skill cards. Full-screen books retain paper pages with an icon toolbar; equipment cards show item types and equipped state.

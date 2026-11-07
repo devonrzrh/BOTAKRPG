@@ -1131,6 +1131,6 @@ enemy:
     - source-ai-09
     - source-ai-10
 clue:
-  title: Signal signature
-  text: The model separates ECHO-7's signal from the decoy traffic.
+  title: LUMA's verified handshake
+  text: 'Verified handshake: M-04 forwarded ECHO-7 from relay R-17 to the abandoned subnet.'
 ```

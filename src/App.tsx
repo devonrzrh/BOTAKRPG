@@ -1646,6 +1646,12 @@ export default function App() {
               {panel === "garden" && (
                 <Suspense fallback={<p>Opening the exhibit…</p>}>
                   <Garden
+                    experiment={save.signalExperiment}
+                    onExperiment={(signalExperiment) =>
+                      updateSave((s) => ({ ...s, signalExperiment }))
+                    }
+                    completed={save.completed.includes("perceptron-exhibit")}
+                    onContinue={() => continueBranch("perceptron-exhibit")}
                     onComplete={() => {
                       updateSave((s) =>
                         evidence(
@@ -1654,7 +1660,9 @@ export default function App() {
                           "held-out-boundary",
                         ),
                       );
-                      notify("Perceptron objective complete.");
+                      notify(
+                        "Calibration complete. Continue the signal investigation.",
+                      );
                     }}
                     onLesson={() => openLesson("perceptron-basics")}
                   />

@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import type { Save } from "../game/state";
 import {
   addSample,
   accuracy,
@@ -11,19 +12,45 @@ import {
 export function Garden({
   onComplete,
   onLesson,
+  onContinue,
+  completed,
+  experiment,
+  onExperiment,
 }: {
   onComplete: () => void;
   onLesson: () => void;
+  onContinue: () => void;
+  completed: boolean;
+  experiment: Save["signalExperiment"];
+  onExperiment: (value: NonNullable<Save["signalExperiment"]>) => void;
 }) {
-  const [samples, setSamples] = useState<Sample[]>([]),
-    [network, setNetwork] = useState(initialNetwork),
-    [label, setLabel] = useState<0 | 1>(0),
-    [rate, setRate] = useState(0.2),
-    [epochs, setEpochs] = useState(10),
-    [tested, setTested] = useState(false),
+  const [samples, setSamples] = useState<Sample[]>(
+      () => experiment?.samples ?? [],
+    ),
+    [network, setNetwork] = useState(
+      () => experiment?.network ?? initialNetwork(),
+    ),
+    [label, setLabel] = useState<0 | 1>(() => experiment?.label ?? 0),
+    [rate, setRate] = useState(() => experiment?.rate ?? 0.2),
+    [epochs, setEpochs] = useState(() => experiment?.epochs ?? 10),
+    [tested, setTested] = useState(() => experiment?.tested ?? false),
     [message, setMessage] = useState(""),
     [x, setX] = useState(-0.5),
     [y, setY] = useState(-0.5);
+  const persist = useRef(onExperiment);
+  persist.current = onExperiment;
+  useEffect(() => {
+    if (
+      !Number.isFinite(rate) ||
+      rate <= 0 ||
+      rate > 1 ||
+      !Number.isInteger(epochs) ||
+      epochs < 1 ||
+      epochs > 100
+    )
+      return;
+    persist.current({ samples, network, label, rate, epochs, tested });
+  }, [samples, network, label, rate, epochs, tested]);
   const add = (px: number, py: number) => {
     try {
       setSamples((previous) => addSample(previous, { x: px, y: py, label }));
@@ -223,7 +250,7 @@ export function Garden({
           </label>
         </details>
         <button
-          className="primary"
+          className={completed ? undefined : "primary"}
           onClick={() => {
             try {
               setNetwork(train(network, samples, epochs, rate));
@@ -243,7 +270,7 @@ export function Garden({
             if (network.epochs >= 10 && score >= 5 / 6) {
               onComplete();
               setMessage(
-                "Exhibit complete. Your boundary generalizes to the held-out examples.",
+                `Calibration complete: ${Math.round(score * 6)} of 6 held-out signals matched. This lab result does not authenticate a sender.`,
               );
             } else
               setMessage(
@@ -254,8 +281,18 @@ export function Garden({
           Test signals
         </button>
         <p className="feedback" role="status">
-          {message || "Start by adding examples of both classes."}
+          {message ||
+            (tested
+              ? "Saved test restored. Continue the investigation or adjust the model."
+              : samples.length
+                ? "Saved examples restored. Train, then test the boundary."
+                : "Start by adding examples of both classes.")}
         </p>
+        {completed && (
+          <button className="primary" onClick={onContinue}>
+            Continue investigation
+          </button>
+        )}
         <button className="text-button" onClick={onLesson}>
           Reference book
         </button>

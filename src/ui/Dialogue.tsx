@@ -10,7 +10,7 @@ import type { Dialogue as DialogueContent } from "../content/schema";
 import { typewriterTimeline, revealedCharacters } from "../game/typewriter";
 
 function Portrait({ speaker }: { speaker: string }) {
-  const robot = /\b(PATCH|FOLIO|Warden|Keeper)\b/i.test(speaker);
+  const robot = /\b(PATCH|FOLIO|LUMA|Mimic|Warden|Keeper)\b/i.test(speaker);
   return (
     <div
       className={`dialogue-portrait ${robot ? "is-robot" : "is-human"}`}

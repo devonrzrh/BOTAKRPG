@@ -59,8 +59,8 @@ lesson: stacks-queues
 id: signal-identification
 title: Signal identification
 type: quest
-description: Investigate 10 connectionist AI chapters, then defeat Signal Mimic
-  to recover the clue.
+description: Help LUMA isolate a forged signal, test the evidence across ten AI
+  chapters and recover a verified handshake from Signal Mimic.
 objectives:
   - perceptron-exhibit
   - encounter-source-ai-01
