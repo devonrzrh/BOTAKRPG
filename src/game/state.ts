@@ -4,6 +4,22 @@ import { STARTER_CODE } from "./maze";
 import { questUnlocked } from "./investigation";
 import { DEFAULT_PLAYER_NAME, assertPlayerName } from "./player";
 import { TUTORIAL_IDS, type TutorialId } from "./tutorials";
+import { createPuzzle, puzzleCommand } from "./puzzles";
+const puzzleRunSchema = z.object({
+  commands: z
+    .array(
+      z.union([
+        z.object({ type: z.enum(["push", "pop", "rotate", "dispatch"]) }),
+        z.object({
+          type: z.literal("swap"),
+          index: z.number().int().nonnegative(),
+        }),
+        z.object({ type: z.literal("move"), node: z.number().int() }),
+      ]),
+    )
+    .max(1000),
+  assisted: z.boolean(),
+});
 const masterySchema = z.object({
   correct: z.number().int().nonnegative(),
   attempted: z.number().int().nonnegative(),
@@ -14,7 +30,9 @@ const finite = z.number().finite();
 const readingSchema = z
   .object({
     mode: z.enum(["book", "fullscreen"]).default("book"),
-    fontSize: z.union([z.literal(20), z.literal(22), z.literal(24)]).default(22),
+    fontSize: z
+      .union([z.literal(20), z.literal(22), z.literal(24)])
+      .default(22),
     positions: z
       .record(
         z.object({
@@ -90,6 +108,7 @@ export const saveSchema = z
     bookmarks: z.array(z.string()),
     notes: z.record(z.string().max(20000)),
     reading: readingSchema,
+    puzzleRuns: z.record(puzzleRunSchema).default({}),
     code: z.string().max(200000),
     blocks: z.unknown().nullable(),
     seed: z.number().int().min(0).max(2147483647),
@@ -139,6 +158,7 @@ export function initialSave(): Save {
     bookmarks: [],
     notes: {},
     reading: { mode: "book", fontSize: 22, positions: {} },
+    puzzleRuns: {},
     code: STARTER_CODE,
     blocks: null,
     seed: 42,
@@ -314,6 +334,22 @@ export function parseSave(input: unknown, content: Content): Save {
   check(save.bookmarks, "lesson");
   check(Object.keys(save.notes), "lesson");
   check(Object.keys(save.reading.positions), "lesson");
+  for (const [id, run] of Object.entries(save.puzzleRuns)) {
+    const activity = content.entities.find((e) => e.id === id);
+    if (
+      activity?.type !== "activity" ||
+      activity.template !== "puzzle" ||
+      !activity.puzzle
+    )
+      throw new Error(`Save contains unknown puzzle: ${id}`);
+    let state = createPuzzle(activity.puzzle);
+    for (const command of run.commands) {
+      const next = puzzleCommand(state, command);
+      if (next.moves === state.moves)
+        throw new Error(`Invalid puzzle command in ${id}: ${next.message}`);
+      state = next;
+    }
+  }
   check(Object.keys(save.mastery), "lesson");
   check(save.character.skills, "skill");
   for (const [id, progress] of Object.entries(save.chapterProgress)) {

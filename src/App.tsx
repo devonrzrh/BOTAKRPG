@@ -44,10 +44,14 @@ import DOMPurify from "dompurify";
 import { renderLessonMarkdown } from "./game/markdown";
 import { ClueLedger } from "./ui/ClueLedger";
 import { BookReader } from "./ui/BookReader";
+import { PuzzleScreen } from "./ui/PuzzleScreen";
+import { rewardPuzzle } from "./game/puzzleProgress";
+import "./ui/PuzzleCases.css";
 import rawContent from "./generated/content.json";
 import {
   validateContent,
   type Lesson,
+  type Activity,
   type Question,
   type Quest,
   type Skill,
@@ -194,6 +198,7 @@ const topicNames = {
   ai: "Connectionist AI",
 };
 type Panel =
+  | "puzzles"
   | "library"
   | "maze"
   | "battle"
@@ -227,6 +232,12 @@ const destinations = [
   },
 ];
 export default function App() {
+  const [puzzleId, setPuzzleId] = useState<string | null>(null);
+  const [returnPuzzleId, setReturnPuzzleId] = useState<string | null>(null);
+  const puzzleActivities = content.entities.filter(
+    (e): e is Activity => e.type === "activity" && e.template === "puzzle",
+  );
+  const currentPuzzle = puzzleActivities.find((e) => e.id === puzzleId);
   const [save, setSave] = useState<Save>(defaultSave),
     saveRef = useRef(save),
     [booted, setBooted] = useState(false),
@@ -500,6 +511,7 @@ export default function App() {
   const open = useCallback(
     (id: string) => {
       setCombatEvent(null);
+      setReturnPuzzleId(null);
       if (tutorialRef.current) closeTutorial();
       if (id === "exit") return;
       if (id === "library" && !officeFallback) {
@@ -560,6 +572,28 @@ export default function App() {
       const encounter = content.entities.find(
         (e) => e.type === "activity" && e.template === "battle" && e.id === id,
       );
+      const puzzle = content.entities.find(
+        (e) => e.type === "activity" && e.template === "puzzle" && e.id === id,
+      );
+      if (id === "puzzles" || puzzle) {
+        if (!saveRef.current.story.caseAccepted) {
+          setDialogueId("case-briefing");
+          return;
+        }
+        if (!saveRef.current.story.networkIntroSeen) {
+          setPendingActivity(id);
+          setCutsceneId("first-connection");
+          return;
+        }
+        generation.current++;
+        runner.current?.reset();
+        setBookOpen(false);
+        setRealm("hub");
+        setScene("hub");
+        setPuzzleId(puzzle ? id : null);
+        setPanel("puzzles");
+        return;
+      }
       if (encounter?.type === "activity") {
         if (!activityUnlocked(saveRef.current, id, content)) {
           notify("Follow the preceding lead on the quest board first.");
@@ -1324,6 +1358,7 @@ export default function App() {
                           maze: "Packet labyrinth",
                           battle: battle.enemyName,
                           garden: "Perceptron lab",
+                          puzzles: currentPuzzle?.title ?? "Field puzzles",
                           inventory: "Clue ledger",
                           character: "Detective skills",
                           journal: "Quest board",
@@ -1333,6 +1368,14 @@ export default function App() {
                       }
                     </h2>
                   </div>
+                  {panel === "puzzles" && currentPuzzle && (
+                    <button
+                      className="puzzle-back"
+                      onClick={() => setPuzzleId(null)}
+                    >
+                      ← Field puzzles
+                    </button>
+                  )}
                   <button
                     className="icon-button"
                     aria-label={
@@ -1909,6 +1952,62 @@ export default function App() {
                   }}
                 />
               )}
+              {panel === "puzzles" &&
+                (currentPuzzle ? (
+                  <>
+                    <PuzzleScreen
+                      key={currentPuzzle.id}
+                      activity={currentPuzzle}
+                      run={save.puzzleRuns[currentPuzzle.id]}
+                      onRun={(run) =>
+                        updateSave((s) => ({
+                          ...s,
+                          puzzleRuns: {
+                            ...s.puzzleRuns,
+                            [currentPuzzle.id]: run,
+                          },
+                        }))
+                      }
+                      completed={save.completed.includes(currentPuzzle.id)}
+                      onComplete={(assisted) =>
+                        updateSave((s) =>
+                          rewardPuzzle(s, currentPuzzle, content, assisted),
+                        )
+                      }
+                      onContinue={() => open("puzzles")}
+                      onLesson={() => {
+                        openLesson(currentPuzzle.lesson);
+                        setReturnPuzzleId(currentPuzzle.id);
+                      }}
+                    />
+                  </>
+                ) : (
+                  <div
+                    className="puzzle-case-list"
+                    aria-label="Field puzzle cases"
+                  >
+                    {puzzleActivities.map((activity) => (
+                      <button
+                        key={activity.id}
+                        onClick={() => open(activity.id)}
+                      >
+                        <strong>{activity.title}</strong>
+                        <span>
+                          {
+                            lessons.find(
+                              (lesson) => lesson.id === activity.lesson,
+                            )?.title
+                          }
+                        </span>
+                        <span>
+                          {save.completed.includes(activity.id)
+                            ? "Solved · practice available"
+                            : "25 XP · recover evidence"}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                ))}
               {panel === "garden" && (
                 <Suspense fallback={<p>Opening the exhibit…</p>}>
                   <Garden
@@ -2398,6 +2497,10 @@ export default function App() {
             onClose={() => {
               setBookOpen(false);
               setNoteEditing(null);
+              if (returnPuzzleId) {
+                open(returnPuzzleId);
+                setReturnPuzzleId(null);
+              }
             }}
             onBookmark={() =>
               updateSave((s) => ({
@@ -2646,6 +2749,23 @@ export default function App() {
               unlocked={activityUnlocked(save, target, content)}
               onClose={() => setChapterId(null)}
               onRead={() => openLesson(chapter.lesson!)}
+              puzzleTitle={
+                puzzleActivities.find(
+                  (activity) => activity.lesson === chapter.lesson,
+                )?.title
+              }
+              onPuzzle={
+                puzzleActivities.some(
+                  (activity) => activity.lesson === chapter.lesson,
+                )
+                  ? () =>
+                      open(
+                        puzzleActivities.find(
+                          (activity) => activity.lesson === chapter.lesson,
+                        )!.id,
+                      )
+                  : undefined
+              }
               onIntroduce={() =>
                 updateSave((s) => introduceChapter(s, chapter))
               }

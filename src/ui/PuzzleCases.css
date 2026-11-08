@@ -1,0 +1,116 @@
+.puzzle-case-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+  padding: 26px;
+  overflow: auto;
+  background: #14232b;
+  flex: 1;
+}
+.app .puzzle-case-list button {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 26px;
+  min-height: 180px;
+  text-align: left;
+  background: #20353e;
+  border: 1px solid #6f999a;
+  border-left: 4px solid #d1b77d;
+  color: #e7e5d8;
+  font: 400 18px/1.5 var(--typewriter);
+  border-radius: 4px;
+}
+.app .puzzle-case-list button strong {
+  font-size: 24px;
+  font-weight: 400;
+}
+.app .puzzle-case-list button span:last-child {
+  color: #b8d6c0;
+}
+.app .puzzle-case-list button:hover,
+.app .puzzle-case-list button:focus-visible {
+  outline: 3px solid #ddc38d;
+  outline-offset: 3px;
+  background: #2a434b;
+}
+.app .puzzle-back {
+  flex-shrink: 0;
+  align-self: flex-start;
+  margin: 10px 20px;
+  min-height: 44px;
+  font: 400 18px var(--typewriter);
+}
+.panel-header > .puzzle-back {
+  margin-left: auto;
+}
+.detective-puzzle .puzzle-main {
+  padding: 14px 24px;
+}
+.detective-puzzle .puzzle-brief {
+  font-size: 18px;
+  text-align: left;
+  max-width: none;
+  margin-bottom: 12px;
+}
+.detective-puzzle .puzzle-stack {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr 1fr;
+  align-items: center;
+  gap: 18px;
+  min-height: 260px;
+  padding: 16px;
+}
+.puzzle-stack .puzzle-lane {
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+}
+.puzzle-stack .puzzle-tiles {
+  justify-content: center;
+}
+.puzzle-stack .stack-work {
+  flex-direction: column;
+  gap: 14px;
+  padding: 0;
+}
+.puzzle-stack .stack-column {
+  min-height: 132px;
+  padding: 8px;
+}
+.puzzle-stack .stack-column .puzzle-tile {
+  height: 32px;
+}
+.detective-puzzle button {
+  font-size: 18px;
+}
+.detective-puzzle .puzzle-meta,
+.detective-puzzle .puzzle-hint strong {
+  font-size: 18px;
+}
+.puzzle-actions .puzzle-status {
+  margin: 0;
+  flex: 1;
+  max-width: 50ch;
+}
+.route-canvas {
+  aspect-ratio: 600 / 320;
+  height: auto;
+  max-width: 520px;
+  flex-shrink: 0;
+}
+.route-canvas text {
+  font-size: 24px;
+}
+@media (max-width: 760px) {
+  .detective-puzzle .puzzle-stack {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 760px) {
+  .puzzle-case-list {
+    grid-template-columns: 1fr;
+  }
+}

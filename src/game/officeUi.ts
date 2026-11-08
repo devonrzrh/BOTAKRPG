@@ -564,6 +564,25 @@ export function createOfficeUi(input: OfficeUiInput): SurfaceModel[] {
   for (const chapter of content.entities.filter(
     (e): e is Quest => e.type === "quest" && e.kind === "chapter",
   )) {
+    const puzzle = content.entities.find(
+      (e) =>
+        e.type === "activity" &&
+        e.template === "puzzle" &&
+        e.lesson === chapter.lesson,
+    );
+    if (puzzle)
+      button(
+        quests,
+        `chapter-puzzle-${chapter.id}`,
+        28,
+        386,
+        310,
+        44,
+        "Field puzzle",
+        "open",
+        puzzle.id,
+        !save.story.caseAccepted,
+      );
     button(
       quests,
       `study-${chapter.id}`,

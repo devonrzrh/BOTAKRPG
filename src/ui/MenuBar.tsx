@@ -23,6 +23,7 @@ const menus = {
   Case: [
     ["Briefing", "briefing", FileText],
     ["Quest board", "quest", Compass],
+    ["Field puzzles", "puzzles", Gamepad2],
   ],
   Game: [
     ["How to play", "manual", HelpCircle],

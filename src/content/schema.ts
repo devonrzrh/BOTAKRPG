@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { puzzleConfigSchema } from "../game/puzzles";
 const id = z.string().regex(/^[a-z][a-z0-9-]*$/);
 const base = { id, title: z.string().min(1) };
 const effectId = z.enum(["shield", "poison", "weaken"]);
@@ -65,7 +66,11 @@ export const effectSchema = z.object({
 export const activitySchema = z.object({
   ...base,
   type: z.literal("activity"),
-  template: z.enum(["maze", "battle", "perceptron"]),
+  template: z.enum(["maze", "battle", "perceptron", "puzzle"]),
+  puzzle: puzzleConfigSchema.optional(),
+  brief: z.string().min(1).optional(),
+  hint: z.string().min(1).optional(),
+  solution: z.string().min(1).optional(),
   lesson: id,
   seed: z.number().int().default(42),
   enemy: z
@@ -174,6 +179,7 @@ export const contentSchema = z.object({
   entities: z.array(entitySchema),
 });
 export type Entity = z.infer<typeof entitySchema>;
+export type Activity = z.infer<typeof activitySchema>;
 export type Lesson = z.infer<typeof lessonSchema>;
 export type Question = z.infer<typeof questionSchema>;
 export type Item = z.infer<typeof itemSchema>;
@@ -224,6 +230,14 @@ export function validateContent(input: unknown): Content {
   for (const entity of content.entities) {
     if ("lesson" in entity && entity.lesson)
       ref(entity.id, entity.lesson, "lesson");
+    if (
+      entity.type === "activity" &&
+      entity.template === "puzzle" &&
+      (!entity.puzzle || !entity.brief || !entity.hint || !entity.solution)
+    )
+      throw new Error(
+        `${entity.id}: puzzle needs config, brief, hint and solution`,
+      );
     if (entity.type === "dialogue" && entity.trigger)
       ref(entity.id, entity.trigger.activity, "activity");
     if (entity.type === "lesson")

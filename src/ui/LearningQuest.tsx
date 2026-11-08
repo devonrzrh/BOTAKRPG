@@ -13,6 +13,8 @@ export function LearningQuest(p: {
   onAnswer: (answer: number) => boolean;
   onEncounter: () => void;
   onRead: () => void;
+  puzzleTitle?: string;
+  onPuzzle?: () => void;
   onClose: () => void;
 }) {
   const c = p.chapter,
@@ -159,6 +161,9 @@ export function LearningQuest(p: {
         </main>
         <footer>
           <button onClick={p.onRead}>Read chapter</button>
+          {p.onPuzzle && (
+            <button onClick={p.onPuzzle}>Puzzle: {p.puzzleTitle}</button>
+          )}
           {page !== "concept" && (
             <button
               onClick={() => {

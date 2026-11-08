@@ -115,7 +115,11 @@ export function createQuestGraph(
                 .every((id) => save.completed.includes(id))
             ? "available"
             : "locked",
-        actions: [`study-${c.id}`, `chapter-book-${c.id}`],
+        actions: [
+          `study-${c.id}`,
+          `chapter-book-${c.id}`,
+          `chapter-puzzle-${c.id}`,
+        ],
       });
     nodes.push({
       id: `chapter-boss-${detail.id}`,
