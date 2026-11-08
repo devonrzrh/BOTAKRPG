@@ -27,6 +27,39 @@ const questionFor = (battle: ReturnType<typeof selectSkill>) =>
   questions.find((question) => question.id === battle.question)!;
 
 describe("combat presentation cues", () => {
+  it("announces ECHO's phase change without treating a killing hit as a new phase", () => {
+    const save = initialSave();
+    const definition = content.entities.find(
+      (e) => e.type === "activity" && e.id === "echo-battle",
+    );
+    if (definition?.type !== "activity" || !definition.enemy)
+      throw new Error("Missing ECHO");
+    const before = {
+      ...createBattle(definition.enemy),
+      hp: 55,
+      phase: "question" as const,
+    };
+    expect(
+      battleCue(
+        before,
+        { ...before, hp: 44, phase: "feedback" },
+        save,
+        save,
+        content,
+        1,
+      )?.phaseShift,
+    ).toBe(true);
+    expect(
+      battleCue(
+        before,
+        { ...before, hp: 0, phase: "won" },
+        save,
+        save,
+        content,
+        2,
+      )?.phaseShift,
+    ).toBe(false);
+  });
   it("describes correct and incorrect player answers from model state", () => {
     const save = initialSave();
     const battle = selectSkill(createBattle(), save, skill(), questions);
@@ -194,7 +227,7 @@ describe("combat presentation cues", () => {
   });
 
   it("uses the shorter cue duration for reduced motion", () => {
-    expect(combatCueDuration(false)).toBe(900);
+    expect(combatCueDuration(false)).toBe(650);
     expect(combatCueDuration(true)).toBe(200);
   });
 });

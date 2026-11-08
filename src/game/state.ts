@@ -116,6 +116,9 @@ export const saveSchema = z
     settings: z.object({
       renderer: z.enum(["auto", "webgpu", "webgl"]),
       reducedMotion: z.boolean(),
+      combatMuted: z.boolean().default(false),
+      battleAutoAdvance: z.boolean().default(true),
+      musicVolume: z.number().min(0).max(1).default(0.55),
     }),
     onboarding: z
       .object({
@@ -163,7 +166,13 @@ export function initialSave(): Save {
     blocks: null,
     seed: 42,
     trialBest: null,
-    settings: { renderer: "auto", reducedMotion: false },
+    settings: {
+      renderer: "auto",
+      reducedMotion: false,
+      combatMuted: false,
+      battleAutoAdvance: true,
+      musicVolume: 0.55,
+    },
     onboarding: { intakeComplete: false, tipsEnabled: true, seenTips: [] },
   };
 }

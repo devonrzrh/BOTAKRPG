@@ -4,6 +4,7 @@ const id = z.string().regex(/^[a-z][a-z0-9-]*$/);
 const base = { id, title: z.string().min(1) };
 const effectId = z.enum(["shield", "poison", "weaken"]);
 export const combatTacticsSchema = z.object({
+  mechanic: z.enum(["routing", "archive", "mimic", "echo"]).optional(),
   weakness: z.enum(["insight", "ward", "trace", "simplify"]),
   pattern: z
     .array(z.enum(["strike", "heavy", "recover"]))

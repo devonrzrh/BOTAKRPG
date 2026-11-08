@@ -93,6 +93,7 @@ enemy:
   attack: 10
   mixedQuestions: true
   tactics:
+    mechanic: echo
     weakness: ward
     pattern:
       - heavy

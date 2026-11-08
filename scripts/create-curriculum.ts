@@ -303,7 +303,12 @@ const records: object[] = checks.map(
     };
   },
 );
-const tacticsFor = (topic: string, index: number, boss = false) => {
+const tacticsFor = (
+  topic: string,
+  index: number,
+  boss = false,
+  mechanic?: "routing" | "archive" | "mimic",
+) => {
   const patterns = [
     ["strike", "heavy", "recover"],
     ["heavy", "strike", "strike", "recover"],
@@ -344,6 +349,7 @@ const tacticsFor = (topic: string, index: number, boss = false) => {
   const rotation = index % options.length;
   const rotated = [...options.slice(rotation), ...options.slice(0, rotation)];
   return {
+    ...(mechanic ? { mechanic } : {}),
     weakness: weaknesses[index % weaknesses.length],
     pattern: patterns[index % patterns.length],
     resolve: boss ? 2 : 1,
@@ -429,6 +435,11 @@ for (const spec of specs) {
         spec.topic,
         spec.topic === "structures" ? 1 : 0,
         true,
+        spec.topic === "algorithms"
+          ? "routing"
+          : spec.topic === "structures"
+            ? "archive"
+            : "mimic",
       ),
     },
     clue: { title: spec.clue, text: spec.text },

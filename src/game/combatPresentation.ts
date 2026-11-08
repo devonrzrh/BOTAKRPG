@@ -12,9 +12,10 @@ export interface BattleCue {
   blocked: boolean;
   defeated: boolean;
   special?: "weakness" | "break" | "limit" | "pacify" | "evade";
+  phaseShift?: boolean;
 }
 export const combatCueDuration = (reducedMotion: boolean) =>
-  reducedMotion ? 200 : 900;
+  reducedMotion ? 200 : 650;
 
 /** Visual events are derived from resolved actions, before XP can heal a level-up. */
 export function battleCue(
@@ -47,6 +48,11 @@ export function battleCue(
       ...base,
       kind: amount ? "player" : "miss",
       amount,
+      phaseShift:
+        before.tactics?.mechanic === "echo" &&
+        before.hp > before.maxHp / 2 &&
+        after.hp <= before.maxHp / 2 &&
+        after.hp > 0,
       special: amount
         ? before.finisher
           ? "limit"

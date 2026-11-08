@@ -42,6 +42,9 @@ export interface Battle {
   finisher?: boolean;
   evasion?: number;
   asked?: string[];
+  mechanicSkill?: string;
+  archiveOpen?: boolean;
+  phaseShiftTurn?: number;
 }
 export function createBattle(
   enemy: {
@@ -114,7 +117,67 @@ export function previewDamage(
   damage = Math.floor(damage * (1 + 0.25 * (battle.boostSpend ?? 0)));
   if (battle.finisher && skill.id === "insight") damage *= 3;
   if (battle.staggered) damage = Math.floor(damage * 1.5);
+  if (
+    battle.tactics?.mechanic === "routing" &&
+    !battle.staggered &&
+    !(battle.boostSpend ?? 0)
+  )
+    damage = Math.max(1, Math.floor(damage * 0.5));
+  if (battle.tactics?.mechanic === "archive" && !battle.archiveOpen)
+    damage = Math.max(1, Math.floor(damage * 0.5));
+  if (battle.tactics?.mechanic === "mimic" && battle.mechanicSkill === skill.id)
+    damage = Math.max(1, Math.floor(damage * 0.5));
+  if (battle.tactics?.mechanic === "echo" && battle.hp <= battle.maxHp / 2)
+    damage = Math.floor(damage * 1.15);
   return damage;
+}
+
+export function bossReadout(
+  battle: Battle,
+): { phase: string; title: string; description: string } | null {
+  switch (battle.tactics?.mechanic) {
+    case "routing":
+      return {
+        phase: "Firewall",
+        title: "Route Firewall",
+        description:
+          "Unboosted hits are halved. Spend Boost or strike while Broken to pierce armor.",
+      };
+    case "archive":
+      return battle.archiveOpen
+        ? {
+            phase: "Open",
+            title: "Audit Window",
+            description:
+              "The archive is exposed this turn; attacks deal full damage.",
+          }
+        : {
+            phase: "Checksum",
+            title: "Checksum Lock",
+            description:
+              "Attacks are halved. Guard to expose it for your next turn.",
+          };
+    case "mimic":
+      return {
+        phase: "Adapting",
+        title: "Signal Adaptation",
+        description: battle.mechanicSkill
+          ? "Repeating your last skill is resisted. Switch skills or Guard to clear adaptation."
+          : "Hits are full. Switch skills after a hit; Guard clears adaptation.",
+      };
+    case "echo": {
+      const phaseTwo = battle.hp <= battle.maxHp / 2;
+      return {
+        phase: phaseTwo ? "Phase 2" : "Phase 1",
+        title: phaseTwo ? "Escalation" : "Containment Pattern",
+        description: phaseTwo
+          ? "Strikes hit harder; Recover opens a safe turn to attack."
+          : "At half health ECHO shifts. Follow its telegraph; Recover opens a safe attack.",
+      };
+    }
+    default:
+      return null;
+  }
 }
 export function selectFinisher(
   battle: Battle,
@@ -169,24 +232,27 @@ export function selectSkill(
       ? questions
       : questions.filter((q) => q.lesson === skill.lesson);
   // A single lesson can hold only two or three questions. Widen the pool to
-  // the same subject so a normal encounter cannot repeat the same two prompts.
+  // prerequisite lessons, keeping future chapters out of early encounters.
   if (content && pool.length < 6) {
-    const lessonIds = new Set(
-      (battle.lessons?.length ? battle.lessons : [skill.lesson]).filter(
-        Boolean,
-      ),
-    );
-    const topics = new Set(
-      content.entities
-        .filter((e) => e.type === "lesson" && lessonIds.has(e.id))
-        .map((e) => (e.type === "lesson" ? e.topic : "")),
+    const lessonIds = new Set<string>();
+    const addPrerequisites = (lessonId: string) => {
+      if (lessonIds.has(lessonId)) return;
+      lessonIds.add(lessonId);
+      const lesson = content.entities.find(
+        (e) => e.type === "lesson" && e.id === lessonId,
+      );
+      if (lesson?.type === "lesson")
+        lesson.prerequisites.forEach(addPrerequisites);
+    };
+    (battle.lessons?.length ? battle.lessons : [skill.lesson]).forEach(
+      addPrerequisites,
     );
     const related = questions.filter((q) => {
       if (pool.some((p) => p.id === q.id)) return false;
       const lesson = content.entities.find(
         (e) => e.type === "lesson" && e.id === q.lesson,
       );
-      return lesson?.type === "lesson" && topics.has(lesson.topic);
+      return lesson?.type === "lesson" && lessonIds.has(lesson.id);
     });
     pool = [...pool, ...related];
   }
@@ -196,7 +262,9 @@ export function selectSkill(
   if (!candidates.length) {
     // Every question in the subject has been asked this encounter. Restart the
     // cycle but never repeat the prompt that is still on screen.
-    candidates = pool.filter((q) => q.id !== battle.question);
+    candidates = pool.filter(
+      (q) => q.id !== (battle.question ?? battle.asked?.at(-1)),
+    );
   }
   if (!candidates.length) candidates = pool;
   const chosen = candidates[Math.max(0, battle.turn - 1) % candidates.length];
@@ -239,13 +307,9 @@ export function answerBattle(
     player = structuredClone(save);
   player.character.focus -= skill.cost;
   if (correct) {
-    let damage = stats(save, content).attack + skill.power;
-    const spends = next.tactics ? (next.boostSpend ?? 0) : 0;
-    damage = Math.floor(damage * (1 + 0.25 * spends));
-    if (next.tactics && next.finisher) damage *= 3;
+    let damage = previewDamage(next, save, skill, content);
     const consumedStagger = Boolean(next.tactics && next.staggered);
     if (consumedStagger) {
-      damage = Math.floor(damage * 1.5);
       next.staggered = false;
       next.resolve = 0;
     }
@@ -256,6 +320,7 @@ export function answerBattle(
       next.correctAnswers = (next.correctAnswers ?? 0) + 1;
       next.limit = Math.min(100, (next.limit ?? 0) + 20 + (matching ? 10 : 0));
       if (matching) next.weaknessKnown = true;
+      if (next.tactics.mechanic === "mimic") next.mechanicSkill = skill.id;
       if (!consumedStagger && !next.staggered && matching) {
         next.resolve = (next.resolve ?? 0) + 1;
         if (next.resolve >= next.tactics.resolve) {
@@ -265,6 +330,17 @@ export function answerBattle(
       }
     }
     next.hp = Math.max(0, next.hp - damage);
+    if (
+      next.tactics?.mechanic === "echo" &&
+      battle.hp > battle.maxHp / 2 &&
+      next.hp <= battle.maxHp / 2 &&
+      next.hp > 0
+    ) {
+      next.phaseShiftTurn = next.turn;
+      next.log.push(
+        `${battle.enemyName} shifts into Phase 2. Its attack pattern intensifies.`,
+      );
+    }
     next.log.push(`${skill.title} deals ${damage} damage.`);
     if (skill.effect) {
       const def = content.entities.find(
@@ -280,6 +356,7 @@ export function answerBattle(
   } else {
     next.log.push("Incorrect answer. Turn spent.");
   }
+  if (next.tactics?.mechanic === "archive") next.archiveOpen = false;
   if (next.tactics) {
     next.boost = Math.min(
       3,
@@ -307,6 +384,17 @@ export function enemyTurn(
   if (poison) {
     next.hp = Math.max(0, next.hp - poison.magnitude);
     next.log.push(`Poison deals ${poison.magnitude} damage.`);
+    if (
+      next.tactics?.mechanic === "echo" &&
+      battle.hp > battle.maxHp / 2 &&
+      next.hp <= next.maxHp / 2 &&
+      next.hp > 0
+    ) {
+      next.phaseShiftTurn = next.turn;
+      next.log.push(
+        `${battle.enemyName} shifts into Phase 2. Its attack pattern intensifies.`,
+      );
+    }
   }
   if (next.hp === 0) {
     next.phase = "won";
@@ -378,10 +466,16 @@ export function enemyIntent(
       description: "The enemy loses this response.",
       damage: 0,
     };
+  const phaseTwo =
+    battle.tactics?.mechanic === "echo" &&
+    battle.hp <= battle.maxHp / 2 &&
+    battle.phaseShiftTurn !== battle.turn;
+  const pattern = phaseTwo
+    ? (["heavy", "strike", "recover", "heavy"] as const)
+    : battle.tactics?.pattern;
   const kind =
-    battle.tactics?.pattern[
-      (battle.turn - 1) % battle.tactics.pattern.length
-    ] ?? (["strike", "heavy", "recover"] as const)[(battle.turn - 1) % 3];
+    pattern?.[(battle.turn - 1) % pattern.length] ??
+    (["strike", "heavy", "recover"] as const)[(battle.turn - 1) % 3];
   const poisonedToDeath =
     battle.effects.some((e) => e.id === "poison") &&
     battle.effects.find((e) => e.id === "poison")!.magnitude >= battle.hp;
@@ -392,8 +486,10 @@ export function enemyIntent(
       description: `${battle.enemyName} pauses; you recover 3 focus.`,
       damage: 0,
     };
-  const base =
-    kind === "heavy" ? Math.ceil(battle.attack * 1.7) : battle.attack;
+  const base = Math.ceil(
+    (kind === "heavy" ? battle.attack * 1.7 : battle.attack) *
+      (phaseTwo ? 1.25 : 1),
+  );
   const reduction = battle.effects
     .filter((e) => e.id === "shield" || e.id === "weaken")
     .reduce((sum, e) => sum + e.magnitude, 0);
@@ -419,6 +515,10 @@ export function guardTurn(
     ...battle,
     phase: "feedback" as const,
     guarding: true,
+    ...(battle.tactics?.mechanic === "archive" ? { archiveOpen: true } : {}),
+    ...(battle.tactics?.mechanic === "mimic"
+      ? { mechanicSkill: undefined }
+      : {}),
     log: [...battle.log, "You brace for the incoming attack."],
   };
   const player = structuredClone(save);

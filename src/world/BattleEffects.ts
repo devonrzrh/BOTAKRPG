@@ -67,6 +67,7 @@ export function attachBattleEffects(
   const shield = makeFlash("guard flare", colors.cyan, "shield");
   shield.mesh.scaling.set(1.25, 1.25, 0.15);
   const ring = makeFlash("impact ring", colors.white, "ring");
+  ring.mesh.scaling.setAll(1.15);
   ring.mesh.rotation.x = Math.PI / 2;
   const sparks = Array.from({ length: 5 }, (_, i) =>
     makeFlash(`impact spark ${i}`, colors.white, "sphere"),
@@ -202,13 +203,13 @@ export function attachBattleEffects(
       }
       const impact =
         t >= contact
-          ? Math.sin(Math.min(1, (t - contact) / (1 - contact)) * Math.PI)
+          ? Math.sin(Math.min(1, (t - contact) / 0.48) * Math.PI)
           : 0;
       if (cue.amount > 0) {
         ring.mesh.isVisible = impact > 0;
         ring.mesh.position.set(5, 1.6, 3.5);
-        ring.mesh.scaling.setAll((0.45 + (t - contact) * 1.7) * (cue.special === "limit" ? 1.8 : 1));
-        ring.material.alpha = 0.85 * impact;
+        ring.mesh.scaling.setAll((0.55 + (t - contact) * 2.5) * (cue.special === "limit" ? 1.8 : 1));
+        ring.material.alpha = 0.95 * impact;
         sparks.forEach((s, i) => {
           s.mesh.isVisible = t >= contact && t < contact + 0.45;
           s.mesh.position.set(
@@ -216,7 +217,7 @@ export function attachBattleEffects(
             1.6 + Math.sin(i * 1.57) * impact * 0.55,
             3.5,
           );
-          s.mesh.scaling.setAll(0.35 + impact * 0.75);
+          s.mesh.scaling.setAll(0.4 + impact * 1.05);
         });
       }
       const recoil =
@@ -240,7 +241,7 @@ export function attachBattleEffects(
     if (cue.kind === "enemy" && !cue.blocked && t > 0.62) {
       const hit =
         Math.sin(Math.min(1, (t - 0.62) / 0.18) * Math.PI) *
-        (cue.heavy ? 0.22 : 0.12);
+        (cue.heavy ? 0.34 : 0.2);
       rig.root.position.x = original.rootPosition.x + hit;
     }
     if (cue.kind === "enemy" && cue.blocked)

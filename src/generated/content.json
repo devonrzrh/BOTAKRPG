@@ -486,6 +486,7 @@
         "attack": 10,
         "mixedQuestions": true,
         "tactics": {
+          "mechanic": "echo",
           "weakness": "ward",
           "pattern": [
             "heavy",
@@ -1549,6 +1550,7 @@
           "source-alg-10"
         ],
         "tactics": {
+          "mechanic": "routing",
           "weakness": "insight",
           "pattern": [
             "strike",
@@ -1995,6 +1997,7 @@
           "source-ds-10"
         ],
         "tactics": {
+          "mechanic": "archive",
           "weakness": "ward",
           "pattern": [
             "heavy",
@@ -2442,6 +2445,7 @@
           "source-ai-10"
         ],
         "tactics": {
+          "mechanic": "mimic",
           "weakness": "insight",
           "pattern": [
             "strike",

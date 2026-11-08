@@ -54,5 +54,5 @@ materially improve speed, quality, or coverage.
   final verification, and reporting.
 - Do not spawn agents when coordination would cost
   more than the expected benefit.
-- Prefer Luna if the task suffices.
+- Prefer GPT 6 Luna if the task suffices.
   

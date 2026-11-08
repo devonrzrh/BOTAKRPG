@@ -32,6 +32,7 @@ import {
   selectSkill,
   answerBattle,
   enemyTurn,
+  guardTurn,
 } from "../src/game/combat";
 const content = validateContent(raw),
   branch = content.entities.find(
@@ -75,6 +76,14 @@ it("plays the entire archive independently, including resource recovery, boss, s
       },
     );
     while (battle.phase !== "won" && battle.phase !== "lost" && turns < 160) {
+      if (
+        activity.enemy?.tactics?.mechanic === "archive" &&
+        !battle.archiveOpen
+      ) {
+        const guarded = guardTurn(battle, save, content);
+        battle = guarded.battle;
+        save = guarded.save;
+      }
       battle = selectSkill(battle, save, probe, questions);
       const q = questions.find((q) => q.id === battle.question)!;
       const hit = answerBattle(battle, save, content, q.answer);

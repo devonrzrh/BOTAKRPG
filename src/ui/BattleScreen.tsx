@@ -1,9 +1,10 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import type { Content, Question, Skill } from "../content/schema";
 import {
   canSpare,
   previewDamage,
   enemyIntent,
+  bossReadout,
   type Battle,
 } from "../game/combat";
 import { Evade } from "./Evade";
@@ -11,7 +12,16 @@ import "./BattleDepth.css";
 import { stats, type Save } from "../game/state";
 import { combatCueDuration, type BattleCue } from "../game/combatPresentation";
 import { XpMeter } from "./XpMeter";
-import { Crosshair, ScanSearch, LogOut, ShieldCheck } from "lucide-react";
+import { createCombatAudio } from "../game/combatAudio";
+import {
+  Crosshair,
+  ScanSearch,
+  LogOut,
+  ShieldCheck,
+  Volume2,
+  VolumeX,
+  BookOpen,
+} from "lucide-react";
 
 interface Props {
   battle: Battle;
@@ -29,7 +39,9 @@ interface Props {
   onAct: (choice: number) => void;
   onSpare: () => void;
   onEvade: (collisions: number) => void;
-  onSubmit: () => void;
+  onSubmit: (answer?: number[]) => void;
+  onToggleSound: () => void;
+  onToggleAutoAdvance: () => void;
   onHint: () => void;
   onContinue: () => void;
   onReview: () => void;
@@ -71,6 +83,22 @@ export function BattleScreen(p: Props) {
   const [reviewing, setReviewing] = useState(false);
   const [impact, setImpact] = useState("");
   const [motion, setMotion] = useState<BattleCue["kind"] | null>(null);
+  const [impactLanded, setImpactLanded] = useState(false);
+  const audio = useRef<ReturnType<typeof createCombatAudio> | null>(null);
+  const lastAnswer = useRef<{ question: Question; correct: boolean } | null>(
+    null,
+  );
+  const submitted = useRef<Battle | null>(null);
+  useEffect(() => {
+    audio.current = createCombatAudio();
+    return () => {
+      audio.current?.dispose();
+      audio.current = null;
+    };
+  }, []);
+  useEffect(() => {
+    audio.current?.setMuted(save.settings.combatMuted);
+  }, [save.settings.combatMuted]);
   const startingSave = useRef(save),
     title = useRef<HTMLHeadingElement>(null),
     skillsButton = useRef<HTMLButtonElement>(null);
@@ -84,55 +112,81 @@ export function BattleScreen(p: Props) {
   };
   const correctFeedback = b.phase === "feedback" && p.notice === "Correct";
   useEffect(() => {
+    if (q && (b.phase === "feedback" || b.phase === "won"))
+      lastAnswer.current = {
+        question: q,
+        correct: p.notice === "Correct",
+      };
+  }, [b.phase, q, p.notice]);
+  useEffect(() => {
     setReviewing(false);
     if (b.phase === "choose") setMenu("skills");
   }, [b.turn, b.phase]);
   useEffect(() => {
-    if (!correctFeedback || reviewing) return;
+    if (!correctFeedback || reviewing || !save.settings.battleAutoAdvance)
+      return;
     const timer = setTimeout(
       advance,
-      save.settings.reducedMotion ? 1100 : 1400,
+      combatCueDuration(save.settings.reducedMotion) + 80,
     );
     return () => clearTimeout(timer);
-  }, [b, correctFeedback, reviewing, save.settings.reducedMotion]);
-  useEffect(() => {
+  }, [
+    b,
+    correctFeedback,
+    reviewing,
+    save.settings.reducedMotion,
+    save.settings.battleAutoAdvance,
+  ]);
+  useLayoutEffect(() => {
     const cue = p.cue;
     if (!cue) {
       setMotion(null);
       return;
     }
     setMotion(cue.kind);
+    setImpactLanded(false);
+    audio.current?.play(cue, save.settings.reducedMotion);
+    const contactTimer = setTimeout(
+      () => setImpactLanded(true),
+      combatCueDuration(save.settings.reducedMotion) *
+        (cue.kind === "enemy" ? 0.62 : 0.32),
+    );
     setImpact(
-      cue.special === "limit"
-        ? "Limit release"
-        : cue.special === "pacify"
-          ? "Target stood down"
-          : cue.special === "break"
-            ? "Stance broken · response skipped"
-            : cue.special === "weakness"
-              ? "Weakness hit"
-              : cue.special === "evade"
-                ? "Dodge resolved"
-                : cue.kind === "player"
-                  ? `${p.content.entities.find((e) => e.id === cue.skill)?.title ?? "Hit"}`
-                  : cue.kind === "poison"
-                    ? "Poison"
-                    : cue.kind === "miss"
-                      ? "Turn spent"
-                      : cue.kind === "recover"
-                        ? "Opening"
-                        : cue.blocked
-                          ? "Guard absorbed the hit"
-                          : cue.heavy
-                            ? "Heavy strike"
-                            : "Enemy strike",
+      cue.phaseShift
+        ? "ECHO-7 · Phase 2"
+        : cue.special === "limit"
+          ? "Limit release"
+          : cue.special === "pacify"
+            ? "Target stood down"
+            : cue.special === "break"
+              ? "Stance broken · response skipped"
+              : cue.special === "weakness"
+                ? "Weakness hit"
+                : cue.special === "evade"
+                  ? "Dodge resolved"
+                  : cue.kind === "player"
+                    ? `${p.content.entities.find((e) => e.id === cue.skill)?.title ?? "Hit"}`
+                    : cue.kind === "poison"
+                      ? "Poison"
+                      : cue.kind === "miss"
+                        ? "Turn spent"
+                        : cue.kind === "recover"
+                          ? "Opening"
+                          : cue.blocked
+                            ? "Guard absorbed the hit"
+                            : cue.heavy
+                              ? "Heavy strike"
+                              : "Enemy strike",
     );
     if (b.phase !== "choose") setMenu(null);
     const timer = setTimeout(
       () => setMotion(null),
       combatCueDuration(save.settings.reducedMotion),
     );
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(timer);
+      clearTimeout(contactTimer);
+    };
   }, [p.cue, save.settings.reducedMotion]);
   useEffect(() => {
     if (motion) return;
@@ -144,29 +198,39 @@ export function BattleScreen(p: Props) {
     (e): e is Skill =>
       e.type === "skill" && save.character.skills.includes(e.id),
   );
-  const meter = (label: string, value: number, max: number, kind: string) => (
-    <div className={`battle-meter ${kind}`}>
-      <div>
-        <span>{label}</span>
-        <strong>
-          {value} / {max}
-        </strong>
+  const meter = (label: string, value: number, max: number, kind: string) => {
+    const pendingHit =
+      !impactLanded &&
+      p.cue &&
+      ((label === "Enemy HP" && (motion === "player" || motion === "poison")) ||
+        (label === "HP" && motion === "enemy"));
+    const shown = pendingHit ? Math.min(max, value + p.cue!.amount) : value;
+    return (
+      <div className={`battle-meter ${kind}`}>
+        <div>
+          <span>{label}</span>
+          <strong>
+            {shown} / {max}
+          </strong>
+        </div>
+        <div
+          role="progressbar"
+          aria-label={label}
+          aria-valuemin={0}
+          aria-valuemax={max}
+          aria-valuenow={shown}
+        >
+          <i style={{ width: `${Math.max(0, shown / max) * 100}%` }} />
+        </div>
       </div>
-      <div
-        role="progressbar"
-        aria-label={label}
-        aria-valuemin={0}
-        aria-valuemax={max}
-        aria-valuenow={value}
-      >
-        <i style={{ width: `${Math.max(0, value / max) * 100}%` }} />
-      </div>
-    </div>
-  );
+    );
+  };
   const activeCard =
     !evading &&
     !motion &&
-    (b.phase !== "choose" || (menu && menu !== "skills"));
+    (b.phase !== "choose" || (menu && menu !== "skills")) &&
+    !(correctFeedback && save.settings.battleAutoAdvance && !reviewing);
+  const boss = bossReadout(b);
   const upcomingIntent = enemyIntent(b, save, p.content);
   const intent =
     motion === "enemy" && p.cue
@@ -189,12 +253,17 @@ export function BattleScreen(p: Props) {
       ) ?? [];
   const selectAnswer = (index: number) => {
     if (!q || b.phase !== "question") return;
+    if (q.format === "choice") {
+      if (submitted.current === b) return;
+      submitted.current = b;
+      p.onAnswer([index]);
+      p.onSubmit([index]);
+      return;
+    }
     p.onAnswer(
-      q.format === "choice"
-        ? [index]
-        : p.answer.includes(index)
-          ? p.answer.filter((x) => x !== index)
-          : [...p.answer, index],
+      p.answer.includes(index)
+        ? p.answer.filter((x) => x !== index)
+        : [...p.answer, index],
     );
   };
   const answerReady =
@@ -220,6 +289,8 @@ export function BattleScreen(p: Props) {
   return (
     <div
       className={`battle-screen phase-${b.phase} ${motion ? `motion-${motion}` : ""}`}
+      onPointerDownCapture={() => audio.current?.unlock()}
+      onKeyDownCapture={() => audio.current?.unlock()}
       onKeyDown={(e) => {
         if (evading) return;
         if (e.repeat || e.ctrlKey || e.altKey || e.metaKey) return;
@@ -263,6 +334,45 @@ export function BattleScreen(p: Props) {
         }
       }}
     >
+      <div className="battle-playback" aria-label="Battle playback">
+        <button
+          onClick={p.onToggleSound}
+          aria-label={
+            save.settings.combatMuted
+              ? "Enable battle sound"
+              : "Mute battle sound"
+          }
+          title={
+            save.settings.combatMuted
+              ? "Enable battle sound"
+              : "Mute battle sound"
+          }
+        >
+          {save.settings.combatMuted ? (
+            <VolumeX size={22} />
+          ) : (
+            <Volume2 size={22} />
+          )}
+        </button>
+        <button
+          aria-pressed={save.settings.battleAutoAdvance}
+          onClick={p.onToggleAutoAdvance}
+          title="Correct answers advance automatically. Turn off to read every explanation."
+        >
+          {save.settings.battleAutoAdvance ? "Auto turns" : "Manual turns"}
+        </button>
+        {lastAnswer.current && (
+          <button
+            disabled={!!motion || !["choose", "feedback"].includes(b.phase)}
+            onClick={() => {
+              setReviewing(true);
+              if (b.phase === "choose") setMenu("inspect");
+            }}
+          >
+            <BookOpen size={18} /> Review
+          </button>
+        )}
+      </div>
       <div className="battle-enemy-hud">
         {b.tactics && b.phase !== "won" && b.phase !== "lost" && (
           <div className="battle-stance">
@@ -273,7 +383,7 @@ export function BattleScreen(p: Props) {
             </span>
             <strong>
               {b.weaknessKnown
-                ? `Weak: ${skills.find((s) => s.id === b.tactics!.weakness)?.title ?? b.tactics.weakness}`
+                ? `Weak: ${p.content.entities.find((s) => s.type === "skill" && s.id === b.tactics!.weakness)?.title ?? b.tactics.weakness}`
                 : "Weakness unknown"}
             </strong>
           </div>
@@ -285,6 +395,14 @@ export function BattleScreen(p: Props) {
           {b.enemyName}
         </h2>
         {meter("Enemy HP", b.hp, b.maxHp, "enemy")}
+        {boss && b.phase === "choose" && !motion && (
+          <div className="battle-boss-rule" role="status">
+            <strong>
+              {boss.phase} · {boss.title}
+            </strong>
+            <span>{boss.description}</span>
+          </div>
+        )}
         {b.phase !== "won" && b.phase !== "lost" && (
           <div className={`battle-intent intent-${intent.kind}`} role="status">
             <span>{intent.label}</span>
@@ -347,23 +465,28 @@ export function BattleScreen(p: Props) {
               key={`flash-${p.cue?.sequence}`}
             />
           )}
-          <div
-            key={p.cue?.sequence}
-            className={`battle-damage-number number-${motion} ${p.cue?.blocked ? "is-blocked" : ""}`}
-            aria-hidden="true"
-          >
-            {motion === "miss"
-              ? "MISS"
-              : motion === "recover"
-                ? p.cue?.amount
-                  ? `+${p.cue.amount} FP`
-                  : p.cue?.special === "break"
-                    ? "BREAK"
-                    : p.cue?.special === "pacify"
-                      ? "STAND DOWN"
-                      : "OPENING"
-                : `${p.cue?.blocked ? "BLOCK " : ""}−${p.cue?.amount ?? 0}`}
-          </div>
+          {(impactLanded || motion === "recover") && (
+            <div
+              key={p.cue?.sequence}
+              className={`battle-damage-number number-${motion} ${p.cue?.blocked ? "is-blocked" : ""}`}
+              aria-hidden="true"
+              style={{
+                animationDuration: `${combatCueDuration(save.settings.reducedMotion) * (motion === "enemy" ? 0.34 : 0.6)}ms`,
+              }}
+            >
+              {motion === "miss"
+                ? "MISS"
+                : motion === "recover"
+                  ? p.cue?.amount
+                    ? `+${p.cue.amount} FP`
+                    : p.cue?.special === "break"
+                      ? "BREAK"
+                      : p.cue?.special === "pacify"
+                        ? "STAND DOWN"
+                        : "OPENING"
+                  : `${p.cue?.blocked ? "BLOCK " : ""}−${p.cue?.amount ?? 0}`}
+            </div>
+          )}
           <div className="battle-impact" role="status">
             {impact}
             {p.cue && p.cue.amount > 0
@@ -455,6 +578,21 @@ export function BattleScreen(p: Props) {
               )}
               {menu === "inspect" && (
                 <>
+                  {lastAnswer.current && (
+                    <details open={reviewing}>
+                      <summary>
+                        Last answer:{" "}
+                        {lastAnswer.current.correct ? "Correct" : "Review"}
+                      </summary>
+                      <p>{lastAnswer.current.question.prompt}</p>
+                      <p>{lastAnswer.current.question.explanation}</p>
+                    </details>
+                  )}
+                  {boss && (
+                    <p>
+                      {boss.title}: {boss.description}
+                    </p>
+                  )}
                   <p>
                     Attack {b.attack} · Your defense {limits.defense}
                   </p>
@@ -507,16 +645,18 @@ export function BattleScreen(p: Props) {
                 ))}
               </div>
               <footer>
-                <button
-                  className="primary"
-                  disabled={!answerReady}
-                  onClick={p.onSubmit}
-                >
-                  {b.finisher
-                    ? "Release Limit"
-                    : `Use ${skills.find((s) => s.id === b.skill)?.title ?? "skill"}`}{" "}
-                  <kbd>Enter</kbd>
-                </button>
+                {q.format !== "choice" && (
+                  <button
+                    className="primary"
+                    disabled={!answerReady}
+                    onClick={() => p.onSubmit()}
+                  >
+                    {b.finisher
+                      ? "Release Limit"
+                      : `Use ${skills.find((s) => s.id === b.skill)?.title ?? "skill"}`}{" "}
+                    <kbd>Enter</kbd>
+                  </button>
+                )}
                 <button onClick={p.onHint}>Hint · no mastery credit</button>
               </footer>
               {p.notice && (
@@ -531,8 +671,18 @@ export function BattleScreen(p: Props) {
               <h2 ref={title} tabIndex={-1}>
                 {p.notice}
               </h2>
-              {(!correctFeedback || reviewing) && (
+              {(!correctFeedback ||
+                reviewing ||
+                !save.settings.battleAutoAdvance) && (
                 <p className="battle-explanation">{q?.explanation}</p>
+              )}
+              {!correctFeedback && q && (
+                <p className="battle-correct-answer">
+                  Correct answer:{" "}
+                  {q.answer
+                    .map((index) => q.options[index])
+                    .join(q.format === "ordering" ? " → " : "; ")}
+                </p>
               )}
               <footer>
                 <button className="primary" onClick={advance}>
@@ -548,7 +698,7 @@ export function BattleScreen(p: Props) {
                     Pause to review
                   </button>
                 )}
-                <button onClick={p.onReview}>Review lesson later</button>
+                <button onClick={p.onReview}>Bookmark chapter</button>
               </footer>
             </>
           )}

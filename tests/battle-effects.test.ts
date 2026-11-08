@@ -4,7 +4,10 @@ import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { Scene } from "@babylonjs/core/scene";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { attachBattleEffects } from "../src/world/BattleEffects";
-import type { BattleCue } from "../src/game/combatPresentation";
+import {
+  combatCueDuration,
+  type BattleCue,
+} from "../src/game/combatPresentation";
 
 const cue = (overrides: Partial<BattleCue> = {}): BattleCue => ({
   sequence: 1,
@@ -76,11 +79,12 @@ describe("battle effects", () => {
       (mesh) => mesh.name === "battle projectile",
     )!;
     expect(projectile.isVisible).toBe(true);
-    frame(288);
+    const duration = combatCueDuration(false);
+    frame(duration * 0.2);
     expect(projectile.position.z).toBeGreaterThan(-3);
-    frame(40);
+    frame(duration * 0.18);
     expect(projectile.isVisible).toBe(false);
-    frame(50);
+    frame(duration * 0.03);
     expect(root.rotation.y).not.toBeCloseTo(0.2);
     expect(root.position.x).not.toBeCloseTo(2);
   });

@@ -71,6 +71,7 @@ import {
 import { Cutscene } from "./ui/Cutscene";
 import { Dialogue } from "./ui/Dialogue";
 import { MenuBar } from "./ui/MenuBar";
+import { chooseMusic, createMusic } from "./game/music";
 import { HomeBoard } from "./ui/HomeBoard";
 import { WorldUiControls } from "./ui/WorldUiControls";
 import { RoomTurns } from "./ui/RoomTurns";
@@ -230,6 +231,12 @@ const destinations = [
     name: "Perceptron lab",
     icon: Sprout,
   },
+];
+const FINAL_BOSS_IDS = [
+  "echo-7",
+  "route-warden",
+  "archive-keeper",
+  "signal-mimic",
 ];
 export default function App() {
   const [puzzleId, setPuzzleId] = useState<string | null>(null);
@@ -625,7 +632,11 @@ export default function App() {
       setNoteEditing(null);
       setSearchEditing(false);
       setOfficeFocused(null);
-      if (id === "echo" && !finaleAvailable(saveRef.current, content)) {
+      if (
+        id === "echo" &&
+        !saveRef.current.completed.includes("echo-battle") &&
+        !finaleAvailable(saveRef.current, content)
+      ) {
         setToast("Recover all three clues first.");
         return;
       }
@@ -909,10 +920,15 @@ export default function App() {
     setBattle(nextBattle);
     updateSave(() => nextSave);
   };
-  const submitAnswer = () => {
+  const submitAnswer = (chosenAnswer?: number[]) => {
     if (battleRef.current !== battle || battle.phase !== "question") return;
     try {
-      const result = answerBattle(battle, saveRef.current, content, answer);
+      const result = answerBattle(
+        battle,
+        saveRef.current,
+        content,
+        chosenAnswer ?? answer,
+      );
       const q = questions.find((q) => q.id === battle.question)!;
       const next = recordAnswer(
         result.save,
@@ -1029,6 +1045,53 @@ export default function App() {
     ],
   );
   const useWorldUi = realm === "desk" && !officeFallback;
+  const bossBattle = FINAL_BOSS_IDS.includes(battle.enemyId);
+  const musicMix = useMemo(
+    () =>
+      chooseMusic({
+        intake: intakeOpen,
+        panel,
+        reading: bookOpen && homeWall === "bookshelf",
+        boss: bossBattle,
+        dialogue: Boolean(dialogueId || cutsceneId || chapterId),
+      }),
+    [
+      intakeOpen,
+      panel,
+      bookOpen,
+      homeWall,
+      bossBattle,
+      dialogueId,
+      cutsceneId,
+      chapterId,
+    ],
+  );
+  const music = useRef<ReturnType<typeof createMusic> | null>(null);
+  useEffect(() => {
+    const director = createMusic();
+    music.current = director;
+    return () => {
+      director.dispose();
+      music.current = null;
+    };
+  }, []);
+  useEffect(() => {
+    music.current?.setReducedMotion(save.settings.reducedMotion);
+  }, [save.settings.reducedMotion]);
+  useEffect(() => {
+    music.current?.setVolume(save.settings.musicVolume);
+  }, [save.settings.musicVolume]);
+  useEffect(() => {
+    music.current?.setTrack(musicMix.track, musicMix.gain);
+  }, [musicMix]);
+  const setMusicVolume = (percent: number) =>
+    updateSave((s) => ({
+      ...s,
+      settings: {
+        ...s.settings,
+        musicVolume: Math.max(0, Math.min(1, percent / 100)),
+      },
+    }));
   const handleOfficeAction = (action: OfficeAction) => {
     const id = action.id;
     if (action.kind === "graph-select") {
@@ -1286,12 +1349,7 @@ export default function App() {
             }
             encounter={panel === "battle"}
             combatCue={panel === "battle" ? combatEvent : null}
-            finalBoss={[
-              "echo-7",
-              "route-warden",
-              "archive-keeper",
-              "signal-mimic",
-            ].includes(battle.enemyId)}
+            finalBoss={FINAL_BOSS_IDS.includes(battle.enemyId)}
             enemyId={battle.enemyId}
             maze={maze}
             renderer={save.settings.renderer}
@@ -1801,6 +1859,24 @@ export default function App() {
                   question={currentQuestion}
                   answer={answer}
                   notice={battleNotice}
+                  onToggleSound={() =>
+                    updateSave((s) => ({
+                      ...s,
+                      settings: {
+                        ...s.settings,
+                        combatMuted: !s.settings.combatMuted,
+                      },
+                    }))
+                  }
+                  onToggleAutoAdvance={() =>
+                    updateSave((s) => ({
+                      ...s,
+                      settings: {
+                        ...s.settings,
+                        battleAutoAdvance: !s.settings.battleAutoAdvance,
+                      },
+                    }))
+                  }
                   onAnswer={setAnswer}
                   onSkill={(skill) => {
                     if (battleRef.current !== battle) return;
@@ -1912,7 +1988,13 @@ export default function App() {
                   }}
                   onReview={() => {
                     setLessonId(currentQuestion!.lesson);
-                    notify("Lesson saved for review after battle.");
+                    updateSave((s) => ({
+                      ...s,
+                      bookmarks: s.bookmarks.includes(currentQuestion!.lesson)
+                        ? s.bookmarks
+                        : [...s.bookmarks, currentQuestion!.lesson],
+                    }));
+                    notify("Chapter bookmarked for review.");
                   }}
                   onRetreat={close}
                   victoryActionLabel={
@@ -2272,6 +2354,26 @@ export default function App() {
               )}
               {panel === "settings" && (
                 <div className="settings-content">
+                  <h3>Audio</h3>
+                  <label>
+                    Music volume
+                    <output>{Math.round(save.settings.musicVolume * 100)}%</output>
+                    <input
+                      type="range"
+                      min={0}
+                      max={100}
+                      step={5}
+                      value={Math.round(save.settings.musicVolume * 100)}
+                      aria-label="Music volume"
+                      aria-valuetext={`${Math.round(save.settings.musicVolume * 100)} percent`}
+                      onChange={(e) => setMusicVolume(Number(e.target.value))}
+                    />
+                  </label>
+                  <p className="muted">
+                    The score changes with the room and quiets under dialogue.
+                    Set it to 0 to silence music; battle cues keep their own
+                    sound toggle.
+                  </p>
                   <h3>Renderer</h3>
                   <label>
                     Rendering backend

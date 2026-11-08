@@ -104,7 +104,7 @@ export function FinaleCard({
       )}
       <button
         className="primary"
-        disabled={!finaleAvailable(save, content)}
+        disabled={!done && !finaleAvailable(save, content)}
         onClick={onStart}
       >
         {done ? "Replay final encounter" : "Confront ECHO-7"}

@@ -13,6 +13,7 @@ import "./ui/Dialogue.css";
 import "./ui/LearningQuest.css";
 import "./investigation.css";
 import "./ui/CombatRevamp.css";
+import "./ui/BattlePolish.css";
 import "./onboarding.css";
 import "./ui/Blocks.css";
 createRoot(document.getElementById("root")!).render(<App />);

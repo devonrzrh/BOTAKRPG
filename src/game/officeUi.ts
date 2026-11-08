@@ -255,7 +255,7 @@ export function createOfficeUi(input: OfficeUiInput): SurfaceModel[] {
         ? "Confront ECHO-7"
         : "Go online",
     "open",
-    finaleAvailable(save, content) ? "echo" : "network",
+    closed || finaleAvailable(save, content) ? "echo" : "network",
   );
 
   const library = panel("bookshelf", "REFERENCE LIBRARY", "paper");
@@ -630,7 +630,7 @@ export function createOfficeUi(input: OfficeUiInput): SurfaceModel[] {
     closed ? "Replay ECHO-7" : `Confront ECHO-7 (${completed}/3)`,
     "open",
     "echo",
-    !finaleAvailable(save, content),
+    !closed && !finaleAvailable(save, content),
   );
   button(
     quests,

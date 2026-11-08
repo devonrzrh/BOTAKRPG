@@ -15,7 +15,7 @@ const insight = content.entities.find(
   (e): e is Skill => e.type === "skill" && e.id === "insight",
 )!;
 
-it("does not repeat the same battle question while the subject pool lasts", () => {
+it("uses only chapter and prerequisite questions without repeating before exhaustion", () => {
   const save = initialSave();
   let battle: Battle = createBattle({
     id: "pool-test",
@@ -26,7 +26,21 @@ it("does not repeat the same battle question while the subject pool lasts", () =
     lessons: ["stacks-queues"],
   });
   const seen: string[] = [];
-  for (let turn = 0; turn < 6; turn++) {
+  const eligibleLessons = new Set<string>();
+  const addPrerequisites = (id: string) => {
+    if (eligibleLessons.has(id)) return;
+    eligibleLessons.add(id);
+    const lesson = content.entities.find(
+      (e) => e.type === "lesson" && e.id === id,
+    );
+    if (lesson?.type === "lesson")
+      lesson.prerequisites.forEach(addPrerequisites);
+  };
+  addPrerequisites("stacks-queues");
+  const eligibleQuestions = questions.filter((q) =>
+    eligibleLessons.has(q.lesson),
+  );
+  for (let turn = 0; turn < eligibleQuestions.length; turn++) {
     battle = selectSkill(
       { ...battle, phase: "choose", turn: turn + 1 },
       save,
@@ -37,13 +51,17 @@ it("does not repeat the same battle question while the subject pool lasts", () =
     seen.push(battle.question!);
   }
   expect(new Set(seen).size).toBe(seen.length);
-  const firstLesson = questions.find((q) => q.id === seen[0])!.lesson;
-  expect(firstLesson).toBe("stacks-queues");
-  // The pool widened beyond the single lesson to the same subject.
-  const widened = seen.some(
-    (id) => questions.find((q) => q.id === id)!.lesson !== "stacks-queues",
-  );
-  expect(widened).toBe(true);
+  expect(new Set(seen)).toEqual(new Set(eligibleQuestions.map((q) => q.id)));
+  expect(
+    seen.every((id) =>
+      eligibleLessons.has(questions.find((q) => q.id === id)!.lesson),
+    ),
+  ).toBe(true);
+  expect(
+    seen.some(
+      (id) => questions.find((q) => q.id === id)!.lesson !== "stacks-queues",
+    ),
+  ).toBe(true);
 });
 
 it("restarts the cycle without repeating the prompt on screen", () => {
@@ -67,4 +85,19 @@ it("restarts the cycle without repeating the prompt on screen", () => {
   };
   const next = selectSkill(battle, save, insight, questions, content);
   expect(next.question).not.toBe(first);
+  const cleared = selectSkill(
+    {
+      ...battle,
+      question: null,
+      asked: [
+        ...questions.filter((q) => q.id !== first).map((q) => q.id),
+        first!,
+      ],
+    },
+    save,
+    insight,
+    questions,
+    content,
+  );
+  expect(cleared.question).not.toBe(first);
 });

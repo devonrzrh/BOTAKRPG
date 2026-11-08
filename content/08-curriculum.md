@@ -957,6 +957,7 @@ enemy:
     - source-alg-09
     - source-alg-10
   tactics:
+    mechanic: routing
     weakness: insight
     pattern:
       - strike
@@ -1347,6 +1348,7 @@ enemy:
     - source-ds-09
     - source-ds-10
   tactics:
+    mechanic: archive
     weakness: ward
     pattern:
       - heavy
@@ -1738,6 +1740,7 @@ enemy:
     - source-ai-09
     - source-ai-10
   tactics:
+    mechanic: mimic
     weakness: insight
     pattern:
       - strike
