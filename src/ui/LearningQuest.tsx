@@ -4,6 +4,7 @@ import DOMPurify from "dompurify";
 import { FileSearch, Check, ChevronRight, X } from "lucide-react";
 import type { Quest } from "../content/schema";
 import type { Save } from "../game/state";
+import { useGameSound } from "./GameSound";
 
 export function LearningQuest(p: {
   chapter: Quest;
@@ -17,6 +18,7 @@ export function LearningQuest(p: {
   onPuzzle?: () => void;
   onClose: () => void;
 }) {
+  const sound = useGameSound();
   const c = p.chapter,
     l = c.learning!,
     [page, setPage] = useState<"concept" | "example" | "practice" | "ready">(
@@ -195,7 +197,11 @@ export function LearningQuest(p: {
             <button
               className="primary"
               disabled={answer === null}
-              onClick={() => setFeedback(p.onAnswer(answer!))}
+              onClick={() => {
+                const correct = p.onAnswer(answer!);
+                sound(correct ? "success" : "error");
+                setFeedback(correct);
+              }}
             >
               Check reasoning
             </button>

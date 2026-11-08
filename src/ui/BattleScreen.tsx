@@ -472,6 +472,7 @@ export function BattleScreen(p: Props) {
       </div>
       {evading && (
         <Evade
+          muted={save.settings.combatMuted}
           seed={b.turn}
           reducedMotion={save.settings.reducedMotion}
           onResolve={(hits) => {

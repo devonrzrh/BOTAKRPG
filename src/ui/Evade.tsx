@@ -6,15 +6,27 @@ import {
   type EvadeState,
 } from "../game/evade";
 import "./Evade.css";
+import { useGameSound } from "./GameSound";
+import { evadeSoundCues } from "../game/sfx";
 
 type Props = {
   seed: number;
   reducedMotion: boolean;
+  muted: boolean;
   onResolve: (collisions: number) => void;
   onCancel: () => void;
 };
 
-export function Evade({ seed, reducedMotion, onResolve, onCancel }: Props) {
+export function Evade({
+  seed,
+  reducedMotion,
+  muted,
+  onResolve,
+  onCancel,
+}: Props) {
+  const sound = useGameSound();
+  const mutedRef = useRef(muted);
+  mutedRef.current = muted;
   const [state, setState] = useState<EvadeState | null>(null);
   const arena = useRef<SVGSVGElement>(null);
   const stateRef = useRef<EvadeState | null>(null);
@@ -33,16 +45,18 @@ export function Evade({ seed, reducedMotion, onResolve, onCancel }: Props) {
     (assisted = false) => {
       if (finished.current) return;
       if (assisted) {
+        if (!mutedRef.current) sound("dodge");
         finished.current = true;
         callbacks.current.onResolve(0);
         return;
       }
       const initial = createEvade(seed);
+      if (!mutedRef.current) sound("scan");
       stateRef.current = initial;
       setState(initial);
       requestAnimationFrame(() => arena.current?.focus());
     },
-    [seed],
+    [seed, sound],
   );
 
   useEffect(() => {
@@ -55,6 +69,7 @@ export function Evade({ seed, reducedMotion, onResolve, onCancel }: Props) {
       const dt = Math.min(0.1, Math.max(0, (now - previous) / 1000));
       previous = now;
       const next = stepEvade(current, dt, direction.current);
+      if (!mutedRef.current) evadeSoundCues(current, next).forEach(sound);
       stateRef.current = next;
       setState(next);
       if (evadeComplete(next)) {
@@ -64,7 +79,7 @@ export function Evade({ seed, reducedMotion, onResolve, onCancel }: Props) {
     };
     frame = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(frame);
-  }, [!!state]);
+  }, [!!state, sound]);
 
   const onKeyDown = (event: React.KeyboardEvent<SVGSVGElement>) => {
     if (event.key === "ArrowLeft" || event.key.toLowerCase() === "a") {

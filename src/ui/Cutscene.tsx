@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { ArrowRight, SkipForward } from "lucide-react";
 import type { Story } from "../content/schema";
 import { personalizeText } from "../game/player";
+import { useGameSound } from "./GameSound";
 export function Cutscene({
   story,
   savedName = "",
@@ -11,6 +12,7 @@ export function Cutscene({
   savedName?: string;
   onFinish: () => void;
 }) {
+  const sound = useGameSound();
   const [frame, setFrame] = useState(0),
     [steps, setSteps] = useState(0);
   const dialog = useRef<HTMLElement>(null);
@@ -20,6 +22,15 @@ export function Cutscene({
     return () => previous?.focus();
   }, []);
   const advance = () => {
+    sound(
+      story.visual === "network"
+        ? "connect"
+        : steps + 1 >= story.frames[frame].steps && frame + 1 === 2
+          ? "connect"
+          : frame < 2 && story.frames[frame].steps > 1
+            ? "pursuit"
+            : "dialogue",
+    );
     if (steps + 1 < story.frames[frame].steps) setSteps((n) => n + 1);
     else if (frame + 1 < story.frames.length) {
       setFrame((n) => n + 1);

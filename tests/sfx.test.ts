@@ -1,5 +1,33 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { createSfx } from "../src/game/sfx";
+import { createSfx, evadeSoundCues } from "../src/game/sfx";
+import { createEvade, stepEvade } from "../src/game/evade";
+
+describe("dodge sound timing", () => {
+  it("warns once before each lane and sounds each hit or miss once", () => {
+    let state = createEvade(7);
+    state = { ...state, playerX: state.hazards[0].lane };
+    const events: string[] = [];
+    for (let i = 0; i < 280; i++) {
+      const next = stepEvade(state, 0.01, 0);
+      events.push(...evadeSoundCues(state, next));
+      expect(evadeSoundCues(next, next)).toEqual([]);
+      state = next;
+    }
+    expect(events.filter((cue) => cue === "hazard")).toHaveLength(3);
+    expect(events.filter((cue) => cue === "hit")).toHaveLength(
+      state.collisions,
+    );
+    expect(events.filter((cue) => cue === "dodge")).toHaveLength(
+      3 - state.collisions,
+    );
+    expect(events.slice(0, 2)).toEqual(["hazard", "hit"]);
+  });
+
+  it("does not replay passed warnings or completed hazards", () => {
+    const before = stepEvade(createEvade(7), 1, 0);
+    expect(evadeSoundCues(before, stepEvade(before, 0.01, 0))).toEqual([]);
+  });
+});
 
 function mockAudio(state: "running" | "suspended" = "running") {
   const oscillator = () => ({
@@ -163,6 +191,34 @@ describe("interface SFX", () => {
     await Promise.resolve();
     expect(ctx.createBufferSource).not.toHaveBeenCalled();
     expect(ctx.createOscillator).toHaveBeenCalledTimes(3);
+    sfx.dispose();
+  });
+
+  it.each([
+    "connect",
+    "pursuit",
+    "train",
+    "scan",
+    "hazard",
+    "dodge",
+    "hit",
+  ] as const)("renders %s and cancels every layer when muted", (cue) => {
+    const { ctx, Ctor } = mockAudio();
+    install(Ctor);
+    const sfx = createSfx();
+    sfx.unlock();
+    sfx.play(cue);
+    expect(ctx.createOscillator).toHaveBeenCalled();
+    const sources = [
+      ...ctx.createOscillator.mock.results,
+      ...ctx.createBufferSource.mock.results,
+    ];
+    for (const { value } of sources) expect(value.start).toHaveBeenCalledOnce();
+    sfx.setVolume(0);
+    for (const { value } of sources) {
+      expect(value.stop).toHaveBeenCalledTimes(2);
+      expect(value.disconnect).toHaveBeenCalledOnce();
+    }
     sfx.dispose();
   });
 });

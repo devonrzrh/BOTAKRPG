@@ -1,3 +1,5 @@
+import type { EvadeState } from "./evade";
+
 export type SfxName =
   | "click"
   | "open"
@@ -12,7 +14,14 @@ export type SfxName =
   | "error"
   | "clue"
   | "levelUp"
-  | "dialogue";
+  | "dialogue"
+  | "connect"
+  | "pursuit"
+  | "train"
+  | "scan"
+  | "hazard"
+  | "dodge"
+  | "hit";
 
 type Voice = {
   sources: AudioScheduledSourceNode[];
@@ -20,6 +29,25 @@ type Voice = {
   ended: number;
 };
 type AudioContextConstructor = new () => AudioContext;
+
+/** Use crossings rather than elapsed-time windows so each lane sounds once. */
+export function evadeSoundCues(
+  before: EvadeState,
+  after: EvadeState,
+): SfxName[] {
+  return after.hazards.flatMap((hazard, index): SfxName[] => {
+    const previous = before.hazards[index];
+    if (hazard.resolved && !previous.resolved)
+      return [hazard.hit ? "hit" : "dodge"];
+    if (
+      !hazard.resolved &&
+      before.elapsed < hazard.at - 0.3 &&
+      after.elapsed >= hazard.at - 0.3
+    )
+      return ["hazard"];
+    return [];
+  });
+}
 
 const MAX_VOICES = 12;
 const COOLDOWNS: Record<SfxName, number> = {
@@ -37,6 +65,13 @@ const COOLDOWNS: Record<SfxName, number> = {
   clue: 220,
   levelUp: 300,
   dialogue: 90,
+  connect: 250,
+  pursuit: 120,
+  train: 180,
+  scan: 180,
+  hazard: 180,
+  dodge: 180,
+  hit: 180,
 };
 
 /** Original, asset-free interface and discovery sounds. AudioContext starts only after unlock(). */
@@ -219,6 +254,42 @@ export function createSfx() {
           break;
         case "dialogue":
           tone(540, 470, 0.035, "sine", 0.012);
+          break;
+        case "connect":
+          // A modem-like handshake, ending in a settled carrier tone.
+          tone(220, 880, 0.24, "triangle", 0.025);
+          tone(1320, 660, 0.13, "sine", 0.018, 0.12);
+          tone(880, 880, 0.2, "sine", 0.022, 0.26);
+          noise(0.14, 0.015);
+          break;
+        case "pursuit":
+          // Paired wet footsteps, distinct from quiet indoor movement.
+          noise(0.07, 0.045);
+          tone(120, 55, 0.09, "triangle", 0.035);
+          noise(0.06, 0.032, 0.13);
+          tone(100, 48, 0.08, "triangle", 0.025, 0.13);
+          break;
+        case "train":
+          [330, 440, 550, 660].forEach((pitch, i) =>
+            tone(pitch, pitch * 1.12, 0.075, "triangle", 0.022, i * 0.055),
+          );
+          break;
+        case "scan":
+          tone(420, 1260, 0.25, "sine", 0.018);
+          tone(840, 420, 0.18, "triangle", 0.012, 0.1);
+          break;
+        case "hazard":
+          // Two short warning pips before a lane reaches the player.
+          tone(740, 740, 0.055, "sine", 0.035);
+          tone(740, 980, 0.07, "sine", 0.03, 0.085);
+          break;
+        case "dodge":
+          noise(0.12, 0.028);
+          tone(310, 900, 0.13, "sine", 0.018);
+          break;
+        case "hit":
+          noise(0.13, 0.06);
+          tone(140, 45, 0.2, "triangle", 0.065);
           break;
       }
     } catch {

@@ -272,7 +272,7 @@ export function Garden({
           onClick={() => {
             try {
               setNetwork(train(network, samples, epochs, rate));
-              sound("puzzleAction");
+              sound("train");
               pulse("train");
               setTested(false);
               setMessage("Weights updated. Test on unseen examples next.");
@@ -288,6 +288,7 @@ export function Garden({
           disabled={!network.epochs}
           onClick={() => {
             setTested(true);
+            sound("scan");
             sound(network.epochs >= 10 && score >= 5 / 6 ? "success" : "error");
             if (network.epochs >= 10 && score >= 5 / 6) {
               pulse("success");
