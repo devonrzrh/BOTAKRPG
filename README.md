@@ -22,6 +22,8 @@ Open the URL Vite prints, normally `http://127.0.0.1:5173/`. If that port is bus
 
 On Windows you can also double-click `run-dev.bat`, which checks for Node and installed dependencies before starting Vite.
 
+Double-click `push-origin.bat` to push the current branch's committed changes to `origin` and set its upstream. It does not stage, commit, or force-push. Use `push-origin.bat --dry-run` to preview, or add `--no-pause` when running from a terminal or automation.
+
 ### Other commands
 
 ```sh
