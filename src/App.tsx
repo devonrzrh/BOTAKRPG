@@ -45,6 +45,10 @@ import { renderLessonMarkdown } from "./game/markdown";
 import { ClueLedger } from "./ui/ClueLedger";
 import { BookReader } from "./ui/BookReader";
 import { useGameSound, useGameSoundVolume } from "./ui/GameSound";
+import {
+  useGameParticles,
+  useGameParticlesReducedMotion,
+} from "./ui/GameParticles";
 import { PuzzleScreen } from "./ui/PuzzleScreen";
 import { rewardPuzzle } from "./game/puzzleProgress";
 import "./ui/PuzzleCases.css";
@@ -241,6 +245,8 @@ const FINAL_BOSS_IDS = [
 ];
 export default function App() {
   const sound = useGameSound();
+  const particles = useGameParticles();
+  const configureParticleMotion = useGameParticlesReducedMotion();
   const configureSfxVolume = useGameSoundVolume();
   const [puzzleId, setPuzzleId] = useState<string | null>(null);
   const [returnPuzzleId, setReturnPuzzleId] = useState<string | null>(null);
@@ -346,6 +352,10 @@ export default function App() {
   tutorialRef.current = tutorialId;
   const intakeOpen = booted && needsIntake(save);
   useEffect(
+    () => configureParticleMotion(save.settings.reducedMotion),
+    [configureParticleMotion, save.settings.reducedMotion],
+  );
+  useEffect(
     () => configureSfxVolume(save.settings.sfxVolume),
     [configureSfxVolume, save.settings.sfxVolume],
   );
@@ -362,9 +372,12 @@ export default function App() {
       save.character.level > previousLevel.current;
     previousLevel.current = save.character.level;
     if (!gainedLevel) return;
-    const timer = setTimeout(() => sound("levelUp"), 450);
+    const timer = setTimeout(() => {
+      sound("levelUp");
+      particles("levelUp");
+    }, 450);
     return () => clearTimeout(timer);
-  }, [booted, save.character.level, sound]);
+  }, [booted, save.character.level, sound, particles]);
   const closeTutorial = () => {
     const current = tutorialRef.current;
     if (current) updateSave((s) => markTutorialSeen(s, current));
@@ -379,6 +392,13 @@ export default function App() {
     setMaze(next);
   }, []);
   const notify = (message: string) => setToast(message);
+  const claimWithFeedback = (quest: Quest) => {
+    const next = claimQuest(saveRef.current, quest, content);
+    if (next === saveRef.current) return;
+    updateSave(() => next);
+    sound("clue");
+    particles("clue");
+  };
   const completedMaze = useRef(false);
   const finishMaze = useCallback(
     (model: Maze, control: string) => {
@@ -1207,7 +1227,7 @@ export default function App() {
       const q = content.entities.find(
         (e): e is Quest => e.type === "quest" && e.id === id,
       );
-      if (q) updateSave((s) => claimQuest(s, q, content));
+      if (q) claimWithFeedback(q);
     }
     if (action.kind === "learn") {
       const skill = skills.find((s) => s.id === id);
@@ -2174,9 +2194,7 @@ export default function App() {
                     content={content}
                     onActivity={(id) => open(activityDestination(id))}
                     onLesson={openLesson}
-                    onClaim={(q) =>
-                      updateSave((s) => claimQuest(s, q, content))
-                    }
+                    onClaim={claimWithFeedback}
                   />
                   <div className="quest-reward">
                     <Sparkles />
@@ -2189,7 +2207,7 @@ export default function App() {
                     className="primary"
                     disabled={done !== 3 || save.claimed.includes(quest.id)}
                     onClick={() => {
-                      updateSave((s) => claimQuest(s, quest, content));
+                      claimWithFeedback(quest);
                       notify("Case reward claimed.");
                     }}
                   >
@@ -2203,9 +2221,7 @@ export default function App() {
                     save={save}
                     content={content}
                     onStart={() => open("echo")}
-                    onClaim={(q) =>
-                      updateSave((s) => claimQuest(s, q, content))
-                    }
+                    onClaim={claimWithFeedback}
                   />
                   {content.entities.some(
                     (e) =>
@@ -2972,7 +2988,7 @@ export default function App() {
                     open(activityDestination(beat.trigger.activity));
                   else {
                     const owner = storyBranch(content, beat.trigger.activity);
-                    if (owner) updateSave((s) => claimQuest(s, owner, content));
+                    if (owner) claimWithFeedback(owner);
                     open("journal");
                     notify(`${owner?.title ?? "Case"} evidence filed.`);
                   }

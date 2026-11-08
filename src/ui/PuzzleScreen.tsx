@@ -16,6 +16,7 @@ import {
 } from "../game/puzzles";
 import "./PuzzleScreen.css";
 import { useGameSound } from "./GameSound";
+import { useGameParticles } from "./GameParticles";
 
 export function PuzzleScreen(p: {
   activity: Activity;
@@ -27,6 +28,8 @@ export function PuzzleScreen(p: {
   onLesson: () => void;
 }) {
   const sound = useGameSound();
+  const particles = useGameParticles();
+  const board = useRef<HTMLElement>(null);
   const config = p.activity.puzzle;
   const [state, setState] = useState<PuzzleState>(() => {
     const initial = config
@@ -66,6 +69,15 @@ export function PuzzleScreen(p: {
       if (next.moves === state.moves) sound("error");
       else if (puzzleSolved(next)) sound("success");
       else sound(command.type === "move" ? "move" : "puzzleAction");
+      if (next.moves !== state.moves) {
+        const rect = board.current?.getBoundingClientRect();
+        particles(
+          puzzleSolved(next) ? "success" : "train",
+          rect
+            ? { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 }
+            : undefined,
+        );
+      }
     }
     if (next.moves !== state.moves && commands.current.length < 1000) {
       commands.current = [...commands.current, command];
@@ -118,6 +130,7 @@ export function PuzzleScreen(p: {
               "A damaged trace remains in the system. Reconstruct its sequence to recover the evidence."}
           </p>
           <section
+            ref={board}
             className={`puzzle-board puzzle-${config.kind}`}
             aria-label={`${config.kind} puzzle`}
           >

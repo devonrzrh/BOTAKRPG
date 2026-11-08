@@ -109,6 +109,11 @@ describe("battle effects", () => {
     expect(
       scene!.meshes.find((mesh) => mesh.name === "impact ring")!.isVisible,
     ).toBe(false);
+    expect(
+      scene!.meshes
+        .filter((mesh) => /^battle particle \d+$/.test(mesh.name))
+        .every((mesh) => !mesh.isVisible),
+    ).toBe(true);
   });
 
   it("keeps rig transforms and pooled VFX still under reduced motion", () => {
@@ -161,7 +166,7 @@ describe("battle effects", () => {
     const removeObserver = vi.spyOn(scene!.onBeforeRenderObservable, "remove");
     const meshes = scene!.meshes.length;
     const materials = scene!.materials.length;
-    expect(meshes).toBe(9);
+    expect(meshes).toBe(29);
     rig.setState({ cue: cue(), reducedMotion: false });
     rig.frame();
     for (let i = 2; i <= 12; i++) {
@@ -177,12 +182,73 @@ describe("battle effects", () => {
     expect(scene!.materials).toContain(rig.material);
     expect(
       scene!.materials.some((material) =>
-        /^(battle projectile|insight beam|guard flare|impact ring|impact spark \d+) material$/.test(
+        /^(battle projectile|insight beam|guard flare|impact ring) material$/.test(
           material.name,
         ),
       ),
     ).toBe(false);
+    expect(
+      scene!.materials.some(
+        (material) => material.name === "battle particle material",
+      ),
+    ).toBe(false);
     expect(rootDisposed).not.toHaveBeenCalled();
     expect(rig.root.isDisposed()).toBe(false);
+  });
+
+  it("emits bounded pooled particles at impact and hides them when cues clear", () => {
+    const rig = setup(cue());
+    const sparks = () =>
+      scene!.meshes.filter((mesh) => /^battle particle \d+$/.test(mesh.name));
+    rig.frame();
+    rig.frame(combatCueDuration(false) * 0.31);
+    expect(sparks().some((mesh) => mesh.isVisible)).toBe(false);
+    rig.frame(combatCueDuration(false) * 0.03);
+    expect(sparks().filter((mesh) => mesh.isVisible)).toHaveLength(24);
+    expect(scene!.meshes).toHaveLength(29);
+    rig.setState({
+      cue: cue({ sequence: 2, kind: "poison", skill: null }),
+      reducedMotion: false,
+    });
+    rig.frame();
+    expect(
+      (
+        scene!.materials.find(
+          (m) => m.name === "battle particle material",
+        ) as StandardMaterial
+      ).emissiveColor.g,
+    ).toBeGreaterThan(0.9);
+    rig.frame(combatCueDuration(false) * 0.34);
+    expect(sparks().some((mesh) => mesh.isVisible)).toBe(true);
+    rig.setState({
+      cue: cue({
+        sequence: 3,
+        kind: "enemy",
+        skill: null,
+        blocked: true,
+        amount: 4,
+      }),
+      reducedMotion: false,
+    });
+    rig.frame();
+    rig.frame(combatCueDuration(false) * 0.65);
+    expect(sparks().some((mesh) => mesh.isVisible)).toBe(true);
+    expect(
+      (
+        scene!.materials.find(
+          (m) => m.name === "battle particle material",
+        ) as StandardMaterial
+      ).emissiveColor.b,
+    ).toBeGreaterThan(0.9);
+    rig.setState({
+      cue: cue({ sequence: 4, defeated: true }),
+      reducedMotion: false,
+    });
+    rig.frame();
+    rig.frame(combatCueDuration(false) * 0.34);
+    expect(sparks().some((mesh) => mesh.isVisible)).toBe(true);
+    rig.setState({ cue: null, reducedMotion: false });
+    rig.frame();
+    expect(sparks().every((mesh) => !mesh.isVisible)).toBe(true);
   });
 });

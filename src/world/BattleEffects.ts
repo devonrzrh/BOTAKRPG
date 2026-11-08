@@ -2,6 +2,7 @@ import { Color3 } from "@babylonjs/core/Maths/math.color";
 import type { Scene } from "@babylonjs/core/scene";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import type { Mesh } from "@babylonjs/core/Meshes/mesh";
+import type { InstancedMesh } from "@babylonjs/core/Meshes/instancedMesh";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { combatCueDuration, type BattleCue } from "../game/combatPresentation";
@@ -14,6 +15,12 @@ type EffectRig = {
 };
 type CueState = { cue: BattleCue | null; reducedMotion: boolean };
 type Flash = { mesh: Mesh; material: StandardMaterial };
+type Particle = {
+  mesh: InstancedMesh;
+  angle: number;
+  speed: number;
+  lift: number;
+};
 
 /** Small pooled combat accents animated from the cue stream. */
 export function attachBattleEffects(
@@ -60,6 +67,7 @@ export function attachBattleEffects(
     material.alpha = 0.9;
     mesh.material = material;
     mesh.isVisible = false;
+    mesh.isPickable = false;
     return { mesh, material };
   };
   const projectile = makeFlash("battle projectile", colors.white, "sphere");
@@ -69,10 +77,34 @@ export function attachBattleEffects(
   const ring = makeFlash("impact ring", colors.white, "ring");
   ring.mesh.scaling.setAll(1.15);
   ring.mesh.rotation.x = Math.PI / 2;
-  const sparks = Array.from({ length: 5 }, (_, i) =>
-    makeFlash(`impact spark ${i}`, colors.white, "sphere"),
+  // One shared low-poly geometry/material, with fixed instances reused by every cue.
+  const particleMaterial = new StandardMaterial(
+    "battle particle material",
+    scene,
   );
-  const pooled = [projectile, beam, shield, ring, ...sparks];
+  particleMaterial.emissiveColor = colors.white.clone();
+  particleMaterial.diffuseColor = colors.white.scale(0.2);
+  particleMaterial.alpha = 0.95;
+  const particleSource = MeshBuilder.CreatePolyhedron(
+    "battle particle source",
+    { type: 1, size: 0.09 },
+    scene,
+  );
+  particleSource.material = particleMaterial;
+  particleSource.isVisible = false;
+  particleSource.isPickable = false;
+  const particles: Particle[] = Array.from({ length: 24 }, (_, i) => {
+    const mesh = particleSource.createInstance(`battle particle ${i}`);
+    mesh.isVisible = false;
+    mesh.isPickable = false;
+    return {
+      mesh,
+      angle: (i / 24) * Math.PI * 2,
+      speed: 0.55 + (i % 4) * 0.12,
+      lift: ((i % 5) - 2) * 0.1,
+    };
+  });
+  const pooled = [projectile, beam, shield, ring];
   const original = {
     rootPosition: rig.root.position.clone(),
     rootRotation: rig.root.rotation.clone(),
@@ -88,6 +120,10 @@ export function attachBattleEffects(
   let reduced = false;
   const hide = () =>
     pooled.forEach(({ mesh }) => {
+      mesh.isVisible = false;
+    });
+  const hideParticles = () =>
+    particles.forEach(({ mesh }) => {
       mesh.isVisible = false;
     });
   const restore = () => {
@@ -111,6 +147,7 @@ export function attachBattleEffects(
       reduced = state.reducedMotion;
       started = performance.now();
       hide();
+      hideParticles();
       restore();
       if (activeCue) begin(activeCue);
     }
@@ -129,6 +166,7 @@ export function attachBattleEffects(
     ) {
       activeCue = null;
       hide();
+      hideParticles();
       restore();
     }
   });
@@ -136,17 +174,21 @@ export function attachBattleEffects(
   function begin(cue: BattleCue): void {
     if (reduced) return;
     const color =
-      cue.special === "limit" ? colors.amber : cue.special === "break" ? colors.red : cue.kind === "poison"
-        ? colors.green
-        : cue.skill === "insight"
-          ? colors.cyan
-          : cue.skill === "ward"
-            ? colors.blue
-            : cue.skill === "trace"
-              ? colors.green
-              : cue.skill === "weaken"
-                ? colors.amber
-                : colors.white;
+      cue.special === "limit"
+        ? colors.amber
+        : cue.special === "break"
+          ? colors.red
+          : cue.kind === "poison"
+            ? colors.green
+            : cue.skill === "insight"
+              ? colors.cyan
+              : cue.skill === "ward"
+                ? colors.blue
+                : cue.skill === "trace"
+                  ? colors.green
+                  : cue.skill === "weaken"
+                    ? colors.amber
+                    : colors.white;
     if (cue.kind === "player" || cue.kind === "poison") {
       projectile.material.emissiveColor.copyFrom(color);
       projectile.mesh.isVisible = true;
@@ -165,8 +207,42 @@ export function attachBattleEffects(
     }
     if ((cue.kind === "player" || cue.kind === "poison") && cue.amount > 0) {
       ring.material.emissiveColor.copyFrom(color);
-      sparks.forEach((s) => s.material.emissiveColor.copyFrom(color));
+      particleMaterial.emissiveColor.copyFrom(
+        cue.defeated ? colors.green : color,
+      );
+    } else if (cue.kind === "enemy" && cue.blocked) {
+      particleMaterial.emissiveColor.copyFrom(colors.cyan);
+    } else if (cue.special === "break" || cue.special === "limit") {
+      particleMaterial.emissiveColor.copyFrom(
+        cue.special === "break" ? colors.red : colors.amber,
+      );
     }
+  }
+  function emitParticles(
+    style: "hit" | "block" | "poison" | "shard" | "defeat",
+    age: number,
+  ): void {
+    const life = style === "defeat" ? 0.48 : 0.42;
+    const progress = Math.max(0, Math.min(1, age / life));
+    particles.forEach(({ mesh, angle, speed, lift }, i) => {
+      mesh.isVisible = progress < 1;
+      const shard = style === "shard" || style === "defeat";
+      const radius =
+        progress *
+        speed *
+        (style === "block" ? 0.48 : style === "defeat" ? 1.05 : 0.78);
+      mesh.position.set(
+        5 + Math.cos(angle) * radius,
+        1.6 + Math.sin(angle) * radius + progress * lift,
+        3.5 + Math.sin(angle * 2) * radius * 0.25,
+      );
+      mesh.scaling.set(
+        shard ? 0.72 : 0.45,
+        shard ? 1.45 : 0.45,
+        shard ? 0.55 : 0.45,
+      );
+      mesh.rotation.set(progress * (i % 3), progress * 3 + angle, progress * 2);
+    });
   }
   function animate(cue: BattleCue, t: number): void {
     const pulse = Math.sin(Math.PI * t);
@@ -193,13 +269,16 @@ export function attachBattleEffects(
         const flight = t / contact;
         projectile.mesh.isVisible = true;
         projectile.mesh.position.set(5, 0.8 + flight * 0.8, -3 + flight * 6.5);
-        projectile.mesh.scaling.setAll((0.8 + flight * 0.55) * (cue.special === "limit" ? 2 : 1));
+        projectile.mesh.scaling.setAll(
+          (0.8 + flight * 0.55) * (cue.special === "limit" ? 2 : 1),
+        );
       } else projectile.mesh.isVisible = false;
       if (cue.skill === "insight") {
         beam.mesh.isVisible = t <= contact;
         beam.mesh.position.set(5, 1.2, 0.25);
         beam.mesh.scaling.z = 1 + Math.min(1, t / contact) * 5.5;
-        beam.mesh.scaling.x = beam.mesh.scaling.y = cue.special === "limit" ? 3 : 1;
+        beam.mesh.scaling.x = beam.mesh.scaling.y =
+          cue.special === "limit" ? 3 : 1;
       }
       const impact =
         t >= contact
@@ -208,17 +287,21 @@ export function attachBattleEffects(
       if (cue.amount > 0) {
         ring.mesh.isVisible = impact > 0;
         ring.mesh.position.set(5, 1.6, 3.5);
-        ring.mesh.scaling.setAll((0.55 + (t - contact) * 2.5) * (cue.special === "limit" ? 1.8 : 1));
+        ring.mesh.scaling.setAll(
+          (0.55 + (t - contact) * 2.5) * (cue.special === "limit" ? 1.8 : 1),
+        );
         ring.material.alpha = 0.95 * impact;
-        sparks.forEach((s, i) => {
-          s.mesh.isVisible = t >= contact && t < contact + 0.45;
-          s.mesh.position.set(
-            5 + Math.cos(i * 1.57) * impact * 0.65,
-            1.6 + Math.sin(i * 1.57) * impact * 0.55,
-            3.5,
+        if (t >= contact)
+          emitParticles(
+            cue.defeated
+              ? "defeat"
+              : cue.kind === "poison"
+                ? "poison"
+                : cue.special === "break" || cue.special === "limit"
+                  ? "shard"
+                  : "hit",
+            ((t - contact) * combatCueDuration(false)) / 1000,
           );
-          s.mesh.scaling.setAll(0.4 + impact * 1.05);
-        });
       }
       const recoil =
         t > contact ? Math.sin(Math.min(1, (t - contact) / 0.2) * Math.PI) : 0;
@@ -246,6 +329,8 @@ export function attachBattleEffects(
     }
     if (cue.kind === "enemy" && cue.blocked)
       shield.mesh.scaling.set(1.1 + pulse * 0.35, 1.1 + pulse * 0.35, 0.12);
+    if (cue.kind === "enemy" && cue.blocked && t >= 0.62 && cue.amount > 0)
+      emitParticles("block", ((t - 0.62) * combatCueDuration(false)) / 1000);
     const flash =
       cue.kind === "miss" || cue.kind === "recover" ? 0 : pulse * 0.2;
     rig.materials.forEach((m, i) =>
@@ -265,10 +350,14 @@ export function attachBattleEffects(
   return () => {
     scene.onBeforeRenderObservable.remove(observer);
     hide();
+    hideParticles();
     restore();
     pooled.forEach(({ mesh, material }) => {
       mesh.dispose();
       material.dispose();
     });
+    particles.forEach(({ mesh }) => mesh.dispose());
+    particleSource.dispose();
+    particleMaterial.dispose();
   };
 }

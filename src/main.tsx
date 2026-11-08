@@ -1,6 +1,7 @@
 import { createRoot } from "react-dom/client";
 import App from "./App";
 import { GameSoundProvider } from "./ui/GameSound";
+import { GameParticlesProvider } from "./ui/GameParticles";
 import "./styles.css";
 import "./noir.css";
 import "./office.css";
@@ -19,6 +20,8 @@ import "./onboarding.css";
 import "./ui/Blocks.css";
 createRoot(document.getElementById("root")!).render(
   <GameSoundProvider>
-    <App />
+    <GameParticlesProvider>
+      <App />
+    </GameParticlesProvider>
   </GameSoundProvider>,
 );

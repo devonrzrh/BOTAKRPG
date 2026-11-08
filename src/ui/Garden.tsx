@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { Save } from "../game/state";
 import { useGameSound } from "./GameSound";
+import { useGameParticles } from "./GameParticles";
 import {
   addSample,
   accuracy,
@@ -26,6 +27,17 @@ export function Garden({
   onExperiment: (value: NonNullable<Save["signalExperiment"]>) => void;
 }) {
   const sound = useGameSound();
+  const particles = useGameParticles();
+  const plot = useRef<SVGSVGElement>(null);
+  const pulse = (kind: "train" | "success") => {
+    const rect = plot.current?.getBoundingClientRect();
+    particles(
+      kind,
+      rect
+        ? { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 }
+        : undefined,
+    );
+  };
   const [samples, setSamples] = useState<Sample[]>(
       () => experiment?.samples ?? [],
     ),
@@ -59,6 +71,7 @@ export function Garden({
       setTested(false);
       setMessage("Example added.");
       sound("puzzleAction");
+      pulse("train");
     } catch (e) {
       sound("error");
       setMessage(String(e));
@@ -86,6 +99,7 @@ export function Garden({
           </button>
         </div>
         <svg
+          ref={plot}
           className="neuron-plot"
           viewBox="0 0 400 400"
           role="img"
@@ -259,6 +273,7 @@ export function Garden({
             try {
               setNetwork(train(network, samples, epochs, rate));
               sound("puzzleAction");
+              pulse("train");
               setTested(false);
               setMessage("Weights updated. Test on unseen examples next.");
             } catch (e) {
@@ -275,6 +290,7 @@ export function Garden({
             setTested(true);
             sound(network.epochs >= 10 && score >= 5 / 6 ? "success" : "error");
             if (network.epochs >= 10 && score >= 5 / 6) {
+              pulse("success");
               onComplete();
               setMessage(
                 `Calibration complete: ${Math.round(score * 6)} of 6 held-out signals matched. This lab result does not authenticate a sender.`,

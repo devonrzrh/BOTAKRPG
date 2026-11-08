@@ -13,6 +13,7 @@ import { stats, type Save } from "../game/state";
 import { combatCueDuration, type BattleCue } from "../game/combatPresentation";
 import { XpMeter } from "./XpMeter";
 import { useGameSound } from "./GameSound";
+import { useGameParticles } from "./GameParticles";
 import { createCombatAudio } from "../game/combatAudio";
 import {
   Crosshair,
@@ -76,6 +77,8 @@ function enemySigil(id: string) {
 }
 export function BattleScreen(p: Props) {
   const sound = useGameSound();
+  const particles = useGameParticles();
+  const victoryBurstSent = useRef(false);
   const { battle: b, save, question: q } = p,
     limits = stats(save, p.content);
   const [menu, setMenu] = useState<"skills" | "inspect" | "act" | null>(
@@ -283,6 +286,17 @@ export function BattleScreen(p: Props) {
     0,
     save.character.xp - startingSave.current.character.xp,
   );
+  useEffect(() => {
+    if (
+      b.phase === "won" &&
+      !motion &&
+      gainedXp > 0 &&
+      !victoryBurstSent.current
+    ) {
+      victoryBurstSent.current = true;
+      particles("clue");
+    }
+  }, [b.phase, motion, gainedXp, particles]);
   const oldStats = stats(startingSave.current, p.content);
   const levelGain = save.character.level - startingSave.current.character.level;
   const newSkills = p.content.entities.filter(

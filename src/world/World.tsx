@@ -15,6 +15,7 @@ import { DynamicTexture } from "@babylonjs/core/Materials/Textures/dynamicTextur
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { attachBattleEffects } from "./BattleEffects";
+import { attachWorldParticles } from "./WorldParticles";
 import type { BattleCue } from "../game/combatPresentation";
 import "@babylonjs/core/Rendering/edgesRenderer";
 import { PointerEventTypes } from "@babylonjs/core/Events/pointerEvents";
@@ -102,6 +103,9 @@ export function World(props: Props) {
 }
 function WorldCanvas(props: Props) {
   const sound = useGameSound();
+  const [motionQuery] = useState(() =>
+    window.matchMedia("(prefers-reduced-motion: reduce)"),
+  );
   const canvas = useRef<HTMLCanvasElement>(null),
     latest = useRef(props);
   latest.current = props;
@@ -238,7 +242,7 @@ function WorldCanvas(props: Props) {
         canvas.current!.parentElement!,
         () => ({
           wall: latest.current.homeWall ?? "investigation",
-          reducedMotion: latest.current.reducedMotion,
+          reducedMotion: latest.current.reducedMotion || motionQuery.matches,
           locked: latest.current.homeLookLocked ?? false,
           reading: latest.current.officeUi?.find((m) => m.id === "bookshelf")
             ?.bookOpen,
@@ -252,7 +256,7 @@ function WorldCanvas(props: Props) {
           wall: latest.current.homeWall ?? "investigation",
           locked: latest.current.homeLookLocked ?? false,
           focused: latest.current.officeFocused ?? null,
-          reducedMotion: latest.current.reducedMotion,
+          reducedMotion: latest.current.reducedMotion || motionQuery.matches,
         }),
         (action) => latest.current.onOfficeAction?.(action),
       );
@@ -697,7 +701,7 @@ function WorldCanvas(props: Props) {
         },
         () => ({
           cue: latest.current.combatCue ?? null,
-          reducedMotion: latest.current.reducedMotion,
+          reducedMotion: latest.current.reducedMotion || motionQuery.matches,
         }),
       );
       const spotlight = new PointLight(
@@ -849,6 +853,29 @@ function WorldCanvas(props: Props) {
         props.maze.position[1] - props.maze.size / 2,
       );
     else actor.position.copyFrom(hubPosition.current);
+    const disposeWorldParticles = !props.encounter
+      ? attachWorldParticles(scene, () => {
+          const current = latest.current;
+          const maze = current.maze;
+          return {
+            position: actor.position,
+            goal:
+              current.scene === "maze"
+                ? {
+                    x: maze.goal[0] - maze.size / 2,
+                    y: 0.35,
+                    z: maze.goal[1] - maze.size / 2,
+                  }
+                : undefined,
+            atGoal:
+              current.scene === "maze" &&
+              maze.position[0] === maze.goal[0] &&
+              maze.position[1] === maze.goal[1],
+            reducedMotion: current.reducedMotion || motionQuery.matches,
+            locked: current.locked,
+          };
+        })
+      : undefined;
     const targets = scene.meshes.filter((mesh) => mesh.metadata?.interaction);
     for (const mesh of targets) {
       mesh.enableEdgesRendering();
@@ -943,6 +970,7 @@ function WorldCanvas(props: Props) {
       if (sceneRef.current === scene) sceneRef.current = null;
       actorRef.current = null;
       disposeBattleEffects?.();
+      disposeWorldParticles?.();
       scene.dispose();
     };
   }, [
