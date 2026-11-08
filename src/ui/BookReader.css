@@ -76,14 +76,6 @@
   color: #eee5cf;
   font: 18px/1.4 var(--typewriter);
 }
-.reader-source {
-  font: 11px/1.2 var(--typewriter);
-  letter-spacing: 2px;
-  color: #9fc3bd;
-  border-right: 1px solid #5c7472;
-  padding-right: 12px;
-  flex-shrink: 0;
-}
 .book-reader .reader-toolbar button {
   background: #293f46;
   color: #f3ead5;
@@ -365,6 +357,24 @@
 .reader-footer input {
   width: 75px;
   padding: 8px;
+}
+.reader-page-status {
+  border-color: transparent !important;
+  background: transparent !important;
+  text-decoration: underline dotted;
+  text-underline-offset: 5px;
+}
+.reader-contents-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+.reader-contents-tabs button {
+  flex: 1;
+}
+.reader-drawer nav .reader-subsection {
+  padding-left: 28px;
+  border-left: 3px solid #ad9b79;
 }
 .reader-drawer {
   position: absolute;

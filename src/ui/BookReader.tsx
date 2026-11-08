@@ -9,6 +9,7 @@ import {
 import { renderLessonMarkdown } from "../game/markdown";
 import DOMPurify from "dompurify";
 import type { Lesson } from "../content/schema";
+import type { Save } from "../game/state";
 import {
   Library,
   Bookmark,
@@ -23,12 +24,25 @@ import {
 } from "lucide-react";
 import { bookLayout, clampSpread } from "../game/reading";
 
+// Arrival animation scales the volume; convert visual coordinates back to CSS pixels.
+function readingOffset(element: Element, frame: HTMLElement) {
+  const bounds = frame.getBoundingClientRect();
+  return (
+    (element.getBoundingClientRect().left - bounds.left) *
+      (frame.offsetWidth / Math.max(1, bounds.width)) +
+    frame.scrollLeft
+  );
+}
+
 export function BookReader(p: {
   lessons: Lesson[];
   lesson: Lesson;
   reducedMotion: boolean;
   bookmarked: boolean;
   note: string;
+  reading: Save["reading"];
+  onPreferences: (mode: "book" | "fullscreen", size: 20 | 22 | 24) => void;
+  onPosition: (id: string, position: { block: number; offset: number }) => void;
   onSelect: (id: string) => void;
   onClose: () => void;
   onBookmark: () => void;
@@ -37,12 +51,18 @@ export function BookReader(p: {
 }) {
   const [ready, setReady] = useState(p.reducedMotion);
   const [closing, setClosing] = useState(false);
-  const [mode, setMode] = useState<"book" | "fullscreen">("book");
+  const [mode, setMode] = useState<"book" | "fullscreen">(p.reading.mode);
   const [drawer, setDrawer] = useState<"contents" | "tools" | "notes" | null>(
     null,
   );
   const [query, setQuery] = useState("");
-  const [fontSize, setFontSize] = useState(22);
+  const [fontSize, setFontSize] = useState<20 | 22 | 24>(p.reading.fontSize);
+  const [contentsTab, setContentsTab] = useState<"chapter" | "library">(
+    "chapter",
+  );
+  const [topicFilter, setTopicFilter] = useState("all");
+  const [jumpOpen, setJumpOpen] = useState(false);
+  const [progress, setProgress] = useState(0);
   const [spread, setSpread] = useState(0);
   const [layout, setLayout] = useState({
     pages: 1,
@@ -63,7 +83,66 @@ export function BookReader(p: {
   const turnTimer = useRef<ReturnType<typeof setTimeout> | undefined>(
     undefined,
   );
-  const pendingAnchor = useRef<number | null>(null);
+  type Position = { block: number; offset: number };
+  const pendingAnchor = useRef<Position | null>(null);
+  const closeTimer = useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined,
+  );
+  const saveTimer = useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined,
+  );
+  const positionCallback = useRef(p.onPosition);
+  positionCallback.current = p.onPosition;
+  const lastPosition = useRef<{ id: string; position: Position } | null>(null);
+  const capturePosition = () => {
+    const frame = viewport.current,
+      page = article.current;
+    if (!frame || !page || pendingAnchor.current) return;
+    const bounds = frame.getBoundingClientRect();
+    const children = Array.from(page.children);
+    for (let block = 0; block < children.length; block++) {
+      const rects = Array.from(children[block].getClientRects());
+      const index = rects.findIndex(
+        (rect) =>
+          rect.bottom > bounds.top + 5 &&
+          rect.top < bounds.bottom &&
+          rect.right > bounds.left + 5 &&
+          rect.left < bounds.right,
+      );
+      if (index < 0) continue;
+      const rect = rects[index];
+      const offset =
+        (index +
+          Math.max(
+            0,
+            Math.min(0.999, (bounds.top - rect.top) / Math.max(1, rect.height)),
+          )) /
+        rects.length;
+      const position = { block, offset };
+      lastPosition.current = { id: p.lesson.id, position };
+      return position;
+    }
+  };
+  const savePosition = () => {
+    capturePosition();
+    if (lastPosition.current)
+      positionCallback.current(
+        lastPosition.current.id,
+        lastPosition.current.position,
+      );
+  };
+  useEffect(
+    () => () => {
+      clearTimeout(closeTimer.current);
+      clearTimeout(saveTimer.current);
+      if (lastPosition.current)
+        positionCallback.current(
+          lastPosition.current.id,
+          lastPosition.current.position,
+        );
+    },
+    [],
+  );
   const html = useMemo(
     () =>
       DOMPurify.sanitize(
@@ -88,12 +167,13 @@ export function BookReader(p: {
   }, [p.reducedMotion]);
   const closeBook = () => {
     if (closing) return;
+    savePosition();
     setClosing(true);
     if (p.reducedMotion) {
       p.onClose();
       return;
     }
-    window.setTimeout(p.onClose, 260);
+    closeTimer.current = setTimeout(p.onClose, 260);
   };
   const measure = useCallback(() => {
     const frame = viewport.current,
@@ -138,6 +218,12 @@ export function BookReader(p: {
   }, [html, ready]);
   useLayoutEffect(() => {
     if (!ready) return;
+    clearTimeout(saveTimer.current);
+    if (lastPosition.current)
+      positionCallback.current(
+        lastPosition.current.id,
+        lastPosition.current.position,
+      );
     const frame = viewport.current!,
       page = article.current!;
     frame.scrollTo(0, 0);
@@ -145,7 +231,12 @@ export function BookReader(p: {
     setPageInput("1");
     setDrawer(null);
     setDiagram(null);
-    pendingAnchor.current = null;
+    pendingAnchor.current = p.reading.positions[p.lesson.id] ?? {
+      block: 0,
+      offset: 0,
+    };
+    lastPosition.current = null;
+    setJumpOpen(false);
     page.focus({ preventScroll: true });
   }, [p.lesson.id, ready]);
   useLayoutEffect(() => {
@@ -158,13 +249,24 @@ export function BookReader(p: {
     const frame = viewport.current,
       page = article.current;
     if (!frame || !page || pendingAnchor.current === null) return;
-    const child = page.children[pendingAnchor.current] as
+    const child = page.children[pendingAnchor.current.block] as
       HTMLElement | undefined;
+    const anchor = pendingAnchor.current;
     pendingAnchor.current = null;
     if (!child) return;
-    const rect = child.getBoundingClientRect(),
+    const rects = Array.from(child.getClientRects());
+    const fragment = Math.min(
+      rects.length - 1,
+      Math.floor(anchor.offset * rects.length),
+    );
+    const rect = rects[fragment] ?? child.getBoundingClientRect(),
       bounds = frame.getBoundingClientRect();
-    if (mode === "fullscreen") frame.scrollTop += rect.top - bounds.top;
+    if (mode === "fullscreen")
+      frame.scrollTop +=
+        (rect.top -
+          bounds.top +
+          (anchor.offset * rects.length - fragment) * rect.height) *
+        (frame.offsetHeight / Math.max(1, bounds.height));
     else {
       const style = getComputedStyle(page);
       const next = bookLayout(
@@ -174,7 +276,13 @@ export function BookReader(p: {
         Number(style.columnCount) || 1,
       );
       const target = clampSpread(
-        Math.floor((rect.left - bounds.left + frame.scrollLeft) / next.step),
+        Math.floor(
+          ((rect.left - bounds.left) *
+            (frame.offsetWidth / Math.max(1, bounds.width)) +
+            frame.scrollLeft +
+            1) /
+            next.step,
+        ),
         next.pages,
         next.columns,
       );
@@ -182,26 +290,16 @@ export function BookReader(p: {
       setLayout(next);
       setSpread(target);
     }
-  }, [mode]);
+  }, [mode, fontSize, ready, p.lesson.id]);
   const rememberAnchor = () => {
-    if (!viewport.current || !article.current) return;
-    const bounds = viewport.current.getBoundingClientRect();
-    const index = Array.from(article.current.children).findIndex((child) =>
-      Array.from(child.getClientRects()).some(
-        (rect) =>
-          rect.bottom > bounds.top + 5 &&
-          rect.top < bounds.bottom &&
-          rect.right > bounds.left + 5 &&
-          rect.left < bounds.right,
-      ),
-    );
-    pendingAnchor.current = Math.max(0, index);
+    pendingAnchor.current = capturePosition() ?? { block: 0, offset: 0 };
   };
   const switchMode = (next: typeof mode) => {
     setDiagram(null);
     if (next !== mode) {
       rememberAnchor();
       setMode(next);
+      p.onPreferences(next, fontSize);
       setDrawer(null);
     }
   };
@@ -238,19 +336,24 @@ export function BookReader(p: {
   const pageEnd = Math.min(layout.pages, pageStart + layout.columns - 1);
   const topics = useMemo(
     () =>
-      p.lessons.filter((l) =>
-        `${l.title} ${l.body}`.toLowerCase().includes(query.toLowerCase()),
+      p.lessons.filter(
+        (l) =>
+          `${l.title} ${l.body}`.toLowerCase().includes(query.toLowerCase()) &&
+          (topicFilter === "all" || l.topic === topicFilter),
       ),
-    [p.lessons, query],
+    [p.lessons, query, topicFilter],
   );
   const sectionLinks = useMemo(
     () =>
-      Array.from(html.matchAll(/<h([123])(?:\s[^>]*)?>([\s\S]*?)<\/h\1>/g)).map(
-        (match, index) => ({
+      Array.from(html.matchAll(/<h([123])(?:\s[^>]*)?>([\s\S]*?)<\/h\1>/g))
+        .map((match, index) => ({
           index,
+          level: Number(match[1]),
           title: match[2].replace(/<[^>]+>/g, "").replace(/&amp;/g, "&"),
-        }),
-      ),
+        }))
+        .filter(
+          (section) => section.level > 1 && !/^contents$/i.test(section.title),
+        ),
     [html],
   );
   const jumpSection = (index: number, allHeadings = false) => {
@@ -260,17 +363,13 @@ export function BookReader(p: {
     const frame = viewport.current;
     if (!heading || !frame) return;
     if (mode === "book")
-      flip(
-        Math.floor(
-          (heading.getBoundingClientRect().left -
-            frame.getBoundingClientRect().left +
-            frame.scrollLeft) /
-            layout.step,
-        ),
-      );
+      flip(Math.floor((readingOffset(heading, frame) + 1) / layout.step));
     else
       frame.scrollTop +=
-        heading.getBoundingClientRect().top - frame.getBoundingClientRect().top;
+        (heading.getBoundingClientRect().top -
+          frame.getBoundingClientRect().top) *
+        (frame.clientHeight /
+          Math.max(1, frame.getBoundingClientRect().height));
     setDrawer(null);
   };
   if (!ready) return null;
@@ -284,6 +383,7 @@ export function BookReader(p: {
           e.stopPropagation();
           if (diagram) closeDiagram();
           else if (drawer) closeDrawer();
+          else if (jumpOpen) setJumpOpen(false);
           else closeBook();
         }
         if (diagram) return;
@@ -304,7 +404,6 @@ export function BookReader(p: {
     >
       <div className="reader-volume">
         <header className="reader-toolbar">
-          <span className="reader-source">BOOKSHELF</span>
           <button
             aria-expanded={drawer === "contents"}
             onClick={() => {
@@ -333,11 +432,30 @@ export function BookReader(p: {
             </button>
           </div>
           <button
-            aria-label="Reading tools"
-            aria-expanded={drawer === "tools" || drawer === "notes"}
+            aria-label={p.bookmarked ? "Remove bookmark" : "Bookmark chapter"}
+            title={p.bookmarked ? "Remove bookmark" : "Bookmark chapter"}
+            aria-pressed={p.bookmarked}
+            onClick={p.onBookmark}
+          >
+            <Bookmark size={20} />
+          </button>
+          <button
+            aria-label="Personal notes"
+            title="Personal notes"
+            aria-expanded={drawer === "notes"}
             onClick={() => {
               setDiagram(null);
-              setDrawer(drawer ? null : "tools");
+              setDrawer(drawer === "notes" ? null : "notes");
+            }}
+          >
+            <NotebookPen size={20} />
+          </button>
+          <button
+            aria-label="Reading tools"
+            aria-expanded={drawer === "tools"}
+            onClick={() => {
+              setDiagram(null);
+              setDrawer(drawer === "tools" ? null : "tools");
             }}
           >
             <SlidersHorizontal size={20} />
@@ -353,6 +471,25 @@ export function BookReader(p: {
               className="reader-viewport"
               ref={viewport}
               onLoadCapture={measure}
+              onScroll={() => {
+                if (pendingAnchor.current) return;
+                const frame = viewport.current!;
+                setProgress(
+                  Math.round(
+                    (100 * frame.scrollTop) /
+                      Math.max(1, frame.scrollHeight - frame.clientHeight),
+                  ),
+                );
+                capturePosition();
+                clearTimeout(saveTimer.current);
+                saveTimer.current = setTimeout(() => {
+                  if (lastPosition.current)
+                    positionCallback.current(
+                      lastPosition.current.id,
+                      lastPosition.current.position,
+                    );
+                }, 350);
+              }}
             >
               <article
                 ref={article}
@@ -363,6 +500,7 @@ export function BookReader(p: {
                 aria-label={p.lesson.title}
                 onClick={(e) => {
                   if (e.target instanceof HTMLImageElement) {
+                    e.preventDefault();
                     enlarge(e.target);
                     return;
                   }
@@ -370,7 +508,10 @@ export function BookReader(p: {
                   if (link?.hash.startsWith("#lesson=")) {
                     e.preventDefault();
                     const id = link.hash.slice(8);
-                    if (p.lessons.some((l) => l.id === id)) p.onSelect(id);
+                    if (p.lessons.some((l) => l.id === id)) {
+                      savePosition();
+                      p.onSelect(id);
+                    }
                   } else if (link?.hash) {
                     const id = decodeURIComponent(link.hash.slice(1));
                     const index = Array.from(
@@ -402,9 +543,7 @@ export function BookReader(p: {
                     return;
                   const frame = viewport.current;
                   const offset =
-                    (e.target as HTMLElement).getBoundingClientRect().left -
-                    frame.getBoundingClientRect().left +
-                    frame.scrollLeft;
+                    readingOffset(e.target as HTMLElement, frame) + 1;
                   setSpread(
                     clampSpread(
                       Math.floor(offset / layout.step),
@@ -480,61 +619,104 @@ export function BookReader(p: {
               </div>
               {drawer === "contents" ? (
                 <>
-                  <label>
-                    Find a chapter
-                    <input
+                  <div
+                    className="reader-contents-tabs"
+                    aria-label="Contents view"
+                  >
+                    <button
                       autoFocus
-                      aria-label="Search all materials"
-                      placeholder="Title or topic…"
-                      value={query}
-                      onChange={(e) => setQuery(e.target.value)}
-                    />
-                  </label>
-                  {!query && sectionLinks.length > 0 && (
+                      aria-pressed={contentsTab === "chapter"}
+                      onClick={() => setContentsTab("chapter")}
+                    >
+                      This chapter
+                    </button>
+                    <button
+                      aria-pressed={contentsTab === "library"}
+                      onClick={() => setContentsTab("library")}
+                    >
+                      Library
+                    </button>
+                  </div>
+                  {contentsTab === "chapter" ? (
                     <nav aria-label="Sections in this chapter">
-                      <h3>This chapter</h3>
-                      {sectionLinks.map((section) => (
-                        <button
-                          key={section.index}
-                          onClick={() => jumpSection(section.index)}
-                        >
-                          {section.title}
-                        </button>
-                      ))}
+                      {sectionLinks.length ? (
+                        sectionLinks.map((section) => (
+                          <button
+                            className={
+                              section.level === 3 ? "reader-subsection" : ""
+                            }
+                            key={section.index}
+                            onClick={() => jumpSection(section.index)}
+                          >
+                            {section.title}
+                          </button>
+                        ))
+                      ) : (
+                        <p>No sections in this chapter.</p>
+                      )}
                     </nav>
+                  ) : (
+                    <>
+                      <label>
+                        Find a chapter
+                        <input
+                          aria-label="Search all materials"
+                          placeholder="Title or topic…"
+                          value={query}
+                          onChange={(e) => setQuery(e.target.value)}
+                        />
+                      </label>
+                      <label>
+                        Subject
+                        <select
+                          aria-label="Filter library by subject"
+                          value={topicFilter}
+                          onChange={(e) => setTopicFilter(e.target.value)}
+                        >
+                          <option value="all">All subjects</option>
+                          <option value="algorithms">Algorithms</option>
+                          <option value="structures">Data structures</option>
+                          <option value="ai">Connectionist AI</option>
+                        </select>
+                      </label>
+                      <nav aria-label="Book chapters">
+                        {(["algorithms", "structures", "ai"] as const).map(
+                          (topic) =>
+                            topics.some((l) => l.topic === topic) && (
+                              <div key={topic}>
+                                <h3>
+                                  {topic === "ai"
+                                    ? "Connectionist AI"
+                                    : topic === "structures"
+                                      ? "Data structures"
+                                      : "Algorithms"}
+                                </h3>
+                                {topics
+                                  .filter((l) => l.topic === topic)
+                                  .map((l) => (
+                                    <button
+                                      key={l.id}
+                                      aria-current={
+                                        l.id === p.lesson.id
+                                          ? "page"
+                                          : undefined
+                                      }
+                                      onClick={() => {
+                                        savePosition();
+                                        p.onSelect(l.id);
+                                        setDrawer(null);
+                                      }}
+                                    >
+                                      {l.title}
+                                    </button>
+                                  ))}
+                              </div>
+                            ),
+                        )}
+                        {!topics.length && <p>No matching chapters.</p>}
+                      </nav>
+                    </>
                   )}
-                  <nav aria-label="Book chapters">
-                    {(["algorithms", "structures", "ai"] as const).map(
-                      (topic) => (
-                        <div key={topic}>
-                          <h3>
-                            {topic === "ai"
-                              ? "Connectionist AI"
-                              : topic === "structures"
-                                ? "Data structures"
-                                : "Algorithms"}
-                          </h3>
-                          {topics
-                            .filter((l) => l.topic === topic)
-                            .map((l) => (
-                              <button
-                                key={l.id}
-                                aria-current={
-                                  l.id === p.lesson.id ? "page" : undefined
-                                }
-                                onClick={() => {
-                                  p.onSelect(l.id);
-                                  setDrawer(null);
-                                }}
-                              >
-                                {l.title}
-                              </button>
-                            ))}
-                        </div>
-                      ),
-                    )}
-                    {!topics.length && <p>No matching chapters.</p>}
-                  </nav>
                 </>
               ) : drawer === "notes" ? (
                 <label>
@@ -555,26 +737,29 @@ export function BookReader(p: {
                       autoFocus
                       aria-label="Reading text size"
                       value={fontSize}
-                      onChange={(e) => setFontSize(Number(e.target.value))}
+                      onChange={(e) => {
+                        rememberAnchor();
+                        const size = Number(e.target.value) as 20 | 22 | 24;
+                        setFontSize(size);
+                        p.onPreferences(mode, size);
+                      }}
                     >
                       <option value={20}>Regular · 20</option>
                       <option value={22}>Large · 22</option>
                       <option value={24}>Larger · 24</option>
                     </select>
                   </label>
-                  <button onClick={p.onBookmark} aria-pressed={p.bookmarked}>
-                    <Bookmark size={20} />
-                    {p.bookmarked ? "Bookmarked" : "Bookmark chapter"}
-                  </button>
-                  <button onClick={() => setDrawer("notes")}>
-                    <NotebookPen size={20} />
-                    Personal notes
-                  </button>
                   {p.lesson.prerequisites.length > 0 && (
                     <>
                       <h3>Read first</h3>
                       {p.lesson.prerequisites.map((id) => (
-                        <button key={id} onClick={() => p.onSelect(id)}>
+                        <button
+                          key={id}
+                          onClick={() => {
+                            savePosition();
+                            p.onSelect(id);
+                          }}
+                        >
                           {p.lessons.find((l) => l.id === id)?.title}
                         </button>
                       ))}
@@ -601,35 +786,48 @@ export function BookReader(p: {
                 <ChevronLeft size={22} />
                 Previous
               </button>
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  const value = Number(pageInput);
-                  if (Number.isInteger(value) && value > 0)
-                    flip(Math.floor((value - 1) / layout.columns));
-                  else setPageInput(String(pageStart));
-                }}
-              >
-                <label>
-                  Page
-                  <input
-                    aria-label="Page number"
-                    inputMode="numeric"
-                    type="number"
-                    min={1}
-                    max={layout.pages}
-                    value={pageInput}
-                    onChange={(e) => setPageInput(e.target.value)}
-                  />
-                </label>
-                <button type="submit">Go</button>
-              </form>
-              <span role="status" aria-live="polite">
-                {pageStart === pageEnd
-                  ? `Page ${pageStart}`
-                  : `Pages ${pageStart}–${pageEnd}`}{" "}
-                of {layout.pages}
-              </span>
+              {jumpOpen ? (
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    const value = Number(pageInput);
+                    if (Number.isInteger(value) && value > 0)
+                      flip(Math.floor((value - 1) / layout.columns));
+                    else setPageInput(String(pageStart));
+                    setJumpOpen(false);
+                  }}
+                >
+                  <label>
+                    Page
+                    <input
+                      autoFocus
+                      aria-label="Page number"
+                      inputMode="numeric"
+                      type="number"
+                      min={1}
+                      max={layout.pages}
+                      value={pageInput}
+                      onChange={(e) => setPageInput(e.target.value)}
+                    />
+                  </label>
+                  <button type="submit">Go</button>
+                  <button type="button" onClick={() => setJumpOpen(false)}>
+                    Cancel
+                  </button>
+                </form>
+              ) : (
+                <button
+                  className="reader-page-status"
+                  title="Jump to page"
+                  aria-label={`Pages ${pageStart} to ${pageEnd} of ${layout.pages}. Jump to page`}
+                  onClick={() => setJumpOpen(true)}
+                >
+                  {pageStart === pageEnd
+                    ? `Page ${pageStart}`
+                    : `Pages ${pageStart}–${pageEnd}`}{" "}
+                  of {layout.pages}
+                </button>
+              )}
               <button
                 disabled={pageEnd >= layout.pages}
                 onClick={() => flip(spread + 1)}
@@ -640,7 +838,7 @@ export function BookReader(p: {
             </>
           ) : (
             <>
-              <span>Scroll to read</span>
+              <span role="status">{progress}% read</span>
               <button
                 onClick={() =>
                   viewport.current?.scrollTo({ top: 0, behavior: "instant" })

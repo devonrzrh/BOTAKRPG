@@ -2370,6 +2370,30 @@ export default function App() {
             reducedMotion={save.settings.reducedMotion}
             bookmarked={save.bookmarks.includes(lessonId)}
             note={save.notes[lessonId] ?? ""}
+            reading={save.reading}
+            onPreferences={(mode, fontSize) =>
+              updateSave((s) => ({
+                ...s,
+                reading: { ...s.reading, mode, fontSize },
+              }))
+            }
+            onPosition={(id, position) =>
+              updateSave((s) => {
+                const current = s.reading.positions[id];
+                if (
+                  current?.block === position.block &&
+                  current?.offset === position.offset
+                )
+                  return s;
+                return {
+                  ...s,
+                  reading: {
+                    ...s.reading,
+                    positions: { ...s.reading.positions, [id]: position },
+                  },
+                };
+              })
+            }
             onSelect={setLessonId}
             onClose={() => {
               setBookOpen(false);

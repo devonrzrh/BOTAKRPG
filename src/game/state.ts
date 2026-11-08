@@ -11,6 +11,20 @@ const masterySchema = z.object({
   answered: z.array(z.string()),
 });
 const finite = z.number().finite();
+const readingSchema = z
+  .object({
+    mode: z.enum(["book", "fullscreen"]).default("book"),
+    fontSize: z.union([z.literal(20), z.literal(22), z.literal(24)]).default(22),
+    positions: z
+      .record(
+        z.object({
+          block: z.number().int().nonnegative(),
+          offset: finite.min(0).max(1).default(0),
+        }),
+      )
+      .default({}),
+  })
+  .default({ mode: "book", fontSize: 22, positions: {} });
 const signalSampleSchema = z.object({
   x: finite.min(-1).max(1),
   y: finite.min(-1).max(1),
@@ -75,6 +89,7 @@ export const saveSchema = z
     mastery: z.record(masterySchema),
     bookmarks: z.array(z.string()),
     notes: z.record(z.string().max(20000)),
+    reading: readingSchema,
     code: z.string().max(200000),
     blocks: z.unknown().nullable(),
     seed: z.number().int().min(0).max(2147483647),
@@ -123,6 +138,7 @@ export function initialSave(): Save {
     mastery: {},
     bookmarks: [],
     notes: {},
+    reading: { mode: "book", fontSize: 22, positions: {} },
     code: STARTER_CODE,
     blocks: null,
     seed: 42,
@@ -297,6 +313,7 @@ export function parseSave(input: unknown, content: Content): Save {
   check(save.claimed, "quest");
   check(save.bookmarks, "lesson");
   check(Object.keys(save.notes), "lesson");
+  check(Object.keys(save.reading.positions), "lesson");
   check(Object.keys(save.mastery), "lesson");
   check(save.character.skills, "skill");
   for (const [id, progress] of Object.entries(save.chapterProgress)) {
