@@ -1,7 +1,12 @@
 import type { Content, Quest } from "../content/schema";
 import type { Save } from "./state";
 import type { SurfaceButton } from "./officeUi";
-import { finaleAvailable, questComplete, nextObjective } from "./investigation";
+import {
+  finaleAvailable,
+  questComplete,
+  nextObjective,
+  activityUnlocked,
+} from "./investigation";
 import { activityStory } from "./questStory";
 import { chapterLabel, chaptersForBranch } from "./chapterQuest";
 
@@ -71,7 +76,15 @@ export function createQuestGraph(
     (b) =>
       b.id === chapter?.branch ||
       selected === `intro-${b.id}` ||
-      selected === `chapter-boss-${b.id}`,
+      selected === `chapter-boss-${b.id}` ||
+      b.objectives.some(
+        (id) =>
+          id === selected &&
+          content.entities.some(
+            (e) =>
+              e.id === id && e.type === "activity" && e.template === "puzzle",
+          ),
+      ),
   );
   if (detail) {
     const chapters = chaptersForBranch(content, detail.id),
@@ -121,6 +134,36 @@ export function createQuestGraph(
           `chapter-puzzle-${c.id}`,
         ],
       });
+    for (const id of detail.objectives) {
+      const activity = content.entities.find((e) => e.id === id);
+      if (activity?.type !== "activity" || activity.template !== "puzzle")
+        continue;
+      nodes.push({
+        id,
+        title: activity.title,
+        description: activityUnlocked(save, id, content)
+          ? (activity.brief ?? "Recover the evidence.")
+          : "Follow the preceding lead to reach this evidence.",
+        x: 0,
+        y: 0,
+        kind: "activity",
+        status: save.completed.includes(id)
+          ? "completed"
+          : activityUnlocked(save, id, content)
+            ? "available"
+            : "locked",
+        actions: [`evidence-${id}`],
+      });
+    }
+    // Place evidence gates beside the encounters that lead to them.
+    nodes.sort((a, b) => {
+      const index = (node: QuestNode) =>
+        detail.objectives.indexOf(
+          chapters.find((c) => c.id === node.id)?.objectives[0] ??
+            (node.id.startsWith("intro-") ? detail.objectives[0] : node.id),
+        );
+      return index(a) - index(b);
+    });
     nodes.push({
       id: `chapter-boss-${detail.id}`,
       title: boss?.title ?? "Branch boss",

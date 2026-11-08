@@ -1,7 +1,8 @@
 # Field puzzles
 
-Optional investigations apply the corresponding Source chapters. They do not
-replace completed chapter checks or change the final encounter prerequisites.
+Field investigations apply the corresponding Source chapters. Evidence cases
+sit between encounters on the clue branches; advanced variants remain available
+for additional practice.
 
 ```entity
 type: activity

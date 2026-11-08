@@ -9,11 +9,155 @@
   text-align: left;
   font-size: 16px;
 }
+/* Contact starts these classes; the persistent menu bar stays still. */
+.app:not(.reduced-motion):has(.battle-screen.impact-damage) .world-canvas,
+.app:not(.reduced-motion) .battle-screen.impact-damage {
+  animation: battle-screen-hit 240ms steps(1, end) both;
+}
+.app:not(.reduced-motion):has(.battle-screen.impact-defeat) .world-canvas,
+.app:not(.reduced-motion) .battle-screen.impact-defeat {
+  animation: battle-screen-defeat 420ms steps(1, end) both;
+}
+.app:not(.reduced-motion) .impact-damage .battle-player-hud {
+  animation: battle-hp-hit 240ms steps(1, end) both;
+  border-color: #ff776a;
+  box-shadow: 0 0 28px #e2463d88;
+}
+.impact-damage .battle-meter.health i {
+  background: #ff776a;
+}
+@keyframes battle-screen-hit {
+  0% {
+    translate: -7px 3px;
+  }
+  18% {
+    translate: 8px -4px;
+  }
+  36% {
+    translate: -6px -2px;
+  }
+  54% {
+    translate: 5px 3px;
+  }
+  72% {
+    translate: -3px 1px;
+  }
+  100% {
+    translate: 0 0;
+  }
+}
+@keyframes battle-hp-hit {
+  0% {
+    translate: 7px -2px;
+  }
+  25% {
+    translate: -9px 1px;
+  }
+  50% {
+    translate: 6px 0;
+  }
+  75% {
+    translate: -4px 0;
+  }
+  100% {
+    translate: 0 0;
+  }
+}
+@keyframes battle-screen-defeat {
+  0% {
+    translate: 0 -9px;
+  }
+  16% {
+    translate: -8px 5px;
+  }
+  32% {
+    translate: 8px -4px;
+  }
+  48% {
+    translate: -5px 3px;
+  }
+  65% {
+    translate: 4px -2px;
+  }
+  82% {
+    translate: -2px 1px;
+  }
+  100% {
+    translate: 0 0;
+  }
+}
+.battle-death {
+  position: fixed;
+  inset: var(--top-height) 0 0;
+  z-index: 12;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  padding: 28px;
+  background: radial-gradient(ellipse at center, #211019 0%, #07070c 65%);
+  color: #f5eeee;
+  pointer-events: auto;
+  text-align: center;
+  font: 400 20px/1.5 var(--typewriter);
+}
+.battle-death h1 {
+  margin: 0;
+  font: 400 clamp(56px, 10vw, 112px)/1.1 var(--typewriter);
+  letter-spacing: 0.08em;
+  color: #ff897d;
+  text-shadow: 0 0 35px #d9403540;
+}
+.battle-death h1:focus {
+  outline: none;
+}
+.battle-death p {
+  max-width: 42ch;
+  margin: 0;
+}
+.battle-death .death-kicker {
+  color: #c77b78;
+  font-size: 16px;
+  letter-spacing: 0.18em;
+}
+.death-signal {
+  font-size: 64px;
+  line-height: 1;
+  color: #e56e65;
+}
+.death-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 14px;
+  margin-top: 16px;
+}
+.app .death-actions button {
+  min-height: 52px;
+  padding: 12px 22px;
+  font-size: 18px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .app:has(.battle-screen.impact-damage) .world-canvas,
+  .app:has(.battle-screen.impact-defeat) .world-canvas,
+  .app .battle-screen.impact-damage,
+  .app .battle-screen.impact-defeat,
+  .app .impact-damage .battle-player-hud {
+    animation: none !important;
+  }
+}
 .battle-stance span,
 .battle-stance strong {
   display: block;
   margin: 4px 0;
   font-weight: 400;
+}
+.enemy-threat {
+  margin: 2px 0 8px;
+  color: #c5d8db;
+  font: 400 16px/1.3 var(--typewriter);
+  letter-spacing: 0.06em;
 }
 .battle-stance strong {
   color: #e8c785;

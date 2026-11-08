@@ -100,15 +100,15 @@ export const tutorials: Tutorial[] = [
     steps: [
       {
         title: "Pick an opening",
-        body: "Skills spend focus and hit weaknesses. Choose one, then answer the question it serves. A correct answer carries the attack; a miss spends the turn.",
+        body: "The bottom console keeps your health, focus, incoming attack and choices together. Each visible skill shows its cost and effect. Choose one, then answer its question to attack.",
       },
       {
         title: "Answer with evidence",
-        body: "The panel in the middle asks one question at a time. Hint reveals the explanation and marks the answer as assisted. Guard restores focus and softens the next hit.",
+        body: "Questions and feedback use the same console. Hint reveals the explanation and marks the answer as assisted. Guard restores focus and softens the incoming hit.",
       },
       {
         title: "Read the machine",
-        body: "Enemy intent shows the next move. Act analyses the pattern, boosts add damage, dodge avoids a strike, and spare ends the fight when resolve is low. Retreat is always safe.",
+        body: "Read the incoming attack above your choices. Talk / ACT can reveal a weakness or a peaceful way out. Dodge patterns change: avoid amber strikes and stay inside teal openings. Retreat keeps your evidence.",
       },
     ],
   },

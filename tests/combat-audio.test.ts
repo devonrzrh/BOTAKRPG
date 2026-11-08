@@ -99,30 +99,48 @@ describe("combat audio", () => {
   it("scales the master level and volume zero silences voices without changing mute state", () => {
     vi.useFakeTimers();
     const oscillator = {
-      frequency: { setValueAtTime: vi.fn(), exponentialRampToValueAtTime: vi.fn() },
-      connect: vi.fn(), start: vi.fn(), stop: vi.fn(), disconnect: vi.fn(),
-      onended: null as (() => void) | null, type: "sine",
+      frequency: {
+        setValueAtTime: vi.fn(),
+        exponentialRampToValueAtTime: vi.fn(),
+      },
+      connect: vi.fn(),
+      start: vi.fn(),
+      stop: vi.fn(),
+      disconnect: vi.fn(),
+      onended: null as (() => void) | null,
+      type: "sine",
     };
     const gain = {
       gain: { setValueAtTime: vi.fn(), exponentialRampToValueAtTime: vi.fn() },
-      connect: vi.fn(), disconnect: vi.fn(),
+      connect: vi.fn(),
+      disconnect: vi.fn(),
     };
     const context = {
-      state: "running", currentTime: 0, destination: {},
-      createOscillator: vi.fn(() => oscillator), createGain: vi.fn(() => gain),
-      close: vi.fn(() => Promise.resolve()), resume: vi.fn(() => Promise.resolve()),
+      state: "running",
+      currentTime: 0,
+      destination: {},
+      createOscillator: vi.fn(() => oscillator),
+      createGain: vi.fn(() => gain),
+      close: vi.fn(() => Promise.resolve()),
+      resume: vi.fn(() => Promise.resolve()),
     };
-    const constructor = vi.fn(function AudioContextMock() { return context; });
+    const constructor = vi.fn(function AudioContextMock() {
+      return context;
+    });
     priorWindow = Object.getOwnPropertyDescriptor(globalThis, "window");
     Object.defineProperty(globalThis, "window", {
-      configurable: true, value: { AudioContext: constructor },
+      configurable: true,
+      value: { AudioContext: constructor },
     });
     const audio = createCombatAudio();
     audio.setVolume(0.5);
     audio.unlock();
     audio.play(cue);
     vi.advanceTimersByTime(300);
-    expect(gain.gain.exponentialRampToValueAtTime).toHaveBeenCalledWith(0.0275, 0.012);
+    expect(gain.gain.exponentialRampToValueAtTime).toHaveBeenCalledWith(
+      0.0275,
+      0.012,
+    );
 
     audio.play({ ...cue, sequence: 2 });
     audio.setVolume(0);
@@ -152,7 +170,8 @@ describe("combat audio", () => {
     const constructor = vi.fn();
     priorWindow = Object.getOwnPropertyDescriptor(globalThis, "window");
     Object.defineProperty(globalThis, "window", {
-      configurable: true, value: { AudioContext: constructor },
+      configurable: true,
+      value: { AudioContext: constructor },
     });
     const audio = createCombatAudio();
     audio.setVolume(Number.NaN);
@@ -166,42 +185,83 @@ describe("combat audio", () => {
   it("adds filtered noise texture to heavy enemy impacts", () => {
     vi.useFakeTimers();
     const oscillator = {
-      frequency: { setValueAtTime: vi.fn(), exponentialRampToValueAtTime: vi.fn() },
-      connect: vi.fn(), start: vi.fn(), stop: vi.fn(), disconnect: vi.fn(),
-      onended: null as (() => void) | null, type: "sine",
+      frequency: {
+        setValueAtTime: vi.fn(),
+        exponentialRampToValueAtTime: vi.fn(),
+      },
+      connect: vi.fn(),
+      start: vi.fn(),
+      stop: vi.fn(),
+      disconnect: vi.fn(),
+      onended: null as (() => void) | null,
+      type: "sine",
     };
     const gain = {
       gain: { setValueAtTime: vi.fn(), exponentialRampToValueAtTime: vi.fn() },
-      connect: vi.fn(), disconnect: vi.fn(),
+      connect: vi.fn(),
+      disconnect: vi.fn(),
     };
     const filter = {
-      frequency: { setValueAtTime: vi.fn() }, Q: { setValueAtTime: vi.fn() },
-      connect: vi.fn(), disconnect: vi.fn(), type: "lowpass",
+      frequency: { setValueAtTime: vi.fn() },
+      Q: { setValueAtTime: vi.fn() },
+      connect: vi.fn(),
+      disconnect: vi.fn(),
+      type: "lowpass",
     };
     const noiseSource = {
-      buffer: null, connect: vi.fn(), start: vi.fn(), stop: vi.fn(), disconnect: vi.fn(),
+      buffer: null,
+      connect: vi.fn(),
+      start: vi.fn(),
+      stop: vi.fn(),
+      disconnect: vi.fn(),
       onended: null as (() => void) | null,
     };
     const channel = new Float32Array(4);
     const context = {
-      state: "running", currentTime: 0, sampleRate: 12, destination: {},
-      createOscillator: vi.fn(() => oscillator), createGain: vi.fn(() => gain),
+      state: "running",
+      currentTime: 0,
+      sampleRate: 12,
+      destination: {},
+      createOscillator: vi.fn(() => oscillator),
+      createGain: vi.fn(() => gain),
       createBuffer: vi.fn(() => ({ getChannelData: () => channel })),
-      createBufferSource: vi.fn(() => noiseSource), createBiquadFilter: vi.fn(() => filter),
-      close: vi.fn(() => Promise.resolve()), resume: vi.fn(() => Promise.resolve()),
+      createBufferSource: vi.fn(() => noiseSource),
+      createBiquadFilter: vi.fn(() => filter),
+      close: vi.fn(() => Promise.resolve()),
+      resume: vi.fn(() => Promise.resolve()),
     };
-    const constructor = vi.fn(function AudioContextMock() { return context; });
+    const constructor = vi.fn(function AudioContextMock() {
+      return context;
+    });
     priorWindow = Object.getOwnPropertyDescriptor(globalThis, "window");
     Object.defineProperty(globalThis, "window", {
-      configurable: true, value: { AudioContext: constructor },
+      configurable: true,
+      value: { AudioContext: constructor },
     });
     const audio = createCombatAudio();
     audio.unlock();
     audio.play({ ...cue, kind: "enemy", heavy: true });
-    vi.advanceTimersByTime(500);
+    vi.advanceTimersByTime(402);
+    expect(oscillator.start).not.toHaveBeenCalled();
+    vi.advanceTimersByTime(1);
     expect(noiseSource.start).toHaveBeenCalledTimes(1);
+    expect(gain.gain.exponentialRampToValueAtTime).toHaveBeenCalledWith(
+      0.18,
+      0.006,
+    );
+    expect(oscillator.stop).toHaveBeenCalledWith(0.23);
     expect(filter.type).toBe("lowpass");
     expect(filter.frequency.setValueAtTime).toHaveBeenCalledWith(320, 0);
+    audio.setVolume(0.5);
+    audio.play({ ...cue, sequence: 2, kind: "enemy" });
+    vi.advanceTimersByTime(403);
+    expect(oscillator.type).toBe("square");
+    expect(gain.gain.exponentialRampToValueAtTime).toHaveBeenCalledWith(
+      0.07,
+      0.006,
+    );
+    expect(filter.type).toBe("bandpass");
+    expect(filter.frequency.setValueAtTime).toHaveBeenCalledWith(920, 0);
     audio.dispose();
     expect(noiseSource.disconnect).toHaveBeenCalled();
     expect(filter.disconnect).toHaveBeenCalled();

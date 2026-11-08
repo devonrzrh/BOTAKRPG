@@ -50,6 +50,8 @@ import {
 } from "../src/game/combat";
 
 const content = validateContent(raw);
+import { solvePuzzle } from "./helpers/solvePuzzle";
+import { rewardPuzzle } from "../src/game/puzzleProgress";
 const signal = content.entities.find(
   (e): e is Quest => e.type === "quest" && e.id === "signal-identification",
 )!;
@@ -170,6 +172,14 @@ it("plays the signal investigation through ordered chapter practice, combat, sav
       const model = trainOrientation();
       expect(model.epochs).toBeGreaterThanOrEqual(10);
       save = completeActivity(save, id);
+    } else if (id.startsWith("puzzle-")) {
+      const activity = content.entities.find((e) => e.id === id);
+      if (activity?.type !== "activity") throw new Error(id);
+      save.puzzleRuns[id] = {
+        commands: solvePuzzle(activity),
+        assisted: false,
+      };
+      save = rewardPuzzle(save, activity, content, false);
     } else {
       const chapter = chapters.find((c) => c.objectives.includes(id));
       if (chapter) {

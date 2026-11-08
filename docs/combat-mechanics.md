@@ -2,6 +2,17 @@
 
 Quizzes remain untimed. Choose a skill, answer, then resolve the enemy's telegraphed response. Guard, ACT, and Evade spend a turn without a quiz. Only correct, unaided quiz answers provide answer mastery evidence. Health and focus reset on encounter entry; no inventory, consumables, or equipment are required. Collected clues live in the office desk ledger.
 
+The bottom battle console groups health, focus, the incoming move, available skills,
+questions and feedback in one place. Commands remain labelled and visible. Enemy
+health stays above the enemy. Damage rattles the enemy or the player's HP panel
+at contact; damaging hits and enemy defeat shake the arena. A full YOU DIED view
+offers recovered retry or return to the office without losing evidence. Saved
+and operating-system reduced-motion preferences suppress shakes and use assisted
+dodging. Music and effects retain separate volume controls.
+
+Enemies embody network threats: packet sniffers, tracking cookies, spam decoys,
+firewalls, cache vaults, phishing mimics, and ECHO's fragmented network worm.
+
 ## Weakness and stance
 
 Each authored enemy has a skill weakness. A correct matching attack reveals it and adds one stance hit. At the configured threshold, the enemy breaks: its next response is skipped and the player's next correct attack deals ×1.5 damage. That attack consumes the opening without immediately building another break.
@@ -18,7 +29,7 @@ ACT offers an enemy-specific dialogue choice. A correct read reveals its weaknes
 
 ## Evade
 
-Heavy attacks offer an optional 2.8-second lane dodge. Move with A/D, arrow keys, or held movement buttons. Zero through three collisions reduce the incoming hit by 80%, 60%, 30%, or 0%. Guard remains available instead. Reduced motion provides an assisted dodge without animation. Quiz answers never have a timer.
+Heavy attacks offer an optional 2.8-second dodge. Crossfire, diagonal sweeps, pincer gaps, heavy pulses and broken rhythm change geometry and timing across enemies, turns and attempts. Each of three waves gives at least 550 ms of visual warning; amber strikes are dangerous and teal openings are safe. Move with A/D, arrow keys, or held movement buttons. Zero through three collisions reduce the incoming hit by 80%, 60%, 30%, or 0%. Guard remains available instead. Reduced motion provides an assisted dodge without animation. Quiz answers never have a timer.
 
 ## Content
 

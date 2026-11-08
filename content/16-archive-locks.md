@@ -1,6 +1,7 @@
 # Archive locks
 
-Optional cases for ordered search and recursive transfers.
+Ordered search and recursive transfers open sealed evidence along the routing
+trace. Advanced cases offer additional practice.
 
 ```entity
 type: activity

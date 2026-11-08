@@ -37,6 +37,7 @@
 - Separate gameplay models from rendering. Markdown is the validated content source; executable activities use registered TypeScript templates.
 - Preserve manual/Blockly/Python parity, bounded worker execution, cancellation, and stale-message rejection.
 - Preserve progression, rewards claimed once, local IndexedDB saves, and validated JSON import/export.
+- Every breaking save or progression change must ship a versioned migration for previous journals, used by both local load and JSON import. Preserve progress, code, notes, settings and claimed rewards; add legacy fixtures and idempotence tests. Never reset a compatible old journal.
 - Keep keyboard navigation and readable renderer-failure fallbacks.
 
 

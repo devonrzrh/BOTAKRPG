@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   createEvade,
+  EVADE_DURATION,
   evadeComplete,
+  hazardLane,
   stepEvade,
   type EvadeState,
 } from "../game/evade";
@@ -102,13 +104,16 @@ export function Evade({
       event.currentTarget.setPointerCapture(event.pointerId);
       direction.current = value;
     };
-  const timeLeft = state ? Math.max(0, 1 - state.elapsed / 2.8) : 1;
+  const timeLeft = state ? Math.max(0, 1 - state.elapsed / EVADE_DURATION) : 1;
 
   return (
     <section className="evade" aria-label="Defensive dodge">
       {!state ? (
         <div className="evade-intro">
-          <p>Move left/right to avoid the lanes. Guard is always available.</p>
+          <p>
+            Move left/right to avoid amber attacks. Teal gaps are safe. Guard is
+            always available.
+          </p>
           <div className="evade-actions">
             <button
               className="evade-primary"
@@ -123,7 +128,7 @@ export function Evade({
       ) : (
         <>
           <div className="evade-status">
-            <span>DODGE WINDOW</span>
+            <span>{state.pattern}</span>
             <span>{state.collisions} / 3 hits</span>
           </div>
           <div
@@ -178,21 +183,51 @@ export function Evade({
               className="evade-player-line"
             />
             {state.hazards.map((hazard, index) => {
+              if (hazard.resolved || hazard.at - state.elapsed > 0.55)
+                return null;
               const distance = (hazard.at - state.elapsed) * 320;
               const y = hazard.resolved
                 ? -20
                 : Math.max(18, Math.min(160, 160 - distance));
+              const x = hazardLane(hazard, state.elapsed);
+              const left = hazard.lane - hazard.width;
+              const right = hazard.lane + hazard.width;
               return (
-                <g
-                  key={index}
-                  className={
-                    hazard.resolved ? "evade-hazard resolved" : "evade-hazard"
-                  }
-                >
-                  <line x1={hazard.lane} x2={hazard.lane} y1="18" y2="176" />
-                  <path
-                    d={`M${hazard.lane - 9} ${y - 10} L${hazard.lane + 9} ${y - 10} L${hazard.lane} ${y + 8} Z`}
-                  />
+                <g key={index} className={`evade-hazard evade-${hazard.kind}`}>
+                  {hazard.kind === "gap" ? (
+                    <>
+                      <rect
+                        className="evade-safe-gap"
+                        x={left}
+                        y="18"
+                        width={hazard.width * 2}
+                        height="158"
+                      />
+                      <path
+                        d={`M18 ${y - 7}H${left}V${y + 7}H18ZM${right} ${y - 7}H462V${y + 7}H${right}Z`}
+                      />
+                      <text
+                        className="evade-safe-label"
+                        x={hazard.lane}
+                        y="38"
+                        textAnchor="middle"
+                      >
+                        SAFE
+                      </text>
+                    </>
+                  ) : (
+                    <>
+                      <line
+                        x1={hazard.lane}
+                        x2={hazard.lane}
+                        y1="18"
+                        y2="176"
+                      />
+                      <path
+                        d={`M${x - hazard.width + 12} ${y - 10} L${x + hazard.width - 12} ${y - 10} L${x} ${y + 8} Z`}
+                      />
+                    </>
+                  )}
                 </g>
               );
             })}

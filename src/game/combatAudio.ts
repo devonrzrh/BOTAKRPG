@@ -110,7 +110,7 @@ export function createCombatAudio() {
       playerhit: [190, 82, "triangle"],
       weakness: [280, 116, "sine"],
       break: [125, 58, "sawtooth"],
-      enemy: [150, 72, "triangle"],
+      enemy: [150, 72, "square"],
       heavyenemy: [105, 48, "sawtooth"],
       block: [420, 190, "triangle"],
       miss: [330, 210, "sine"],
@@ -136,14 +136,25 @@ export function createCombatAudio() {
         return;
       try {
         const now = ctx.currentTime;
-        const length = cueName === "victory" ? 0.2 : 0.12;
+        const damage = cue.kind === "enemy" && cue.amount > 0;
+        const length = damage
+          ? cue.heavy
+            ? 0.22
+            : 0.18
+          : cueName === "victory"
+            ? 0.2
+            : 0.12;
+        const peak = damage ? (cue.heavy ? 0.18 : 0.14) : 0.055;
         const oscillator = ctx.createOscillator();
         const gain = ctx.createGain();
         oscillator.type = type;
         oscillator.frequency.setValueAtTime(startHz, now);
         oscillator.frequency.exponentialRampToValueAtTime(endHz, now + length);
         gain.gain.setValueAtTime(0.0001, now);
-        gain.gain.exponentialRampToValueAtTime(0.055 * volume, now + 0.012);
+        gain.gain.exponentialRampToValueAtTime(
+          peak * volume,
+          now + (damage ? 0.006 : 0.012),
+        );
         gain.gain.exponentialRampToValueAtTime(0.0001, now + length);
         oscillator.connect(gain);
         gain.connect(ctx.destination);
@@ -188,7 +199,9 @@ export function createCombatAudio() {
         } else if (cueName === "block") {
           playNoise(ctx, now, 0.075, 0.014, "highpass", 1750, 1.1);
         } else if (cueName === "heavyenemy") {
-          playNoise(ctx, now, 0.09, 0.018, "lowpass", 320, 0.7);
+          playNoise(ctx, now, 0.14, 0.055, "lowpass", 320, 0.7);
+        } else if (cueName === "enemy") {
+          playNoise(ctx, now, 0.085, 0.035, "bandpass", 920, 0.55);
         } else if (cueName === "break") {
           playNoise(ctx, now, 0.085, 0.014, "highpass", 2200, 0.6);
           playNoise(ctx, now + 0.04, 0.06, 0.008, "bandpass", 1050, 0.7);

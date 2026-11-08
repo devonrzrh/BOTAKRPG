@@ -449,7 +449,13 @@ export default function App() {
             saveRef.current = loaded;
             setSave(loaded);
             updateMaze(createMaze(loaded.seed));
-            setSaveStatus("Journal restored");
+            setSaveStatus(
+              typeof raw === "object" &&
+                "version" in raw &&
+                raw.version !== loaded.version
+                ? "Journal upgraded"
+                : "Journal restored",
+            );
           } catch {
             setStorageReady(false);
             setSaveStatus(
@@ -637,6 +643,14 @@ export default function App() {
         if (!saveRef.current.story.networkIntroSeen) {
           setPendingActivity(id);
           setCutsceneId("first-connection");
+          return;
+        }
+        if (
+          puzzle &&
+          !saveRef.current.completed.includes(id) &&
+          !activityUnlocked(saveRef.current, id, content)
+        ) {
+          notify("Follow the preceding lead on the quest board first.");
           return;
         }
         generation.current++;
@@ -1006,7 +1020,8 @@ export default function App() {
   const importSave = async (file: File) => {
     try {
       if (file.size > 1500000) throw new Error("Save file is too large");
-      const parsed = parseSave(JSON.parse(await file.text()), content);
+      const importedInput = JSON.parse(await file.text());
+      const parsed = parseSave(importedInput, content);
       await storeSave(parsed);
       stop();
       previousLevel.current = parsed.character.level;
@@ -1023,7 +1038,11 @@ export default function App() {
       setScene("desk");
       setTrial(false);
       trialRef.current = false;
-      notify("Journal imported and saved.");
+      notify(
+        importedInput.version !== parsed.version
+          ? "Journal upgraded and saved."
+          : "Journal imported and saved.",
+      );
     } catch (e) {
       notify(`Import rejected. Existing progress is unchanged. ${String(e)}`);
     }
@@ -2112,7 +2131,11 @@ export default function App() {
                           rewardPuzzle(s, currentPuzzle, content, assisted),
                         )
                       }
-                      onContinue={() => open("puzzles")}
+                      onContinue={() =>
+                        storyBranch(content, currentPuzzle.id)
+                          ? continueBranch(currentPuzzle.id)
+                          : open("puzzles")
+                      }
                       onLesson={() => {
                         openLesson(currentPuzzle.lesson);
                         setReturnPuzzleId(currentPuzzle.id);
@@ -2127,6 +2150,10 @@ export default function App() {
                     {puzzleActivities.map((activity) => (
                       <button
                         key={activity.id}
+                        disabled={
+                          !save.completed.includes(activity.id) &&
+                          !activityUnlocked(save, activity.id, content)
+                        }
                         onClick={() => open(activity.id)}
                       >
                         <strong>{activity.title}</strong>
@@ -2140,7 +2167,11 @@ export default function App() {
                         <span>
                           {save.completed.includes(activity.id)
                             ? "Solved · practice available"
-                            : "25 XP · recover evidence"}
+                            : !activityUnlocked(save, activity.id, content)
+                              ? "Locked · follow the preceding lead"
+                              : storyBranch(content, activity.id)
+                                ? "Case lead · 25 XP"
+                                : "Practice case · 25 XP"}
                         </span>
                       </button>
                     ))}
@@ -3021,7 +3052,7 @@ export default function App() {
           }}
         />
       )}
-      {toast && (
+      {toast && !(panel === "battle" && battle.phase === "lost") && (
         <div className="toast" role="status">
           <Sparkles size={18} />
           <span>{toast}</span>

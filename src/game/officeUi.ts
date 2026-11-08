@@ -1,5 +1,10 @@
 import type { Content, Quest, Lesson } from "../content/schema";
-import { finaleAvailable, questComplete, nextObjective } from "./investigation";
+import {
+  finaleAvailable,
+  questComplete,
+  nextObjective,
+  activityUnlocked,
+} from "./investigation";
 import type { Save } from "./state";
 import { recoveredClues } from "./evidence";
 import { pendingStory } from "./questStory";
@@ -581,7 +586,8 @@ export function createOfficeUi(input: OfficeUiInput): SurfaceModel[] {
         "Field puzzle",
         "open",
         puzzle.id,
-        !save.story.caseAccepted,
+        !save.completed.includes(puzzle.id) &&
+          !activityUnlocked(save, puzzle.id, content),
       );
     button(
       quests,
@@ -604,6 +610,25 @@ export function createOfficeUi(input: OfficeUiInput): SurfaceModel[] {
       "Reference book",
       "lesson",
       chapter.lesson!,
+    );
+  }
+  for (const activity of content.entities) {
+    if (activity.type !== "activity" || activity.template !== "puzzle")
+      continue;
+    button(
+      quests,
+      `evidence-${activity.id}`,
+      28,
+      278,
+      310,
+      44,
+      save.completed.includes(activity.id)
+        ? "Practice evidence case"
+        : "Recover evidence",
+      "open",
+      activity.id,
+      !save.completed.includes(activity.id) &&
+        !activityUnlocked(save, activity.id, content),
     );
   }
   button(

@@ -8,13 +8,13 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 import { DirectionalLight } from "@babylonjs/core/Lights/directionalLight";
-import { PointLight } from "@babylonjs/core/Lights/pointLight";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { Color3, Color4 } from "@babylonjs/core/Maths/math.color";
 import { DynamicTexture } from "@babylonjs/core/Materials/Textures/dynamicTexture";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
-import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { attachBattleEffects } from "./BattleEffects";
+import { buildEnemyModel } from "./EnemyModel";
+import { buildBattleArena } from "./BattleArena";
 import { attachWorldParticles } from "./WorldParticles";
 import type { BattleCue } from "../game/combatPresentation";
 import "@babylonjs/core/Rendering/edgesRenderer";
@@ -286,7 +286,8 @@ function WorldCanvas(props: Props) {
     if (props.encounter) {
       camera.alpha = -Math.PI / 2;
       camera.beta = 1.18;
-      camera.target.set(5, 1.55, 4);
+      // Leave the upper strip for the enemy's name and HP, above its silhouette.
+      camera.target.set(5, 3.1, 4);
     }
     const view = props.encounter ? 2.9 : props.scene === "maze" ? 9 : 12;
     const resize = () => {
@@ -328,78 +329,6 @@ function WorldCanvas(props: Props) {
       wood = mat("walnut", "#655044"),
       red = mat("oxblood", "#a15c58");
     const enemyId = props.enemyId ?? "sentinel-a-03";
-    const style = {
-      stone: "#344854",
-      light: "#728c94",
-      accent: "#4fb6c2",
-      glow: "#d6a25f",
-      scale: 1,
-      floating: false,
-      horns: false,
-      folios: false,
-      wings: false,
-    };
-    if (enemyId.startsWith("echo")) {
-      Object.assign(style, {
-        stone: "#1d2733",
-        light: "#3c4d5f",
-        accent: "#d94a44",
-        glow: "#ff6a5e",
-        scale: 1.04,
-        wings: true,
-      });
-    } else if (enemyId.includes("warden")) {
-      Object.assign(style, {
-        stone: "#6d4a2a",
-        light: "#b07a45",
-        accent: "#ffcf7a",
-        glow: "#ffb35c",
-        horns: true,
-      });
-    } else if (enemyId.includes("keeper")) {
-      Object.assign(style, {
-        stone: "#4b3f5e",
-        light: "#8b7aa8",
-        accent: "#d9c2ff",
-        glow: "#bda6ff",
-        scale: 1.1,
-        folios: true,
-      });
-    } else if (enemyId.includes("mimic")) {
-      Object.assign(style, {
-        stone: "#24545c",
-        light: "#5fc4c9",
-        accent: "#d7ffff",
-        glow: "#8ef0ff",
-        scale: 0.92,
-        floating: true,
-      });
-    } else if (enemyId.startsWith("guard-source-alg")) {
-      Object.assign(style, {
-        stone: "#5e2a2a",
-        light: "#a15c58",
-        accent: "#ff8a6a",
-        glow: "#ffb08a",
-        scale: 0.72,
-      });
-    } else if (enemyId.startsWith("guard-source-ds")) {
-      Object.assign(style, {
-        stone: "#4b4b52",
-        light: "#a9aab5",
-        accent: "#d8d8e8",
-        glow: "#ffffff",
-        scale: 0.72,
-      });
-    } else if (enemyId.startsWith("guard-source-ai")) {
-      Object.assign(style, {
-        stone: "#2c4f52",
-        light: "#7fd3d3",
-        accent: "#bfffff",
-        glow: "#9ff5ff",
-        scale: 0.68,
-        floating: true,
-      });
-    }
     const box = (
       name: string,
       x: number,
@@ -516,6 +445,7 @@ function WorldCanvas(props: Props) {
       box("capital", x, height + 0.35, z, 0.85, 0.25, 0.85, light);
     };
     let disposeBattleEffects: (() => void) | undefined;
+    let disposeBattleArena: (() => void) | undefined;
     if (props.scene === "maze") {
       const m = props.maze;
       box(
@@ -565,158 +495,13 @@ function WorldCanvas(props: Props) {
       ])
         tree(x, z, 0.85);
     } else if (props.encounter) {
-      box("arena floor", 5, -0.2, 4, 24, 0.3, 18, dark);
-      box("arena wall", 5, 3, 8, 24, 7, 0.3, edge);
-      for (let i = 0; i < 9; i++) {
-        const x = -3 + i * 2;
-        box("server rack", x, 2, 7, 1.2, 4, 0.7, stone);
-        for (let j = 0; j < 7; j++)
-          box(
-            "server light",
-            x,
-            0.6 + j * 0.45,
-            6.62,
-            0.7,
-            0.04,
-            0.03,
-            j % 3 ? teal : gold,
-          );
-      }
-      cylinder("sentinel platform", 5, 0.05, 4, 3, 0.2, stone, 32);
-      cylinder("platform ring", 5, 0.17, 4, 2.4, 0.04, teal, 32);
-      cylinder("platform inset", 5, 0.2, 4, 2.25, 0.04, edge, 32);
-      const enemyRoot = new TransformNode("enemy combat rig", scene);
-      enemyRoot.position.set(5, 0, 4);
-      enemyRoot.computeWorldMatrix(true);
-      const arms = [-1, 1].map((side) => {
-        const pivot = new TransformNode(
-          side < 0 ? "left shoulder pivot" : "right shoulder pivot",
-          scene,
-        );
-        pivot.parent = enemyRoot;
-        pivot.position.set(side * 1.03, 2.12, 0);
-        pivot.computeWorldMatrix(true);
-        return pivot;
-      });
-      const firstRobotMesh = scene.meshes.length;
-      box("sentinel torso", 5, 1.55, 4, 1.45, 1.65, 0.85, light);
-      box("chest plate", 5, 1.55, 3.53, 1.14, 1.1, 0.13, stone);
-      box("chest indicator", 5, 1.7, 3.44, 0.42, 0.13, 0.05, teal);
-      box("sentinel head", 5, 2.75, 4, 1.05, 0.7, 0.8, stone);
-      box(
-        "optical visor",
-        5,
-        2.8,
-        3.57,
-        0.84,
-        0.16,
-        0.06,
-        props.finalBoss ? red : gold,
-      );
-      for (const side of [-1, 1]) {
-        box("shoulder", 5 + side * 1.03, 2.12, 4, 0.55, 0.5, 0.85, stone);
-        box("arm", 5 + side * 1.03, 1.43, 4, 0.4, 1.05, 0.55, light).setParent(
-          arms[side < 0 ? 0 : 1],
-        );
-        box(
-          "hand",
-          5 + side * 1.03,
-          0.82,
-          4,
-          0.44,
-          0.32,
-          0.55,
-          stone,
-        ).setParent(arms[side < 0 ? 0 : 1]);
-        box("leg", 5 + side * 0.43, 0.52, 4, 0.47, 0.6, 0.6, light);
-        box("foot", 5 + side * 0.43, 0.28, 3.86, 0.57, 0.2, 0.9, stone);
-      }
-      if (style.horns) {
-        box("warden horn", 4.45, 3.28, 4, 0.16, 0.9, 0.16, gold);
-        box("warden horn", 5.55, 3.28, 4, 0.16, 0.9, 0.16, gold);
-        box("warden crest", 5, 2.35, 4.5, 0.18, 1.5, 0.16, gold);
-      }
-      if (style.folios) {
-        box("keeper folio", 3.82, 1.7, 4, 0.24, 2.1, 1.2, stone);
-        box("keeper folio", 6.18, 1.7, 4, 0.24, 2.1, 1.2, stone);
-        box("keeper cartouche", 5, 2.35, 3.42, 0.6, 1.5, 0.12, gold);
-      }
-      if (style.wings) {
-        for (const side of [-1, 1]) {
-          const wing = box(
-            "echo shard",
-            5 + side * 1.45,
-            1.9,
-            4.05,
-            0.5,
-            1.2,
-            0.1,
-            stone,
-          );
-          wing.rotation.z = side * 0.42;
-        }
-      }
-      if (style.floating) {
-        for (const mesh of scene.meshes
-          .slice(firstRobotMesh)
-          .filter((mesh) => /leg|foot/.test(mesh.name)))
-          mesh.dispose();
-        enemyRoot.position.y = 0.45;
-        const halo = MeshBuilder.CreateTorus(
-          "signal halo",
-          { diameter: 3.1, thickness: 0.06, tessellation: 40 },
-          scene,
-        );
-        halo.parent = enemyRoot;
-        halo.position.set(0, 1.35, 0);
-        halo.rotation.x = Math.PI / 2;
-        halo.material = teal;
-      }
-      enemyRoot.scaling.setAll(style.scale);
-      const robotMaterials = new Map<StandardMaterial, StandardMaterial>();
-      for (const mesh of scene.meshes.slice(firstRobotMesh)) {
-        if (!mesh.parent) mesh.setParent(enemyRoot);
-        const original = mesh.material as StandardMaterial;
-        if (!robotMaterials.has(original)) {
-          const clone = original.clone(`enemy ${original.name}`);
-          const color =
-            original === stone
-              ? style.stone
-              : original === light
-                ? style.light
-                : original === teal
-                  ? style.accent
-                  : original === gold || original === red
-                    ? style.glow
-                    : style.stone;
-          clone.diffuseColor = Color3.FromHexString(color);
-          clone.emissiveColor = clone.diffuseColor.scale(0.3);
-          clone.specularColor = new Color3(0.06, 0.06, 0.06);
-          robotMaterials.set(original, clone);
-        }
-        mesh.material = robotMaterials.get(original)!;
-      }
-      disposeBattleEffects = attachBattleEffects(
-        scene,
-        {
-          root: enemyRoot,
-          leftArm: arms[0],
-          rightArm: arms[1],
-          materials: [...robotMaterials.values()],
-        },
-        () => ({
-          cue: latest.current.combatCue ?? null,
-          reducedMotion: latest.current.reducedMotion || motionQuery.matches,
-        }),
-      );
-      const spotlight = new PointLight(
-        "sentinel light",
-        new Vector3(5, 3, 1),
-        scene,
-      );
-      spotlight.diffuse = new Color3(0.45, 0.78, 1);
-      spotlight.intensity = 1;
-      spotlight.range = 9;
+      const arena = buildBattleArena(scene, enemyId);
+      disposeBattleArena = arena.dispose;
+      const enemyRig = buildEnemyModel(scene, enemyId);
+      disposeBattleEffects = attachBattleEffects(scene, enemyRig, () => ({
+        cue: latest.current.combatCue ?? null,
+        reducedMotion: latest.current.reducedMotion || motionQuery.matches,
+      }));
     } else {
       box("floating foundation", 0, -1.1, 0, 20, 2, 17, edge);
       box("academy grounds", 0, -0.1, 0, 20, 0.25, 17, grass);
@@ -1014,6 +799,7 @@ function WorldCanvas(props: Props) {
       if (sceneRef.current === scene) sceneRef.current = null;
       actorRef.current = null;
       disposeBattleEffects?.();
+      disposeBattleArena?.();
       disposeWorldParticles?.();
       scene.dispose();
     };

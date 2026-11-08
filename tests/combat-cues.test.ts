@@ -27,6 +27,17 @@ const questionFor = (battle: ReturnType<typeof selectSkill>) =>
   questions.find((question) => question.id === battle.question)!;
 
 describe("combat presentation cues", () => {
+  it("uses remaining HP for lethal hits so the pending meter cannot invent health", () => {
+    const save = initialSave();
+    save.character.hp = 3;
+    const battle = { ...createBattle(), phase: "feedback" as const };
+    const turn = enemyTurn(battle, save, content);
+    expect(turn.battle.phase).toBe("lost");
+    expect(turn.save.character.hp).toBe(0);
+    const cue = battleCue(battle, turn.battle, save, turn.save, content, 1);
+    expect(cue).toMatchObject({ kind: "enemy", amount: 3 });
+    expect(turn.save.character.hp + cue!.amount).toBe(save.character.hp);
+  });
   it("announces ECHO's phase change without treating a killing hit as a new phase", () => {
     const save = initialSave();
     const definition = content.entities.find(

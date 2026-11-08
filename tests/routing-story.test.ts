@@ -35,6 +35,8 @@ import {
   enemyTurn,
 } from "../src/game/combat";
 const content = validateContent(raw);
+import { solvePuzzle } from "./helpers/solvePuzzle";
+import { rewardPuzzle } from "../src/game/puzzleProgress";
 const route = content.entities.find(
   (e): e is Quest => e.type === "quest" && e.id === "routing-trace",
 )!;
@@ -66,6 +68,14 @@ it("plays the complete routing story from the maze to the Warden and files its r
       let maze = createMaze(save.seed);
       for (const direction of shortestPath(maze)) maze = move(maze, direction);
       expect(atGoal(maze)).toBe(true);
+    } else if (id.startsWith("puzzle-")) {
+      const activity = content.entities.find((e) => e.id === id);
+      if (activity?.type !== "activity") throw new Error(id);
+      save.puzzleRuns[id] = {
+        commands: solvePuzzle(activity),
+        assisted: false,
+      };
+      save = rewardPuzzle(save, activity, content, false);
     } else {
       save = recoverResources(save);
       const activity = content.entities.find((e) => e.id === id);
@@ -104,9 +114,11 @@ it("plays the complete routing story from the maze to the Warden and files its r
   expect(claimQuest(save, route, content)).toBe(save);
   expect(acknowledgeStory(save, ending)).toBe(save);
   expect(save.character.level).toBeGreaterThan(1);
-  expect(save.story.seenDialogues).toHaveLength(14);
+  expect(save.story.seenDialogues).toHaveLength(route.objectives.length + 1);
   expect(finaleAvailable(save, content)).toBe(false);
-  expect(parseSave(save, content).story.seenDialogues).toHaveLength(14);
+  expect(parseSave(save, content).story.seenDialogues).toHaveLength(
+    route.objectives.length + 1,
+  );
 });
 it("keeps unseen dialogue resumable after leaving and requires a boss victory before the ending", () => {
   const save = initialSave(),

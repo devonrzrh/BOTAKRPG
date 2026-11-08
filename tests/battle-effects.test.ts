@@ -99,6 +99,32 @@ describe("battle effects", () => {
     expect(leftArm.rotation.x).toBeLessThan(0.4);
   });
 
+  it("rattles the enemy across multiple axes after contact and damps back to rest", () => {
+    const { root, leftArm, rightArm, frame } = setup(cue());
+    const duration = combatCueDuration(false);
+    frame();
+    frame(duration * 0.335);
+    const firstOffset = root.position.x - 2;
+    expect(Math.abs(firstOffset)).toBeGreaterThan(0.02);
+    expect(root.position.z).toBeGreaterThan(4);
+    expect(root.rotation.z).not.toBe(0.3);
+    expect(leftArm.rotation.z).not.toBe(0.6);
+    expect(rightArm.rotation.z).not.toBe(-0.6);
+    frame(duration * 0.03);
+    expect((root.position.x - 2) * firstOffset).toBeLessThan(0);
+    frame(duration * 0.535);
+    expect(root.position.x).toBeCloseTo(2);
+    expect(root.rotation.z).toBeCloseTo(0.3);
+  });
+
+  it("does not shake the enemy when an attack deals zero damage", () => {
+    const { root, frame } = setup(cue({ amount: 0 }));
+    frame();
+    frame(combatCueDuration(false) * 0.4);
+    expect(root.position.asArray()).toEqual([2, 3, 4]);
+    expect(root.rotation.asArray()).toEqual([0.1, 0.2, 0.3]);
+  });
+
   it("does not recoil or flash the enemy for a missed answer", () => {
     const { root, material, frame } = setup(cue({ kind: "miss", amount: 0 }));
     frame();

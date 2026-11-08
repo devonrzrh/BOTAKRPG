@@ -303,10 +303,22 @@ export function attachBattleEffects(
             ((t - contact) * combatCueDuration(false)) / 1000,
           );
       }
+      // Contact launches a sharp, damped rattle rather than a single soft sway.
+      // Empty/blocked attacks do not shake the enemy.
+      const hitAge = Math.max(0, t - contact);
+      const hitEnvelope =
+        cue.amount > 0 && t > contact ? Math.max(0, 1 - hitAge / 0.48) : 0;
+      const strength =
+        cue.special === "limit" ? 1.65 : cue.special === "break" ? 1.35 : 1;
+      const rattle = Math.sin(hitAge * Math.PI * 34) * hitEnvelope * strength;
       const recoil =
-        t > contact ? Math.sin(Math.min(1, (t - contact) / 0.2) * Math.PI) : 0;
-      rig.root.rotation.y = original.rootRotation.y + recoil * 0.09;
-      rig.root.position.x = original.rootPosition.x + recoil * 0.1;
+        Math.sin(Math.min(1, hitAge / 0.2) * Math.PI) * hitEnvelope;
+      rig.root.rotation.y = original.rootRotation.y + rattle * 0.16;
+      rig.root.rotation.z = original.rootRotation.z + rattle * 0.075;
+      rig.root.position.x = original.rootPosition.x + rattle * 0.19;
+      rig.root.position.z = original.rootPosition.z + recoil * 0.25 * strength;
+      rig.leftArm.rotation.z = original.left.z - rattle * 0.11;
+      rig.rightArm.rotation.z = original.right.z + rattle * 0.11;
       if (cue.defeated && t > 0.55) {
         const fall = Math.min(1, (t - 0.55) / 0.45);
         rig.root.rotation.x = original.rootRotation.x + fall * 0.95;

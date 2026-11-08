@@ -446,11 +446,21 @@ for (const spec of specs) {
   });
   const branch = branches.find((b) => b.id === spec.branch)!;
   if (branch.type === "quest") {
+    // Keep authored evidence gates when rebuilding chapter encounters.
+    const gates = branch.objectives.flatMap((id, index) =>
+      id.startsWith("puzzle-")
+        ? [{ id, after: branch.objectives[index - 1] }]
+        : [],
+    );
     branch.objectives = [
       branch.objectives[0],
       ...chapters.map((c: { id: string }) => `encounter-${c.id}`),
       spec.boss,
     ];
+    for (const gate of gates) {
+      const index = branch.objectives.indexOf(gate.after);
+      if (index >= 0) branch.objectives.splice(index + 1, 0, gate.id);
+    }
     branch.description =
       spec.topic === "algorithms"
         ? "Find the trapped courier PATCH. Trace ECHO-7's forged routes and recover its signed delivery receipt from the Route Warden."

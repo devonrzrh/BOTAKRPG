@@ -44,6 +44,8 @@ const questions = content.entities.filter(
 const probe = content.entities.find(
   (e): e is Skill => e.type === "skill" && e.id === "insight",
 )!;
+import { solvePuzzle } from "./helpers/solvePuzzle";
+import { rewardPuzzle } from "../src/game/puzzleProgress";
 
 it("plays the entire archive independently, including resource recovery, boss, saved dialogue and its own reward", () => {
   let save = initialSave();
@@ -64,6 +66,14 @@ it("plays the entire archive independently, including resource recovery, boss, s
     save = parseSave(JSON.parse(JSON.stringify(save)), content);
     const activity = content.entities.find((e) => e.id === id);
     if (activity?.type !== "activity") throw new Error(id);
+    if (activity.template === "puzzle") {
+      save.puzzleRuns[id] = {
+        commands: solvePuzzle(activity),
+        assisted: false,
+      };
+      save = rewardPuzzle(save, activity, content, false);
+      continue;
+    }
     save = recoverResources(save);
     let battle = createBattle(
       activity.enemy ?? {
@@ -104,13 +114,19 @@ it("plays the entire archive independently, including resource recovery, boss, s
   save = acknowledgeStory(save, ending);
   const owner = storyBranch(content, ending.trigger!.activity)!;
   save = claimQuest(save, owner, content);
-  expect(save.claimed).toEqual(["access-records"]);
+  expect(save.claimed).toEqual([
+    "case-stack-buffer",
+    "case-queue-relay",
+    "access-records",
+  ]);
   expect(claimQuest(save, owner, content)).toBe(save);
-  expect(save.character.level).toBe(3);
-  expect(save.character.xp).toBe(260);
-  expect(save.story.seenDialogues).toHaveLength(13);
+  expect(save.character.level).toBe(4);
+  expect(save.character.xp).toBe(310);
+  expect(save.story.seenDialogues).toHaveLength(branch.objectives.length + 1);
   expect(finaleAvailable(save, content)).toBe(false);
-  expect(parseSave(save, content).story.seenDialogues).toHaveLength(13);
+  expect(parseSave(save, content).story.seenDialogues).toHaveLength(
+    branch.objectives.length + 1,
+  );
 });
 it("keeps archive and routing endings separate and restores an interrupted archive ending", () => {
   let save = initialSave();

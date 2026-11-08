@@ -11,10 +11,14 @@ objectives:
   - encounter-source-alg-00
   - encounter-source-alg-01
   - encounter-source-alg-02
+  - puzzle-sort-log
   - encounter-source-alg-03
+  - puzzle-search-archive
   - encounter-source-alg-04
+  - puzzle-hanoi-lock
   - encounter-source-alg-05
   - encounter-source-alg-06
+  - puzzle-route-packet
   - encounter-source-alg-07
   - encounter-source-alg-08
   - encounter-source-alg-09
@@ -40,7 +44,9 @@ objectives:
   - encounter-source-ds-03
   - encounter-source-ds-04
   - encounter-source-ds-05
+  - puzzle-stack-buffer
   - encounter-source-ds-06
+  - puzzle-queue-relay
   - encounter-source-ds-07
   - encounter-source-ds-08
   - encounter-source-ds-09
@@ -64,10 +70,12 @@ objectives:
   - encounter-source-ai-01
   - encounter-source-ai-02
   - encounter-source-ai-03
+  - puzzle-signal-confidence
   - encounter-source-ai-04
   - encounter-source-ai-05
   - encounter-source-ai-06
   - encounter-source-ai-07
+  - puzzle-signal-index
   - encounter-source-ai-08
   - encounter-source-ai-09
   - encounter-source-ai-10

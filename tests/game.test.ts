@@ -276,7 +276,7 @@ describe("Progression and saves", () => {
   });
   it("rejects incompatible, unknown and inconsistent saves", () => {
     const save = initialSave();
-    expect(() => parseSave({ ...save, version: 2 }, content)).toThrow();
+    expect(() => parseSave({ ...save, version: 3 }, content)).toThrow();
     expect(() =>
       parseSave({ ...save, completed: ["missing"] }, content),
     ).toThrow();

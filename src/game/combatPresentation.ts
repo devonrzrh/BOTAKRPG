@@ -79,14 +79,9 @@ export function battleCue(
       ...base,
       kind: intent.kind === "recover" ? "recover" : "enemy",
       amount:
-        cause === "evade"
-          ? Math.max(0, beforeSave.character.hp - afterSave.character.hp)
-          : intent.kind === "recover"
-            ? Math.max(
-                0,
-                afterSave.character.focus - beforeSave.character.focus,
-              )
-            : intent.damage,
+        intent.kind === "recover"
+          ? Math.max(0, afterSave.character.focus - beforeSave.character.focus)
+          : Math.max(0, beforeSave.character.hp - afterSave.character.hp),
       heavy: intent.kind === "heavy",
       blocked:
         cause === "guard" ||

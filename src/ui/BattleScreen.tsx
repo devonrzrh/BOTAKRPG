@@ -8,11 +8,14 @@ import {
   type Battle,
 } from "../game/combat";
 import { Evade } from "./Evade";
+import { evadeSeed } from "../game/evade";
 import "./BattleDepth.css";
+import "./BattleConsole.css";
 import { stats, type Save } from "../game/state";
 import { combatCueDuration, type BattleCue } from "../game/combatPresentation";
 import { XpMeter } from "./XpMeter";
 import { useGameSound } from "./GameSound";
+import { enemyThreatName } from "../game/enemyIdentity";
 import { useGameParticles } from "./GameParticles";
 import { createCombatAudio } from "../game/combatAudio";
 import {
@@ -77,14 +80,25 @@ function enemySigil(id: string) {
 }
 export function BattleScreen(p: Props) {
   const sound = useGameSound();
+  const [osReduced, setOsReduced] = useState(
+    () => window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+  );
+  useEffect(() => {
+    const query = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const change = () => setOsReduced(query.matches);
+    query.addEventListener("change", change);
+    return () => query.removeEventListener("change", change);
+  }, []);
   const particles = useGameParticles();
   const victoryBurstSent = useRef(false);
   const { battle: b, save, question: q } = p,
     limits = stats(save, p.content);
+  const reducedMotion = save.settings.reducedMotion || osReduced;
   const [menu, setMenu] = useState<"skills" | "inspect" | "act" | null>(
     "skills",
   );
   const [evading, setEvading] = useState(false);
+  const dodgeAttempt = useRef(Math.floor(Math.random() * 0x7fffffff));
   const [reviewing, setReviewing] = useState(false);
   const [impact, setImpact] = useState("");
   const [motion, setMotion] = useState<BattleCue["kind"] | null>(null);
@@ -133,16 +147,13 @@ export function BattleScreen(p: Props) {
   useEffect(() => {
     if (!correctFeedback || reviewing || !save.settings.battleAutoAdvance)
       return;
-    const timer = setTimeout(
-      advance,
-      combatCueDuration(save.settings.reducedMotion) + 80,
-    );
+    const timer = setTimeout(advance, combatCueDuration(reducedMotion) + 80);
     return () => clearTimeout(timer);
   }, [
     b,
     correctFeedback,
     reviewing,
-    save.settings.reducedMotion,
+    reducedMotion,
     save.settings.battleAutoAdvance,
   ]);
   useLayoutEffect(() => {
@@ -153,11 +164,10 @@ export function BattleScreen(p: Props) {
     }
     setMotion(cue.kind);
     setImpactLanded(false);
-    audio.current?.play(cue, save.settings.reducedMotion);
+    audio.current?.play(cue, reducedMotion);
     const contactTimer = setTimeout(
       () => setImpactLanded(true),
-      combatCueDuration(save.settings.reducedMotion) *
-        (cue.kind === "enemy" ? 0.62 : 0.32),
+      combatCueDuration(reducedMotion) * (cue.kind === "enemy" ? 0.62 : 0.32),
     );
     setImpact(
       cue.phaseShift
@@ -189,13 +199,13 @@ export function BattleScreen(p: Props) {
     if (b.phase !== "choose") setMenu(null);
     const timer = setTimeout(
       () => setMotion(null),
-      combatCueDuration(save.settings.reducedMotion),
+      combatCueDuration(reducedMotion),
     );
     return () => {
       clearTimeout(timer);
       clearTimeout(contactTimer);
     };
-  }, [p.cue, save.settings.reducedMotion]);
+  }, [p.cue, reducedMotion]);
   useEffect(() => {
     if (motion) return;
     if ((menu && menu !== "skills") || b.phase !== "choose")
@@ -233,11 +243,7 @@ export function BattleScreen(p: Props) {
       </div>
     );
   };
-  const activeCard =
-    !evading &&
-    !motion &&
-    (b.phase !== "choose" || (menu && menu !== "skills")) &&
-    !(correctFeedback && save.settings.battleAutoAdvance && !reviewing);
+  const activeCard = b.phase !== "lost" && !evading && !motion;
   const boss = bossReadout(b);
   const upcomingIntent = enemyIntent(b, save, p.content);
   const intent =
@@ -308,7 +314,7 @@ export function BattleScreen(p: Props) {
   );
   return (
     <div
-      className={`battle-screen phase-${b.phase} ${motion ? `motion-${motion}` : ""}`}
+      className={`battle-screen battle-layout-console phase-${b.phase} ${motion ? `motion-${motion}` : ""} ${impactLanded && motion && p.cue?.amount && motion === "enemy" ? "impact-damage" : impactLanded && motion && p.cue?.defeated ? "impact-defeat" : ""}`}
       data-sfx-silent
       onClickCapture={(event) => {
         if (
@@ -325,7 +331,7 @@ export function BattleScreen(p: Props) {
         if (e.key === "Escape" && menu) {
           e.preventDefault();
           e.stopPropagation();
-          setMenu(menu === "skills" ? null : "skills");
+          setMenu("skills");
         }
         if (motion) return;
         if (/^[1-9]$/.test(e.key)) {
@@ -362,104 +368,15 @@ export function BattleScreen(p: Props) {
         }
       }}
     >
-      <div className="battle-playback" aria-label="Battle playback">
-        <button
-          onClick={p.onToggleSound}
-          aria-label={
-            save.settings.combatMuted
-              ? "Enable battle sound"
-              : "Mute battle sound"
-          }
-          title={
-            save.settings.combatMuted
-              ? "Enable battle sound"
-              : "Mute battle sound"
-          }
-        >
-          {save.settings.combatMuted ? (
-            <VolumeX size={22} />
-          ) : (
-            <Volume2 size={22} />
-          )}
-        </button>
-        <button
-          aria-pressed={save.settings.battleAutoAdvance}
-          onClick={p.onToggleAutoAdvance}
-          title="Correct answers advance automatically. Turn off to read every explanation."
-        >
-          {save.settings.battleAutoAdvance ? "Auto turns" : "Manual turns"}
-        </button>
-        {lastAnswer.current && (
-          <button
-            disabled={!!motion || !["choose", "feedback"].includes(b.phase)}
-            onClick={() => {
-              setReviewing(true);
-              if (b.phase === "choose") setMenu("inspect");
-            }}
-          >
-            <BookOpen size={18} /> Review
-          </button>
-        )}
-      </div>
       <div className="battle-enemy-hud">
-        {b.tactics && b.phase !== "won" && b.phase !== "lost" && (
-          <div className="battle-stance">
-            <span>
-              {b.staggered
-                ? "BROKEN · next hit ×1.5"
-                : `Stance ${b.resolve ?? 0} / ${b.tactics.resolve}`}
-            </span>
-            <strong>
-              {b.weaknessKnown
-                ? `Weak: ${p.content.entities.find((s) => s.type === "skill" && s.id === b.tactics!.weakness)?.title ?? b.tactics.weakness}`
-                : "Weakness unknown"}
-            </strong>
-          </div>
-        )}
         <h2 className={`enemy-name enemy-${enemyKind(b.enemyId)}`}>
           <span className="enemy-sigil" aria-hidden="true">
             {enemySigil(b.enemyId)}
           </span>
           {b.enemyName}
         </h2>
+        <p className="enemy-threat">{enemyThreatName(b.enemyId)}</p>
         {meter("Enemy HP", b.hp, b.maxHp, "enemy")}
-        {boss && b.phase === "choose" && !motion && (
-          <div className="battle-boss-rule" role="status">
-            <strong>
-              {boss.phase} · {boss.title}
-            </strong>
-            <span>{boss.description}</span>
-          </div>
-        )}
-        {b.phase !== "won" && b.phase !== "lost" && (
-          <div className={`battle-intent intent-${intent.kind}`} role="status">
-            <span>{intent.label}</span>
-            <strong>
-              {intent.damage
-                ? `${intent.damage} damage`
-                : intent.kind === "recover"
-                  ? b.breakFresh ||
-                    (motion === "recover" && p.cue?.special === "break")
-                    ? "Response skipped"
-                    : "+3 focus"
-                  : "Poison will finish"}
-            </strong>
-            {b.tactics &&
-              intent.kind === "heavy" &&
-              b.phase === "choose" &&
-              !motion &&
-              !evading && (
-                <button
-                  onClick={() => {
-                    setMenu(null);
-                    setEvading(true);
-                  }}
-                >
-                  Evade
-                </button>
-              )}
-          </div>
-        )}
         <div className="battle-status-effects">
           {b.effects
             .filter((e) => e.id !== "shield")
@@ -473,8 +390,8 @@ export function BattleScreen(p: Props) {
       {evading && (
         <Evade
           muted={save.settings.combatMuted}
-          seed={b.turn}
-          reducedMotion={save.settings.reducedMotion}
+          seed={evadeSeed(b.enemyId, b.turn, dodgeAttempt.current)}
+          reducedMotion={reducedMotion}
           onResolve={(hits) => {
             setEvading(false);
             p.onEvade(hits);
@@ -500,7 +417,7 @@ export function BattleScreen(p: Props) {
               className={`battle-damage-number number-${motion} ${p.cue?.blocked ? "is-blocked" : ""}`}
               aria-hidden="true"
               style={{
-                animationDuration: `${combatCueDuration(save.settings.reducedMotion) * (motion === "enemy" ? 0.34 : 0.6)}ms`,
+                animationDuration: `${combatCueDuration(reducedMotion) * (motion === "enemy" ? 0.34 : 0.6)}ms`,
               }}
             >
               {motion === "miss"
@@ -516,389 +433,524 @@ export function BattleScreen(p: Props) {
                   : `${p.cue?.blocked ? "BLOCK " : ""}−${p.cue?.amount ?? 0}`}
             </div>
           )}
-          <div className="battle-impact" role="status">
-            {impact}
-            {p.cue && p.cue.amount > 0
-              ? ` · ${p.cue.amount}${motion === "recover" ? " focus" : " damage"}`
-              : ""}
-          </div>
         </>
       )}
-      {activeCard && (
-        <section
-          className={`battle-decision ${b.phase === "choose" ? "command-panel" : "quiz-panel"} ${b.phase === "feedback" ? "feedback-panel" : ""} ${correctFeedback ? "answer-correct" : ""}`}
-          aria-label={
-            b.phase === "question" ? "Battle question" : "Battle decision"
-          }
-        >
-          {b.phase === "choose" && (
-            <>
-              <header>
-                <h2 ref={title} tabIndex={-1}>
-                  {menu === "skills"
-                    ? "Skills"
-                    : menu === "act"
-                      ? "ACT"
-                      : "Inspect"}
-                </h2>
-                <button onClick={() => setMenu("skills")}>Back</button>
-              </header>
-              {menu === "skills" && (
-                <div className="battle-skill-options">
-                  {skills.map((s) => (
-                    <button
-                      key={s.id}
-                      disabled={
-                        save.character.focus < s.cost || save.character.hp === 0
-                      }
-                      onClick={() => {
-                        setMenu(null);
-                        p.onSkill(s);
-                      }}
+      <div className="battle-console" aria-label="Battle console">
+        <header className="battle-console-status">
+          <div className="battle-player-hud">
+            <strong>{save.character.name}</strong>
+            {meter("HP", save.character.hp, limits.maxHp, "health")}
+            {meter("Focus", save.character.focus, limits.maxFocus, "focus")}
+            <div className="battle-status-effects">
+              {b.effects
+                .filter((e) => e.id === "shield")
+                .map((e) => (
+                  <span key={e.id}>Shield · {e.remaining} turns</span>
+                ))}
+            </div>
+          </div>
+
+          <div className={`battle-intent intent-${intent.kind}`} role="status">
+            <span>
+              TURN {b.turn} ·{" "}
+              {b.phase === "won" ? "ENCOUNTER COMPLETE" : "INCOMING"}
+            </span>
+            {b.phase !== "won" && (
+              <strong>
+                {intent.label}
+                {intent.damage
+                  ? ` · ${intent.damage} damage`
+                  : intent.kind === "recover"
+                    ? " · focus recovery"
+                    : ""}
+              </strong>
+            )}
+            {b.tactics &&
+              b.phase === "choose" &&
+              (b.staggered || b.weaknessKnown) && (
+                <span>
+                  {b.staggered
+                    ? "Armor broken · next hit ×1.5"
+                    : `Weak to ${p.content.entities.find((s) => s.type === "skill" && s.id === b.tactics!.weakness)?.title ?? b.tactics.weakness} · break ${b.resolve ?? 0}/${b.tactics.resolve}`}
+                </span>
+              )}
+          </div>
+          <div className="battle-playback" aria-label="Battle playback">
+            <button
+              onClick={p.onToggleSound}
+              aria-label={
+                save.settings.combatMuted
+                  ? "Enable battle sound"
+                  : "Mute battle sound"
+              }
+            >
+              {save.settings.combatMuted ? (
+                <VolumeX size={18} />
+              ) : (
+                <Volume2 size={18} />
+              )}
+              {save.settings.combatMuted ? "Sound off" : "Sound on"}
+            </button>
+            <button
+              aria-pressed={save.settings.battleAutoAdvance}
+              onClick={p.onToggleAutoAdvance}
+            >
+              {save.settings.battleAutoAdvance ? "Auto turns" : "Manual turns"}
+            </button>
+          </div>
+        </header>
+        {motion && (
+          <div className="battle-console-transition" role="status">
+            {impact}
+            {p.cue?.amount
+              ? ` · ${p.cue.amount} ${motion === "recover" ? "focus" : "damage"}`
+              : ""}
+          </div>
+        )}
+        {activeCard && (
+          <section
+            className={`battle-decision ${b.phase === "choose" ? "command-panel" : "quiz-panel"} ${b.phase === "feedback" ? "feedback-panel" : ""} ${correctFeedback ? "answer-correct" : ""}`}
+            aria-label={
+              b.phase === "question" ? "Battle question" : "Battle decision"
+            }
+          >
+            {b.phase === "choose" && (
+              <>
+                <header>
+                  <h2 ref={title} tabIndex={-1}>
+                    {menu === "skills"
+                      ? "Choose an action"
+                      : menu === "act"
+                        ? "Talk / ACT"
+                        : "Inspect"}
+                  </h2>
+                  {menu !== "skills" && (
+                    <button onClick={() => setMenu("skills")}>
+                      Back to actions
+                    </button>
+                  )}
+                </header>
+                {menu === "skills" && (
+                  <div
+                    className="battle-skill-options"
+                    aria-label="Available skills"
+                  >
+                    {skills.map((s, index) => (
+                      <button
+                        key={s.id}
+                        ref={index === 0 ? skillsButton : undefined}
+                        disabled={
+                          save.character.focus < s.cost ||
+                          save.character.hp === 0
+                        }
+                        onClick={() => {
+                          setMenu(null);
+                          p.onSkill(s);
+                        }}
+                      >
+                        <span>
+                          <strong>
+                            <kbd>{index + 1}</kbd> {s.title}
+                          </strong>
+                          <span>{s.description}</span>
+                        </span>
+                        <b>
+                          {s.cost ? `${s.cost} focus` : "Free"} ·{" "}
+                          {previewDamage(b, save, s, p.content)} damage
+                          {b.weaknessKnown && b.tactics?.weakness === s.id
+                            ? " · WEAK"
+                            : ""}
+                        </b>
+                      </button>
+                    ))}
+                  </div>
+                )}
+                {menu === "skills" &&
+                  b.tactics &&
+                  ((b.boost ?? 0) > 0 || (b.limit ?? 0) > 0) && (
+                    <div className="battle-special-actions">
+                      {(b.boost ?? 0) > 0 && (
+                        <button
+                          onClick={() =>
+                            p.onBoost(
+                              ((b.boostSpend ?? 0) + 1) % ((b.boost ?? 0) + 1),
+                            )
+                          }
+                        >
+                          Boost: spend {b.boostSpend ?? 0}/{b.boost} · +
+                          {(b.boostSpend ?? 0) * 25}% damage
+                        </button>
+                      )}
+                      {(b.limit ?? 0) > 0 && (
+                        <button
+                          className={b.limit === 100 ? "limit-ready" : ""}
+                          disabled={b.limit !== 100}
+                          onClick={p.onFinisher}
+                        >
+                          Finisher {b.limit}%
+                          {b.limit === 100
+                            ? " · triple-power Probe"
+                            : " · charges on hits"}
+                        </button>
+                      )}
+                    </div>
+                  )}
+                {menu === "act" && b.tactics && (
+                  <div className="battle-act-options">
+                    <p>
+                      {b.analyzed
+                        ? b.tactics.act.explanation
+                        : b.tactics.act.prompt}
+                    </p>
+                    {!b.analyzed && (
+                      <>
+                        <p>
+                          Talking spends a turn. A successful read reveals the
+                          weakness.
+                        </p>
+                        {b.tactics.act.options.map((option, index) => (
+                          <button key={index} onClick={() => p.onAct(index)}>
+                            {option}
+                          </button>
+                        ))}
+                      </>
+                    )}
+                    {b.analyzed && b.tactics.spare && (
+                      <>
+                        <button
+                          className="primary"
+                          disabled={!canSpare(b)}
+                          onClick={p.onSpare}
+                        >
+                          Stand down
+                        </button>
+                        {!canSpare(b) && (
+                          <p>
+                            Land {b.tactics.boss ? 3 : 1} correct attacks and
+                            reduce enemy HP below {b.tactics.boss ? 35 : 65}%. (
+                            {b.correctAnswers ?? 0} correct)
+                          </p>
+                        )}
+                      </>
+                    )}
+                  </div>
+                )}
+                {menu === "inspect" && (
+                  <>
+                    {lastAnswer.current && (
+                      <details open={reviewing}>
+                        <summary>
+                          Last answer:{" "}
+                          {lastAnswer.current.correct ? "Correct" : "Review"}
+                        </summary>
+                        <p>{lastAnswer.current.question.prompt}</p>
+                        <p>{lastAnswer.current.question.explanation}</p>
+                      </details>
+                    )}
+                    {boss && (
+                      <p>
+                        {boss.title}: {boss.description}
+                      </p>
+                    )}
+                    <p>
+                      Attack {b.attack} · Your defense {limits.defense}
+                    </p>
+                    <p>
+                      Guard reduces the next hit and restores 4 focus. A wrong
+                      answer spends the turn. Shield and weaken reduce incoming
+                      damage; poison damages the enemy.
+                      {b.tactics &&
+                        " Weakness hits break stance, skipping one response and strengthening your next hit. Correct answers and Guard bank Boost; each spent point adds 25% damage. Limit builds from correct answers and taking hits. ACT can reveal a peaceful resolution."}
+                    </p>
+                    <div
+                      className="battle-recent-log"
+                      aria-label="Recent battle events"
                     >
-                      <span>
-                        <strong>{s.title}</strong>
-                        <span>{s.description}</span>
-                      </span>
-                      <b>{s.cost} FP</b>
+                      {b.log.slice(-3).map((line, i) => (
+                        <p key={i}>{line}</p>
+                      ))}
+                    </div>
+                  </>
+                )}
+              </>
+            )}
+            {b.phase === "question" && q && (
+              <>
+                <p className="battle-selected-action">
+                  {b.finisher
+                    ? "FINISHER"
+                    : (skills.find((s) => s.id === b.skill)?.title ??
+                      "ATTACK")}{" "}
+                  · Answer correctly to use this skill.
+                </p>
+                <h2 ref={title} tabIndex={-1}>
+                  {q.prompt}
+                </h2>
+                {q.format === "ordering" && (
+                  <p>
+                    Select the steps in order. Select a step again to remove it.
+                  </p>
+                )}
+                {q.format === "multiple" && <p>Select all that apply.</p>}
+                <div className="battle-answer-options">
+                  {displayOptions.map(({ text, index }, position) => (
+                    <button
+                      key={index}
+                      aria-pressed={p.answer.includes(index)}
+                      className={p.answer.includes(index) ? "selected" : ""}
+                      onClick={() => selectAnswer(index)}
+                    >
+                      <span>{position + 1}</span>
+                      {q.format === "ordering" && p.answer.includes(index) && (
+                        <strong className="answer-order">
+                          #{p.answer.indexOf(index) + 1}
+                        </strong>
+                      )}
+                      {text}
                     </button>
                   ))}
                 </div>
-              )}
-              {menu === "act" && b.tactics && (
-                <div className="battle-act-options">
-                  <p>
-                    {b.analyzed
-                      ? b.tactics.act.explanation
-                      : b.tactics.act.prompt}
-                  </p>
-                  {!b.analyzed && (
-                    <>
-                      <p>
-                        ACT spends a turn. A successful read reveals the
-                        weakness.
-                      </p>
-                      {b.tactics.act.options.map((option, index) => (
-                        <button key={index} onClick={() => p.onAct(index)}>
-                          {option}
-                        </button>
-                      ))}
-                    </>
+                <footer>
+                  {q.format !== "choice" && (
+                    <button
+                      className="primary"
+                      disabled={!answerReady}
+                      onClick={() => p.onSubmit()}
+                    >
+                      {b.finisher
+                        ? "Release Limit"
+                        : `Use ${skills.find((s) => s.id === b.skill)?.title ?? "skill"}`}{" "}
+                      <kbd>Enter</kbd>
+                    </button>
                   )}
-                  {b.analyzed && b.tactics.spare && (
+                  <button onClick={p.onHint}>Hint · no mastery credit</button>
+                </footer>
+                {p.notice && (
+                  <p className="battle-explanation" role="status">
+                    {p.notice}
+                  </p>
+                )}
+              </>
+            )}
+            {b.phase === "feedback" && (
+              <>
+                <h2 ref={title} tabIndex={-1}>
+                  {p.notice}
+                </h2>
+                {(!correctFeedback ||
+                  reviewing ||
+                  !save.settings.battleAutoAdvance) && (
+                  <p className="battle-explanation">{q?.explanation}</p>
+                )}
+                {!correctFeedback && q && (
+                  <p className="battle-correct-answer">
+                    Correct answer:{" "}
+                    {q.answer
+                      .map((index) => q.options[index])
+                      .join(q.format === "ordering" ? " → " : "; ")}
+                  </p>
+                )}
+                <footer>
+                  <button className="primary" onClick={advance}>
+                    {correctFeedback ? "Next turn" : "Continue"}
+                  </button>
+                  {correctFeedback && !reviewing && (
+                    <button
+                      onClick={() => {
+                        setReviewing(true);
+                        title.current?.focus();
+                      }}
+                    >
+                      Pause to review
+                    </button>
+                  )}
+                  <button onClick={p.onReview}>Bookmark chapter</button>
+                </footer>
+              </>
+            )}
+            {b.phase === "won" && (
+              <>
+                <h2 ref={title} tabIndex={-1}>
+                  {b.resolution === "pacified"
+                    ? `${b.enemyName} stood down`
+                    : b.enemyId === "echo-7"
+                      ? "ECHO-7 contained"
+                      : `${b.enemyName} defeated`}
+                </h2>
+                <div className="battle-xp-reward">
+                  <strong role="status">
+                    {gainedXp
+                      ? `+${gainedXp} XP`
+                      : "Practice victory · XP already earned"}
+                  </strong>
+                  <XpMeter
+                    xp={save.character.xp}
+                    initialXp={startingSave.current.character.xp}
+                    reducedMotion={reducedMotion}
+                    label="Victory experience"
+                  />
+                  {levelGain > 0 && (
                     <>
-                      <button
-                        className="primary"
-                        disabled={!canSpare(b)}
-                        onClick={p.onSpare}
-                      >
-                        Stand down
-                      </button>
-                      {!canSpare(b) && (
+                      <h3>
+                        Level up! {startingSave.current.character.level} →{" "}
+                        {save.character.level}
+                      </h3>
+                      <p>
+                        HP +{limits.maxHp - oldStats.maxHp} · Focus +
+                        {limits.maxFocus - oldStats.maxFocus} · Attack +
+                        {limits.attack - oldStats.attack} · Defense +
+                        {limits.defense - oldStats.defense}
+                      </p>
+                      {newSkills.length > 0 && (
                         <p>
-                          Land {b.tactics.boss ? 3 : 1} correct attacks and
-                          reduce enemy HP below {b.tactics.boss ? 35 : 65}%. (
-                          {b.correctAnswers ?? 0} correct)
+                          Available skills:{" "}
+                          {newSkills.map((s) => s.title).join(", ")}. Learn them
+                          in the character menu.
                         </p>
                       )}
                     </>
                   )}
                 </div>
-              )}
-              {menu === "inspect" && (
-                <>
-                  {lastAnswer.current && (
-                    <details open={reviewing}>
-                      <summary>
-                        Last answer:{" "}
-                        {lastAnswer.current.correct ? "Correct" : "Review"}
-                      </summary>
-                      <p>{lastAnswer.current.question.prompt}</p>
-                      <p>{lastAnswer.current.question.explanation}</p>
-                    </details>
-                  )}
-                  {boss && (
-                    <p>
-                      {boss.title}: {boss.description}
-                    </p>
-                  )}
-                  <p>
-                    Attack {b.attack} · Your defense {limits.defense}
-                  </p>
-                  <p>
-                    Guard reduces the next hit and restores 4 focus. A wrong
-                    answer spends the turn. Shield and weaken reduce incoming
-                    damage; poison damages the enemy.
-                    {b.tactics &&
-                      " Weakness hits break stance, skipping one response and strengthening your next hit. Correct answers and Guard bank Boost; each spent point adds 25% damage. Limit builds from correct answers and taking hits. ACT can reveal a peaceful resolution."}
-                  </p>
-                  <div
-                    className="battle-recent-log"
-                    aria-label="Recent battle events"
-                  >
-                    {b.log.slice(-3).map((line, i) => (
-                      <p key={i}>{line}</p>
-                    ))}
-                  </div>
-                </>
-              )}
-            </>
-          )}
-          {b.phase === "question" && q && (
-            <>
-              <h2 ref={title} tabIndex={-1}>
-                {q.prompt}
-              </h2>
-              {q.format === "ordering" && (
-                <p>
-                  Select the steps in order. Select a step again to remove it.
-                </p>
-              )}
-              {q.format === "multiple" && <p>Select all that apply.</p>}
-              <div className="battle-answer-options">
-                {displayOptions.map(({ text, index }, position) => (
-                  <button
-                    key={index}
-                    aria-pressed={p.answer.includes(index)}
-                    className={p.answer.includes(index) ? "selected" : ""}
-                    onClick={() => selectAnswer(index)}
-                  >
-                    <span>{position + 1}</span>
-                    {q.format === "ordering" && p.answer.includes(index) && (
-                      <strong className="answer-order">
-                        #{p.answer.indexOf(index) + 1}
-                      </strong>
-                    )}
-                    {text}
-                  </button>
-                ))}
-              </div>
-              <footer>
-                {q.format !== "choice" && (
-                  <button
-                    className="primary"
-                    disabled={!answerReady}
-                    onClick={() => p.onSubmit()}
-                  >
-                    {b.finisher
-                      ? "Release Limit"
-                      : `Use ${skills.find((s) => s.id === b.skill)?.title ?? "skill"}`}{" "}
-                    <kbd>Enter</kbd>
-                  </button>
+                {q?.explanation && (
+                  <details>
+                    <summary>Answer explanation</summary>
+                    <p>{q.explanation}</p>
+                  </details>
                 )}
-                <button onClick={p.onHint}>Hint · no mastery credit</button>
-              </footer>
-              {p.notice && (
-                <p className="battle-explanation" role="status">
-                  {p.notice}
-                </p>
-              )}
-            </>
-          )}
-          {b.phase === "feedback" && (
-            <>
-              <h2 ref={title} tabIndex={-1}>
-                {p.notice}
-              </h2>
-              {(!correctFeedback ||
-                reviewing ||
-                !save.settings.battleAutoAdvance) && (
-                <p className="battle-explanation">{q?.explanation}</p>
-              )}
-              {!correctFeedback && q && (
-                <p className="battle-correct-answer">
-                  Correct answer:{" "}
-                  {q.answer
-                    .map((index) => q.options[index])
-                    .join(q.format === "ordering" ? " → " : "; ")}
-                </p>
-              )}
-              <footer>
-                <button className="primary" onClick={advance}>
-                  {correctFeedback ? "Next turn" : "Continue"}
-                </button>
-                {correctFeedback && !reviewing && (
-                  <button
-                    onClick={() => {
-                      setReviewing(true);
-                      title.current?.focus();
-                    }}
-                  >
-                    Pause to review
+                <footer>
+                  <button className="primary" onClick={p.onJournal}>
+                    {p.victoryActionLabel ?? "Quest map"}
                   </button>
-                )}
-                <button onClick={p.onReview}>Bookmark chapter</button>
-              </footer>
-            </>
-          )}
-          {b.phase === "won" && (
-            <>
-              <h2 ref={title} tabIndex={-1}>
-                {b.resolution === "pacified"
-                  ? `${b.enemyName} stood down`
-                  : b.enemyId === "echo-7"
-                    ? "ECHO-7 contained"
-                    : `${b.enemyName} defeated`}
-              </h2>
-              <div className="battle-xp-reward">
-                <strong role="status">
-                  {gainedXp
-                    ? `+${gainedXp} XP`
-                    : "Practice victory · XP already earned"}
-                </strong>
-                <XpMeter
-                  xp={save.character.xp}
-                  initialXp={startingSave.current.character.xp}
-                  reducedMotion={save.settings.reducedMotion}
-                  label="Victory experience"
-                />
-                {levelGain > 0 && (
-                  <>
-                    <h3>
-                      Level up! {startingSave.current.character.level} →{" "}
-                      {save.character.level}
-                    </h3>
-                    <p>
-                      HP +{limits.maxHp - oldStats.maxHp} · Focus +
-                      {limits.maxFocus - oldStats.maxFocus} · Attack +
-                      {limits.attack - oldStats.attack} · Defense +
-                      {limits.defense - oldStats.defense}
-                    </p>
-                    {newSkills.length > 0 && (
-                      <p>
-                        Available skills:{" "}
-                        {newSkills.map((s) => s.title).join(", ")}. Learn them
-                        in the character menu.
-                      </p>
-                    )}
-                  </>
-                )}
-              </div>
-              {q?.explanation && (
-                <details>
-                  <summary>Answer explanation</summary>
-                  <p>{q.explanation}</p>
-                </details>
-              )}
-              <footer>
-                <button className="primary" onClick={p.onJournal}>
-                  {p.victoryActionLabel ?? "Quest map"}
-                </button>
-                <button onClick={p.onRetreat}>Return to network</button>
-              </footer>
-            </>
-          )}
-          {b.phase === "lost" && (
-            <>
-              <h2 ref={title} tabIndex={-1}>
-                Connection lost
-              </h2>
-              <p>Your evidence is safe. Return to recover before retrying.</p>
+                  <button onClick={p.onRetreat}>Return to network</button>
+                </footer>
+              </>
+            )}
+          </section>
+        )}
+        {b.phase === "lost" && !motion && (
+          <section
+            className="battle-death"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="battle-death-title"
+            onKeyDown={(event) => {
+              if (event.key !== "Tab") return;
+              const buttons = [
+                ...event.currentTarget.querySelectorAll<HTMLButtonElement>(
+                  "button",
+                ),
+              ];
+              const index = buttons.indexOf(
+                document.activeElement as HTMLButtonElement,
+              );
+              event.preventDefault();
+              buttons[
+                index < 0
+                  ? event.shiftKey
+                    ? buttons.length - 1
+                    : 0
+                  : (index + (event.shiftKey ? -1 : 1) + buttons.length) %
+                    buttons.length
+              ]?.focus();
+            }}
+          >
+            <div className="death-signal" aria-hidden="true">
+              ◇
+            </div>
+            <p className="death-kicker">SIGNAL TERMINATED</p>
+            <h1 id="battle-death-title" ref={title} tabIndex={-1}>
+              YOU DIED
+            </h1>
+            <p>Your evidence is safe. The investigation isn’t over.</p>
+            <div className="death-actions">
               {p.onRetry && (
                 <button className="primary" onClick={p.onRetry}>
-                  Recover and retry encounter
+                  Recover & retry
                 </button>
               )}
-              <button className="primary" onClick={p.onRecover}>
-                Return & recover
-              </button>
-            </>
-          )}
-        </section>
-      )}
-      <div className="battle-player-hud">
-        <strong>{save.character.name}</strong>
-        {meter("HP", save.character.hp, limits.maxHp, "health")}
-        {meter("Focus", save.character.focus, limits.maxFocus, "focus")}
-        <div className="battle-status-effects">
-          {b.effects
-            .filter((e) => e.id === "shield")
-            .map((e) => (
-              <span key={e.id}>Shield · {e.remaining} turns</span>
-            ))}
-        </div>
-      </div>
-      {b.phase === "choose" && !motion && !evading && menu === "skills" && (
-        <div className="battle-skill-tray" aria-label="Available skills">
-          {b.tactics && (
-            <div className="battle-special-actions">
-              <button onClick={() => setMenu("act")}>
-                {canSpare(b) ? "ACT · Stand down" : "ACT"}
-              </button>
-              <button
-                disabled={!b.boost}
-                aria-label={`Boost ${b.boostSpend ?? 0} of ${b.boost ?? 0}`}
-                onClick={() =>
-                  p.onBoost(((b.boostSpend ?? 0) + 1) % ((b.boost ?? 0) + 1))
-                }
-                title="Cycle stored Boost. Each point adds 25% damage to your next skill."
-              >
-                Boost {b.boostSpend ?? 0} / {b.boost ?? 0}
-              </button>
-              <button
-                className={b.limit === 100 ? "limit-ready" : ""}
-                disabled={b.limit !== 100}
-                onClick={p.onFinisher}
-                title="At 100%, answer correctly for a triple-power Probe."
-              >
-                Limit {b.limit ?? 0}%
-              </button>
+              <button onClick={p.onRecover}>Return to the office</button>
             </div>
-          )}
-          {skills.map((s, index) => (
+          </section>
+        )}
+        <nav className="battle-command-menu" aria-label="Battle commands">
+          <button
+            aria-pressed={menu === "skills"}
+            disabled={b.phase !== "choose" || !!motion || evading}
+            onClick={() => setMenu("skills")}
+          >
+            <Crosshair size={20} />
+            <span>
+              Attack<small>Choose skill</small>
+            </span>
+          </button>
+          <button
+            disabled={b.phase !== "choose" || !!motion || evading}
+            onClick={p.onGuard}
+          >
+            <ShieldCheck size={20} />
+            <span>
+              Guard<small>−70% · +4 focus</small>
+            </span>
+          </button>
+          {b.tactics && (
             <button
-              key={s.id}
-              ref={index === 0 ? skillsButton : undefined}
-              disabled={save.character.focus < s.cost}
-              onClick={() => p.onSkill(s)}
-              title={s.description}
+              disabled={
+                b.phase !== "choose" ||
+                !!motion ||
+                evading ||
+                intent.kind !== "heavy"
+              }
+              onClick={() => {
+                setMenu(null);
+                dodgeAttempt.current++;
+                setEvading(true);
+              }}
             >
-              <span className="battle-skill-title">
-                <kbd>{index + 1}</kbd>
-                <strong>{s.title}</strong>
-                <span>{s.cost ? `${s.cost} FP` : "Free"}</span>
-              </span>
-              <span className="battle-skill-detail">
-                {previewDamage(b, save, s, p.content)} damage
-                {b.weaknessKnown && b.tactics?.weakness === s.id
-                  ? " · WEAK"
-                  : ""}
-                {s.effect ? ` · ${s.effect}` : ""}
+              <span>
+                Dodge
+                <small>
+                  {intent.kind === "heavy"
+                    ? "Avoid heavy strike"
+                    : "Heavy strikes only"}
+                </small>
               </span>
             </button>
-          ))}
-        </div>
-      )}
-      <nav className="battle-command-menu" aria-label="Battle commands">
-        <span>Turn {b.turn}</span>
-        {(["skills", "inspect"] as const).map((id) => (
+          )}
+          {b.tactics && (
+            <button
+              aria-pressed={menu === "act"}
+              disabled={b.phase !== "choose" || !!motion || evading}
+              onClick={() => setMenu("act")}
+            >
+              <span>
+                Talk / ACT
+                <small>
+                  {canSpare(b) ? "Stand down available" : "Find weakness"}
+                </small>
+              </span>
+            </button>
+          )}
           <button
-            key={id}
-            aria-expanded={b.phase === "choose" && menu === id}
+            aria-pressed={menu === "inspect"}
             disabled={b.phase !== "choose" || !!motion || evading}
-            onClick={() => setMenu(menu === id ? null : id)}
+            onClick={() => setMenu("inspect")}
           >
-            {id === "skills" ? (
-              <Crosshair size={22} aria-hidden="true" />
-            ) : (
-              <ScanSearch size={22} aria-hidden="true" />
-            )}
-            {id[0].toUpperCase() + id.slice(1)}
+            <ScanSearch size={20} />
+            <span>
+              Inspect<small>Enemy details</small>
+            </span>
           </button>
-        ))}
-        <button
-          disabled={b.phase !== "choose" || !!motion || evading}
-          onClick={p.onGuard}
-          title="Reduce the incoming hit by 70% and restore 4 focus. Spends a turn; no question."
-        >
-          <ShieldCheck size={22} aria-hidden="true" />
-          Guard <span>+4 FP</span>
-        </button>
-        <button disabled={!!motion || evading} onClick={p.onRetreat}>
-          <LogOut size={22} aria-hidden="true" />
-          Retreat
-        </button>
-      </nav>
+          <button
+            disabled={!!motion || evading || b.phase === "lost"}
+            onClick={p.onRetreat}
+          >
+            <LogOut size={20} />
+            <span>
+              Retreat<small>Keep evidence</small>
+            </span>
+          </button>
+        </nav>
+      </div>
     </div>
   );
 }

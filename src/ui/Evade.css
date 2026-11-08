@@ -92,6 +92,17 @@
 .evade-hazard.resolved {
   opacity: 0.22;
 }
+.evade-safe-gap {
+  fill: #3bcdb51b;
+  stroke: #71e2cd;
+  stroke-width: 1;
+  stroke-dasharray: 4 4;
+}
+.evade-safe-label {
+  fill: #a6f6df;
+  font-size: 16px;
+  font-weight: 400;
+}
 .evade-player {
   fill: #50d9e8;
   stroke: #c5fbff;

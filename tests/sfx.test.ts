@@ -5,7 +5,10 @@ import { createEvade, stepEvade } from "../src/game/evade";
 describe("dodge sound timing", () => {
   it("warns once before each lane and sounds each hit or miss once", () => {
     let state = createEvade(7);
-    state = { ...state, playerX: state.hazards[0].lane };
+    state = {
+      ...state,
+      playerX: state.hazards[0].kind === "gap" ? 24 : state.hazards[0].lane,
+    };
     const events: string[] = [];
     for (let i = 0; i < 280; i++) {
       const next = stepEvade(state, 0.01, 0);

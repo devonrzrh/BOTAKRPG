@@ -5,6 +5,11 @@ import { questUnlocked } from "./investigation";
 import { DEFAULT_PLAYER_NAME, assertPlayerName } from "./player";
 import { TUTORIAL_IDS, type TutorialId } from "./tutorials";
 import { createPuzzle, puzzleCommand } from "./puzzles";
+import {
+  CURRENT_SAVE_VERSION,
+  migrateSaveInput,
+  upgradeCampaignProgress,
+} from "./saveMigrations";
 const puzzleRunSchema = z.object({
   commands: z
     .array(
@@ -75,7 +80,7 @@ const signalExperimentSchema = z
   .default(null);
 export const saveSchema = z
   .object({
-    version: z.literal(1),
+    version: z.literal(2),
     curriculumVersion: z.union([z.literal(1), z.literal(2)]).default(1),
     signalExperiment: signalExperimentSchema,
     chapterProgress: z
@@ -146,7 +151,7 @@ export const saveSchema = z
 export type Save = z.infer<typeof saveSchema>;
 export function initialSave(): Save {
   return {
-    version: 1,
+    version: CURRENT_SAVE_VERSION,
     curriculumVersion: 2,
     signalExperiment: null,
     chapterProgress: {},
@@ -342,8 +347,9 @@ export function parseSave(input: unknown, content: Content): Save {
     if (typeof equipment === "string" && !retiredItems.has(equipment))
       throw new Error(`Save contains unknown retired item: ${equipment}`);
   }
-  const save = saveSchema.parse(input),
-    ids = new Map(content.entities.map((e) => [e.id, e.type]));
+  const migrated = migrateSaveInput(input);
+  let save = saveSchema.parse(migrated.input);
+  const ids = new Map(content.entities.map((e) => [e.id, e.type]));
   const check = (values: string[], type: string) =>
     values.forEach((id) => {
       if (ids.get(id) !== type)
@@ -351,6 +357,7 @@ export function parseSave(input: unknown, content: Content): Save {
     });
   check(save.completed, "activity");
   check(save.claimed, "quest");
+  save = upgradeCampaignProgress(save, content, migrated.fromVersion);
   check(save.bookmarks, "lesson");
   check(Object.keys(save.notes), "lesson");
   check(Object.keys(save.reading.positions), "lesson");
