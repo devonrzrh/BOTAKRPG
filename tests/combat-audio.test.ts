@@ -95,4 +95,107 @@ describe("combat audio", () => {
     audio.dispose();
     expect(vi.getTimerCount()).toBe(0);
   });
+
+  it("keeps only the latest cue while a gesture-triggered resume is pending", async () => {
+    vi.useFakeTimers();
+    let resolveResume!: () => void;
+    const resumed = new Promise<void>((resolve) => {
+      resolveResume = resolve;
+    });
+    const oscillator = {
+      frequency: {
+        setValueAtTime: vi.fn(),
+        exponentialRampToValueAtTime: vi.fn(),
+      },
+      connect: vi.fn(),
+      start: vi.fn(),
+      stop: vi.fn(),
+      disconnect: vi.fn(),
+      onended: null as (() => void) | null,
+      type: "sine",
+    };
+    const gain = {
+      gain: { setValueAtTime: vi.fn(), exponentialRampToValueAtTime: vi.fn() },
+      connect: vi.fn(),
+      disconnect: vi.fn(),
+    };
+    const context = {
+      state: "suspended",
+      currentTime: 0,
+      destination: {},
+      createOscillator: vi.fn(() => oscillator),
+      createGain: vi.fn(() => gain),
+      close: vi.fn(() => Promise.resolve()),
+      resume: vi.fn(() => resumed),
+    };
+    const constructor = vi.fn(function AudioContextMock() {
+      return context;
+    });
+    priorWindow = Object.getOwnPropertyDescriptor(globalThis, "window");
+    Object.defineProperty(globalThis, "window", {
+      configurable: true,
+      value: { AudioContext: constructor },
+    });
+    const audio = createCombatAudio();
+    audio.unlock();
+    audio.play({ ...cue, sequence: 2 });
+    audio.play({ ...cue, sequence: 3, kind: "enemy", heavy: true }, true);
+    expect(context.createOscillator).not.toHaveBeenCalled();
+    context.state = "running";
+    resolveResume();
+    await Promise.resolve();
+    await Promise.resolve();
+    vi.advanceTimersByTime(125);
+    expect(context.createOscillator).toHaveBeenCalledTimes(1);
+    expect(oscillator.frequency.setValueAtTime).toHaveBeenCalledWith(105, 0);
+    // A running context can accept a new cue before the resume promise drains.
+    context.state = "suspended";
+    audio.unlock();
+    audio.play({ ...cue, sequence: 4 }, true);
+    context.state = "running";
+    audio.play({ ...cue, sequence: 5, kind: "enemy", heavy: true }, true);
+    await Promise.resolve();
+    await Promise.resolve();
+    vi.advanceTimersByTime(125);
+    expect(context.createOscillator).toHaveBeenCalledTimes(2);
+    audio.dispose();
+  });
+
+  it.each(["mute", "dispose"] as const)(
+    "cancels a queued cue when %s happens before resume",
+    async (action) => {
+      let resolveResume!: () => void;
+      const resumed = new Promise<void>((resolve) => {
+        resolveResume = resolve;
+      });
+      const context = {
+        state: "suspended",
+        currentTime: 0,
+        destination: {},
+        createOscillator: vi.fn(),
+        createGain: vi.fn(),
+        close: vi.fn(() => Promise.resolve()),
+        resume: vi.fn(() => resumed),
+      };
+      const constructor = vi.fn(function AudioContextMock() {
+        return context;
+      });
+      priorWindow = Object.getOwnPropertyDescriptor(globalThis, "window");
+      Object.defineProperty(globalThis, "window", {
+        configurable: true,
+        value: { AudioContext: constructor },
+      });
+      const audio = createCombatAudio();
+      audio.unlock();
+      audio.play(cue);
+      if (action === "mute") audio.setMuted(true);
+      else audio.dispose();
+      context.state = "running";
+      resolveResume();
+      await Promise.resolve();
+      await Promise.resolve();
+      expect(context.createOscillator).not.toHaveBeenCalled();
+      if (action === "mute") audio.dispose();
+    },
+  );
 });

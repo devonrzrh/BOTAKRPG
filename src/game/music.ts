@@ -6,13 +6,15 @@ import puzzleSource from "../../sounds/ost_puzzle.mp3?url";
 export type MusicTrack = "menu" | "puzzle" | "battle" | "boss";
 
 /** Relative loudness per setting. Ambient sits low; battles lead. */
-export const MUSIC_TRACKS: Record<MusicTrack, { source: string; gain: number }> =
-  {
-    menu: { source: menuSource, gain: 0.5 },
-    puzzle: { source: puzzleSource, gain: 0.44 },
-    battle: { source: battleSource, gain: 0.62 },
-    boss: { source: bossSource, gain: 0.72 },
-  };
+export const MUSIC_TRACKS: Record<
+  MusicTrack,
+  { source: string; gain: number }
+> = {
+  menu: { source: menuSource, gain: 0.5 },
+  puzzle: { source: puzzleSource, gain: 0.44 },
+  battle: { source: battleSource, gain: 0.62 },
+  boss: { source: bossSource, gain: 0.72 },
+};
 
 /** Dialogue and cutscenes duck the score instead of stopping it. */
 export const DUCKED_GAIN = 0.38;
@@ -27,6 +29,7 @@ export interface MusicSituation {
   panel: string | null;
   reading: boolean;
   boss: boolean;
+  battleResolved?: boolean;
   dialogue: boolean;
 }
 
@@ -41,12 +44,13 @@ export function chooseMusic({
   panel,
   reading,
   boss,
+  battleResolved = false,
   dialogue,
 }: MusicSituation): MusicChoice {
   if (intake) return { track: null, gain: 0 };
   const quiet = reading || panel === "library";
   const track: MusicTrack =
-    panel === "battle"
+    panel === "battle" && !battleResolved
       ? boss
         ? "boss"
         : "battle"
@@ -255,7 +259,9 @@ export function createMusic() {
   function warmRemaining() {
     if (warmed || disposed) return;
     warmed = true;
-    (Object.keys(MUSIC_TRACKS) as MusicTrack[]).forEach((track) => ensure(track));
+    (Object.keys(MUSIC_TRACKS) as MusicTrack[]).forEach((track) =>
+      ensure(track),
+    );
   }
 
   const onVisibility = () => {

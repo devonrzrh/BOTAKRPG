@@ -1053,6 +1053,9 @@ export default function App() {
         panel,
         reading: bookOpen && homeWall === "bookshelf",
         boss: bossBattle,
+        battleResolved:
+          panel === "battle" &&
+          (battle.phase === "won" || battle.phase === "lost"),
         dialogue: Boolean(dialogueId || cutsceneId || chapterId),
       }),
     [
@@ -1061,6 +1064,7 @@ export default function App() {
       bookOpen,
       homeWall,
       bossBattle,
+      battle.phase,
       dialogueId,
       cutsceneId,
       chapterId,
@@ -2357,7 +2361,9 @@ export default function App() {
                   <h3>Audio</h3>
                   <label>
                     Music volume
-                    <output>{Math.round(save.settings.musicVolume * 100)}%</output>
+                    <output>
+                      {Math.round(save.settings.musicVolume * 100)}%
+                    </output>
                     <input
                       type="range"
                       min={0}

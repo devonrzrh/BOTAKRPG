@@ -8,30 +8,12 @@ export function createCombatAudio() {
   let muted = false;
   let disposed = false;
   let lastSequence = -1;
+  let resumePending: Promise<void> | null = null;
+  let queuedCue: { cue: BattleCue; reducedMotion: boolean } | null = null;
   const timers = new Set<ReturnType<typeof setTimeout>>();
   const nodes = new Set<OscillatorNode | GainNode>();
 
-  const unlock = () => {
-    if (disposed || muted || typeof window === "undefined") return;
-    if (context) {
-      if (context.state === "suspended") void context.resume().catch(() => {});
-      return;
-    }
-    const Context = window.AudioContext;
-    if (!Context) return;
-    try {
-      context = new Context();
-      if (context.state === "suspended") void context.resume().catch(() => {});
-    } catch {
-      context = null;
-    }
-  };
-
-  const play = (cue: BattleCue, reducedMotion = false) => {
-    if (disposed || muted || !context || context.state !== "running") return;
-    if (cue.sequence === lastSequence) return;
-    lastSequence = cue.sequence;
-
+  const schedule = (cue: BattleCue, reducedMotion: boolean) => {
     const victory =
       cue.defeated || (cue.kind === "recover" && cue.special === "pacify");
     const playerHit = cue.kind === "player" || cue.kind === "poison";
@@ -104,9 +86,70 @@ export function createCombatAudio() {
     timers.add(timer);
   };
 
+  const drainQueuedCue = (ctx: AudioContextLike) => {
+    if (ctx !== context || disposed || muted || ctx.state !== "running") {
+      queuedCue = null;
+      return;
+    }
+    const pending = queuedCue;
+    queuedCue = null;
+    if (pending) schedule(pending.cue, pending.reducedMotion);
+  };
+
+  const unlock = () => {
+    if (disposed || muted || typeof window === "undefined") return;
+    if (!context) {
+      const Context = window.AudioContext;
+      if (!Context) return;
+      try {
+        context = new Context();
+      } catch {
+        context = null;
+        return;
+      }
+    }
+    const ctx = context;
+    if (ctx.state === "running") {
+      drainQueuedCue(ctx);
+      return;
+    }
+    if (resumePending) return;
+    let attempt: Promise<void>;
+    try {
+      attempt = ctx.resume();
+    } catch {
+      queuedCue = null;
+      return;
+    }
+    resumePending = attempt;
+    void attempt.then(
+      () => {
+        if (resumePending !== attempt) return;
+        resumePending = null;
+        drainQueuedCue(ctx);
+      },
+      () => {
+        if (resumePending === attempt) resumePending = null;
+        queuedCue = null;
+      },
+    );
+  };
+
+  const play = (cue: BattleCue, reducedMotion = false) => {
+    if (disposed || muted || !context || cue.sequence <= lastSequence) return;
+    lastSequence = cue.sequence;
+    if (context.state === "running") {
+      queuedCue = null;
+      schedule(cue, reducedMotion);
+    } else if (resumePending) {
+      queuedCue = { cue, reducedMotion };
+    }
+  };
+
   const setMuted = (value: boolean) => {
     muted = value;
     if (!value) return;
+    queuedCue = null;
     timers.forEach(clearTimeout);
     timers.clear();
     nodes.forEach((node) => {
@@ -121,6 +164,7 @@ export function createCombatAudio() {
   const dispose = () => {
     if (disposed) return;
     disposed = true;
+    queuedCue = null;
     timers.forEach(clearTimeout);
     timers.clear();
     nodes.forEach((node) => {

@@ -37,6 +37,28 @@ describe("music direction", () => {
     expect(chooseMusic(calm).track).toBe("menu");
   });
 
+  it("settles resolved fights to ambient and restarts the battle score for a retry", () => {
+    expect(
+      chooseMusic({
+        ...calm,
+        panel: "battle",
+        boss: true,
+        battleResolved: true,
+      }).track,
+    ).toBe("menu");
+    expect(
+      chooseMusic({ ...calm, panel: "battle", battleResolved: true }).track,
+    ).toBe("menu");
+    expect(
+      chooseMusic({
+        ...calm,
+        panel: "battle",
+        boss: true,
+        battleResolved: false,
+      }).track,
+    ).toBe("boss");
+  });
+
   it("keeps the menu score for reading, only quieter", () => {
     expect(chooseMusic({ ...calm, reading: true })).toEqual({
       track: "menu",
@@ -78,7 +100,8 @@ describe("music director", () => {
     while (restore.length) {
       const [key, value] = restore.pop()!;
       if (value === undefined) Reflect.deleteProperty(globalThis, key);
-      else Object.defineProperty(globalThis, key, { value, configurable: true });
+      else
+        Object.defineProperty(globalThis, key, { value, configurable: true });
     }
   });
 
@@ -170,9 +193,7 @@ describe("music director", () => {
 
     music.setTrack("battle");
     vi.advanceTimersByTime(180);
-    const battle = instances.find((audio) =>
-      audio.src.includes("ost_battle"),
-    )!;
+    const battle = instances.find((audio) => audio.src.includes("ost_battle"))!;
     expect(instances[0].volume).toBeGreaterThan(0);
     expect(battle.volume).toBeGreaterThan(0);
     vi.advanceTimersByTime(3000);
@@ -209,9 +230,7 @@ describe("music director", () => {
     vi.advanceTimersByTime(2000);
     music.setTrack("battle");
     vi.advanceTimersByTime(2000);
-    const battle = instances.find((audio) =>
-      audio.src.includes("ost_battle"),
-    )!;
+    const battle = instances.find((audio) => audio.src.includes("ost_battle"))!;
     battle.currentTime = 42;
     music.setTrack("menu");
     vi.advanceTimersByTime(2000);
