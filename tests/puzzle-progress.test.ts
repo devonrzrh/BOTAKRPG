@@ -66,8 +66,28 @@ it("restores in-progress commands and rejects incompatible imports", () => {
   expect(parseSave(legacy, content).puzzleRuns).toEqual({});
 });
 
-it("ships four solvable Markdown puzzles with library and reward links", () => {
+it("ships solvable Markdown puzzle variants with library and reward links", () => {
+  const transfer = (
+    count: number,
+    from = 0,
+    to = 2,
+    spare = 1,
+  ): PuzzleCommand[] =>
+    count === 0
+      ? []
+      : [
+          ...transfer(count - 1, from, spare, to),
+          { type: "transfer", from, to },
+          ...transfer(count - 1, spare, to, from),
+        ];
   const solutions: Record<string, PuzzleCommand[]> = {
+    "puzzle-search-archive": [3, 5].map((index) => ({ type: "probe", index })),
+    "puzzle-search-cold-storage": [7, 3, 1, 2].map((index) => ({
+      type: "probe",
+      index,
+    })),
+    "puzzle-hanoi-lock": transfer(3),
+    "puzzle-hanoi-vault": transfer(4),
     "puzzle-stack-buffer": [
       "push",
       "push",
@@ -91,6 +111,38 @@ it("ships four solvable Markdown puzzles with library and reward links", () => {
       index,
     })),
     "puzzle-route-packet": [3, 4, 5, 6].map((node) => ({ type: "move", node })),
+    "puzzle-stack-nested": [
+      "push",
+      "push",
+      "push",
+      "pop",
+      "pop",
+      "push",
+      "pop",
+      "push",
+      "push",
+      "pop",
+      "pop",
+      "pop",
+    ].map((type) => ({ type }) as PuzzleCommand),
+    "puzzle-queue-interleave": [
+      "rotate",
+      "rotate",
+      "dispatch",
+      "rotate",
+      "rotate",
+      "dispatch",
+      "rotate",
+      "rotate",
+      "dispatch",
+      "dispatch",
+      "dispatch",
+    ].map((type) => ({ type }) as PuzzleCommand),
+    "puzzle-sort-duplicates": [0, 2, 1, 0, 3, 2, 4, 3, 2].map((index) => ({
+      type: "swap",
+      index,
+    })),
+    "puzzle-route-detour": [3, 2, 5, 6].map((node) => ({ type: "move", node })),
   };
   for (const [id, commands] of Object.entries(solutions)) {
     const puzzle = content.entities.find(
@@ -113,5 +165,12 @@ it("ships four solvable Markdown puzzles with library and reward links", () => {
         (e) => e.type === "quest" && e.objectives.includes(id) && e.xp === 25,
       ),
     ).toBe(true);
+    const save = initialSave();
+    save.puzzleRuns[id] = { commands, assisted: false };
+    const restored = parseSave(JSON.parse(JSON.stringify(save)), content);
+    expect(restored.puzzleRuns[id].commands).toEqual(commands);
+    const rewarded = rewardPuzzle(restored, puzzle, content, false);
+    expect(rewarded.character.xp).toBe(save.character.xp + 25);
+    expect(rewardPuzzle(rewarded, puzzle, content, false)).toEqual(rewarded);
   }
 });

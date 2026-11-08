@@ -15,6 +15,15 @@ const puzzleRunSchema = z.object({
           index: z.number().int().nonnegative(),
         }),
         z.object({ type: z.literal("move"), node: z.number().int() }),
+        z.object({
+          type: z.literal("probe"),
+          index: z.number().int().nonnegative(),
+        }),
+        z.object({
+          type: z.literal("transfer"),
+          from: z.number().int().min(0).max(2),
+          to: z.number().int().min(0).max(2),
+        }),
       ]),
     )
     .max(1000),

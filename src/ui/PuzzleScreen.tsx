@@ -40,6 +40,7 @@ export function PuzzleScreen(p: {
       .reduce((current, command) => puzzleCommand(current, command), initial);
   });
   const [hintLevel, setHintLevel] = useState(p.run?.assisted ? 1 : 0);
+  const [selectedPeg, setSelectedPeg] = useState<number | null>(null);
   const assisted = useRef(p.run?.assisted ?? false);
   const commands = useRef<PuzzleCommand[]>(
     (p.run?.commands ?? []).slice(0, 1000),
@@ -92,6 +93,7 @@ export function PuzzleScreen(p: {
     p.onRun({ commands: [], assisted: false });
     setState(createPuzzle(config));
     setHintLevel(0);
+    setSelectedPeg(null);
     completeSent.current = false;
     setRewardEarned(false);
   };
@@ -134,6 +136,99 @@ export function PuzzleScreen(p: {
             className={`puzzle-board puzzle-${config.kind}`}
             aria-label={`${config.kind} puzzle`}
           >
+            {config.kind === "search" && (
+              <>
+                <p className="board-instruction">
+                  Locate record <b>{config.target[0]}</b>. Archive slots are
+                  ordered from lowest to highest. Each probe reveals one record.
+                </p>
+                <div className="search-slots">
+                  {config.values.map((value, i) => {
+                    const revealed = state.probes.includes(i);
+                    const excluded = i < state.low || i > state.high;
+                    return (
+                      <button
+                        key={i}
+                        className={`search-slot ${excluded ? "search-excluded" : ""} ${revealed && value === config.target[0] ? "tile-done" : ""}`}
+                        aria-label={`Probe slot ${i + 1}${revealed ? `, record ${value}` : ""}${excluded ? ", excluded" : ""}`}
+                        disabled={
+                          solved || excluded || state.moves >= config.budget
+                        }
+                        onClick={() => act({ type: "probe", index: i })}
+                      >
+                        <span>Slot {i + 1}</span>
+                        <b>{revealed ? value : "?"}</b>
+                      </button>
+                    );
+                  })}
+                </div>
+                <p className="board-instruction" role="status">
+                  {solved
+                    ? "Record recovered"
+                    : `Remaining range: slots ${state.low + 1}–${state.high + 1}`}
+                </p>
+              </>
+            )}
+            {config.kind === "hanoi" && (
+              <>
+                <p className="board-instruction">
+                  Move every disc to peg 3. Only top discs move; larger discs
+                  cannot rest on smaller ones. Select a source peg, then a
+                  destination.
+                </p>
+                <div className="transfer-pegs">
+                  {state.pegs.map((peg, i) => (
+                    <button
+                      key={i}
+                      className="transfer-peg"
+                      aria-label={`Peg ${i + 1}: ${peg.length ? peg.join(", ") + ", bottom to top" : "empty"}${selectedPeg === i ? ", selected" : ""}`}
+                      aria-pressed={selectedPeg === i}
+                      disabled={solved || state.moves >= config.budget}
+                      onClick={() => {
+                        if (selectedPeg === null) {
+                          if (peg.length) {
+                            setSelectedPeg(i);
+                            sound("click");
+                          }
+                        } else if (selectedPeg === i) setSelectedPeg(null);
+                        else {
+                          act({ type: "transfer", from: selectedPeg, to: i });
+                          setSelectedPeg(null);
+                        }
+                      }}
+                    >
+                      <span>
+                        Peg {i + 1}
+                        {i === 2 ? " · target" : ""}
+                      </span>
+                      <span className="transfer-tower" aria-hidden="true">
+                        {[...peg].reverse().map((disc) => (
+                          <span
+                            className="transfer-disc"
+                            key={disc}
+                            style={{
+                              width: `${35 + (60 * disc) / config.values[0]}%`,
+                            }}
+                          >
+                            {disc}
+                          </span>
+                        ))}
+                        {!peg.length && (
+                          <span className="puzzle-empty">empty</span>
+                        )}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+                <p className="board-instruction" role="status">
+                  {solved
+                    ? "Transfer complete"
+                    : selectedPeg === null
+                      ? "Select a source peg"
+                      : `Peg ${selectedPeg + 1} selected · choose destination, or select again to cancel`}
+                </p>
+              </>
+            )}
             {config.kind === "stack" && (
               <>
                 <div className="puzzle-lane">

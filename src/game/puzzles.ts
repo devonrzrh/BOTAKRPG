@@ -17,6 +17,8 @@ const rawPuzzleConfigSchema = z.discriminatedUnion("kind", [
   z.object({ ...base, kind: z.literal("stack") }),
   z.object({ ...base, kind: z.literal("queue") }),
   z.object({ ...base, kind: z.literal("sorting") }),
+  z.object({ ...base, kind: z.literal("search") }),
+  z.object({ ...base, kind: z.literal("hanoi") }),
   z.object({
     ...base,
     kind: z.literal("routing"),
@@ -164,6 +166,71 @@ export const puzzleConfigSchema = rawPuzzleConfigSchema.superRefine(
       }
       return;
     }
+    if (config.kind === "search") {
+      if (config.values.some((v, i) => i > 0 && v <= config.values[i - 1]))
+        ctx.addIssue({
+          code: "custom",
+          path: ["values"],
+          message: "Search values must be strictly ascending.",
+        });
+      if (
+        config.target.length !== 1 ||
+        !config.values.includes(config.target[0])
+      )
+        ctx.addIssue({
+          code: "custom",
+          path: ["target"],
+          message: "Search target must be one listed value.",
+        });
+      // Ensure the intended midpoint strategy can finish within the budget.
+      let low = 0,
+        high = config.values.length - 1,
+        probes = 0;
+      while (low <= high) {
+        const mid = Math.floor((low + high) / 2);
+        probes++;
+        if (config.values[mid] === config.target[0]) break;
+        if (config.values[mid] < config.target[0]) low = mid + 1;
+        else high = mid - 1;
+      }
+      if (config.budget < probes)
+        ctx.addIssue({
+          code: "custom",
+          path: ["budget"],
+          message: "Search budget must allow the midpoint strategy.",
+        });
+      return;
+    }
+    if (config.kind === "hanoi") {
+      if (
+        config.values.length > 5 ||
+        config.values.some(
+          (v, i) => v <= 0 || (i > 0 && v >= config.values[i - 1]),
+        )
+      )
+        ctx.addIssue({
+          code: "custom",
+          path: ["values"],
+          message:
+            "Transfer lock needs up to five positive discs, largest first.",
+        });
+      if (
+        config.values.length !== config.target.length ||
+        config.values.some((v, i) => v !== config.target[i])
+      )
+        ctx.addIssue({
+          code: "custom",
+          path: ["target"],
+          message: "Transfer target must preserve disc order.",
+        });
+      if (config.budget < 2 ** config.values.length - 1)
+        ctx.addIssue({
+          code: "custom",
+          path: ["budget"],
+          message: "Transfer budget is below the minimum required.",
+        });
+      return;
+    }
     if (!sameMultiset(config.values, config.target))
       ctx.addIssue({
         code: "custom",
@@ -232,6 +299,10 @@ export type PuzzleState = {
   output: number[];
   route: number[];
   cost: number;
+  low: number;
+  high: number;
+  probes: number[];
+  pegs: number[][];
 };
 
 export type PuzzleCommand =
@@ -240,7 +311,9 @@ export type PuzzleCommand =
   | { type: "rotate" }
   | { type: "dispatch" }
   | { type: "swap"; index: number }
-  | { type: "move"; node: number };
+  | { type: "move"; node: number }
+  | { type: "probe"; index: number }
+  | { type: "transfer"; from: number; to: number };
 
 export function createPuzzle(config: PuzzleConfig): PuzzleState {
   const parsed = puzzleConfigSchema.parse(config);
@@ -258,6 +331,10 @@ export function createPuzzle(config: PuzzleConfig): PuzzleState {
     output: [],
     route,
     cost: 0,
+    low: 0,
+    high: parsed.values.length - 1,
+    probes: [],
+    pegs: [[...parsed.values], [], []],
   };
 }
 
@@ -275,12 +352,58 @@ export function puzzleCommand(
   command: PuzzleCommand,
 ): PuzzleState {
   if (state.solved) return unchanged(state, "Puzzle already solved.");
-  if (state.moves >= 1000) return unchanged(state, "Action limit reached. Reset to try again.");
+  if (state.moves >= 1000)
+    return unchanged(state, "Action limit reached. Reset to try again.");
   const { config } = state;
   if (config.kind !== "routing" && state.moves >= config.budget)
     return unchanged(state, "Move budget exhausted. Reset to try again.");
   let next: PuzzleState | undefined;
-  if (config.kind === "stack" && command.type === "push") {
+  if (config.kind === "search" && command.type === "probe") {
+    const i = command.index;
+    if (!Number.isInteger(i) || i < state.low || i > state.high)
+      return unchanged(state, "Choose a slot inside the remaining range.");
+    const value = config.values[i],
+      target = config.target[0];
+    const solved = value === target;
+    next = {
+      ...state,
+      moves: state.moves + 1,
+      probes: [...state.probes, i],
+      solved,
+      low: value < target ? i + 1 : state.low,
+      high: value > target ? i - 1 : state.high,
+      message: solved
+        ? `Record ${value} located in slot ${i + 1}.`
+        : `Slot ${i + 1} holds ${value}; search ${value < target ? "higher" : "lower"} slots.`,
+    };
+  } else if (config.kind === "hanoi" && command.type === "transfer") {
+    const { from, to } = command;
+    if (
+      ![from, to].every(
+        (peg) => Number.isInteger(peg) && peg >= 0 && peg <= 2,
+      ) ||
+      from === to
+    )
+      return unchanged(state, "Choose two different pegs.");
+    const disc = state.pegs[from].at(-1),
+      destination = state.pegs[to].at(-1);
+    if (disc === undefined) return unchanged(state, "That peg is empty.");
+    if (destination !== undefined && disc > destination)
+      return unchanged(state, "A larger disc cannot rest on a smaller disc.");
+    const pegs = state.pegs.map((peg) => [...peg]);
+    pegs[from].pop();
+    pegs[to].push(disc);
+    const solved = pegs[2].length === config.values.length;
+    next = {
+      ...state,
+      pegs,
+      moves: state.moves + 1,
+      solved,
+      message: solved
+        ? "Transfer lock released."
+        : `Moved disc ${disc} from peg ${from + 1} to ${to + 1}.`,
+    };
+  } else if (config.kind === "stack" && command.type === "push") {
     if (!state.input.length) return unchanged(state, "No more values to push.");
     next = {
       ...state,

@@ -5642,6 +5642,424 @@
       "lesson": "source-alg-06"
     },
     {
+      "id": "puzzle-stack-nested",
+      "title": "Nested recall frames",
+      "type": "activity",
+      "template": "puzzle",
+      "puzzle": {
+        "values": [
+          11,
+          22,
+          33,
+          44,
+          55,
+          66
+        ],
+        "target": [
+          33,
+          22,
+          44,
+          66,
+          55,
+          11
+        ],
+        "budget": 12,
+        "kind": "stack"
+      },
+      "brief": "FOLIO found six recall frames buried inside one long-running call. Release the requested addresses while keeping the oldest frame at the base until the end. Pushing every frame first will bury the next address.",
+      "hint": "Leave 11 at the base. Push through 33, release 33 and 22, then release 44 before accepting 55 and 66.",
+      "solution": "Push 11, 22 and 33. Pop 33 and 22. Push 44 and pop it. Push 55 and 66, then pop 66, 55 and 11. Twelve operations recover every frame.",
+      "lesson": "source-ds-05",
+      "seed": 42,
+      "clue": {
+        "title": "Oldest recall frame",
+        "text": "The frame held at the base records a maintenance call made before ECHO-7's escape."
+      }
+    },
+    {
+      "id": "puzzle-queue-interleave",
+      "title": "Interleaved dispatch orders",
+      "type": "activity",
+      "template": "puzzle",
+      "puzzle": {
+        "values": [
+          10,
+          20,
+          30,
+          40,
+          50
+        ],
+        "target": [
+          30,
+          10,
+          50,
+          20,
+          40
+        ],
+        "budget": 11,
+        "kind": "queue"
+      },
+      "brief": "PATCH recovered a signed dispatch order split across three packet batches. One initial rotation cannot restore it. Rotate between deliveries and spend no more than eleven operations.",
+      "hint": "Dispatching removes the front packet permanently. After sending 30, rotate 40 and 50 away to reach 10. Recalculate the front after every delivery.",
+      "solution": "Rotate twice and dispatch 30. Rotate twice and dispatch 10. Rotate twice and dispatch 50. Finally dispatch 20 and 40. Six rotations and five deliveries use eleven operations.",
+      "lesson": "source-ds-06",
+      "seed": 42,
+      "clue": {
+        "title": "Split dispatch signature",
+        "text": "The three batches share one signature. ECHO-7 used the same dispatcher across multiple relays."
+      }
+    },
+    {
+      "id": "puzzle-sort-duplicates",
+      "title": "Duplicate clock stamps",
+      "type": "activity",
+      "template": "puzzle",
+      "puzzle": {
+        "values": [
+          4,
+          2,
+          4,
+          1,
+          3,
+          2
+        ],
+        "target": [
+          1,
+          2,
+          2,
+          3,
+          4,
+          4
+        ],
+        "budget": 9,
+        "kind": "sorting"
+      },
+      "brief": "Two relays reused clock stamps in the surveillance log. Recover ascending order without discarding duplicate values. Only neighboring stamps can be swapped.",
+      "hint": "Equal stamps are already in the correct relative order. Move 1 left, then move the final 2 left past larger stamps. Each useful adjacent swap removes one inversion.",
+      "solution": "Swap positions 1–2, 3–4, 2–3, 1–2, 4–5, 3–4, 5–6, 4–5 and 3–4. The result is 1, 2, 2, 3, 4, 4 in nine swaps. Positions count from one.",
+      "lesson": "source-alg-02",
+      "seed": 42,
+      "clue": {
+        "title": "Reused clock stamp",
+        "text": "Duplicate timestamps came from two separate relays. Their matching clock offset identifies a shared maintenance source."
+      }
+    },
+    {
+      "id": "puzzle-route-detour",
+      "title": "Cheap first hop",
+      "type": "activity",
+      "template": "puzzle",
+      "puzzle": {
+        "values": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "target": [
+          1,
+          6
+        ],
+        "budget": 6,
+        "edges": [
+          {
+            "from": 1,
+            "to": 2,
+            "cost": 4
+          },
+          {
+            "from": 1,
+            "to": 3,
+            "cost": 1
+          },
+          {
+            "from": 1,
+            "to": 4,
+            "cost": 1
+          },
+          {
+            "from": 3,
+            "to": 2,
+            "cost": 1
+          },
+          {
+            "from": 2,
+            "to": 5,
+            "cost": 2
+          },
+          {
+            "from": 5,
+            "to": 6,
+            "cost": 2
+          },
+          {
+            "from": 4,
+            "to": 6,
+            "cost": 8
+          },
+          {
+            "from": 3,
+            "to": 5,
+            "cost": 5
+          }
+        ],
+        "kind": "routing"
+      },
+      "brief": "A damaged relay has only six units of signal. Relay 4 looks close to the exit, but its outgoing connection is costly. Reach relay 6 by planning the whole route.",
+      "hint": "Choosing the cheapest first edge alone is not enough. Relay 3 can reach relay 2 for one unit, bypassing the expensive direct connection from relay 1.",
+      "solution": "Travel 1 → 3 → 2 → 5 → 6. Costs are 1 + 1 + 2 + 2 = 6. The route through relay 4 cannot reach the exit within budget.",
+      "lesson": "source-alg-06",
+      "seed": 42,
+      "clue": {
+        "title": "Costly decoy relay",
+        "text": "Relay 4 advertises a cheap entry while charging too much to leave. Its routing table was altered to strand incoming traces."
+      }
+    },
+    {
+      "id": "case-stack-nested",
+      "title": "Unwind the nested recall",
+      "type": "quest",
+      "description": "Hold an old stack frame while releasing newer calls in order.",
+      "objectives": [
+        "puzzle-stack-nested"
+      ],
+      "xp": 25,
+      "rewards": [],
+      "kind": "case",
+      "prerequisites": [],
+      "lesson": "source-ds-05"
+    },
+    {
+      "id": "case-queue-interleave",
+      "title": "Reassemble split dispatches",
+      "type": "quest",
+      "description": "Rotate between deliveries to restore an interleaved queue order.",
+      "objectives": [
+        "puzzle-queue-interleave"
+      ],
+      "xp": 25,
+      "rewards": [],
+      "kind": "case",
+      "prerequisites": [],
+      "lesson": "source-ds-06"
+    },
+    {
+      "id": "case-sort-duplicates",
+      "title": "Separate the clock stamps",
+      "type": "quest",
+      "description": "Sort a surveillance log containing repeated timestamps.",
+      "objectives": [
+        "puzzle-sort-duplicates"
+      ],
+      "xp": 25,
+      "rewards": [],
+      "kind": "case",
+      "prerequisites": [],
+      "lesson": "source-alg-02"
+    },
+    {
+      "id": "case-route-detour",
+      "title": "Bypass the decoy relay",
+      "type": "quest",
+      "description": "Compare total route costs to avoid a tempting first hop.",
+      "objectives": [
+        "puzzle-route-detour"
+      ],
+      "xp": 25,
+      "rewards": [],
+      "kind": "case",
+      "prerequisites": [],
+      "lesson": "source-alg-06"
+    },
+    {
+      "id": "puzzle-search-archive",
+      "title": "Sealed archive index",
+      "type": "activity",
+      "template": "puzzle",
+      "puzzle": {
+        "values": [
+          4,
+          9,
+          15,
+          22,
+          31,
+          43,
+          58
+        ],
+        "target": [
+          43
+        ],
+        "budget": 3,
+        "kind": "search"
+      },
+      "brief": "FOLIO found a sealed, sorted archive. Each probe reveals one record. Locate record 43 before the archive closes after three probes.",
+      "hint": "Probe the middle slot. If its record is lower than 43, every slot to its left is also too low.",
+      "solution": "Probe slot 4: record 22 is too low. Probe slot 6: record 43 is the match. Two probes recover the index.",
+      "lesson": "source-alg-03",
+      "seed": 42,
+      "clue": {
+        "title": "Sealed archive index evidence",
+        "text": "Archive record 43 ties the abandoned chassis to a maintenance credential."
+      }
+    },
+    {
+      "id": "case-search-archive",
+      "title": "Sealed archive index",
+      "type": "quest",
+      "description": "FOLIO found a sealed, sorted archive. Each probe reveals one record. Locate record 43 before the archive closes after three probes.",
+      "objectives": [
+        "puzzle-search-archive"
+      ],
+      "xp": 25,
+      "rewards": [],
+      "kind": "case",
+      "prerequisites": [],
+      "lesson": "source-alg-03"
+    },
+    {
+      "id": "puzzle-search-cold-storage",
+      "title": "Cold storage needle",
+      "type": "activity",
+      "template": "puzzle",
+      "puzzle": {
+        "values": [
+          3,
+          8,
+          14,
+          19,
+          25,
+          32,
+          40,
+          49,
+          59,
+          70,
+          82,
+          95,
+          109,
+          124,
+          140
+        ],
+        "target": [
+          14
+        ],
+        "budget": 4,
+        "kind": "search"
+      },
+      "brief": "A cold-storage index holds fifteen sorted records. Recover record 14 in four probes. Every comparison can rule out an entire section.",
+      "hint": "Start at slot 8, then halve the lower remaining range. Slots count from one; records are hidden until probed.",
+      "solution": "Probe slots 8, 4, 2 and 3. Their records are 49, 19, 8 and 14. The last probe recovers the record.",
+      "lesson": "source-alg-03",
+      "seed": 42,
+      "clue": {
+        "title": "Cold storage needle evidence",
+        "text": "The cold-storage record predates the forged dispatcher certificate."
+      }
+    },
+    {
+      "id": "case-search-cold-storage",
+      "title": "Cold storage needle",
+      "type": "quest",
+      "description": "A cold-storage index holds fifteen sorted records. Recover record 14 in four probes. Every comparison can rule out an entire section.",
+      "objectives": [
+        "puzzle-search-cold-storage"
+      ],
+      "xp": 25,
+      "rewards": [],
+      "kind": "case",
+      "prerequisites": [],
+      "lesson": "source-alg-03"
+    },
+    {
+      "id": "puzzle-hanoi-lock",
+      "title": "Three-disc transfer lock",
+      "type": "activity",
+      "template": "puzzle",
+      "puzzle": {
+        "values": [
+          3,
+          2,
+          1
+        ],
+        "target": [
+          3,
+          2,
+          1
+        ],
+        "budget": 7,
+        "kind": "hanoi"
+      },
+      "brief": "PATCH found a physical transfer lock. Move the full disc stack from peg 1 to peg 3 in seven moves. Peg 2 can hold discs while you clear a path.",
+      "hint": "First move the top two discs to peg 2, using peg 3 as temporary storage. Then the largest disc can reach peg 3.",
+      "solution": "Move pegs 1→3, 1→2, 3→2, 1→3, 2→1, 2→3, 1→3. Each move transfers only the top disc.",
+      "lesson": "source-alg-04",
+      "seed": 42,
+      "clue": {
+        "title": "Three-disc transfer lock evidence",
+        "text": "The lock opens a service vault carrying ECHO-7's deleted route fragment."
+      }
+    },
+    {
+      "id": "case-hanoi-lock",
+      "title": "Three-disc transfer lock",
+      "type": "quest",
+      "description": "PATCH found a physical transfer lock. Move the full disc stack from peg 1 to peg 3 in seven moves. Peg 2 can hold discs while you clear a path.",
+      "objectives": [
+        "puzzle-hanoi-lock"
+      ],
+      "xp": 25,
+      "rewards": [],
+      "kind": "case",
+      "prerequisites": [],
+      "lesson": "source-alg-04"
+    },
+    {
+      "id": "puzzle-hanoi-vault",
+      "title": "Nested vault transfer",
+      "type": "activity",
+      "template": "puzzle",
+      "puzzle": {
+        "values": [
+          4,
+          3,
+          2,
+          1
+        ],
+        "target": [
+          4,
+          3,
+          2,
+          1
+        ],
+        "budget": 15,
+        "kind": "hanoi"
+      },
+      "brief": "A second vault adds a fourth disc. Transfer the stack from peg 1 to peg 3 in fifteen moves. The smaller transfer lock is now one step inside a larger plan.",
+      "hint": "Move the top three discs to peg 2 first. Move disc 4 to peg 3, then transfer the three-disc stack from peg 2 to peg 3.",
+      "solution": "Move pegs 1→2, 1→3, 2→3, 1→2, 3→1, 3→2, 1→2, 1→3, 2→3, 2→1, 3→1, 2→3, 1→2, 1→3, 2→3.",
+      "lesson": "source-alg-04",
+      "seed": 42,
+      "clue": {
+        "title": "Nested vault transfer evidence",
+        "text": "Inside the nested vault, a checksum identifies a second copy of the rogue signal."
+      }
+    },
+    {
+      "id": "case-hanoi-vault",
+      "title": "Nested vault transfer",
+      "type": "quest",
+      "description": "A second vault adds a fourth disc. Transfer the stack from peg 1 to peg 3 in fifteen moves. The smaller transfer lock is now one step inside a larger plan.",
+      "objectives": [
+        "puzzle-hanoi-vault"
+      ],
+      "xp": 25,
+      "rewards": [],
+      "kind": "case",
+      "prerequisites": [],
+      "lesson": "source-alg-04"
+    },
+    {
       "id": "source-guide",
       "title": "Module guide and review notes",
       "type": "lesson",
