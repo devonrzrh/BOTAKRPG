@@ -84,7 +84,7 @@ export const tutorials: Tutorial[] = [
       },
       {
         title: "Program the route",
-        body: "Blocks build Python code for the same maze. Copy it to the Python editor when you want to change it by hand. Run resets the maze and keeps your program.",
+        body: "Blocks opens a large editor. Choose a category and drag blocks onto the canvas. Show maze docks the editor; Expand editor gives it the screen again. Run resets the maze and keeps your program.",
         keys: ["Ctrl", "Enter"],
       },
       {

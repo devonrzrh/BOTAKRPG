@@ -1,4 +1,4 @@
-import { mkdir, copyFile } from "node:fs/promises";
+import { mkdir, copyFile, cp } from "node:fs/promises";
 const root = new URL("../", import.meta.url);
 await mkdir(new URL("public/pyodide/", root), { recursive: true });
 for (const [source, target] of [
@@ -14,3 +14,9 @@ for (const [source, target] of [
   );
 }
 console.log("Local Python runtime ready.");
+await cp(
+  new URL("node_modules/blockly/media/", root),
+  new URL("public/blockly-media/", root),
+  { recursive: true },
+);
+console.log("Local Blockly media ready.");

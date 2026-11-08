@@ -244,3 +244,10 @@ At 1280 × 720, the large book measured 1200px wide with visible room margins, 2
 Browser checks opened the refreshed Introduction to Algorithms chapter, followed its inline Implementation link to book pages 5–6, switched to fullscreen, and followed Check Your Understanding to the correct section. Both jumps stayed inside the reader without changing the game URL. Existing Level 9 case progress restored successfully.
 
 ![Refreshed chapter](screenshots/source-refresh.png)
+## Larger block workspace
+
+135 tests pass; production build passes. Existing onboarding, player-name validation, legacy saves, shared Python execution, and progression tests remain intact. Blockly stays enabled.
+
+Browser checks at 1280 × 720 confirmed a 1222 × 383px block canvas in expanded mode, 18px block text at 115% zoom, category contrast, zoom to 130%, reset/centering, and the dock/expand toggle. Run docked the editor beside the maze; the preserved block program reached the exit in 24 steps. Reload restored the saved blocks. Blockly sprite assets now load from the same origin rather than a demo server. Code, output, and hints remain accessible behind explicit controls.
+
+![Expanded block editor](screenshots/blocks-expanded.png)

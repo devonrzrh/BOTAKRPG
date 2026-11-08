@@ -34,3 +34,9 @@ Tips are non-blocking: no scrim, the top bar and world remain visible, Escape cl
 ```
 
 The block defaults when missing, so saves written before onboarding still load. Unknown tip identifiers are rejected by the save schema.
+
+## Block editor
+
+Blocks stays enabled. Selecting it opens a wide workspace with 18px block text at 115% zoom. Zoom controls stop at 100% to preserve readability; Center blocks and Reset zoom recover a lost canvas. Show maze docks the editor beside the world; Expand editor restores its width. Run docks it automatically. Resizing recenters the blocks without shrinking them or changing the program.
+
+Generated Python, output, and hints open only when requested. Blockly icons and sounds are copied from the installed package during `npm run runtime`, so the editor does not fetch them from a demo server. Saved blocks and handwritten Python remain separately editable.

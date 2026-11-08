@@ -284,6 +284,7 @@ export default function App() {
     [panel, setPanel] = useState<Panel>(null),
     [toast, setToast] = useState(""),
     [metrics, setMetrics] = useState<WorldMetrics | null>(null);
+  const [blocksExpanded, setBlocksExpanded] = useState(true);
   const [maze, setMaze] = useState<Maze>(() => createMaze(defaultSave().seed)),
     mazeRef = useRef(maze),
     [mazeSession, setMazeSession] = useState(0),
@@ -796,6 +797,7 @@ export default function App() {
   );
   const run = () => {
     if (busy || trialExpired) return;
+    if (mode === "blocks") setBlocksExpanded(false);
     generation.current++;
     completedMaze.current = false;
     updateMaze(createMaze(mazeRef.current.seed));
@@ -1087,7 +1089,7 @@ export default function App() {
   ).length;
   return (
     <div
-      className={`app gameplay-${panel ?? "explore"} maze-${mode} ${useWorldUi ? "world-ui-view" : ""} ${realm === "desk" ? "home-view" : "network-view"} ${homeMoving && realm === "desk" ? "home-panning" : ""} ${save.settings.reducedMotion ? "reduced-motion" : ""}`}
+      className={`app gameplay-${panel ?? "explore"} maze-${mode} ${blocksExpanded ? "blocks-expanded" : "blocks-docked"} ${useWorldUi ? "world-ui-view" : ""} ${realm === "desk" ? "home-view" : "network-view"} ${homeMoving && realm === "desk" ? "home-panning" : ""} ${save.settings.reducedMotion ? "reduced-motion" : ""}`}
     >
       {intakeOpen && (
         <Onboarding
@@ -1506,7 +1508,10 @@ export default function App() {
                     <button
                       className={mode === "blocks" ? "selected" : ""}
                       disabled={busy}
-                      onClick={() => setMode("blocks")}
+                      onClick={() => {
+                        setMode("blocks");
+                        setBlocksExpanded(true);
+                      }}
                     >
                       Blocks
                     </button>
@@ -1517,6 +1522,15 @@ export default function App() {
                     >
                       Python
                     </button>
+                    {mode === "blocks" && (
+                      <button
+                        className="workspace-toggle"
+                        aria-pressed={blocksExpanded}
+                        onClick={() => setBlocksExpanded((value) => !value)}
+                      >
+                        {blocksExpanded ? "Show maze" : "Expand editor"}
+                      </button>
+                    )}
                   </div>
                   {mode === "manual" ? (
                     <>
@@ -1654,14 +1668,22 @@ export default function App() {
                           {line > 0 ? ` · line ${line}` : ""}
                         </span>
                       </div>
-                      <pre
-                        className="terminal"
-                        aria-label="Python output"
-                        aria-live="polite"
+                      <details
+                        className="program-output"
+                        open={mode === "python" ? true : undefined}
                       >
-                        {output.join("\n") ||
-                          "Your observations will appear here. Ctrl+Enter to run."}
-                      </pre>
+                        <summary>
+                          Output{output.length > 0 ? ` (${output.length})` : ""}
+                        </summary>
+                        <pre
+                          className="terminal"
+                          aria-label="Python output"
+                          aria-live="polite"
+                        >
+                          {output.join("\n") ||
+                            "Your observations will appear here. Ctrl+Enter to run."}
+                        </pre>
+                      </details>
                     </>
                   )}
                   <details className="activity-tools">
