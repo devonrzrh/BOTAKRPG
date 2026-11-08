@@ -10,6 +10,7 @@ import type { Dialogue as DialogueContent } from "../content/schema";
 import { typewriterTimeline, revealedCharacters } from "../game/typewriter";
 import { personalizeText, speakerLabel } from "../game/player";
 import { useGameSound } from "./GameSound";
+import { dialogueVoice, shouldBlip } from "../game/dialogueSpeech";
 
 function Portrait({ speaker }: { speaker: string }) {
   const robot = /\b(PATCH|FOLIO|LUMA|Mimic|Warden|Keeper)\b/i.test(speaker);
@@ -79,6 +80,7 @@ export function Dialogue({
   }, []);
   const instant = reducedMotion || osReduced;
   const timeline = useMemo(() => typewriterTimeline(line), [line]);
+  const voice = dialogueVoice(node.speaker);
   const [typing, setTyping] = useState({ node: "", visible: 0 });
   const frame = useRef<number | null>(null);
   const count = instant
@@ -102,10 +104,17 @@ export function Dialogue({
       return;
     const start = performance.now();
     let cancelled = false;
+    let previousVisible = 0;
     setTyping({ node: node.id, visible: 0 });
     const tick = (now: number) => {
       if (cancelled) return;
       const visible = revealedCharacters(timeline.times, now - start);
+      if (
+        !document.hidden &&
+        shouldBlip(timeline.characters, previousVisible, visible)
+      )
+        sound(voice);
+      previousVisible = visible;
       setTyping((previous) =>
         previous.node === node.id && previous.visible === visible
           ? previous
@@ -119,7 +128,7 @@ export function Dialogue({
       cancelled = true;
       if (frame.current !== null) cancelAnimationFrame(frame.current);
     };
-  }, [node.id, timeline, instant]);
+  }, [node.id, timeline, instant, voice, sound]);
   useEffect(() => {
     const previous = document.activeElement as HTMLElement | null;
     root.current?.focus();

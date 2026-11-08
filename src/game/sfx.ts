@@ -15,6 +15,10 @@ export type SfxName =
   | "clue"
   | "levelUp"
   | "dialogue"
+  | "speechHuman"
+  | "speechRobot"
+  | "speechEcho"
+  | "speechSoft"
   | "connect"
   | "pursuit"
   | "train"
@@ -65,6 +69,10 @@ const COOLDOWNS: Record<SfxName, number> = {
   clue: 220,
   levelUp: 300,
   dialogue: 90,
+  speechHuman: 48,
+  speechRobot: 48,
+  speechEcho: 55,
+  speechSoft: 55,
   connect: 250,
   pursuit: 120,
   train: 180,
@@ -254,6 +262,21 @@ export function createSfx() {
           break;
         case "dialogue":
           tone(540, 470, 0.035, "sine", 0.012);
+          break;
+        case "speechHuman":
+          tone(280, 235, 0.026, "triangle", 0.022);
+          tone(560, 470, 0.019, "sine", 0.007);
+          break;
+        case "speechRobot":
+          tone(480, 430, 0.022, "square", 0.011);
+          tone(960, 860, 0.016, "sine", 0.006);
+          break;
+        case "speechEcho":
+          tone(155, 110, 0.035, "sawtooth", 0.015);
+          tone(310, 220, 0.025, "triangle", 0.008);
+          break;
+        case "speechSoft":
+          tone(720, 640, 0.027, "sine", 0.022);
           break;
         case "connect":
           // A modem-like handshake, ending in a settled carrier tone.

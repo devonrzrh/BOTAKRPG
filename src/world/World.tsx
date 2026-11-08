@@ -29,6 +29,11 @@ import type {
   SceneId,
 } from "../game/contracts";
 import type { Maze } from "../game/maze";
+import {
+  cameraRelativeDirection,
+  createMovementInput,
+  movementKey,
+} from "../game/movementInput";
 import { buildOffice, type HomeWall } from "./Office";
 import { attachOfficeSurfaces } from "./OfficeSurfaces";
 import type { SurfaceModel, OfficeAction } from "../game/officeUi";
@@ -906,49 +911,70 @@ function WorldCanvas(props: Props) {
         if (id) latest.current.onInteract(id);
       }
     });
-    const down = (event: KeyboardEvent) => {
-      const target = event.target as HTMLElement;
-      if (latest.current.scene === "desk" || latest.current.encounter) return;
+    const movement = createMovementInput();
+    const canMove = (target: EventTarget | null = document.activeElement) => {
       if (
-        target.closest(
-          'input,textarea,select,[contenteditable="true"],.blocklyDiv',
-        ) ||
+        latest.current.scene === "desk" ||
+        latest.current.encounter ||
         latest.current.locked
       )
+        return false;
+      if (!(target instanceof Element)) return true;
+      if (
+        target.closest(
+          'input,textarea,select,[role="menu"],[role="dialog"],[contenteditable="true"],.blocklyDiv',
+        )
+      )
+        return false;
+      // Manual-mode controls must not require an extra click on the canvas.
+      if (
+        latest.current.scene === "maze" &&
+        target.closest(
+          ".maze-manual .dpad, .maze-manual .maze-content > .segmented > button.selected",
+        )
+      )
+        return true;
+      return !target.closest("button,a,summary");
+    };
+    const step = (screenDirection: Direction) => {
+      const direction = cameraRelativeDirection(screenDirection, camera.alpha);
+      if (latest.current.scene === "maze") latest.current.onMove(direction);
+      else {
+        const vectors: Record<Direction, Cell> = {
+          north: [0, -0.45],
+          east: [0.45, 0],
+          south: [0, 0.45],
+          west: [-0.45, 0],
+        };
+        const [dx, dz] = vectors[direction],
+          p = hubPosition.current,
+          nx = p.x + dx,
+          nz = p.z + dz;
+        const blocked =
+          (nx > -6.5 && nx < -3.5 && nz > -3.5 && nz < -2.1) ||
+          (Math.abs(nx - 5) < 0.9 && Math.abs(nz - 4) < 0.9);
+        if (!blocked && Math.abs(nx) < 9 && Math.abs(nz) < 7.5) {
+          hubPosition.current.set(nx, 0.5, nz);
+          sound("move");
+        } else sound("blocked");
+      }
+    };
+    const down = (event: KeyboardEvent) => {
+      if (
+        event.defaultPrevented ||
+        event.ctrlKey ||
+        event.altKey ||
+        event.metaKey ||
+        !canMove(event.target)
+      ) {
+        movement.clear();
         return;
-      const keys: Record<string, Direction> = {
-        w: "north",
-        ArrowUp: "north",
-        d: "east",
-        ArrowRight: "east",
-        s: "south",
-        ArrowDown: "south",
-        a: "west",
-        ArrowLeft: "west",
-      };
-      const direction = keys[event.key];
-      if (direction) {
+      }
+      if (movementKey(event.key)) {
         event.preventDefault();
-        if (latest.current.scene === "maze") latest.current.onMove(direction);
-        else {
-          const vectors: Record<Direction, Cell> = {
-            north: [0, -0.45],
-            east: [0.45, 0],
-            south: [0, 0.45],
-            west: [-0.45, 0],
-          };
-          const [dx, dz] = vectors[direction],
-            p = hubPosition.current,
-            nx = p.x + dx,
-            nz = p.z + dz;
-          const blocked =
-            (nx > -6.5 && nx < -3.5 && nz > -3.5 && nz < -2.1) ||
-            (Math.abs(nx - 5) < 0.9 && Math.abs(nz - 4) < 0.9);
-          if (!blocked && Math.abs(nx) < 9 && Math.abs(nz) < 7.5) {
-            hubPosition.current.set(nx, 0.5, nz);
-            sound("move");
-          } else if (!event.repeat) sound("blocked");
-        }
+        if (event.repeat) return;
+        const direction = movement.press(event.key, performance.now());
+        if (direction) step(direction);
       }
       if (event.key === "e" || event.key === "Enter") {
         const p = hubPosition.current;
@@ -960,9 +986,27 @@ function WorldCanvas(props: Props) {
           latest.current.onInteract(nearest.id);
       }
     };
+    const up = (event: KeyboardEvent) =>
+      movement.release(event.key, performance.now());
+    const clearMovement = () => movement.clear();
+    const movementTimer = window.setInterval(() => {
+      if (!canMove() || document.hidden) {
+        movement.clear();
+        return;
+      }
+      const direction = movement.tick(performance.now());
+      if (direction) step(direction);
+    }, 30);
     window.addEventListener("keydown", down);
+    window.addEventListener("keyup", up);
+    window.addEventListener("blur", clearMovement);
+    document.addEventListener("visibilitychange", clearMovement);
     return () => {
       window.removeEventListener("keydown", down);
+      window.removeEventListener("keyup", up);
+      window.removeEventListener("blur", clearMovement);
+      document.removeEventListener("visibilitychange", clearMovement);
+      window.clearInterval(movementTimer);
       engine.onResizeObservable.remove(obs);
       scene.onPointerObservable.remove(interactions);
       activeCanvas.removeEventListener("pointerleave", clearHover);

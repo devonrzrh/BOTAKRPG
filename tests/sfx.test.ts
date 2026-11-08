@@ -202,6 +202,10 @@ describe("interface SFX", () => {
     "hazard",
     "dodge",
     "hit",
+    "speechHuman",
+    "speechRobot",
+    "speechEcho",
+    "speechSoft",
   ] as const)("renders %s and cancels every layer when muted", (cue) => {
     const { ctx, Ctor } = mockAudio();
     install(Ctor);

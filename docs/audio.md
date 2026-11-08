@@ -15,7 +15,7 @@ the master effects preference. Both volumes survive journal export/import.
 | Blockly editing / puzzle operations | Packet clicks |
 | Puzzle completion / invalid operation | Success pair / short error cue |
 | Signal labeling, training, testing | Operation and result cues |
-| Dialogue advance | Quiet communication tick; no continuous character noise |
+| Dialogue typing / advance | Short speech blips as letters appear, with human, robot, LUMA and ECHO voice tones / communication tick |
 | Story pursuit / network transfer | Paired wet footsteps / carrier handshake; keyboard and mouse share cues |
 | Guided chapter answer | Correct pair / error cue |
 | Signal training / testing | Rising processing pulses / scanning sweep and result cue |
@@ -29,6 +29,10 @@ external asset dependencies. Audio contexts unlock on an explicit pointer or
 keyboard gesture. Unsupported audio fails silently. Short cooldowns and voice
 limits prevent input spam, and zero volume or disposal cancels live effects.
 Loading a save or restoring puzzle commands does not replay success cues.
+Speech blips follow the typewriter, pause on whitespace and punctuation, and
+stop when a line is revealed, skipped, closed, or shown instantly with reduced
+motion. Hidden tabs and large catch-up frames stay silent. Effects volume also
+controls speech; it does not use microphone access or external voice services.
 Dodge warnings and impact cues respect the battle speaker mute control as well
 as the master effects volume. They fire on hazard transitions, never every frame.
 
