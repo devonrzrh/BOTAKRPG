@@ -9,6 +9,7 @@ import {
 import type { Dialogue as DialogueContent } from "../content/schema";
 import { typewriterTimeline, revealedCharacters } from "../game/typewriter";
 import { personalizeText, speakerLabel } from "../game/player";
+import { useGameSound } from "./GameSound";
 
 function Portrait({ speaker }: { speaker: string }) {
   const robot = /\b(PATCH|FOLIO|LUMA|Mimic|Warden|Keeper)\b/i.test(speaker);
@@ -60,6 +61,7 @@ export function Dialogue({
   savedName?: string;
   reducedMotion?: boolean;
 }) {
+  const sound = useGameSound();
   const [nodeId, setNodeId] = useState(dialogue.start),
     root = useRef<HTMLElement>(null),
     speechId = useId();
@@ -136,10 +138,11 @@ export function Dialogue({
     if (!complete) return;
     const choice = node.choices[index];
     if (!choice) return;
+    sound("dialogue");
     choice.next ? setNodeId(choice.next) : onAction(choice.action!);
   };
   return (
-    <div className="dialogue-backdrop">
+    <div className="dialogue-backdrop" data-sfx-silent>
       <section
         ref={root}
         tabIndex={-1}

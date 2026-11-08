@@ -96,6 +96,117 @@ describe("combat audio", () => {
     expect(vi.getTimerCount()).toBe(0);
   });
 
+  it("scales the master level and volume zero silences voices without changing mute state", () => {
+    vi.useFakeTimers();
+    const oscillator = {
+      frequency: { setValueAtTime: vi.fn(), exponentialRampToValueAtTime: vi.fn() },
+      connect: vi.fn(), start: vi.fn(), stop: vi.fn(), disconnect: vi.fn(),
+      onended: null as (() => void) | null, type: "sine",
+    };
+    const gain = {
+      gain: { setValueAtTime: vi.fn(), exponentialRampToValueAtTime: vi.fn() },
+      connect: vi.fn(), disconnect: vi.fn(),
+    };
+    const context = {
+      state: "running", currentTime: 0, destination: {},
+      createOscillator: vi.fn(() => oscillator), createGain: vi.fn(() => gain),
+      close: vi.fn(() => Promise.resolve()), resume: vi.fn(() => Promise.resolve()),
+    };
+    const constructor = vi.fn(function AudioContextMock() { return context; });
+    priorWindow = Object.getOwnPropertyDescriptor(globalThis, "window");
+    Object.defineProperty(globalThis, "window", {
+      configurable: true, value: { AudioContext: constructor },
+    });
+    const audio = createCombatAudio();
+    audio.setVolume(0.5);
+    audio.unlock();
+    audio.play(cue);
+    vi.advanceTimersByTime(300);
+    expect(gain.gain.exponentialRampToValueAtTime).toHaveBeenCalledWith(0.0275, 0.012);
+
+    audio.play({ ...cue, sequence: 2 });
+    audio.setVolume(0);
+    expect(oscillator.disconnect).toHaveBeenCalled();
+    expect(gain.disconnect).toHaveBeenCalled();
+    vi.advanceTimersByTime(1000);
+    expect(context.createOscillator).toHaveBeenCalledTimes(1);
+    audio.setVolume(1);
+    audio.play({ ...cue, sequence: 3 });
+    vi.advanceTimersByTime(300);
+    expect(context.createOscillator).toHaveBeenCalledTimes(2);
+
+    audio.setMuted(true);
+    audio.setVolume(0);
+    audio.setVolume(1);
+    audio.play({ ...cue, sequence: 4 });
+    vi.advanceTimersByTime(1000);
+    expect(context.createOscillator).toHaveBeenCalledTimes(2);
+    audio.setMuted(false);
+    audio.play({ ...cue, sequence: 5 });
+    vi.advanceTimersByTime(300);
+    expect(context.createOscillator).toHaveBeenCalledTimes(3);
+    audio.dispose();
+  });
+
+  it("does not create an audio context at zero volume", () => {
+    const constructor = vi.fn();
+    priorWindow = Object.getOwnPropertyDescriptor(globalThis, "window");
+    Object.defineProperty(globalThis, "window", {
+      configurable: true, value: { AudioContext: constructor },
+    });
+    const audio = createCombatAudio();
+    audio.setVolume(Number.NaN);
+    audio.unlock();
+    expect(constructor).not.toHaveBeenCalled();
+    audio.setVolume(0.2);
+    expect(constructor).not.toHaveBeenCalled();
+    audio.dispose();
+  });
+
+  it("adds filtered noise texture to heavy enemy impacts", () => {
+    vi.useFakeTimers();
+    const oscillator = {
+      frequency: { setValueAtTime: vi.fn(), exponentialRampToValueAtTime: vi.fn() },
+      connect: vi.fn(), start: vi.fn(), stop: vi.fn(), disconnect: vi.fn(),
+      onended: null as (() => void) | null, type: "sine",
+    };
+    const gain = {
+      gain: { setValueAtTime: vi.fn(), exponentialRampToValueAtTime: vi.fn() },
+      connect: vi.fn(), disconnect: vi.fn(),
+    };
+    const filter = {
+      frequency: { setValueAtTime: vi.fn() }, Q: { setValueAtTime: vi.fn() },
+      connect: vi.fn(), disconnect: vi.fn(), type: "lowpass",
+    };
+    const noiseSource = {
+      buffer: null, connect: vi.fn(), start: vi.fn(), stop: vi.fn(), disconnect: vi.fn(),
+      onended: null as (() => void) | null,
+    };
+    const channel = new Float32Array(4);
+    const context = {
+      state: "running", currentTime: 0, sampleRate: 12, destination: {},
+      createOscillator: vi.fn(() => oscillator), createGain: vi.fn(() => gain),
+      createBuffer: vi.fn(() => ({ getChannelData: () => channel })),
+      createBufferSource: vi.fn(() => noiseSource), createBiquadFilter: vi.fn(() => filter),
+      close: vi.fn(() => Promise.resolve()), resume: vi.fn(() => Promise.resolve()),
+    };
+    const constructor = vi.fn(function AudioContextMock() { return context; });
+    priorWindow = Object.getOwnPropertyDescriptor(globalThis, "window");
+    Object.defineProperty(globalThis, "window", {
+      configurable: true, value: { AudioContext: constructor },
+    });
+    const audio = createCombatAudio();
+    audio.unlock();
+    audio.play({ ...cue, kind: "enemy", heavy: true });
+    vi.advanceTimersByTime(500);
+    expect(noiseSource.start).toHaveBeenCalledTimes(1);
+    expect(filter.type).toBe("lowpass");
+    expect(filter.frequency.setValueAtTime).toHaveBeenCalledWith(320, 0);
+    audio.dispose();
+    expect(noiseSource.disconnect).toHaveBeenCalled();
+    expect(filter.disconnect).toHaveBeenCalled();
+  });
+
   it("keeps only the latest cue while a gesture-triggered resume is pending", async () => {
     vi.useFakeTimers();
     let resolveResume!: () => void;

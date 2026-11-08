@@ -15,6 +15,7 @@ import {
   type PuzzleState,
 } from "../game/puzzles";
 import "./PuzzleScreen.css";
+import { useGameSound } from "./GameSound";
 
 export function PuzzleScreen(p: {
   activity: Activity;
@@ -25,6 +26,7 @@ export function PuzzleScreen(p: {
   onContinue: () => void;
   onLesson: () => void;
 }) {
+  const sound = useGameSound();
   const config = p.activity.puzzle;
   const [state, setState] = useState<PuzzleState>(() => {
     const initial = config
@@ -51,7 +53,7 @@ export function PuzzleScreen(p: {
 
   if (!config)
     return (
-      <div className="puzzle-backdrop">
+      <div className="puzzle-backdrop" data-sfx-silent>
         <section className="detective-puzzle">
           <p role="alert">Puzzle data is missing.</p>
           <button onClick={p.onContinue}>Continue</button>
@@ -60,6 +62,11 @@ export function PuzzleScreen(p: {
     );
   const act = (command: PuzzleCommand) => {
     const next = puzzleCommand(state, command);
+    if (!puzzleSolved(state)) {
+      if (next.moves === state.moves) sound("error");
+      else if (puzzleSolved(next)) sound("success");
+      else sound(command.type === "move" ? "move" : "puzzleAction");
+    }
     if (next.moves !== state.moves && commands.current.length < 1000) {
       commands.current = [...commands.current, command];
       p.onRun({ commands: commands.current, assisted: assisted.current });
@@ -67,6 +74,7 @@ export function PuzzleScreen(p: {
     setState(next);
   };
   const reset = () => {
+    sound("open");
     commands.current = [];
     assisted.current = false;
     p.onRun({ commands: [], assisted: false });
@@ -102,7 +110,7 @@ export function PuzzleScreen(p: {
           }))
       : [];
   return (
-    <div className="puzzle-backdrop">
+    <div className="puzzle-backdrop" data-sfx-silent>
       <section className="detective-puzzle" aria-label={p.activity.title}>
         <main className="puzzle-main">
           <p className="puzzle-brief">

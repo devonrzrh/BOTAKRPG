@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useGameSound } from "./GameSound";
 import * as Blockly from "blockly/core";
 import "blockly/blocks";
 import * as En from "blockly/msg/en";
@@ -199,6 +200,7 @@ export default function Blocks({
   onChange: (value: unknown) => void;
   onCode: (value: string) => void;
 }) {
+  const sound = useGameSound();
   const host = useRef<HTMLDivElement>(null),
     workspaceRef = useRef<Blockly.WorkspaceSvg | null>(null),
     change = useRef(onChange),
@@ -210,6 +212,7 @@ export default function Blocks({
   useEffect(() => {
     const workspace = Blockly.inject(host.current!, {
       toolbox,
+      sounds: false,
       media: "/blockly-media/",
       theme: editorTheme,
       trashcan: true,
@@ -249,10 +252,17 @@ export default function Blocks({
         setError(String(e));
       }
     };
+    let armed = false;
+    const soundTimer = setTimeout(() => {
+      armed = true;
+    }, 250);
     workspace.addChangeListener((event) => {
       if (event.type === Blockly.Events.VIEWPORT_CHANGE)
         setZoom(Math.round(workspace.scale * 100));
-      if (!event.isUiEvent) update();
+      if (!event.isUiEvent) {
+        update();
+        if (armed && event.recordUndo) sound("puzzleAction");
+      }
     });
     update();
     const resize = new ResizeObserver(() => {
@@ -261,11 +271,12 @@ export default function Blocks({
     });
     resize.observe(host.current!);
     return () => {
+      clearTimeout(soundTimer);
       resize.disconnect();
       workspace.dispose();
       workspaceRef.current = null;
     };
-  }, []);
+  }, [sound]);
   const changeScale = (delta: number) => {
     const workspace = workspaceRef.current;
     if (workspace)

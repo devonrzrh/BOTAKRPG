@@ -44,6 +44,7 @@ import DOMPurify from "dompurify";
 import { renderLessonMarkdown } from "./game/markdown";
 import { ClueLedger } from "./ui/ClueLedger";
 import { BookReader } from "./ui/BookReader";
+import { useGameSound, useGameSoundVolume } from "./ui/GameSound";
 import { PuzzleScreen } from "./ui/PuzzleScreen";
 import { rewardPuzzle } from "./game/puzzleProgress";
 import "./ui/PuzzleCases.css";
@@ -239,6 +240,8 @@ const FINAL_BOSS_IDS = [
   "signal-mimic",
 ];
 export default function App() {
+  const sound = useGameSound();
+  const configureSfxVolume = useGameSoundVolume();
   const [puzzleId, setPuzzleId] = useState<string | null>(null);
   const [returnPuzzleId, setReturnPuzzleId] = useState<string | null>(null);
   const puzzleActivities = content.entities.filter(
@@ -342,6 +345,26 @@ export default function App() {
   const tutorialRef = useRef<TutorialId | null>(null);
   tutorialRef.current = tutorialId;
   const intakeOpen = booted && needsIntake(save);
+  useEffect(
+    () => configureSfxVolume(save.settings.sfxVolume),
+    [configureSfxVolume, save.settings.sfxVolume],
+  );
+  const previousLevel = useRef<number | null>(null);
+  const previousWall = useRef(homeWall);
+  useEffect(() => {
+    if (previousWall.current !== homeWall && realm === "desk") sound("open");
+    previousWall.current = homeWall;
+  }, [homeWall, realm, sound]);
+  useEffect(() => {
+    if (!booted) return;
+    const gainedLevel =
+      previousLevel.current !== null &&
+      save.character.level > previousLevel.current;
+    previousLevel.current = save.character.level;
+    if (!gainedLevel) return;
+    const timer = setTimeout(() => sound("levelUp"), 450);
+    return () => clearTimeout(timer);
+  }, [booted, save.character.level, sound]);
   const closeTutorial = () => {
     const current = tutorialRef.current;
     if (current) updateSave((s) => markTutorialSeen(s, current));
@@ -364,6 +387,7 @@ export default function App() {
       const timed = trialRef.current,
         seconds = timed ? (performance.now() - trialStart.current) / 1000 : 0;
       if (timed && seconds > 90) return;
+      sound("clue");
       updateSave((previous) => {
         let next = completeActivity(previous, "maze-chamber");
         if (control !== "manual")
@@ -392,7 +416,7 @@ export default function App() {
           : "Maze complete.",
       );
     },
-    [updateSave],
+    [updateSave, sound],
   );
   useEffect(() => {
     let active = true;
@@ -463,6 +487,8 @@ export default function App() {
           command.method,
           command.args,
         );
+        if (command.method === "move")
+          sound(result.maze.steps > mazeRef.current.steps ? "move" : "blocked");
         updateMaze(result.maze);
         finishMaze(result.maze, runMode.current);
         return result.value;
@@ -476,7 +502,7 @@ export default function App() {
       },
     );
     return () => runner.current?.dispose();
-  }, [finishMaze, updateMaze]);
+  }, [finishMaze, updateMaze, sound]);
   useEffect(() => {
     if (!trial || completedMaze.current) return;
     const timer = setInterval(() => {
@@ -521,6 +547,7 @@ export default function App() {
       setReturnPuzzleId(null);
       if (tutorialRef.current) closeTutorial();
       if (id === "exit") return;
+      sound(id === "inventory" ? "clue" : "open");
       if (id === "library" && !officeFallback) {
         setHomeWall("bookshelf");
         setRealm("desk");
@@ -747,9 +774,10 @@ export default function App() {
         trialRef.current = false;
       }
     },
-    [realm, officeFallback],
+    [realm, officeFallback, sound],
   );
   const close = () => {
+    if (panel || realm !== "desk") sound("close");
     stop();
     setPanel(null);
     setRealm("desk");
@@ -835,10 +863,11 @@ export default function App() {
       if (trialRef.current && performance.now() - trialStart.current > 90000)
         return;
       const next = move(mazeRef.current, direction);
+      sound(next.steps > mazeRef.current.steps ? "move" : "blocked");
       updateMaze(next);
       finishMaze(next, "manual");
     },
-    [finishMaze, updateMaze],
+    [finishMaze, updateMaze, sound],
   );
   const run = () => {
     if (busy || trialExpired) return;
@@ -960,6 +989,7 @@ export default function App() {
       const parsed = parseSave(JSON.parse(await file.text()), content);
       await storeSave(parsed);
       stop();
+      previousLevel.current = parsed.character.level;
       updateSave(() => parsed);
       setDialogueId(null);
       setChapterId(null);
@@ -1098,6 +1128,8 @@ export default function App() {
     }));
   const handleOfficeAction = (action: OfficeAction) => {
     const id = action.id;
+    if (action.kind === "graph-select" || action.kind === "graph-view")
+      sound("click");
     if (action.kind === "graph-select") {
       setQuestSelection(id);
       const graph = officeUi.find((m) => m.id === "quests")!.graph!;
@@ -2380,6 +2412,37 @@ export default function App() {
                     Set it to 0 to silence music; battle cues keep their own
                     sound toggle.
                   </p>
+                  <label>
+                    Sound effects volume{" "}
+                    <output>
+                      {Math.round(save.settings.sfxVolume * 100)}%
+                    </output>
+                    <input
+                      type="range"
+                      min={0}
+                      max={100}
+                      step={5}
+                      value={Math.round(save.settings.sfxVolume * 100)}
+                      aria-label="Sound effects volume"
+                      aria-valuetext={`${Math.round(save.settings.sfxVolume * 100)} percent`}
+                      onChange={(e) =>
+                        updateSave((s) => ({
+                          ...s,
+                          settings: {
+                            ...s.settings,
+                            sfxVolume: Number(e.target.value) / 100,
+                          },
+                        }))
+                      }
+                    />
+                  </label>
+                  <button
+                    data-sfx-silent
+                    disabled={save.settings.sfxVolume === 0}
+                    onClick={() => sound("clue")}
+                  >
+                    Preview sound effects
+                  </button>
                   <h3>Renderer</h3>
                   <label>
                     Rendering backend

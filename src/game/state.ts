@@ -119,6 +119,7 @@ export const saveSchema = z
       combatMuted: z.boolean().default(false),
       battleAutoAdvance: z.boolean().default(true),
       musicVolume: z.number().min(0).max(1).default(0.55),
+      sfxVolume: z.number().finite().min(0).max(1).default(0.65),
     }),
     onboarding: z
       .object({
@@ -172,6 +173,7 @@ export function initialSave(): Save {
       combatMuted: false,
       battleAutoAdvance: true,
       musicVolume: 0.55,
+      sfxVolume: 0.65,
     },
     onboarding: { intakeComplete: false, tipsEnabled: true, seenTips: [] },
   };

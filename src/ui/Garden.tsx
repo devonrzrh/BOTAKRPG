@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import type { Save } from "../game/state";
+import { useGameSound } from "./GameSound";
 import {
   addSample,
   accuracy,
@@ -24,6 +25,7 @@ export function Garden({
   experiment: Save["signalExperiment"];
   onExperiment: (value: NonNullable<Save["signalExperiment"]>) => void;
 }) {
+  const sound = useGameSound();
   const [samples, setSamples] = useState<Sample[]>(
       () => experiment?.samples ?? [],
     ),
@@ -56,7 +58,9 @@ export function Garden({
       setSamples((previous) => addSample(previous, { x: px, y: py, label }));
       setTested(false);
       setMessage("Example added.");
+      sound("puzzleAction");
     } catch (e) {
+      sound("error");
       setMessage(String(e));
     }
   };
@@ -254,9 +258,11 @@ export function Garden({
           onClick={() => {
             try {
               setNetwork(train(network, samples, epochs, rate));
+              sound("puzzleAction");
               setTested(false);
               setMessage("Weights updated. Test on unseen examples next.");
             } catch (e) {
+              sound("error");
               setMessage(String(e));
             }
           }}
@@ -267,6 +273,7 @@ export function Garden({
           disabled={!network.epochs}
           onClick={() => {
             setTested(true);
+            sound(network.epochs >= 10 && score >= 5 / 6 ? "success" : "error");
             if (network.epochs >= 10 && score >= 5 / 6) {
               onComplete();
               setMessage(

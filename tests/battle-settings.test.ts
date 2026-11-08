@@ -12,6 +12,7 @@ it("restores legacy journals with independent music, combat sound and turn defau
   };
   expect(parseSave(legacy, content).settings).toMatchObject({
     musicVolume: 0.55,
+    sfxVolume: 0.65,
     combatMuted: false,
     battleAutoAdvance: true,
   });
@@ -21,6 +22,7 @@ it("preserves independent audio and pacing preferences through export and import
   save.settings = {
     ...save.settings,
     musicVolume: 0.2,
+    sfxVolume: 0,
     combatMuted: true,
     battleAutoAdvance: false,
   };
@@ -34,4 +36,10 @@ it("preserves independent audio and pacing preferences through export and import
     ),
   ).toThrow();
   expect(save.settings.musicVolume).toBe(0.2);
+  expect(() =>
+    parseSave(
+      { ...save, settings: { ...save.settings, sfxVolume: 1.1 } },
+      content,
+    ),
+  ).toThrow();
 });

@@ -12,6 +12,7 @@ import "./BattleDepth.css";
 import { stats, type Save } from "../game/state";
 import { combatCueDuration, type BattleCue } from "../game/combatPresentation";
 import { XpMeter } from "./XpMeter";
+import { useGameSound } from "./GameSound";
 import { createCombatAudio } from "../game/combatAudio";
 import {
   Crosshair,
@@ -74,6 +75,7 @@ function enemySigil(id: string) {
   }[enemyKind(id)];
 }
 export function BattleScreen(p: Props) {
+  const sound = useGameSound();
   const { battle: b, save, question: q } = p,
     limits = stats(save, p.content);
   const [menu, setMenu] = useState<"skills" | "inspect" | "act" | null>(
@@ -99,6 +101,9 @@ export function BattleScreen(p: Props) {
   useEffect(() => {
     audio.current?.setMuted(save.settings.combatMuted);
   }, [save.settings.combatMuted]);
+  useEffect(() => {
+    audio.current?.setVolume(save.settings.sfxVolume);
+  }, [save.settings.sfxVolume]);
   const startingSave = useRef(save),
     title = useRef<HTMLHeadingElement>(null),
     skillsButton = useRef<HTMLButtonElement>(null);
@@ -253,6 +258,7 @@ export function BattleScreen(p: Props) {
       ) ?? [];
   const selectAnswer = (index: number) => {
     if (!q || b.phase !== "question") return;
+    sound("click");
     if (q.format === "choice") {
       if (submitted.current === b) return;
       submitted.current = b;
@@ -289,6 +295,14 @@ export function BattleScreen(p: Props) {
   return (
     <div
       className={`battle-screen phase-${b.phase} ${motion ? `motion-${motion}` : ""}`}
+      data-sfx-silent
+      onClickCapture={(event) => {
+        if (
+          event.target instanceof Element &&
+          event.target.closest("button:not(:disabled)")
+        )
+          sound("click");
+      }}
       onPointerDownCapture={() => audio.current?.unlock()}
       onKeyDownCapture={() => audio.current?.unlock()}
       onKeyDown={(e) => {

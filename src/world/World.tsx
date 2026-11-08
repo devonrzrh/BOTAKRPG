@@ -1,4 +1,5 @@
 import { Component, useEffect, useRef, useState, type ReactNode } from "react";
+import { useGameSound } from "../ui/GameSound";
 import { Engine } from "@babylonjs/core/Engines/engine";
 import { WebGPUEngine } from "@babylonjs/core/Engines/webgpuEngine";
 import { Scene } from "@babylonjs/core/scene";
@@ -100,6 +101,7 @@ export function World(props: Props) {
   );
 }
 function WorldCanvas(props: Props) {
+  const sound = useGameSound();
   const canvas = useRef<HTMLCanvasElement>(null),
     latest = useRef(props);
   latest.current = props;
@@ -195,13 +197,18 @@ function WorldCanvas(props: Props) {
           }
         });
       } catch (e) {
+        if (engineRef.current === engine) engineRef.current = null;
+        if (disposed) return;
         latest.current.onRenderFailure?.();
         setError(String(e));
         engine?.dispose();
       }
     };
     void start();
-    const resize = () => engine?.resize();
+    // WebGPU resize is valid only after initAsync has installed the engine.
+    const resize = () => {
+      if (!disposed && engine && engineRef.current === engine) engine.resize();
+    };
     window.addEventListener("resize", resize);
     const sizeObserver = new ResizeObserver(resize);
     if (canvas.current) sizeObserver.observe(canvas.current);
@@ -910,8 +917,10 @@ function WorldCanvas(props: Props) {
           const blocked =
             (nx > -6.5 && nx < -3.5 && nz > -3.5 && nz < -2.1) ||
             (Math.abs(nx - 5) < 0.9 && Math.abs(nz - 4) < 0.9);
-          if (!blocked && Math.abs(nx) < 9 && Math.abs(nz) < 7.5)
+          if (!blocked && Math.abs(nx) < 9 && Math.abs(nz) < 7.5) {
             hubPosition.current.set(nx, 0.5, nz);
+            sound("move");
+          } else if (!event.repeat) sound("blocked");
         }
       }
       if (event.key === "e" || event.key === "Enter") {

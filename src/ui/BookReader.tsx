@@ -23,6 +23,7 @@ import {
   SlidersHorizontal,
 } from "lucide-react";
 import { bookLayout, clampSpread } from "../game/reading";
+import { useGameSound } from "./GameSound";
 
 // Arrival animation scales the volume; convert visual coordinates back to CSS pixels.
 function readingOffset(element: Element, frame: HTMLElement) {
@@ -49,6 +50,7 @@ export function BookReader(p: {
   onNote: (value: string) => void;
   onEncounter: () => void;
 }) {
+  const sound = useGameSound();
   const [ready, setReady] = useState(p.reducedMotion);
   const [closing, setClosing] = useState(false);
   const [mode, setMode] = useState<"book" | "fullscreen">(p.reading.mode);
@@ -159,6 +161,9 @@ export function BookReader(p: {
   );
 
   useEffect(() => {
+    sound("bookOpen");
+  }, [sound]);
+  useEffect(() => {
     const timer = setTimeout(() => setReady(true), p.reducedMotion ? 0 : 1100);
     return () => {
       clearTimeout(timer);
@@ -167,6 +172,7 @@ export function BookReader(p: {
   }, [p.reducedMotion]);
   const closeBook = () => {
     if (closing) return;
+    sound("bookClose");
     savePosition();
     setClosing(true);
     if (p.reducedMotion) {
@@ -304,12 +310,14 @@ export function BookReader(p: {
     }
   };
   const enlarge = (img: HTMLImageElement) => {
+    sound("open");
     selectedImage.current = img;
     setDiagramZoom(100);
     setDiagram({ src: img.src, alt: img.alt });
     setDrawer(null);
   };
   const closeDiagram = () => {
+    sound("close");
     restoreFocus.current = selectedImage.current;
     setDiagram(null);
   };
@@ -327,6 +335,7 @@ export function BookReader(p: {
     setDiagram(null);
     const target = clampSpread(next, layout.pages, layout.columns);
     if (target === spread) return;
+    sound("page");
     setTurn(target > spread ? "next" : "previous");
     clearTimeout(turnTimer.current);
     turnTimer.current = setTimeout(() => setTurn(null), 350);
@@ -364,18 +373,21 @@ export function BookReader(p: {
     if (!heading || !frame) return;
     if (mode === "book")
       flip(Math.floor((readingOffset(heading, frame) + 1) / layout.step));
-    else
+    else {
+      sound("page");
       frame.scrollTop +=
         (heading.getBoundingClientRect().top -
           frame.getBoundingClientRect().top) *
         (frame.clientHeight /
           Math.max(1, frame.getBoundingClientRect().height));
+    }
     setDrawer(null);
   };
   if (!ready) return null;
   return (
     <section
       className={`book-reader reader-${mode} ${turn && !p.reducedMotion ? `turn-${turn}` : ""} ${closing ? "reader-closing" : ""}`}
+      data-sfx-silent
       aria-label="Open book"
       style={{ "--reading-size": `${fontSize}px` } as React.CSSProperties}
       onKeyDown={(e) => {
@@ -703,6 +715,7 @@ export function BookReader(p: {
                                       }
                                       onClick={() => {
                                         savePosition();
+                                        sound("page");
                                         p.onSelect(l.id);
                                         setDrawer(null);
                                       }}
@@ -757,6 +770,7 @@ export function BookReader(p: {
                           key={id}
                           onClick={() => {
                             savePosition();
+                            sound("page");
                             p.onSelect(id);
                           }}
                         >
