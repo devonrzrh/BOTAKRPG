@@ -20,6 +20,7 @@ import { enemyThreatName } from "../game/enemyIdentity";
 import { EnemySpeech } from "./EnemySpeech";
 import { useGameParticles } from "./GameParticles";
 import { createCombatAudio } from "../game/combatAudio";
+import { createCombatHaptics } from "../game/combatHaptics";
 import { useBattleFeedback } from "./useBattleFeedback";
 import "./BattleFeedback.css";
 import {
@@ -114,13 +115,22 @@ export function BattleScreen(p: Props) {
   const [motion, setMotion] = useState<BattleCue["kind"] | null>(null);
   const [impactLanded, setImpactLanded] = useState(false);
   const audio = useRef<ReturnType<typeof createCombatAudio> | null>(null);
+  const haptics = useRef<ReturnType<typeof createCombatHaptics> | null>(null);
   const lastAnswer = useRef<{ question: Question; correct: boolean } | null>(
     null,
   );
   const submitted = useRef<Battle | null>(null);
   useEffect(() => {
     audio.current = createCombatAudio();
+    haptics.current = createCombatHaptics();
+    const stopWhenHidden = () => {
+      if (document.hidden) haptics.current?.cancel();
+    };
+    document.addEventListener("visibilitychange", stopWhenHidden);
     return () => {
+      document.removeEventListener("visibilitychange", stopWhenHidden);
+      haptics.current?.cancel();
+      haptics.current = null;
       audio.current?.dispose();
       audio.current = null;
     };
@@ -176,7 +186,10 @@ export function BattleScreen(p: Props) {
     setImpactLanded(false);
     audio.current?.play(cue, reducedMotion);
     const contactTimer = setTimeout(
-      () => setImpactLanded(true),
+      () => {
+        setImpactLanded(true);
+        haptics.current?.impact(cue, reducedMotion);
+      },
       combatCueDuration(reducedMotion) * (cue.kind === "enemy" ? 0.62 : 0.32),
     );
     setImpact(
@@ -216,6 +229,7 @@ export function BattleScreen(p: Props) {
     return () => {
       clearTimeout(timer);
       clearTimeout(contactTimer);
+      haptics.current?.cancel();
     };
   }, [p.cue, reducedMotion]);
   useEffect(() => {
