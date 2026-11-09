@@ -12,9 +12,11 @@ Enemies use individually authored deterministic patterns composed of these actio
 | Heavy Strike | Base attack × 1.7, rounded up, then reductions. |
 | Opening | No attack; the player recovers 3 focus. |
 
-The intent shows the actual incoming damage after current defenses. Guard spends a turn without a question, restores up to 4 focus, and reduces the next hit by approximately 70%, with the same 1-damage minimum. It preserves skill shields. Poison resolves before the enemy can act. Effects tick on each enemy turn, including openings.
+The intent shows the actual incoming damage after current defenses. Defend spends a turn without a question, restores up to 4 focus, adds 15 Momentum, and reduces the next hit by approximately 70%, with the same 1-damage minimum. It preserves Firewall's shield. Heavy attacks also offer optional Dodge through Defend. Poison resolves before the enemy can act. Effects tick on each enemy turn, including openings.
 
 HP and focus reset before each encounter. There are no consumables or equipment. Available skills show damage, focus cost and effect, including boss defenses. Number keys choose a skill or submit a multiple-choice answer; Enter confirms a multiple-answer or ordering response. Ordering keys follow displayed positions; # badges show the selected sequence. Short encounter banks use their chapter and prerequisite questions, without pulling in future chapters. Bookmark chapter saves the relevant library entry for later review.
+
+Probe deals direct damage at no focus cost. Firewall deals damage and grants a two-enemy-turn shield; it is the single defensive skill. Trace injection deals damage and applies three-turn poison. Journals that unlocked the retired Throttle skill migrate to Firewall without losing other skills or progress.
 
 ## Presentation
 
@@ -28,16 +30,16 @@ Each final boss has a distinct counter:
 
 | Boss | Mechanic | Counter |
 | --- | --- | --- |
-| Route Warden | Firewall halves unboosted hits | Spend Boost or attack a Broken stance; Guard banks Boost |
-| Archive Keeper | Checksum armor halves hits | Guard to expose its next attack window |
-| Signal Mimic | Adapts to the last successful skill | Switch skills, or Guard to clear adaptation |
+| Route Warden | Firewall halves attacks with no Momentum committed | Spend Momentum or attack a Broken stance; Defend builds Momentum |
+| Archive Keeper | Checksum armor halves hits | Defend to expose its next attack window |
+| Signal Mimic | Adapts to the last successful skill | Switch skills, or Defend to clear adaptation |
 | ECHO-7 | Stronger pattern below half HP | Follow the displayed intent and use recovery openings |
 
 ECHO's phase shift preserves the response already telegraphed for that turn.
-All counters work with Probe and Guard; unlocked skills provide alternatives.
+All counters work with Probe and Defend; unlocked skills provide alternatives.
 Completed final encounters remain replayable without repeating XP rewards.
 
-All 36 authored encounters have weakness, stance, ACT, and attack-pattern profiles. [Combat mechanics](combat-mechanics.md) documents Boost, Limit release, stand-down requirements, and optional heavy-attack dodging. Chapter question pools and first-completion rewards remain in force.
+All 36 authored encounters have weakness, stance, ACT, and attack-pattern profiles. Analyze gathers inspection, ACT, and stand-down actions. [Combat mechanics](combat-mechanics.md) documents Momentum spending, the full-meter finisher, stand-down requirements, and optional heavy-attack dodging. Chapter question pools and first-completion rewards remain in force.
 
 ## Sound and timing
 

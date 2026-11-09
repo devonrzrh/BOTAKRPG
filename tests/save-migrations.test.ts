@@ -1,8 +1,9 @@
 import { describe, expect, it } from "vitest";
 import raw from "../src/generated/content.json";
 import legacy from "./fixtures/journal-v1.json";
+import legacyV2 from "./fixtures/journal-v2.json";
 import { validateContent, type Quest } from "../src/content/schema";
-import { initialSave, parseSave } from "../src/game/state";
+import { claimQuest, initialSave, parseSave } from "../src/game/state";
 import {
   activityUnlocked,
   finaleAvailable,
@@ -28,7 +29,7 @@ describe("journal migration", () => {
     const original = structuredClone(input);
     const save = parseSave(input, content);
     expect(input).toEqual(original);
-    expect(save.version).toBe(2);
+    expect(save.version).toBe(3);
     expect(save.character).toEqual(input.character);
     expect(save.code).toBe(input.code);
     expect(save.notes).toEqual(input.notes);
@@ -119,12 +120,85 @@ describe("journal migration", () => {
   it("does not grandfather v2 progress or accept future/malformed journals", () => {
     const save = initialSave();
     save.completed = ["encounter-source-alg-03"];
-    expect(parseSave(save, content).completed).toEqual(save.completed);
-    for (const version of [0, 3, 1.5, "1"])
+    expect(parseSave({ ...save, version: 2 }, content).completed).toEqual(
+      save.completed,
+    );
+    for (const version of [0, 4, 1.5, "1"])
       expect(() => parseSave({ ...save, version }, content)).toThrow();
     expect(() =>
       parseSave({ ...save, version: 1, completed: ["unknown"] }, content),
     ).toThrow(/unknown activity/);
+  });
+
+  it("merges retired Throttle into Firewall without losing any other v2 journal data", () => {
+    const input = structuredClone(legacyV2);
+    const original = structuredClone(input);
+    const save = parseSave(input, content);
+    expect(input).toEqual(original);
+    expect(save).toEqual({
+      ...input,
+      version: 3,
+      character: { ...input.character, skills: ["insight", "ward", "trace"] },
+    });
+    expect(parseSave(JSON.parse(JSON.stringify(save)), content)).toEqual(save);
+  });
+
+  it("uses the v2 skill migration for local load and JSON import", async () => {
+    const input = structuredClone(legacyV2);
+    await storeSave(input as unknown as ReturnType<typeof initialSave>);
+    const local = parseSave(await loadSave(), content);
+    expect(local).toEqual(
+      parseSave(JSON.parse(JSON.stringify(input)), content),
+    );
+    await storeSave(local);
+    expect(parseSave(await loadSave(), content)).toEqual(local);
+  });
+
+  it("keeps claimed v2 rewards claimed and rejects unknown data instead of dropping it", () => {
+    const input = structuredClone(legacyV2);
+    const migrated = parseSave(input, content);
+    const quest = content.entities.find(
+      (entity): entity is Quest =>
+        entity.type === "quest" && entity.id === "case-sort-log",
+    )!;
+    expect(claimQuest(migrated, quest, content)).toEqual(migrated);
+    const puzzle = content.entities.find(
+      (entity) => entity.id === "puzzle-sort-log",
+    )!;
+    if (puzzle.type !== "activity") throw new Error("missing puzzle");
+    expect(rewardPuzzle(migrated, puzzle, content, false).character.xp).toBe(
+      input.character.xp,
+    );
+    expect(rewardPuzzle(migrated, puzzle, content, true).character.xp).toBe(
+      input.character.xp,
+    );
+    const unknownSkill = {
+      ...input,
+      character: { ...input.character, skills: ["simplify", "unknown-skill"] },
+    };
+    const original = structuredClone(unknownSkill);
+    expect(() => parseSave(unknownSkill, content)).toThrow(/unknown skill/);
+    expect(unknownSkill).toEqual(original);
+    expect(() =>
+      parseSave({ ...input, unknownSlot: { preserved: true } }, content),
+    ).toThrow();
+  });
+
+  it("chains v1 campaign and skill upgrades and grants Firewall to Throttle-only owners", () => {
+    const input = {
+      ...structuredClone(legacy),
+      character: {
+        ...legacy.character,
+        skills: ["insight", "simplify", "trace", "simplify"],
+      },
+    };
+    const save = parseSave(input, content);
+    expect(save.version).toBe(3);
+    expect(save.character.skills).toEqual(["insight", "ward", "trace"]);
+    expect(save.completed).toContain("puzzle-sort-log");
+    expect(save.claimed).toContain("case-sort-log");
+    expect(save.character.xp).toBe(input.character.xp);
+    expect(parseSave(save, content)).toEqual(save);
   });
 
   it("does not treat optional puzzle completion as having passed a campaign gate", () => {

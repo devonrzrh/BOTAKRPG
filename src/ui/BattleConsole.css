@@ -1,47 +1,6 @@
 .app.gameplay-battle {
   --battle-console-height: min(210px, 34dvh);
 }
-.battle-combo {
-  display: flex;
-  justify-content: center;
-  align-items: baseline;
-  flex-wrap: wrap;
-  gap: 4px 12px;
-  margin-top: 6px;
-  color: #ffdc8b;
-  font: 400 18px/1.3 var(--typewriter);
-  animation: combo-arrive 180ms ease-out;
-}
-.battle-combo strong {
-  font-weight: 400;
-}
-.battle-combo span {
-  font-size: 16px;
-  color: #e5dbc3;
-}
-.battle-combo-preview {
-  display: block;
-  color: #ffdc8b;
-  font-size: 16px;
-}
-@keyframes combo-arrive {
-  from {
-    opacity: 0;
-    transform: translateY(4px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-.app.reduced-motion .battle-combo {
-  animation: none;
-}
-@media (prefers-reduced-motion: reduce) {
-  .battle-combo {
-    animation: none;
-  }
-}
 .app.gameplay-battle:has(.battle-layout-console.phase-question) {
   --battle-console-height: min(280px, 42dvh);
 }
@@ -137,7 +96,7 @@
 .app.gameplay-battle .battle-layout-console .battle-player-hud {
   position: static;
   display: grid;
-  grid-template-columns: 140px 130px;
+  grid-template-columns: 140px 130px 180px;
   align-items: center;
   gap: 18px;
   width: auto;
@@ -578,5 +537,136 @@
     button
     > span {
     font-size: 16px;
+  }
+}
+
+.app.gameplay-battle .battle-layout-console .battle-momentum {
+  position: relative;
+  min-width: 0;
+  pointer-events: auto;
+}
+.app.gameplay-battle .battle-layout-console .battle-momentum summary {
+  display: block;
+  padding: 0;
+  cursor: pointer;
+  color: #ead6a4;
+  font: 400 16px/1.3 var(--typewriter);
+}
+.app.gameplay-battle .battle-layout-console .battle-momentum summary:hover,
+.app.gameplay-battle
+  .battle-layout-console
+  .battle-momentum
+  summary:focus-visible {
+  outline: 2px solid #ffe5a8;
+  outline-offset: 4px;
+}
+.momentum-label {
+  display: flex;
+  justify-content: space-between;
+  gap: 6px;
+  margin-bottom: 6px;
+  white-space: nowrap;
+}
+.momentum-label strong {
+  font: inherit;
+}
+.momentum-track {
+  display: block;
+  height: 10px;
+  background: #071118;
+  border: 1px solid #8c805f;
+}
+.momentum-track i {
+  display: block;
+  height: 100%;
+  background: #d4b875;
+}
+.momentum-options {
+  position: absolute;
+  bottom: calc(100% + 12px);
+  left: 0;
+  z-index: 12;
+  width: min(290px, 80vw);
+  padding: 12px;
+  border: 1px solid #b7a379;
+  background: #101b22;
+  box-shadow: 0 6px 24px #0008;
+}
+.app .momentum-options p {
+  margin: 0 0 8px;
+  font-size: 18px;
+}
+.app .momentum-options button {
+  display: flex;
+  width: 100%;
+  margin-top: 6px;
+  min-height: 44px;
+  font-size: 16px;
+}
+.app .momentum-options button[aria-pressed="true"],
+.app .momentum-options .finisher-ready {
+  border-color: #edca79;
+  color: #ffe1a0;
+  background: #49371b;
+}
+.battle-defense-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.app.gameplay-battle:has(.phase-choose .analysis-panel) {
+  --battle-console-height: min(360px, 50dvh);
+}
+.analysis-replies {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+  gap: 8px;
+}
+.app.gameplay-battle
+  .battle-layout-console
+  .analysis-panel
+  .battle-act-options {
+  gap: 4px;
+}
+.app.gameplay-battle
+  .battle-layout-console
+  .battle-console
+  .battle-decision.analysis-panel
+  p {
+  margin: 4px 0;
+  line-height: 1.35;
+}
+.app.gameplay-battle
+  .battle-layout-console
+  .battle-console
+  .battle-decision.analysis-panel
+  header {
+  margin-bottom: 6px;
+}
+.app .analysis-replies button,
+.app .battle-defense-options button {
+  font-weight: 400;
+}
+.app.gameplay-battle .battle-layout-console .analysis-panel .analysis-note {
+  font-size: 16px;
+  color: #bdcdc6;
+}
+.app .battle-defense-options button {
+  min-height: 44px;
+  font-size: 18px;
+}
+@media (max-width: 1000px) {
+  .app.gameplay-battle .battle-layout-console .battle-player-hud {
+    grid-template-columns: 118px 108px 170px;
+    gap: 12px;
+  }
+}
+@media (max-width: 700px) {
+  .app.gameplay-battle .battle-layout-console .battle-player-hud {
+    grid-template-columns: 1fr 1fr;
+    gap: 6px 14px;
+  }
+  .app.gameplay-battle .battle-layout-console .battle-momentum {
+    grid-column: 1 / -1;
   }
 }

@@ -10,13 +10,13 @@ Browser checks exercised player hits, a miss, guarded enemy strikes, a heavy ung
 
 ![Enemy impact](screenshots/enemy-impact.png)
 
-![Guard impact](screenshots/guard-impact.png)
+![Defend impact](screenshots/guard-impact.png)
 
 ## Combat flow and tactics
 
-92 tests pass; build validates 282 content records. Added exact enemy intent previews, strike/heavy/opening turns, Guard with focus recovery, direct skill selection, numbered answer shortcuts and automatic correct-answer continuation with an optional review pause. Wrong answers retain deliberate explanation/Continue. Full-resource items are rejected without consuming a turn, and stale callbacks cannot resolve a turn twice. Status durations use enemy turns, including openings.
+92 tests pass; build validates 282 content records. Added exact enemy intent previews, strike/heavy/opening turns, Defend with focus recovery, direct skill selection, numbered answer shortcuts and automatic correct-answer continuation with an optional review pause. Wrong answers retain deliberate explanation/Continue. Full-resource items are rejected without consuming a turn, and stale callbacks cannot resolve a turn twice. Status durations use enemy turns, including openings.
 
-Browser QA used a completed three-clue journal at 1280 × 720: keyboard Firewall and answer confirmation, automatic enemy response, shield-adjusted heavy preview, Guard's capped focus recovery and one-turn resolution, wrong-answer pause, an opening without attack, one consumed healing item, disabled focus item at cap, retreat/restart, paused correct-answer review, keyboard BFS ordering, and a finishing hit against ECHO-7. Victory awarded 60 XP and level 9, stayed open, and returned to the quest map. Quiz and victory controls fit above player vitals. All three branch playthrough tests still pass; routing now exercises healing under the stronger heavy attack.
+Browser QA used a completed three-clue journal at 1280 × 720: keyboard Firewall and answer confirmation, automatic enemy response, shield-adjusted heavy preview, Defend's capped focus recovery and one-turn resolution, wrong-answer pause, an opening without attack, one consumed healing item, disabled focus item at cap, retreat/restart, paused correct-answer review, keyboard BFS ordering, and a finishing hit against ECHO-7. Victory awarded 60 XP and level 9, stayed open, and returned to the quest map. Quiz and victory controls fit above player vitals. All three branch playthrough tests still pass; routing now exercises healing under the stronger heavy attack.
 
 ![Direct combat commands](screenshots/combat-tactics.png)
 
@@ -219,14 +219,14 @@ The measured difference is too small to establish a performance advantage. Captu
 
 117 tests pass. Coverage includes authored tactics on all 36 encounters, invalid ACT answers and missing weakness references, one-response breaks, stagger consumption, Boost spending and caps, Limit question pools and damage, stand-down gates, deterministic dodge simulation, and accurate visual cues.
 
-Browser verification at 1280 × 720: ACT revealed ECHO-7's weakness; Guard banked Boost; selecting Boost updated damage previews; two matching hits broke stance and skipped the response; a charged Limit attack won without duplicate practice XP. The timed dodge completed and reduced incoming damage. Forced WebGL2 rendered correctly, and reduced motion offered an immediate assisted dodge. Automatic rendering and motion preferences were restored afterward. Peaceful completion gates are verified by model tests; that route was not played through in this browser pass.
+Browser verification at 1280 × 720: ACT revealed ECHO-7's weakness; Defend banked Boost; selecting Boost updated damage previews; two matching hits broke stance and skipped the response; a charged Limit attack won without duplicate practice XP. The timed dodge completed and reduced incoming damage. Forced WebGL2 rendered correctly, and reduced motion offered an immediate assisted dodge. Automatic rendering and motion preferences were restored afterward. Peaceful completion gates are verified by model tests; that route was not played through in this browser pass.
 
 ![Combat depth](screenshots/combat-depth.png)
 ## Clue-only desk
 
 118 tests pass; production build passes with 279 validated content records. Branch walkthrough tests now recover between encounters without consumables. Legacy inventory/equipment fields are validated and removed on import, preserving completion, XP, skills, and clue evidence. Ledger tests cover discovery, duplicate completion, save round trips, pagination, and reference actions.
 
-Browser checks confirmed the physical desk ledger displays two recovered files per spread, Next clues changes pages, and Open reference opens the linked full-screen book. The character menu retains skill unlocks separately. ECHO-7 replay started at full HP/focus and offered Skills / Inspect / Guard / Retreat with no Items command.
+Browser checks confirmed the physical desk ledger displays two recovered files per spread, Next clues changes pages, and Open reference opens the linked full-screen book. The character menu retains skill unlocks separately. ECHO-7 replay started at full HP/focus and offered Skills / Inspect / Defend / Retreat with no Items command.
 
 ![Clue ledger](screenshots/clue-ledger.png)
 ## Paged and fullscreen reader

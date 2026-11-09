@@ -264,14 +264,6 @@
       "magnitude": 4
     },
     {
-      "id": "weaken",
-      "title": "Weaken",
-      "type": "effect",
-      "description": "Reduce the next two enemy attacks.",
-      "duration": 2,
-      "magnitude": 3
-    },
-    {
       "id": "insight",
       "title": "Probe",
       "type": "skill",
@@ -285,7 +277,7 @@
       "id": "ward",
       "title": "Firewall",
       "type": "skill",
-      "description": "Deal damage and gain a shield for two enemy turns.",
+      "description": "Deal damage and gain a shield that reduces incoming damage for two enemy turns.",
       "cost": 3,
       "power": 3,
       "level": 1,
@@ -304,18 +296,6 @@
       "parent": "insight",
       "effect": "poison",
       "lesson": "perceptron-basics"
-    },
-    {
-      "id": "simplify",
-      "title": "Throttle",
-      "type": "skill",
-      "description": "Reduce damage from two attacks.",
-      "cost": 3,
-      "power": 4,
-      "level": 2,
-      "parent": "ward",
-      "effect": "weaken",
-      "lesson": "stacks-queues"
     },
     {
       "id": "case-briefing",

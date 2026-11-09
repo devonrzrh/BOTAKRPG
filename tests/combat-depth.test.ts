@@ -8,7 +8,7 @@ import {
   enemyTurn,
   evadeTurn,
   guardTurn,
-  selectBoost,
+  selectMomentum,
   selectFinisher,
   selectSkill,
   spareBattle,
@@ -38,7 +38,7 @@ const tactics: CombatTactics = {
 };
 
 describe("profiled combat depth", () => {
-  it("spends stored Boost before earning the answer reward and resolves a charged finisher", () => {
+  it("resolves a charged finisher without stacking spending or regenerating momentum", () => {
     const save = initialSave();
     const skill = content.entities.find(
       (e): e is Skill => e.type === "skill" && e.id === "insight",
@@ -55,22 +55,17 @@ describe("profiled combat depth", () => {
         mixedQuestions: true,
         tactics,
       }),
-      boost: 3,
-      limit: 100,
+      momentum: 100,
     };
-    const selected = selectFinisher(selectBoost(base, 3), save, questions);
+    const selected = selectFinisher(selectMomentum(base, 75), save, questions);
     const q = questions.find((q) => q.id === selected.question)!;
     const result = answerBattle(selected, save, content, q.answer);
-    expect(result.battle.boost).toBe(1);
-    expect(base.hp - result.battle.hp).toBe(
-      Math.floor((6 + skill.power) * 1.75) * 3,
-    );
-    expect(result.battle.limit).toBe(0);
+    expect(result.battle.momentumSpend).toBe(0);
+    expect(base.hp - result.battle.hp).toBe((6 + skill.power) * 3);
+    expect(result.battle.momentum).toBe(0);
     expect(result.battle.correctAnswers).toBe(1);
-    expect(guardTurn({ ...base, boost: 3 }, save, content).battle.boost).toBe(
-      3,
-    );
-    expect(selectBoost({ ...base, boost: 3 }, 0).boostSpend).toBe(0);
+    expect(guardTurn(base, save, content).battle.momentum).toBe(100);
+    expect(selectMomentum(base, 0).momentumSpend).toBe(0);
     expect(
       canSpare({
         ...base,
@@ -129,7 +124,7 @@ describe("profiled combat depth", () => {
       nextQuestion.answer,
     ).battle;
     expect(damageBefore - staggerHit.hp).toBe(
-      Math.floor(Math.floor((6 + insight.power) * 1.5) * 1.1),
+      Math.floor((6 + insight.power) * 1.5),
     );
     expect(staggerHit.staggered).toBe(false);
     expect(staggerHit.resolve).toBe(0);
@@ -138,7 +133,7 @@ describe("profiled combat depth", () => {
     expect(afterBreak.save.character.hp).toBeLessThan(broken.save.character.hp);
   });
 
-  it("grants guard boost and consumes selection after answer path selection", () => {
+  it("grants guard momentum and validates spending in points", () => {
     const save = initialSave();
     const battle = createBattle({
       id: "unit",
@@ -149,14 +144,14 @@ describe("profiled combat depth", () => {
       tactics,
     });
     const guarded = guardTurn(battle, save, content);
-    expect(guarded.battle.boost).toBe(1);
-    expect(selectBoost(guarded.battle, 1).boostSpend).toBe(1);
-    expect(() => selectBoost(guarded.battle, 2)).toThrow();
-    expect(() => selectBoost(battle, -1)).toThrow();
-    expect(() => selectBoost(battle, 4)).toThrow();
+    expect(guarded.battle.momentum).toBe(25);
+    expect(selectMomentum(guarded.battle, 25).momentumSpend).toBe(25);
+    expect(() => selectMomentum(guarded.battle, 50)).toThrow();
+    expect(() => selectMomentum(battle, -1)).toThrow();
+    expect(() => selectMomentum(battle, 4)).toThrow();
   });
 
-  it("spends boost on a wrong answer and leaves the input state untouched", () => {
+  it("spends momentum on a wrong answer and leaves the input state untouched", () => {
     const save = initialSave();
     const skill = content.entities.find(
       (e): e is Skill => e.type === "skill" && e.id === "insight",
@@ -171,9 +166,14 @@ describe("profiled combat depth", () => {
         mixedQuestions: true,
         tactics,
       }),
-      boost: 1,
+      momentum: 25,
     };
-    const selected = selectSkill(selectBoost(base, 1), save, skill, questions);
+    const selected = selectSkill(
+      selectMomentum(base, 25),
+      save,
+      skill,
+      questions,
+    );
     const q = questions.find((item) => item.id === selected.question)!;
     const snapshot = structuredClone({ battle: selected, save });
     const miss = answerBattle(
@@ -183,14 +183,13 @@ describe("profiled combat depth", () => {
       q.answer.length === 1 ? [(q.answer[0] + 1) % q.options.length] : [],
     );
     expect(miss.correct).toBe(false);
-    expect(miss.battle.boost).toBe(0);
-    expect(miss.battle.boostSpend).toBe(0);
-    expect(miss.battle.limit).toBe(0);
+    expect(miss.battle.momentum).toBe(0);
+    expect(miss.battle.momentumSpend).toBe(0);
     expect(selected).toEqual(snapshot.battle);
     expect(save).toEqual(snapshot.save);
   });
 
-  it("uses the battle lesson pool for limit finishers and spends limit on a miss", () => {
+  it("uses the battle lesson pool for finishers and spends momentum on a miss", () => {
     const save = initialSave();
     const questions = content.entities.filter(
       (e): e is Question =>
@@ -205,7 +204,7 @@ describe("profiled combat depth", () => {
       lessons: ["source-ai-01"],
       tactics,
     });
-    const charged = { ...profile, limit: 100 };
+    const charged = { ...profile, momentum: 100 };
     const selected = selectFinisher(
       charged,
       save,
@@ -217,7 +216,7 @@ describe("profiled combat depth", () => {
       (q.answer[0] + 1) % q.options.length,
     ]);
     expect(miss.correct).toBe(false);
-    expect(miss.battle.limit).toBe(0);
+    expect(miss.battle.momentum).toBe(0);
     expect(miss.battle.finisher).toBe(false);
     expect(miss.battle.phase).toBe("feedback");
     expect(() => selectFinisher(profile, save, questions)).toThrow();

@@ -11,9 +11,8 @@ export interface BattleCue {
   heavy: boolean;
   blocked: boolean;
   defeated: boolean;
-  special?: "weakness" | "break" | "limit" | "pacify" | "evade";
+  special?: "weakness" | "break" | "momentum" | "finisher" | "pacify" | "evade";
   phaseShift?: boolean;
-  comboBroken?: boolean;
 }
 export const combatCueDuration = (reducedMotion: boolean) =>
   reducedMotion ? 200 : 650;
@@ -48,7 +47,6 @@ export function battleCue(
     return {
       ...base,
       kind: amount ? "player" : "miss",
-      comboBroken: !amount && (before.combo ?? 0) > 0 && !after.combo,
       amount,
       phaseShift:
         before.tactics?.mechanic === "echo" &&
@@ -57,12 +55,14 @@ export function battleCue(
         after.hp > 0,
       special: amount
         ? before.finisher
-          ? "limit"
+          ? "finisher"
           : after.breakFresh && !before.breakFresh
             ? "break"
             : before.tactics && before.skill === before.tactics.weakness
               ? "weakness"
-              : undefined
+              : before.momentumSpend > 0
+                ? "momentum"
+                : undefined
         : undefined,
     };
   }

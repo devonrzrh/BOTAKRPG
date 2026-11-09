@@ -80,7 +80,7 @@ const signalExperimentSchema = z
   .default(null);
 export const saveSchema = z
   .object({
-    version: z.literal(2),
+    version: z.literal(3),
     curriculumVersion: z.union([z.literal(1), z.literal(2)]).default(1),
     signalExperiment: signalExperimentSchema,
     chapterProgress: z

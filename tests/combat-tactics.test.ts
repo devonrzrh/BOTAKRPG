@@ -22,10 +22,7 @@ describe("combat tactics", () => {
         attack: 10,
         mixedQuestions: false,
       }),
-      effects: [
-        { id: "shield" as const, remaining: 2, magnitude: 2 },
-        { id: "weaken" as const, remaining: 1, magnitude: 1 },
-      ],
+      effects: [{ id: "shield" as const, remaining: 2, magnitude: 3 }],
     };
     expect(enemyIntent(battle, save, content).damage).toBe(
       Math.max(1, 10 - stats(save, content).defense - 3),
@@ -138,5 +135,4 @@ describe("combat tactics", () => {
       battle = { ...createBattle(), phase: "question" as const };
     expect(guardTurn(battle, save, content)).toEqual({ battle, save });
   });
-
 });

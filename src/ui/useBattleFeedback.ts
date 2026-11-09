@@ -46,7 +46,7 @@ export function useBattleFeedback(
       ...current.filter(
         (event) =>
           event.expires > now &&
-          (event.id !== "boost-selection" ||
+          (event.id !== "momentum-selection" ||
             next.phase === "choose" ||
             next.phase === "question") &&
           !events.some((next) => next.id === event.id),

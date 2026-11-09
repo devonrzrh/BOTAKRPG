@@ -181,7 +181,7 @@ export function attachBattleEffects(
   function begin(cue: BattleCue): void {
     if (reduced) return;
     const color =
-      cue.special === "limit"
+      cue.special === "finisher"
         ? colors.amber
         : cue.special === "break"
           ? colors.red
@@ -193,9 +193,7 @@ export function attachBattleEffects(
                 ? colors.blue
                 : cue.skill === "trace"
                   ? colors.green
-                  : cue.skill === "weaken"
-                    ? colors.amber
-                    : colors.white;
+                  : colors.white;
     if (cue.kind === "player" || cue.kind === "poison") {
       projectile.material.emissiveColor.copyFrom(color);
       projectile.mesh.isVisible = true;
@@ -219,7 +217,7 @@ export function attachBattleEffects(
       );
     } else if (cue.kind === "enemy" && cue.blocked) {
       particleMaterial.emissiveColor.copyFrom(colors.cyan);
-    } else if (cue.special === "break" || cue.special === "limit") {
+    } else if (cue.special === "break" || cue.special === "finisher") {
       particleMaterial.emissiveColor.copyFrom(
         cue.special === "break" ? colors.red : colors.amber,
       );
@@ -277,7 +275,7 @@ export function attachBattleEffects(
         projectile.mesh.isVisible = true;
         projectile.mesh.position.set(5, 0.8 + flight * 0.8, -3 + flight * 6.5);
         projectile.mesh.scaling.setAll(
-          (0.8 + flight * 0.55) * (cue.special === "limit" ? 2 : 1),
+          (0.8 + flight * 0.55) * (cue.special === "finisher" ? 2 : 1),
         );
       } else projectile.mesh.isVisible = false;
       if (cue.skill === "insight") {
@@ -285,7 +283,7 @@ export function attachBattleEffects(
         beam.mesh.position.set(5, 1.2, 0.25);
         beam.mesh.scaling.z = 1 + Math.min(1, t / contact) * 5.5;
         beam.mesh.scaling.x = beam.mesh.scaling.y =
-          cue.special === "limit" ? 3 : 1;
+          cue.special === "finisher" ? 3 : 1;
       }
       const impact =
         t >= contact
@@ -295,7 +293,7 @@ export function attachBattleEffects(
         ring.mesh.isVisible = impact > 0;
         ring.mesh.position.set(5, 1.6, 3.5);
         ring.mesh.scaling.setAll(
-          (0.55 + (t - contact) * 2.5) * (cue.special === "limit" ? 1.8 : 1),
+          (0.55 + (t - contact) * 2.5) * (cue.special === "finisher" ? 1.8 : 1),
         );
         ring.material.alpha = 0.95 * impact;
         if (t >= contact)
@@ -304,7 +302,7 @@ export function attachBattleEffects(
               ? "defeat"
               : cue.kind === "poison"
                 ? "poison"
-                : cue.special === "break" || cue.special === "limit"
+                : cue.special === "break" || cue.special === "finisher"
                   ? "shard"
                   : "hit",
             ((t - contact) * combatCueDuration(false)) / 1000,
@@ -316,7 +314,7 @@ export function attachBattleEffects(
       const hitEnvelope =
         cue.amount > 0 && t > contact ? Math.max(0, 1 - hitAge / 0.48) : 0;
       const strength =
-        cue.special === "limit" ? 1.65 : cue.special === "break" ? 1.35 : 1;
+        cue.special === "finisher" ? 1.65 : cue.special === "break" ? 1.35 : 1;
       const rattle = Math.sin(hitAge * Math.PI * 34) * hitEnvelope * strength;
       const recoil =
         Math.sin(Math.min(1, hitAge / 0.2) * Math.PI) * hitEnvelope;

@@ -7,7 +7,7 @@ import {
   answerBattle,
   createBattle,
   enemyTurn,
-  selectBoost,
+  selectMomentum,
   selectSkill,
 } from "../src/game/combat";
 import { initialSave } from "../src/game/state";
@@ -75,7 +75,7 @@ describe("battle change feedback", () => {
           id: "effect-shield",
           text: expect.stringContaining("Shield applied"),
         }),
-        expect.objectContaining({ target: "boost", delta: 1 }),
+        expect.objectContaining({ target: "momentum", delta: 25 }),
       ]),
     );
     expect(changes.some((change) => change.target === "health")).toBe(false);
@@ -104,25 +104,24 @@ describe("battle change feedback", () => {
     expect(battleChanges(before, { ...before })).toEqual([]);
   });
 
-  it("separates boost selection from spending, and announces finisher readiness once", () => {
-    const battle = { ...start(), boost: 3 };
-    const selected = selectBoost(battle, 2);
+  it("separates momentum selection from spending, and announces finisher readiness once", () => {
+    const battle = { ...start(), momentum: 75 };
+    const selected = selectMomentum(battle, 50);
     expect(battleChanges(snapshot(battle), snapshot(selected))).toEqual([
-      expect.objectContaining({ text: "Boost selected · +50% next hit" }),
+      expect.objectContaining({ text: "Momentum selected · +50% next hit" }),
     ]);
-    const before = { ...snapshot(selected), limit: 80 };
+    const before = { ...snapshot(selected), momentum: 80 };
     const after = {
       ...before,
       spend: 0,
-      boost: 1,
-      limit: 100,
+      momentum: 100,
       phase: "feedback" as const,
     };
     const changes = battleChanges(before, after);
     expect(changes).toContainEqual(
       expect.objectContaining({ text: "Finisher ready" }),
     );
-    expect(changes.some((change) => change.id === "boost-selection")).toBe(
+    expect(changes.some((change) => change.id === "momentum-selection")).toBe(
       false,
     );
     expect(battleChanges(after, { ...after })).toEqual([]);

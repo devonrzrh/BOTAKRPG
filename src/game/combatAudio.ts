@@ -120,7 +120,6 @@ export function createCombatAudio() {
       insight: [900, 140, "triangle"],
       ward: [420, 630, "sine"],
       trace: [240, 110, "square"],
-      simplify: [340, 130, "triangle"],
     };
     const [startHz, endHz, type] =
       cueName === "playerhit"
@@ -171,7 +170,7 @@ export function createCombatAudio() {
           else if (cue.skill === "ward")
             playNoise(ctx, now, 0.075, 0.014, "highpass", 1750, 1.1);
           else playNoise(ctx, now, 0.045, 0.012, "bandpass", 1450, 0.65);
-          if (cue.special === "limit") {
+          if (cue.special === "finisher") {
             try {
               const pulse = ctx.createOscillator();
               const pulseGain = ctx.createGain();

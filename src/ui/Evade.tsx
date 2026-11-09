@@ -121,8 +121,8 @@ export function Evade({
       {!state ? (
         <div className="evade-intro">
           <p>
-            Move left/right to avoid amber attacks. Teal gaps are safe. Guard is
-            always available.
+            Move left/right to avoid amber attacks. Teal gaps are safe. Bracing
+            is always available.
           </p>
           <div className="evade-actions">
             <button
@@ -132,7 +132,7 @@ export function Evade({
               {" "}
               {reducedMotion ? "Use assisted dodge" : "Begin dodge"}
             </button>
-            <button onClick={cancel}>Guard instead</button>
+            <button onClick={cancel}>Brace instead</button>
           </div>
         </div>
       ) : (
@@ -276,7 +276,7 @@ export function Evade({
             </button>
           </div>
           <button className="evade-guard" onClick={cancel}>
-            Guard instead
+            Brace instead
           </button>
         </>
       )}

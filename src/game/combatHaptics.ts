@@ -35,7 +35,7 @@ export function createCombatHaptics() {
           ? 12
           : cue.defeated
             ? [45, 40, 65]
-            : cue.special === "limit" || cue.heavy
+            : cue.special === "finisher" || cue.heavy
               ? 80
               : cue.kind === "enemy"
                 ? 45

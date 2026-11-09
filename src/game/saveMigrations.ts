@@ -1,7 +1,7 @@
 import type { Content, Quest } from "../content/schema";
 import type { Save } from "./state";
 
-export const CURRENT_SAVE_VERSION = 2;
+export const CURRENT_SAVE_VERSION = 3;
 
 /** Each breaking release adds one step; future formats must never be downgraded. */
 export function migrateSaveInput(input: unknown): {
@@ -25,6 +25,30 @@ export function migrateSaveInput(input: unknown): {
     (value: Record<string, unknown>) => Record<string, unknown>
   > = {
     1: (value) => ({ ...value, version: 2 }),
+    2: (value) => {
+      const character = value.character;
+      if (
+        !character ||
+        typeof character !== "object" ||
+        Array.isArray(character)
+      )
+        return { ...value, version: 3 };
+      const player = character as Record<string, unknown>;
+      return {
+        ...value,
+        version: 3,
+        character: {
+          ...player,
+          skills: Array.isArray(player.skills)
+            ? [
+                ...new Set(
+                  player.skills.map((id) => (id === "simplify" ? "ward" : id)),
+                ),
+              ]
+            : player.skills,
+        },
+      };
+    },
   };
   for (let version = fromVersion; version < CURRENT_SAVE_VERSION; version++) {
     const upgrade = steps[version];

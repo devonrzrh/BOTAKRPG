@@ -7,9 +7,8 @@ export interface BattleFeedbackSnapshot {
   hp: number;
   enemyHp: number;
   focus: number;
-  boost: number;
+  momentum: number;
   spend: number;
-  limit: number;
   resolve: number;
   staggered: boolean;
   weakness: string;
@@ -22,14 +21,7 @@ export interface BattleFeedbackSnapshot {
 export interface BattleChange {
   id: string;
   target:
-    | "health"
-    | "enemy"
-    | "focus"
-    | "boost"
-    | "limit"
-    | "intent"
-    | "effect"
-    | "stance";
+    "health" | "enemy" | "focus" | "momentum" | "intent" | "effect" | "stance";
   tone: "gain" | "loss" | "notice";
   text: string;
   delta?: number;
@@ -51,9 +43,8 @@ export function battleFeedbackSnapshot(
     hp: save.character.hp,
     enemyHp: battle.hp,
     focus: save.character.focus,
-    boost: battle.boost ?? 0,
-    spend: battle.boostSpend ?? 0,
-    limit: battle.limit ?? 0,
+    momentum: battle.momentum,
+    spend: battle.momentumSpend,
     resolve: battle.resolve ?? 0,
     staggered: Boolean(battle.staggered),
     weakness,
@@ -79,7 +70,7 @@ export function battleChanges(
     return [];
   const changes: BattleChange[] = [];
   const metric = (
-    id: "health" | "enemy" | "focus" | "boost" | "limit",
+    id: "health" | "enemy" | "focus" | "momentum",
     label: string,
     a: number,
     b: number,
@@ -93,28 +84,27 @@ export function battleChanges(
       delta,
       previous: a,
       text:
-        id === "limit" && b === 100
+        id === "momentum" && b === 100
           ? "Finisher ready"
-          : `${label} ${delta > 0 ? "+" : "−"}${Math.abs(delta)}${id === "limit" ? "%" : ""}`,
+          : `${label} ${delta > 0 ? "+" : "−"}${Math.abs(delta)}`,
     });
   };
   metric("health", "HP", before.hp, after.hp);
   metric("enemy", "Enemy HP", before.enemyHp, after.enemyHp);
   metric("focus", "Focus", before.focus, after.focus);
-  metric("boost", "Boost", before.boost, after.boost);
-  metric("limit", "Finisher", before.limit, after.limit);
+  metric("momentum", "Momentum", before.momentum, after.momentum);
   if (
     before.spend !== after.spend &&
     before.phase === "choose" &&
     after.phase === "choose"
   )
     changes.push({
-      id: "boost-selection",
-      target: "boost",
+      id: "momentum-selection",
+      target: "momentum",
       tone: "notice",
       text: after.spend
-        ? `Boost selected · +${after.spend * 25}% next hit`
-        : "Boost cleared",
+        ? `Momentum selected · +${after.spend}% next hit`
+        : "Momentum cleared",
     });
   for (const effect of after.effects) {
     const prior = before.effects.find((e) => e.id === effect.id);

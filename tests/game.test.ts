@@ -141,7 +141,7 @@ describe("Combat rules", () => {
     expect(reply.save.character.hp).toBe(47);
     expect(reply.battle.effects).toEqual([]);
   });
-  it("poison can win before an enemy attacks; weaken reduces damage", () => {
+  it("poison can win before an enemy attacks; shield reduces damage", () => {
     const save = initialSave(),
       battle = {
         ...createBattle(),
@@ -152,16 +152,16 @@ describe("Combat rules", () => {
     const result = enemyTurn(battle, save, content);
     expect(result.battle.phase).toBe("won");
     expect(result.save.character.hp).toBe(60);
-    const weakened = enemyTurn(
+    const shielded = enemyTurn(
       {
         ...battle,
         hp: 76,
-        effects: [{ id: "weaken", magnitude: 3, remaining: 2 }],
+        effects: [{ id: "shield", magnitude: 3, remaining: 2 }],
       },
       save,
       content,
     );
-    expect(weakened.save.character.hp).toBe(55);
+    expect(shielded.save.character.hp).toBe(55);
   });
   it("defeat is explicit and unaffordable skills cannot be selected", () => {
     const save = initialSave();
@@ -276,7 +276,7 @@ describe("Progression and saves", () => {
   });
   it("rejects incompatible, unknown and inconsistent saves", () => {
     const save = initialSave();
-    expect(() => parseSave({ ...save, version: 3 }, content)).toThrow();
+    expect(() => parseSave({ ...save, version: 999 }, content)).toThrow();
     expect(() =>
       parseSave({ ...save, completed: ["missing"] }, content),
     ).toThrow();

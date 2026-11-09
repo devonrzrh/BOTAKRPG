@@ -78,15 +78,6 @@ magnitude: 4
 ```
 
 ```entity
-type: effect
-id: weaken
-title: Weaken
-description: Reduce the next two enemy attacks.
-duration: 2
-magnitude: 3
-```
-
-```entity
 type: skill
 id: insight
 title: Probe
@@ -101,7 +92,7 @@ lesson: stacks-queues
 type: skill
 id: ward
 title: Firewall
-description: Deal damage and gain a shield for two enemy turns.
+description: Deal damage and gain a shield that reduces incoming damage for two enemy turns.
 cost: 3
 power: 3
 level: 1
@@ -121,17 +112,4 @@ level: 2
 parent: insight
 effect: poison
 lesson: perceptron-basics
-```
-
-```entity
-type: skill
-id: simplify
-title: Throttle
-description: Reduce damage from two attacks.
-cost: 3
-power: 4
-level: 2
-parent: ward
-effect: weaken
-lesson: stacks-queues
 ```

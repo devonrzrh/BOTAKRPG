@@ -7,7 +7,7 @@ import {
   enemyTurn,
   guardTurn,
   previewDamage,
-  selectBoost,
+  selectMomentum,
   selectSkill,
   type CombatTactics,
 } from "../src/game/combat";
@@ -56,7 +56,7 @@ describe("distinct boss mechanics", () => {
         bossReadout(battle(mechanic))!.description.length,
       ).toBeLessThanOrEqual(90);
   });
-  it("lets Guard-built or spent Boost pierce the Warden firewall and aligns damage preview", () => {
+  it("lets earned Momentum pierce the Warden firewall and aligns damage preview", () => {
     const save = initialSave(),
       base = battle("routing");
     const insight = skill("insight"),
@@ -64,11 +64,11 @@ describe("distinct boss mechanics", () => {
     expect(previewDamage(base, save, insight, content)).toBe(5);
     expect(previewDamage(base, save, ward, content)).toBe(4);
     const guarded = guardTurn(base, save, content).battle;
-    expect(guarded.boost).toBe(1);
-    expect(previewDamage(selectBoost(guarded, 1), save, insight, content)).toBe(
-      13,
-    );
-    const boosted = selectBoost({ ...base, boost: 1 }, 1);
+    expect(guarded.momentum).toBe(25);
+    expect(
+      previewDamage(selectMomentum(guarded, 25), save, insight, content),
+    ).toBe(13);
+    const boosted = selectMomentum({ ...base, momentum: 25 }, 25);
     expect(previewDamage(boosted, save, ward, content)).toBe(11);
     expect(
       previewDamage({ ...base, staggered: true }, save, insight, content),

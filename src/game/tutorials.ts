@@ -104,11 +104,19 @@ export const tutorials: Tutorial[] = [
       },
       {
         title: "Answer with evidence",
-        body: "Questions and feedback use the same console. Hint reveals the explanation and marks the answer as assisted. Guard restores focus and softens the incoming hit.",
+        body: "Questions are untimed. Hint reveals the explanation and marks the answer as assisted. Defend restores focus, reduces the incoming hit, and adds 15 Momentum. Heavy attacks also offer Dodge.",
       },
       {
         title: "Read the machine",
-        body: "Read the incoming attack above your choices. Talk / ACT can reveal a weakness or a peaceful way out. Dodge patterns change: avoid amber strikes and stay inside teal openings. Retreat keeps your evidence.",
+        body: "Analyze shows enemy details and dialogue choices. A successful read reveals the weakness, adds 20 Momentum, and can open a peaceful stand-down. Retreat keeps your evidence.",
+      },
+      {
+        title: "Use your skills",
+        body: "Probe deals direct damage. Firewall deals damage and shields you for two enemy turns. Trace injection adds poison for three turns. Correct weakness hits also build Break, which skips a response and strengthens your next hit.",
+      },
+      {
+        title: "Build Momentum",
+        body: "Correct answers add 25 Momentum, plus 10 for a weakness; taking damage adds 10. Spend 25, 50, or 75 for that much extra damage. At 100, use a free triple-power Probe. Committed Momentum is spent even if the answer is wrong.",
       },
     ],
   },
@@ -176,8 +184,10 @@ export const manualSections: ManualSection[] = [
   {
     title: "Encounters",
     lines: [
-      "Pick a skill, answer the question, then continue to the enemy turn. Guard restores focus.",
-      "Read enemy intent. Act, boosts, dodge, and spare are situational. Retreat keeps your evidence.",
+      "Pick a skill and answer an untimed question. Probe deals direct damage; Firewall adds a two-turn shield; Trace injection poisons for three turns.",
+      "Defend restores focus, reduces the next hit, and adds 15 Momentum. Heavy attacks offer an optional Dodge with amber strikes and teal openings.",
+      "Analyze shows enemy details and dialogue choices. A successful read reveals the weakness and may enable stand-down. Retreat keeps your evidence.",
+      "Momentum caps at 100: correct answers +25, weaknesses +10, successful ACT +20, damage taken +10. Spend 25/50/75 for +25/50/75% damage, or all 100 for a free triple-power Probe. Wrong answers still spend committed Momentum.",
     ],
   },
   {

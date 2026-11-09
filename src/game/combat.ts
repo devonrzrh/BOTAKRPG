@@ -8,7 +8,7 @@ import type {
 export type { CombatTactics } from "../content/schema";
 import { stats, type Save } from "./state";
 export interface ActiveEffect {
-  id: "shield" | "poison" | "weaken";
+  id: "shield" | "poison";
   remaining: number;
   magnitude: number;
 }
@@ -32,9 +32,8 @@ export interface Battle {
   resolve?: number;
   staggered?: boolean;
   breakFresh?: boolean;
-  boost?: number;
-  boostSpend?: number;
-  limit?: number;
+  momentum: number;
+  momentumSpend: number;
   correctAnswers?: number;
   analyzed?: boolean;
   weaknessKnown?: boolean;
@@ -45,8 +44,6 @@ export interface Battle {
   mechanicSkill?: string;
   archiveOpen?: boolean;
   phaseShiftTurn?: number;
-  /** Encounter-only successful attack streak; defensive turns preserve it. */
-  combo?: number;
 }
 export function createBattle(
   enemy: {
@@ -80,7 +77,8 @@ export function createBattle(
     effects: [],
     log: [`${enemy.title} encounter started.`],
     assisted: false,
-    combo: 0,
+    momentum: 0,
+    momentumSpend: 0,
     asked: [],
     ...(enemy.tactics
       ? {
@@ -88,9 +86,6 @@ export function createBattle(
           resolve: 0,
           staggered: false,
           breakFresh: false,
-          boost: 0,
-          boostSpend: 0,
-          limit: 0,
           correctAnswers: 0,
           analyzed: false,
           weaknessKnown: false,
@@ -98,21 +93,14 @@ export function createBattle(
       : {}),
   };
 }
-export function selectBoost(battle: Battle, amount: number): Battle {
+export function selectMomentum(battle: Battle, amount: number): Battle {
   if (
-    !battle.tactics ||
     battle.phase !== "choose" ||
-    !Number.isInteger(amount) ||
-    amount < 0 ||
-    amount > 3 ||
-    amount > (battle.boost ?? 0)
+    ![0, 25, 50, 75].includes(amount) ||
+    amount > battle.momentum
   )
-    throw new Error("Boost unavailable");
-  return { ...battle, boostSpend: amount };
-}
-/** Bonus on a hit: first +0%, second +10%, third +20%, fourth onward +30%. */
-export function comboBonus(hits: number): number {
-  return Math.min(3, Math.max(0, hits - 1)) * 10;
+    throw new Error("Momentum unavailable");
+  return { ...battle, momentumSpend: amount };
 }
 
 export function previewDamage(
@@ -122,13 +110,16 @@ export function previewDamage(
   content: Content,
 ): number {
   let damage = stats(save, content).attack + skill.power;
-  damage = Math.floor(damage * (1 + 0.25 * (battle.boostSpend ?? 0)));
+  damage = Math.floor(
+    damage * (1 + (battle.finisher ? 0 : battle.momentumSpend) / 100),
+  );
   if (battle.finisher && skill.id === "insight") damage *= 3;
   if (battle.staggered) damage = Math.floor(damage * 1.5);
   if (
     battle.tactics?.mechanic === "routing" &&
     !battle.staggered &&
-    !(battle.boostSpend ?? 0)
+    !battle.momentumSpend &&
+    !battle.finisher
   )
     damage = Math.max(1, Math.floor(damage * 0.5));
   if (battle.tactics?.mechanic === "archive" && !battle.archiveOpen)
@@ -137,7 +128,7 @@ export function previewDamage(
     damage = Math.max(1, Math.floor(damage * 0.5));
   if (battle.tactics?.mechanic === "echo" && battle.hp <= battle.maxHp / 2)
     damage = Math.floor(damage * 1.15);
-  return Math.floor(damage * (1 + comboBonus((battle.combo ?? 0) + 1) / 100));
+  return damage;
 }
 
 export function bossReadout(
@@ -149,7 +140,7 @@ export function bossReadout(
         phase: "Firewall",
         title: "Route Firewall",
         description:
-          "Unboosted hits are halved. Spend Boost or strike while Broken to pierce armor.",
+          "Unpowered hits are halved. Momentum, Finisher, or Broken stance bypass armor.",
       };
     case "archive":
       return battle.archiveOpen
@@ -163,15 +154,15 @@ export function bossReadout(
             phase: "Checksum",
             title: "Checksum Lock",
             description:
-              "Attacks are halved. Guard to expose it for your next turn.",
+              "Attacks are halved. Brace with Defend to expose it for your next turn.",
           };
     case "mimic":
       return {
         phase: "Adapting",
         title: "Signal Adaptation",
         description: battle.mechanicSkill
-          ? "Repeating your last skill is resisted. Switch skills or Guard to clear adaptation."
-          : "Hits are full. Switch skills after a hit; Guard clears adaptation.",
+          ? "Repeating your last skill is resisted. Switch skills or brace with Defend to clear adaptation."
+          : "Hits are full. Switch skills after a hit; bracing clears adaptation.",
       };
     case "echo": {
       const phaseTwo = battle.hp <= battle.maxHp / 2;
@@ -194,16 +185,15 @@ export function selectFinisher(
   content?: Content,
 ): Battle {
   if (
-    !battle.tactics ||
     battle.phase !== "choose" ||
-    battle.limit !== 100 ||
+    battle.momentum !== 100 ||
     !save.character.skills.includes("insight")
   )
     throw new Error("Finisher unavailable");
   const base: Skill = {
     type: "skill",
     id: "insight",
-    title: "Limit release",
+    title: "Finisher",
     description: "",
     level: 1,
     power: 5,
@@ -211,7 +201,13 @@ export function selectFinisher(
     lesson: battle.lessons?.[0] ?? "stacks-queues",
   };
   return {
-    ...selectSkill(battle, save, base, questions, content),
+    ...selectSkill(
+      { ...battle, momentumSpend: 0 },
+      save,
+      base,
+      questions,
+      content,
+    ),
     finisher: true,
   };
 }
@@ -313,10 +309,12 @@ export function answerBattle(
   const correct = isCorrect(question, answer),
     next = structuredClone(battle),
     player = structuredClone(save);
-  player.character.focus -= skill.cost;
+  player.character.focus -= battle.finisher ? 0 : skill.cost;
+  next.momentum = battle.finisher
+    ? 0
+    : Math.max(0, battle.momentum - battle.momentumSpend);
   if (correct) {
     let damage = previewDamage(next, save, skill, content);
-    next.combo = (next.combo ?? 0) + 1;
     const consumedStagger = Boolean(next.tactics && next.staggered);
     if (consumedStagger) {
       next.staggered = false;
@@ -325,9 +323,10 @@ export function answerBattle(
     const matching = Boolean(
       next.tactics && skill.id === next.tactics.weakness,
     );
+    if (!battle.finisher)
+      next.momentum = Math.min(100, next.momentum + 25 + (matching ? 10 : 0));
     if (next.tactics) {
       next.correctAnswers = (next.correctAnswers ?? 0) + 1;
-      next.limit = Math.min(100, (next.limit ?? 0) + 20 + (matching ? 10 : 0));
       if (matching) next.weaknessKnown = true;
       if (next.tactics.mechanic === "mimic") next.mechanicSkill = skill.id;
       if (!consumedStagger && !next.staggered && matching) {
@@ -351,10 +350,6 @@ export function answerBattle(
       );
     }
     next.log.push(`${skill.title} deals ${damage} damage.`);
-    if (next.combo > 1)
-      next.log.push(
-        `${next.combo}-hit combo · +${comboBonus(next.combo)}% damage.`,
-      );
     if (skill.effect) {
       const def = content.entities.find(
         (e): e is Effect => e.type === "effect" && e.id === skill.effect,
@@ -367,21 +362,11 @@ export function answerBattle(
       });
     }
   } else {
-    if ((next.combo ?? 0) > 0) next.log.push("Combo broken.");
-    next.combo = 0;
     next.log.push("Incorrect answer. Turn spent.");
   }
   if (next.tactics?.mechanic === "archive") next.archiveOpen = false;
-  if (next.tactics) {
-    next.boost = Math.min(
-      3,
-      Math.max(0, (next.boost ?? 0) - (next.boostSpend ?? 0)) +
-        (correct ? 1 : 0),
-    );
-    next.boostSpend = 0;
-    if (next.finisher) next.limit = 0;
-    next.finisher = false;
-  }
+  next.momentumSpend = 0;
+  next.finisher = false;
   next.log.push(question.explanation);
   next.phase = next.hp === 0 ? "won" : "feedback";
   if (next.tactics && next.hp === 0) next.resolution = "defeated";
@@ -443,8 +428,7 @@ export function enemyTurn(
     next.log.push(`${battle.enemyName} pauses. You recover 3 focus.`);
   } else {
     player.character.hp = Math.max(0, player.character.hp - incoming);
-    if (next.tactics)
-      next.limit = Math.min(100, (next.limit ?? 0) + (incoming > 0 ? 10 : 0));
+    if (incoming > 0) next.momentum = Math.min(100, next.momentum + 10);
     next.log.push(
       `${battle.enemyName} ${intent.kind === "heavy" ? "unleashes a heavy strike" : "strikes"} for ${incoming} damage.`,
     );
@@ -506,7 +490,7 @@ export function enemyIntent(
       (phaseTwo ? 1.25 : 1),
   );
   const reduction = battle.effects
-    .filter((e) => e.id === "shield" || e.id === "weaken")
+    .filter((e) => e.id === "shield")
     .reduce((sum, e) => sum + e.magnitude, 0);
   let damage = Math.max(1, base - stats(save, content).defense - reduction);
   if (battle.guarding) damage = Math.max(1, damage - Math.ceil(damage * 0.7));
@@ -530,6 +514,8 @@ export function guardTurn(
     ...battle,
     phase: "feedback" as const,
     guarding: true,
+    momentum: Math.min(100, battle.momentum + 15),
+    momentumSpend: 0,
     ...(battle.tactics?.mechanic === "archive" ? { archiveOpen: true } : {}),
     ...(battle.tactics?.mechanic === "mimic"
       ? { mechanicSkill: undefined }
@@ -537,7 +523,6 @@ export function guardTurn(
     log: [...battle.log, "You brace for the incoming attack."],
   };
   const player = structuredClone(save);
-  if (battle.tactics) guarded.boost = Math.min(3, (battle.boost ?? 0) + 1);
   player.character.focus = Math.min(
     stats(save, content).maxFocus,
     player.character.focus + 4,
@@ -561,7 +546,8 @@ export function analyzeBattle(
     phase: "feedback" as const,
     analyzed: correct,
     weaknessKnown: battle.weaknessKnown || correct,
-    limit: Math.min(100, (battle.limit ?? 0) + (correct ? 20 : 0)),
+    momentum: Math.min(100, battle.momentum + (correct ? 20 : 0)),
+    momentumSpend: 0,
     log: [
       ...battle.log,
       correct

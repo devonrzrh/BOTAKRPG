@@ -129,7 +129,7 @@ import {
   answerBattle,
   enemyTurn,
   guardTurn,
-  selectBoost,
+  selectMomentum,
   selectFinisher,
   analyzeBattle,
   canSpare,
@@ -2010,10 +2010,10 @@ export default function App() {
                       notify(String(e));
                     }
                   }}
-                  onBoost={(amount) => {
+                  onMomentum={(amount) => {
                     if (battleRef.current !== battle) return;
                     try {
-                      const next = selectBoost(battle, amount);
+                      const next = selectMomentum(battle, amount);
                       battleRef.current = next;
                       setBattle(next);
                     } catch (e) {
