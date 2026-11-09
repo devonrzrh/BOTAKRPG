@@ -51,11 +51,6 @@
   .battle-status-effects {
   margin-top: 0;
 }
-@media (min-width: 701px) {
-  .app.gameplay-battle {
-    --battle-console-height: min(420px, 58vh);
-  }
-}
 .app.gameplay-battle .battle-layout-console .battle-enemy-hud .battle-meter {
   margin-bottom: 22px;
 }

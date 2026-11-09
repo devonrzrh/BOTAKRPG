@@ -111,6 +111,7 @@ export function BattleScreen(p: Props) {
     "skills",
   );
   const [evading, setEvading] = useState(false);
+  const skillList = useRef<HTMLDivElement>(null);
   const dodgeAttempt = useRef(Math.floor(Math.random() * 0x7fffffff));
   const [reviewing, setReviewing] = useState(false);
   const [impact, setImpact] = useState("");
@@ -242,8 +243,11 @@ export function BattleScreen(p: Props) {
   }, [p.cue, reducedMotion]);
   useEffect(() => {
     if (motion) return;
-    if ((menu && menu !== "skills") || b.phase !== "choose")
-      title.current?.focus();
+    if (menu === "skills")
+      skillList.current
+        ?.querySelector<HTMLButtonElement>("button:not(:disabled)")
+        ?.focus();
+    else if (menu || b.phase !== "choose") title.current?.focus();
     else skillsButton.current?.focus();
   }, [b.phase, menu, motion]);
   const skills = p.content.entities.filter(
@@ -571,7 +575,8 @@ export function BattleScreen(p: Props) {
                 </span>
               )}
           </div>
-          <div className="battle-playback" aria-label="Battle playback">
+          <details className="battle-playback">
+            <summary>Battle options</summary>
             <button
               onClick={p.onToggleSound}
               aria-label={
@@ -593,7 +598,7 @@ export function BattleScreen(p: Props) {
             >
               {save.settings.battleAutoAdvance ? "Auto turns" : "Manual turns"}
             </button>
-          </div>
+          </details>
         </header>
         {resultChanges.length > 0 && (
           <div
@@ -641,12 +646,14 @@ export function BattleScreen(p: Props) {
                 {menu === "skills" && (
                   <div
                     className="battle-skill-options"
+                    ref={skillList}
                     aria-label="Available skills"
                   >
                     {skills.map((s, index) => (
                       <button
                         key={s.id}
-                        ref={index === 0 ? skillsButton : undefined}
+                        title={s.description}
+                        aria-description={s.description}
                         disabled={
                           save.character.focus < s.cost ||
                           save.character.hp === 0
@@ -660,7 +667,9 @@ export function BattleScreen(p: Props) {
                           <strong>
                             <kbd>{index + 1}</kbd> {s.title}
                           </strong>
-                          <span>{s.description}</span>
+                          <span className="skill-description">
+                            {s.description}
+                          </span>
                         </span>
                         <b>
                           {s.cost ? `${s.cost} focus` : "Free"} ·{" "}
@@ -751,6 +760,14 @@ export function BattleScreen(p: Props) {
                 )}
                 {menu === "inspect" && (
                   <>
+                    <details>
+                      <summary>Skill effects</summary>
+                      {skills.map((skill) => (
+                        <p key={skill.id}>
+                          <strong>{skill.title}</strong> · {skill.description}
+                        </p>
+                      ))}
+                    </details>
                     {lastAnswer.current && (
                       <details open={reviewing}>
                         <summary>
@@ -844,6 +861,7 @@ export function BattleScreen(p: Props) {
                     </button>
                   )}
                   <button onClick={p.onHint}>Hint · no mastery credit</button>
+                  <button onClick={p.onRetreat}>Retreat</button>
                 </footer>
                 {p.notice && (
                   <p className="battle-explanation" role="status">
@@ -994,6 +1012,7 @@ export function BattleScreen(p: Props) {
         )}
         <nav className="battle-command-menu" aria-label="Battle commands">
           <button
+            ref={skillsButton}
             aria-pressed={menu === "skills"}
             disabled={b.phase !== "choose" || !!motion || evading}
             onClick={() => setMenu("skills")}
@@ -1012,7 +1031,7 @@ export function BattleScreen(p: Props) {
               Guard<small>−70% · +4 focus</small>
             </span>
           </button>
-          {b.tactics && (
+          {b.tactics && intent.kind === "heavy" && (
             <button
               disabled={
                 b.phase !== "choose" ||

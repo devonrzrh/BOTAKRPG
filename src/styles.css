@@ -14,8 +14,54 @@
 * {
   box-sizing: border-box;
 }
+/* The room owns the viewport; only its books, panels and editors scroll. */
+html,
+body,
+#root {
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
 body {
   margin: 0;
+  position: fixed;
+  inset: 0;
+}
+#root {
+  height: 100dvh;
+}
+:where(.app, .boot, .onboarding, .prologue) {
+  overscroll-behavior: none;
+}
+:where(.app, .onboarding, .prologue)
+  :where(
+    main,
+    [role="dialog"],
+    textarea,
+    .cm-scroller,
+    .journey-sidebar,
+    .library-layout,
+    .library-nav,
+    .lesson-body,
+    .maze-content,
+    .garden-layout,
+    .journal-content,
+    .inventory-content,
+    .settings-content,
+    .reader-viewport,
+    .reader-drawer,
+    .reader-diagram-canvas,
+    .field-manual,
+    .puzzle-backdrop,
+    .terminal,
+    .generated-code,
+    .program-output,
+    .activity-tools
+  ) {
+  overscroll-behavior: contain;
 }
 button,
 input,
@@ -189,8 +235,8 @@ label > select {
   text-transform: uppercase;
 }
 .app {
-  height: 100dvh;
-  min-height: 700px;
+  height: 100%;
+  min-height: 0;
   display: grid;
   grid-template-columns: 72px minmax(0, 1fr) 280px;
   grid-template-rows: 80px minmax(0, 1fr);
@@ -1796,7 +1842,9 @@ kbd {
   font-size: 28px;
 }
 .boot {
-  min-height: 100dvh;
+  height: 100%;
+  min-height: 0;
+  overflow: auto;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -2033,7 +2081,6 @@ kbd {
 }
 @media (max-width: 650px) {
   .app {
-    min-height: 640px;
     grid-template-columns: 45px minmax(0, 1fr);
     grid-template-rows: 65px minmax(0, 1fr);
   }

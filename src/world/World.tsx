@@ -287,9 +287,9 @@ function WorldCanvas(props: Props) {
       camera.alpha = -Math.PI / 2;
       camera.beta = 1.18;
       // Leave the upper strip for the enemy's name and HP, above its silhouette.
-      camera.target.set(5, 3.1, 4);
+      camera.target.set(5, 2.3, 4);
     }
-    const view = props.encounter ? 2.9 : props.scene === "maze" ? 9 : 12;
+    const view = props.encounter ? 3.1 : props.scene === "maze" ? 9 : 12;
     const resize = () => {
       const aspect = engine.getRenderWidth() / engine.getRenderHeight();
       const vertical = view / Math.min(1, aspect);
