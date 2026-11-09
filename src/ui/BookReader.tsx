@@ -22,8 +22,9 @@ import {
   ChevronRight,
   SlidersHorizontal,
 } from "lucide-react";
-import { bookLayout, clampSpread } from "../game/reading";
+import { bookLayout, clampSpread, nextBookChapter } from "../game/reading";
 import { useGameSound } from "./GameSound";
+import { BOOK_OPEN_MS, BOOK_READER_FADE_MS } from "../game/bookAnimation";
 
 // Arrival animation scales the volume; convert visual coordinates back to CSS pixels.
 function readingOffset(element: Element, frame: HTMLElement) {
@@ -46,11 +47,22 @@ export function BookReader(p: {
   onPosition: (id: string, position: { block: number; offset: number }) => void;
   onSelect: (id: string) => void;
   onClose: () => void;
+  onClosing?: () => void;
   onBookmark: () => void;
   onNote: (value: string) => void;
   onEncounter: () => void;
 }) {
   const sound = useGameSound();
+  const [osReduced, setOsReduced] = useState(
+    () => window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+  );
+  const reducedMotion = p.reducedMotion || osReduced;
+  useEffect(() => {
+    const query = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const change = () => setOsReduced(query.matches);
+    query.addEventListener("change", change);
+    return () => query.removeEventListener("change", change);
+  }, []);
   const [ready, setReady] = useState(p.reducedMotion);
   const [closing, setClosing] = useState(false);
   const [mode, setMode] = useState<"book" | "fullscreen">(p.reading.mode);
@@ -74,6 +86,19 @@ export function BookReader(p: {
   });
   const [pageInput, setPageInput] = useState("1");
   const [turn, setTurn] = useState<"next" | "previous" | null>(null);
+  const [sheet, setSheet] = useState<{
+    html: string;
+    width: number;
+    height: number;
+    gap: string;
+    columns: number;
+    front: number;
+    back: number;
+  } | null>(null);
+  const turning = useRef(false);
+  const startAtBeginning = useRef<string | null>(null);
+  const [atEnd, setAtEnd] = useState(false);
+  const nextChapter = nextBookChapter(p.lessons, p.lesson);
   const [diagram, setDiagram] = useState<{ src: string; alt: string } | null>(
     null,
   );
@@ -149,7 +174,7 @@ export function BookReader(p: {
     () =>
       DOMPurify.sanitize(
         renderLessonMarkdown(
-          p.reducedMotion
+          reducedMotion
             ? p.lesson.body.replace(
                 /\/materials\/([^\s)]+\/Animated\/[^\s)]+)/g,
                 "/materials-still/$1",
@@ -157,34 +182,42 @@ export function BookReader(p: {
             : p.lesson.body,
         ),
       ),
-    [p.lesson.body, p.reducedMotion],
+    [p.lesson.body, reducedMotion],
   );
 
   useEffect(() => {
     sound("bookOpen");
   }, [sound]);
   useEffect(() => {
-    const timer = setTimeout(() => setReady(true), p.reducedMotion ? 0 : 1100);
+    const timer = setTimeout(
+      () => setReady(true),
+      reducedMotion ? 0 : BOOK_OPEN_MS,
+    );
     return () => {
       clearTimeout(timer);
       clearTimeout(turnTimer.current);
     };
-  }, [p.reducedMotion]);
+  }, [reducedMotion]);
   const closeBook = () => {
     if (closing) return;
     sound("bookClose");
     savePosition();
     setClosing(true);
-    if (p.reducedMotion) {
+    p.onClosing?.();
+    if (reducedMotion) {
       p.onClose();
       return;
     }
-    closeTimer.current = setTimeout(p.onClose, 260);
+    closeTimer.current = setTimeout(p.onClose, BOOK_READER_FADE_MS);
   };
   const measure = useCallback(() => {
     const frame = viewport.current,
       page = article.current;
-    if (!frame || !page || mode !== "book") return;
+    if (!frame || !page) return;
+    if (mode !== "book") {
+      setAtEnd(frame.scrollHeight - frame.clientHeight - frame.scrollTop <= 8);
+      return;
+    }
     const style = getComputedStyle(page);
     const next = bookLayout(
       frame.clientWidth,
@@ -234,13 +267,22 @@ export function BookReader(p: {
       page = article.current!;
     frame.scrollTo(0, 0);
     setSpread(0);
+    setProgress(0);
+    setAtEnd(false);
+    clearTimeout(turnTimer.current);
+    turning.current = false;
+    setTurn(null);
+    setSheet(null);
     setPageInput("1");
     setDrawer(null);
     setDiagram(null);
-    pendingAnchor.current = p.reading.positions[p.lesson.id] ?? {
+    pendingAnchor.current = (startAtBeginning.current === p.lesson.id
+      ? null
+      : p.reading.positions[p.lesson.id]) ?? {
       block: 0,
       offset: 0,
     };
+    startAtBeginning.current = null;
     lastPosition.current = null;
     setJumpOpen(false);
     page.focus({ preventScroll: true });
@@ -296,11 +338,14 @@ export function BookReader(p: {
       setLayout(next);
       setSpread(target);
     }
+    if (mode === "fullscreen")
+      setAtEnd(frame.scrollHeight - frame.clientHeight - frame.scrollTop <= 8);
   }, [mode, fontSize, ready, p.lesson.id]);
   const rememberAnchor = () => {
     pendingAnchor.current = capturePosition() ?? { block: 0, offset: 0 };
   };
   const switchMode = (next: typeof mode) => {
+    if (turning.current || closing) return;
     setDiagram(null);
     if (next !== mode) {
       rememberAnchor();
@@ -332,17 +377,48 @@ export function BookReader(p: {
     }
   }, [diagram, drawer]);
   const flip = (next: number) => {
+    if (turning.current || closing) return;
     setDiagram(null);
     const target = clampSpread(next, layout.pages, layout.columns);
     if (target === spread) return;
     sound("page");
-    setTurn(target > spread ? "next" : "previous");
-    clearTimeout(turnTimer.current);
-    turnTimer.current = setTimeout(() => setTurn(null), 350);
+    const direction = target > spread ? "next" : "previous";
+    const frame = viewport.current,
+      page = article.current;
+    if (!reducedMotion && frame && page) {
+      const clone = page.cloneNode(true) as HTMLElement;
+      clone
+        .querySelectorAll("[id]")
+        .forEach((element) => element.removeAttribute("id"));
+      const half = layout.columns > 1 ? frame.clientWidth / 2 : 0;
+      setSheet({
+        html: clone.innerHTML,
+        width: frame.clientWidth,
+        height: frame.clientHeight,
+        gap: getComputedStyle(page).columnGap,
+        columns: layout.columns,
+        front: frame.scrollLeft + (direction === "next" ? half : 0),
+        back: target * layout.step + (direction === "previous" ? half : 0),
+      });
+      turning.current = true;
+      setTurn(direction);
+      turnTimer.current = setTimeout(() => {
+        turning.current = false;
+        setTurn(null);
+        setSheet(null);
+      }, 560);
+    }
     setSpread(target);
   };
   const pageStart = spread * layout.columns + 1;
   const pageEnd = Math.min(layout.pages, pageStart + layout.columns - 1);
+  const continueChapter = () => {
+    if (!nextChapter || closing || turning.current) return;
+    savePosition();
+    sound("page");
+    startAtBeginning.current = nextChapter.id;
+    p.onSelect(nextChapter.id);
+  };
   const topics = useMemo(
     () =>
       p.lessons.filter(
@@ -386,7 +462,7 @@ export function BookReader(p: {
   if (!ready) return null;
   return (
     <section
-      className={`book-reader reader-${mode} ${turn && !p.reducedMotion ? `turn-${turn}` : ""} ${closing ? "reader-closing" : ""}`}
+      className={`book-reader reader-${mode} ${turn && !reducedMotion ? `turn-${turn}` : ""} ${reducedMotion ? "reader-reduced-motion" : ""} ${closing ? "reader-closing" : ""}`}
       data-sfx-silent
       aria-label="Open book"
       style={{ "--reading-size": `${fontSize}px` } as React.CSSProperties}
@@ -492,6 +568,10 @@ export function BookReader(p: {
                       Math.max(1, frame.scrollHeight - frame.clientHeight),
                   ),
                 );
+                setAtEnd(
+                  frame.scrollHeight - frame.clientHeight - frame.scrollTop <=
+                    8,
+                );
                 capturePosition();
                 clearTimeout(saveTimer.current);
                 saveTimer.current = setTimeout(() => {
@@ -574,6 +654,34 @@ export function BookReader(p: {
                 />
               )}
             </div>
+            {sheet && !reducedMotion && (
+              <div
+                className={`reader-turn-layer ${sheet.columns === 1 ? "single-page" : ""}`}
+                aria-hidden="true"
+                inert
+              >
+                <div className="reader-turn-sheet">
+                  {(["front", "back"] as const).map((face) => (
+                    <div
+                      key={face}
+                      className={`reader-turn-face reader-turn-${face}`}
+                    >
+                      <article
+                        className="markdown reader-content"
+                        style={{
+                          width: sheet.width,
+                          height: sheet.height,
+                          columnCount: sheet.columns,
+                          columnGap: sheet.gap,
+                          transform: `translateX(-${sheet[face]}px)`,
+                        }}
+                        dangerouslySetInnerHTML={{ __html: sheet.html }}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
           {diagram && (
             <section className="reader-diagram" aria-label="Enlarged diagram">
@@ -796,7 +904,10 @@ export function BookReader(p: {
         <footer className="reader-footer">
           {mode === "book" ? (
             <>
-              <button disabled={spread === 0} onClick={() => flip(spread - 1)}>
+              <button
+                disabled={spread === 0 || Boolean(turn)}
+                onClick={() => flip(spread - 1)}
+              >
                 <ChevronLeft size={22} />
                 Previous
               </button>
@@ -843,16 +954,28 @@ export function BookReader(p: {
                 </button>
               )}
               <button
-                disabled={pageEnd >= layout.pages}
-                onClick={() => flip(spread + 1)}
+                disabled={
+                  Boolean(turn) || (pageEnd >= layout.pages && !nextChapter)
+                }
+                onClick={() =>
+                  pageEnd >= layout.pages ? continueChapter() : flip(spread + 1)
+                }
+                title={pageEnd >= layout.pages ? nextChapter?.title : undefined}
               >
-                Next
+                {pageEnd >= layout.pages && nextChapter
+                  ? "Next chapter"
+                  : "Next"}
                 <ChevronRight size={22} />
               </button>
             </>
           ) : (
             <>
               <span role="status">{progress}% read</span>
+              {atEnd && nextChapter && (
+                <button onClick={continueChapter} title={nextChapter.title}>
+                  Next chapter <ChevronRight size={22} />
+                </button>
+              )}
               <button
                 onClick={() =>
                   viewport.current?.scrollTo({ top: 0, behavior: "instant" })

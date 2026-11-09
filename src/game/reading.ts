@@ -25,3 +25,13 @@ export function clampSpread(spread: number, pages: number, columns: number) {
     Math.min(Math.floor(spread), Math.ceil(pages / columns) - 1),
   );
 }
+
+/** Follow the library's chapter order without jumping into another subject. */
+export function nextBookChapter<T extends { id: string; topic: string }>(
+  lessons: readonly T[],
+  current: T,
+): T | undefined {
+  const chapters = lessons.filter((lesson) => lesson.topic === current.topic);
+  const index = chapters.findIndex((lesson) => lesson.id === current.id);
+  return index < 0 ? undefined : chapters[index + 1];
+}

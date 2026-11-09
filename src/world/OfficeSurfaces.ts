@@ -16,7 +16,13 @@ import {
   type SurfaceButton,
   type OfficeAction,
 } from "../game/officeUi";
-import { bookPose } from "../game/bookAnimation";
+import {
+  BOOK_OPEN_MS,
+  BOOK_CLOSE_MS,
+  BOOK_SHELF_SCALE,
+  bookPose,
+  bookReadingScale,
+} from "../game/bookAnimation";
 import { drawQuestGraph } from "./QuestGraphSurface";
 import {
   GRAPH_AREA,
@@ -638,15 +644,30 @@ export function attachOfficeSurfaces(
       c.setTransform(2, 0, 0, 2, 0, 0);
       c.fillStyle = "#e2d4b4";
       c.fillRect(0, 0, 1024, 576);
+      const coverTexture = (outside.material as StandardMaterial)
+        .diffuseTexture as DynamicTexture;
+      const coverContext = coverTexture.getContext() as unknown as Ctx;
+      coverContext.fillStyle = wall === "desk" ? "#45352e" : "#4b5351";
+      coverContext.fillRect(0, 0, 1024, 1024);
+      coverContext.strokeStyle = "#ba9d65";
+      coverContext.lineWidth = 8;
+      coverContext.strokeRect(70, 65, 884, 894);
+      ink(coverContext, model.title, 110, 280, 55, 810, "#d8bd83");
+      coverTexture.update();
       // The 3D prop is a transition, not a second reading surface. Blank pages
       // avoid duplicate controls and warped lesson text during the opening.
-      if (wall === "bookshelf" && model.bookOpen) {
-        c.textAlign = "center";
-        c.fillStyle = "#8a7a5c";
-        c.font = "22px Georgia, serif";
-        c.fillText(model.title.slice(0, 24), 256, 250);
-        c.font = "16px Georgia, serif";
-        c.fillText("Opening the volume…", 768, 250);
+      if (wall === "bookshelf") {
+        // Quiet paper texture bridges the prop and the reader without loading copy.
+        c.strokeStyle = "#b7a78644";
+        c.lineWidth = 1;
+        for (let row = 0; row < 15; row++) {
+          for (const x of [75, 590]) {
+            c.beginPath();
+            c.moveTo(x, 120 + row * 22);
+            c.lineTo(x + (row % 4 === 3 ? 240 : 345), 120 + row * 22);
+            c.stroke();
+          }
+        }
         c.strokeStyle = "#b7a786";
         c.lineWidth = 1;
         c.beginPath();
@@ -761,16 +782,6 @@ export function attachOfficeSurfaces(
         pc.drawImage(source, index * 1024, 0, 1024, 1152, 0, 0, 1024, 1152);
         t.update();
       });
-      const t = (outside.material as StandardMaterial)
-          .diffuseTexture as DynamicTexture,
-        cc = t.getContext() as unknown as Ctx;
-      cc.fillStyle = wall === "desk" ? "#45352e" : "#4b5351";
-      cc.fillRect(0, 0, 1024, 1024);
-      cc.strokeStyle = "#ba9d65";
-      cc.lineWidth = 8;
-      cc.strokeRect(70, 65, 884, 894);
-      ink(cc, model.title, 110, 280, 55, 810, "#d8bd83");
-      t.update();
     };
     return { root, hinge, pages, draw };
   };
@@ -799,16 +810,30 @@ export function attachOfficeSurfaces(
     const s = state(),
       library = modelFor("bookshelf");
     if (!library) return;
-    if (library.selectedLesson !== activeBook) {
+    if (progress === 0 && library.selectedLesson !== activeBook) {
       activeBook = library.selectedLesson ?? books[0]?.id ?? "";
-      progress = 0;
     }
     const target = library.bookOpen ? 1 : 0,
       dt = Math.min(0.05, scene.getEngine().getDeltaTime() / 1000);
     progress = s.reducedMotion
       ? target
-      : Math.max(0, Math.min(1, progress + ((target ? 1 : -1) * dt) / 1.05));
-    const pose = bookPose(progress, 0.46),
+      : Math.max(
+          0,
+          Math.min(
+            1,
+            progress +
+              ((target ? 1 : -1) * dt * 1000) /
+                (target ? BOOK_OPEN_MS : BOOK_CLOSE_MS),
+          ),
+        );
+    const camera = scene.activeCamera;
+    const aspect =
+      scene.getEngine().getRenderWidth() /
+      Math.max(1, scene.getEngine().getRenderHeight());
+    const pose = bookPose(
+        progress,
+        bookReadingScale(aspect, camera?.fov ?? 1.03, 3.46) * 0.87,
+      ),
       volume =
         volumes.find((v) => v.id === activeBook) ??
         volumes.find((v) => books[v.index].topic === library.selectedTopic) ??
@@ -816,12 +841,12 @@ export function attachOfficeSurfaces(
       x = volume ? -2.2 + volume.index * 2.2 : 0;
     reading.root.setEnabled(progress > 0.001);
     reading.root.position = Vector3.Lerp(
-      new Vector3(x - 0.435, 2.12, 4.38),
-      new Vector3(0, 2.02 + pose.lift, 3.46),
+      new Vector3(x - 1.45 * BOOK_SHELF_SCALE, 2.12, 4.38),
+      new Vector3(0, 2.2 + pose.lift, 3.46),
       pose.travel,
     );
     reading.root.scaling.setAll(pose.scale);
-    reading.root.rotation.x = -0.08 * pose.travel;
+    reading.root.rotation.x = -0.035 * Math.sin(pose.travel * Math.PI);
     reading.hinge.rotation.y = pose.coverYaw;
     for (const v of volumes)
       v.root.setEnabled(v.id !== volume?.id || progress < 0.01);

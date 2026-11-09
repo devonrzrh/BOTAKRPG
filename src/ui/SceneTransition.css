@@ -1,0 +1,38 @@
+.scene-content {
+  position: absolute;
+  inset: 0;
+}
+.scene-curtain {
+  position: absolute;
+  inset: 0;
+  z-index: 90;
+  background: #080e14;
+  pointer-events: auto;
+}
+.scene-departing {
+  animation: scene-darken 140ms ease-in both;
+}
+.scene-arriving {
+  animation: scene-reveal 300ms ease-out both;
+}
+@keyframes scene-darken {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes scene-reveal {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .scene-curtain {
+    display: none;
+  }
+}

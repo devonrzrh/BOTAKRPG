@@ -6,6 +6,7 @@ import type { Quest } from "../content/schema";
 import type { Save } from "../game/state";
 import { useGameSound } from "./GameSound";
 import { usePanelExit } from "./usePanelExit";
+import { createPracticeAttempt } from "../game/practiceAttempt";
 
 export function LearningQuest(p: {
   chapter: Quest;
@@ -30,9 +31,15 @@ export function LearningQuest(p: {
           ? "practice"
           : "concept",
     ),
-    [answer, setAnswer] = useState<number | null>(null),
-    [feedback, setFeedback] = useState<boolean | null>(null),
+    practice = useRef(
+      createPracticeAttempt(
+        l.practice.options.length,
+        p.progress?.practiced ? l.practice.answer : undefined,
+      ),
+    ),
+    [attempt, setAttempt] = useState(practice.current.state),
     root = useRef<HTMLElement>(null);
+  const { answer, feedback } = attempt;
   const stages = [
       "Concept",
       "Worked example",
@@ -48,7 +55,7 @@ export function LearningQuest(p: {
       className={`learning-backdrop feedback-panel${leaving ? " is-leaving" : ""}`}
     >
       <section
-        className="learning-quest"
+        className={`learning-quest${page === "practice" && feedback !== null ? ` practice-${feedback ? "correct" : "incorrect"}` : ""}`}
         role="dialog"
         aria-modal="true"
         aria-label={`Chapter: ${c.title}`}
@@ -136,10 +143,10 @@ export function LearningQuest(p: {
                 {l.practice.options.map((option, index) => (
                   <button
                     key={index}
+                    disabled={feedback === true || leaving}
                     aria-pressed={answer === index}
                     onClick={() => {
-                      setAnswer(index);
-                      setFeedback(null);
+                      setAttempt(practice.current.choose(index));
                     }}
                   >
                     <span className="learning-option-number" aria-hidden="true">
@@ -150,8 +157,16 @@ export function LearningQuest(p: {
                 ))}
               </div>
               {feedback !== null && (
-                <div className="learning-feedback" role="status">
-                  <strong>{feedback ? "Correct." : "Try again."}</strong>
+                <div
+                  key={attempt.attempt}
+                  className={`learning-feedback ${feedback ? "is-correct" : "is-incorrect"}`}
+                  role="status"
+                >
+                  <strong>
+                    {feedback
+                      ? "Correct. Answer locked."
+                      : "Not quite. Choose another answer."}
+                  </strong>
                   <p>{l.practice.explanation}</p>
                 </div>
               )}
@@ -180,7 +195,6 @@ export function LearningQuest(p: {
             <button
               onClick={() => {
                 setPage(page === "practice" ? "example" : "concept");
-                setFeedback(null);
               }}
             >
               Review
@@ -197,7 +211,6 @@ export function LearningQuest(p: {
               onClick={() => {
                 p.onIntroduce();
                 setPage("practice");
-                setFeedback(null);
               }}
             >
               Try it
@@ -206,11 +219,13 @@ export function LearningQuest(p: {
           {page === "practice" && feedback !== true && (
             <button
               className="primary"
-              disabled={answer === null}
+              disabled={answer === null || feedback !== null || leaving}
               onClick={() => {
-                const correct = p.onAnswer(answer!);
-                sound(correct ? "success" : "error");
-                setFeedback(correct);
+                const previous = practice.current.state;
+                const next = practice.current.submit(p.onAnswer);
+                if (next !== previous)
+                  sound(next.feedback ? "success" : "error");
+                setAttempt(next);
               }}
             >
               Check reasoning

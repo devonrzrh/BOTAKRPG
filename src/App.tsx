@@ -44,6 +44,7 @@ import DOMPurify from "dompurify";
 import { renderLessonMarkdown } from "./game/markdown";
 import { ClueLedger } from "./ui/ClueLedger";
 import { BookReader } from "./ui/BookReader";
+import { SceneTransition } from "./ui/SceneTransition";
 import { useGameSound, useGameSoundVolume } from "./ui/GameSound";
 import {
   useGameParticles,
@@ -265,6 +266,10 @@ export default function App() {
   const [officeFallback, setOfficeFallback] = useState(false);
   const [officePage, setOfficePage] = useState(0);
   const [bookOpen, setBookOpen] = useState(false);
+  const [bookClosing, setBookClosing] = useState(false);
+  useEffect(() => {
+    if (!bookOpen) setBookClosing(false);
+  }, [bookOpen]);
   const [questSelection, setQuestSelection] = useState<string>();
   const [questView, setQuestView] = useState<GraphView>({
     x: 0,
@@ -1099,7 +1104,7 @@ export default function App() {
         content,
         lessonId,
         page: officePage,
-        bookOpen,
+        bookOpen: bookOpen && !bookClosing,
         questSelection,
         questView,
         search,
@@ -1116,6 +1121,7 @@ export default function App() {
       noteEditing,
       noteDraft,
       bookOpen,
+      bookClosing,
       questSelection,
       questView,
     ],
@@ -1388,7 +1394,19 @@ export default function App() {
           <ScrollText size={21} />
         </button>
       </aside>
-      <main
+      <SceneTransition
+        sceneKey={
+          panel === "battle"
+            ? `battle:${battle.enemyId}`
+            : panel === "maze"
+              ? "maze"
+              : panel === "garden"
+                ? "garden"
+                : panel === "puzzles"
+                  ? `puzzle:${puzzleId ?? "index"}`
+                  : scene
+        }
+        reducedMotion={save.settings.reducedMotion}
         className="world-shell"
         inert={intakeOpen}
         onPointerMove={(e) => {
@@ -1421,6 +1439,7 @@ export default function App() {
             homeWall={homeWall}
             homeLookLocked={
               intakeOpen ||
+              bookOpen ||
               panel === "settings" ||
               panel === "character" ||
               !save.story.prologueSeen ||
@@ -2719,6 +2738,7 @@ export default function App() {
               })
             }
             onSelect={setLessonId}
+            onClosing={() => setBookClosing(true)}
             onClose={() => {
               setBookOpen(false);
               setNoteEditing(null);
@@ -2806,7 +2826,7 @@ export default function App() {
             {metrics && ` · ${metrics.fps} FPS`}
           </span>
         </footer>
-      </main>
+      </SceneTransition>
       <aside className="journey-sidebar" inert={intakeOpen}>
         <div className="profile-mini">
           <span className="profile-avatar">

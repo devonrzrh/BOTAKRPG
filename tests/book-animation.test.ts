@@ -1,5 +1,9 @@
 import { expect, it } from "vitest";
-import { bookPose, bookReadingScale } from "../src/game/bookAnimation";
+import {
+  BOOK_SHELF_SCALE,
+  bookPose,
+  bookReadingScale,
+} from "../src/game/bookAnimation";
 
 it("pulls the closed book clear before opening, then closes before returning", () => {
   expect(bookPose(0).travel).toBe(0);
@@ -23,7 +27,7 @@ it("fits the full reading spread after resizing without cropping either page", (
     expect(heightFill).toBeLessThanOrEqual(0.99001);
     expect(Math.max(widthFill, heightFill)).toBeCloseTo(0.99);
     expect(bookPose(1, scale).scale).toBeCloseTo(scale);
-    expect(bookPose(0, scale).scale).toBe(0.24);
+    expect(bookPose(0, scale).scale).toBe(BOOK_SHELF_SCALE);
   }
 });
 

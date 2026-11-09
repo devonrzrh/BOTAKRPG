@@ -18,6 +18,7 @@ import { XpMeter } from "./XpMeter";
 import { useGameSound } from "./GameSound";
 import { enemyThreatName } from "../game/enemyIdentity";
 import { EnemySpeech } from "./EnemySpeech";
+import { useSceneLeaving } from "./SceneTransition";
 import { useGameParticles } from "./GameParticles";
 import { createCombatAudio } from "../game/combatAudio";
 import { createCombatHaptics } from "../game/combatHaptics";
@@ -84,6 +85,7 @@ function enemySigil(id: string) {
   }[enemyKind(id)];
 }
 export function BattleScreen(p: Props) {
+  const sceneLeaving = useSceneLeaving();
   const sound = useGameSound();
   const [osReduced, setOsReduced] = useState(
     () => window.matchMedia("(prefers-reduced-motion: reduce)").matches,
@@ -165,7 +167,12 @@ export function BattleScreen(p: Props) {
     if (b.phase === "choose") setMenu("skills");
   }, [b.turn, b.phase]);
   useEffect(() => {
-    if (!correctFeedback || reviewing || !save.settings.battleAutoAdvance)
+    if (
+      sceneLeaving ||
+      !correctFeedback ||
+      reviewing ||
+      !save.settings.battleAutoAdvance
+    )
       return;
     const timer = setTimeout(advance, combatCueDuration(reducedMotion) + 80);
     return () => clearTimeout(timer);
@@ -175,6 +182,7 @@ export function BattleScreen(p: Props) {
     reviewing,
     reducedMotion,
     save.settings.battleAutoAdvance,
+    sceneLeaving,
   ]);
   useLayoutEffect(() => {
     const cue = p.cue;
