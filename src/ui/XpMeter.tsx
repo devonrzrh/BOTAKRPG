@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { xpProgress } from "../game/xp";
 export function XpMeter({
   xp,
@@ -14,9 +14,36 @@ export function XpMeter({
   compact?: boolean;
 }) {
   const [shown, setShown] = useState(initialXp);
+  const previousXp = useRef(xp);
+  const [gain, setGain] = useState(0),
+    [leveled, setLeveled] = useState(false);
+  const gainTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
+  useEffect(() => {
+    const before = previousXp.current;
+    previousXp.current = xp;
+    if (!compact || xp === before) return;
+    clearTimeout(gainTimer.current);
+    if (xp < before) {
+      setGain(0);
+      setLeveled(false);
+      return;
+    }
+    setGain((value) => value + xp - before);
+    setLeveled(
+      (value) => value || xpProgress(xp).level > xpProgress(before).level,
+    );
+    gainTimer.current = setTimeout(() => {
+      setGain(0);
+      setLeveled(false);
+    }, 2800);
+  }, [xp, compact]);
+  useEffect(() => () => clearTimeout(gainTimer.current), []);
   useEffect(() => {
     if (xp === shown) return;
-    if (reducedMotion) {
+    if (
+      reducedMotion ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) {
       setShown(xp);
       return;
     }
@@ -35,7 +62,10 @@ export function XpMeter({
   const progress = xpProgress(shown);
   if (compact)
     return (
-      <div className="xp-meter xp-compact" aria-label="Character progression">
+      <div
+        className={`xp-meter xp-compact${gain ? " xp-gained" : ""}`}
+        aria-label="Character progression"
+      >
         <span>Level {progress.level}</span>
         <div className="xp-compact-track">
           <strong>
@@ -54,6 +84,12 @@ export function XpMeter({
         {!progress.maxed && (
           <span>
             {progress.needed} XP to level {progress.level + 1}
+          </span>
+        )}
+        {gain > 0 && (
+          <span className="xp-gain" key={gain} role="status">
+            {leveled ? `Level ${xpProgress(xp).level} reached · ` : ""}+{gain}{" "}
+            XP
           </span>
         )}
       </div>

@@ -66,6 +66,7 @@ import {
 import { BattleScreen } from "./ui/BattleScreen";
 import { battleCue, type BattleCue } from "./game/combatPresentation";
 import { XpMeter } from "./ui/XpMeter";
+import { GameNotice } from "./ui/GameNotice";
 import { LearningQuest } from "./ui/LearningQuest";
 import {
   chapterForActivity,
@@ -391,7 +392,11 @@ export default function App() {
     mazeRef.current = next;
     setMaze(next);
   }, []);
-  const notify = (message: string) => setToast(message);
+  const [noticeSequence, setNoticeSequence] = useState(0);
+  const notify = (message: string) => {
+    setToast(message);
+    setNoticeSequence((value) => value + 1);
+  };
   const claimWithFeedback = (quest: Quest) => {
     const next = claimQuest(saveRef.current, quest, content);
     if (next === saveRef.current) return;
@@ -490,11 +495,6 @@ export default function App() {
     }, 450);
     return () => clearTimeout(timeout);
   }, [save, booted, storageReady]);
-  useEffect(() => {
-    if (!toast) return;
-    const timer = setTimeout(() => setToast(""), 6500);
-    return () => clearTimeout(timer);
-  }, [toast]);
   useEffect(() => {
     runner.current = new PythonRunner(
       async (command) => {
@@ -3060,16 +3060,11 @@ export default function App() {
         />
       )}
       {toast && !(panel === "battle" && battle.phase === "lost") && (
-        <div className="toast" role="status">
-          <Sparkles size={18} />
-          <span>{toast}</span>
-          <button
-            aria-label="Dismiss notification"
-            onClick={() => setToast("")}
-          >
-            <X size={15} />
-          </button>
-        </div>
+        <GameNotice
+          key={`${noticeSequence}:${toast}`}
+          message={toast}
+          onDismiss={() => setToast("")}
+        />
       )}
     </div>
   );

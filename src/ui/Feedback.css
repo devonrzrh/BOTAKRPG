@@ -1,0 +1,199 @@
+/* Short, local effects communicate arrivals; no idle motion or input delays. */
+.app .dialogue-backdrop,
+.app .learning-backdrop {
+  animation: feedback-fade-in 220ms ease-out both;
+}
+.app .dialogue-box,
+.app .learning-quest {
+  animation: feedback-rise-in 240ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  transform-origin: bottom center;
+}
+.app .feedback-panel.is-leaving {
+  animation: feedback-fade-out 180ms ease-in both;
+  pointer-events: none;
+}
+.app .dialogue-backdrop.is-leaving .dialogue-box,
+.app .learning-backdrop.is-leaving .learning-quest {
+  animation: feedback-rise-out 180ms ease-in both;
+}
+.app .tutorial-card {
+  animation: feedback-centered-in 220ms ease-out both;
+}
+.app .tutorial-card.is-leaving,
+.app .game-notice.is-leaving {
+  animation: feedback-centered-out 180ms ease-in both;
+}
+.app .feedback-step,
+.app .line-complete .dialogue-choices {
+  animation: feedback-rise-in 180ms ease-out both;
+}
+.app .dialogue-channel {
+  display: block;
+  margin-bottom: 3px;
+  color: #a9bdbd;
+  font: 400 16px/1.3 var(--typewriter);
+  letter-spacing: 0.04em;
+}
+.app .dialogue-portrait::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  background: linear-gradient(transparent, #c9e5d52e, transparent);
+  animation: feedback-signal 650ms ease-out both;
+}
+.app .game-notice {
+  overflow: hidden;
+  padding: 16px 18px 20px;
+  border-left: 3px solid #d5b67c;
+  font: 400 18px/1.45 var(--typewriter);
+  color: #e4e9df;
+  animation: feedback-centered-in 220ms ease-out both;
+}
+.app .game-notice > span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.app .game-notice button {
+  flex-shrink: 0;
+  min-width: 36px;
+  min-height: 36px;
+  color: #c5d7d6;
+}
+.app .notice-lifetime {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: #d5b67c;
+  transform-origin: left;
+  animation: feedback-lifetime linear both;
+}
+.app .xp-compact {
+  position: relative;
+}
+.app .xp-gained [role="progressbar"] {
+  box-shadow: 0 0 12px #e5bf795e;
+  border-color: #e5bf79;
+}
+.app .xp-gain {
+  position: absolute;
+  top: calc(100% + 12px);
+  right: 0;
+  z-index: 48;
+  padding: 8px 12px;
+  border: 1px solid #c4a570;
+  background: #14232af5;
+  color: #ffe1a1;
+  font: 400 18px/1.3 var(--typewriter);
+  pointer-events: none;
+  box-shadow: 0 5px 20px #0008;
+  animation: feedback-rise-in 220ms ease-out both;
+}
+@keyframes feedback-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes feedback-fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+@keyframes feedback-rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes feedback-rise-out {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+@keyframes feedback-centered-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 12px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+@keyframes feedback-centered-out {
+  from {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+  to {
+    opacity: 0;
+    transform: translate(-50%, 10px);
+  }
+}
+@keyframes feedback-signal {
+  from {
+    opacity: 0;
+    transform: translateY(-100%);
+  }
+  30% {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+}
+@keyframes feedback-lifetime {
+  from {
+    transform: scaleX(1);
+  }
+  to {
+    transform: scaleX(0);
+  }
+}
+.app.reduced-motion .feedback-panel,
+.app.reduced-motion .dialogue-box,
+.app.reduced-motion .learning-quest,
+.app.reduced-motion .feedback-step,
+.app.reduced-motion .dialogue-choices,
+.app.reduced-motion .dialogue-portrait::after,
+.app.reduced-motion .xp-gain,
+.app.reduced-motion .notice-lifetime {
+  animation: none !important;
+}
+.app.reduced-motion .notice-lifetime {
+  display: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .app .feedback-panel,
+  .app .dialogue-box,
+  .app .learning-quest,
+  .app .feedback-step,
+  .app .dialogue-choices,
+  .app .dialogue-portrait::after,
+  .app .xp-gain,
+  .app .notice-lifetime {
+    animation: none !important;
+  }
+  .app .notice-lifetime {
+    display: none;
+  }
+}

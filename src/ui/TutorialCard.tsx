@@ -1,6 +1,7 @@
 import { useEffect, useId, useRef, useState } from "react";
 import { ArrowLeft, ArrowRight, X } from "lucide-react";
 import type { Tutorial } from "../game/tutorials";
+import { usePanelExit } from "./usePanelExit";
 export function TutorialCard({
   tutorial,
   onClose,
@@ -10,6 +11,9 @@ export function TutorialCard({
   onClose: () => void;
   onSkipAll: () => void;
 }) {
+  const { leaving, exit } = usePanelExit((skip: boolean) =>
+    skip ? onSkipAll() : onClose(),
+  );
   const [step, setStep] = useState(0),
     card = useRef<HTMLElement>(null),
     titleId = useId();
@@ -26,10 +30,11 @@ export function TutorialCard({
   }, []);
   useEffect(() => {
     const key = (event: KeyboardEvent) => {
+      if (leaving) return;
       if (event.key === "Escape") {
         event.preventDefault();
         event.stopPropagation();
-        onClose();
+        exit(false);
       }
       if (event.key === "ArrowRight" && !last) {
         event.preventDefault();
@@ -42,11 +47,11 @@ export function TutorialCard({
     };
     window.addEventListener("keydown", key);
     return () => window.removeEventListener("keydown", key);
-  }, [last, onClose, step]);
+  }, [last, exit, step, leaving]);
   return (
     <aside
       ref={card}
-      className="tutorial-card"
+      className={`tutorial-card feedback-panel${leaving ? " is-leaving" : ""}`}
       role="dialog"
       aria-label={tutorial.title}
       aria-labelledby={titleId}
@@ -57,7 +62,7 @@ export function TutorialCard({
           type="button"
           className="icon-button"
           aria-label="Close field tip"
-          onClick={onClose}
+          onClick={() => exit(false)}
         >
           <X size={17} />
         </button>
@@ -67,8 +72,12 @@ export function TutorialCard({
           <i key={index} className={index <= step ? "active" : ""} />
         ))}
       </div>
-      <h2 id={titleId}>{current.title}</h2>
-      <p>{current.body}</p>
+      <h2 id={titleId} key={`title-${step}`} className="feedback-step">
+        {current.title}
+      </h2>
+      <p key={`body-${step}`} className="feedback-step">
+        {current.body}
+      </p>
       {current.keys && (
         <div className="tutorial-keys" aria-label="Keys">
           {current.keys.map((key) => (
@@ -77,7 +86,11 @@ export function TutorialCard({
         </div>
       )}
       <footer>
-        <button type="button" className="tutorial-skip" onClick={onSkipAll}>
+        <button
+          type="button"
+          className="tutorial-skip"
+          onClick={() => exit(true)}
+        >
           Turn off tips
         </button>
         <span className="tutorial-count">
@@ -93,7 +106,7 @@ export function TutorialCard({
           <button
             type="button"
             className="primary"
-            onClick={() => (last ? onClose() : setStep((value) => value + 1))}
+            onClick={() => (last ? exit(false) : setStep((value) => value + 1))}
           >
             {last ? "Got it" : "Next"}
             {!last && <ArrowRight size={15} />}

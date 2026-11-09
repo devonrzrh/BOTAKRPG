@@ -5,6 +5,7 @@ import { FileSearch, Check, ChevronRight, X } from "lucide-react";
 import type { Quest } from "../content/schema";
 import type { Save } from "../game/state";
 import { useGameSound } from "./GameSound";
+import { usePanelExit } from "./usePanelExit";
 
 export function LearningQuest(p: {
   chapter: Quest;
@@ -19,6 +20,7 @@ export function LearningQuest(p: {
   onClose: () => void;
 }) {
   const sound = useGameSound();
+  const { leaving, exit } = usePanelExit((action: () => void) => action());
   const c = p.chapter,
     l = c.learning!,
     [page, setPage] = useState<"concept" | "example" | "practice" | "ready">(
@@ -42,7 +44,9 @@ export function LearningQuest(p: {
     root.current?.querySelector<HTMLElement>("h2")?.focus();
   }, [page]);
   return (
-    <div className="learning-backdrop">
+    <div
+      className={`learning-backdrop feedback-panel${leaving ? " is-leaving" : ""}`}
+    >
       <section
         className="learning-quest"
         role="dialog"
@@ -51,7 +55,11 @@ export function LearningQuest(p: {
         ref={root}
         onKeyDown={(e) => {
           e.stopPropagation();
-          if (e.key === "Escape") p.onClose();
+          if (leaving) {
+            e.preventDefault();
+            return;
+          }
+          if (e.key === "Escape") exit(p.onClose);
           if (e.key === "Tab") {
             const nodes = [
                 ...root.current!.querySelectorAll<HTMLButtonElement>(
@@ -69,7 +77,7 @@ export function LearningQuest(p: {
         <header>
           <FileSearch size={26} aria-hidden="true" />
           <span>{c.title}</span>
-          <button onClick={p.onClose}>
+          <button onClick={() => exit(p.onClose)}>
             <X size={20} aria-hidden="true" /> Close
           </button>
         </header>
@@ -94,7 +102,7 @@ export function LearningQuest(p: {
             </li>
           ))}
         </ol>
-        <main>
+        <main key={page} className="feedback-step">
           <p className="learning-stage">
             {page === "concept"
               ? "Concept"
@@ -162,9 +170,11 @@ export function LearningQuest(p: {
           )}
         </main>
         <footer>
-          <button onClick={p.onRead}>Read chapter</button>
+          <button onClick={() => exit(p.onRead)}>Read chapter</button>
           {p.onPuzzle && (
-            <button onClick={p.onPuzzle}>Puzzle: {p.puzzleTitle}</button>
+            <button onClick={() => exit(p.onPuzzle!)}>
+              Puzzle: {p.puzzleTitle}
+            </button>
           )}
           {page !== "concept" && (
             <button
@@ -215,7 +225,7 @@ export function LearningQuest(p: {
             <button
               className="primary"
               disabled={!p.unlocked}
-              onClick={p.onEncounter}
+              onClick={() => exit(p.onEncounter)}
             >
               Enter encounter
             </button>

@@ -19,6 +19,7 @@ import "./ui/CombatRevamp.css";
 import "./ui/BattlePolish.css";
 import "./onboarding.css";
 import "./ui/Blocks.css";
+import "./ui/Feedback.css";
 createRoot(document.getElementById("root")!).render(
   <GameSoundProvider>
     <GameParticlesProvider>

@@ -11,6 +11,7 @@ import { typewriterTimeline, revealedCharacters } from "../game/typewriter";
 import { personalizeText, speakerLabel } from "../game/player";
 import { useGameSound } from "./GameSound";
 import { dialogueVoice, shouldBlip } from "../game/dialogueSpeech";
+import { usePanelExit } from "./usePanelExit";
 
 function Portrait({ speaker }: { speaker: string }) {
   const robot = /\b(PATCH|FOLIO|LUMA|Mimic|Warden|Keeper)\b/i.test(speaker);
@@ -63,6 +64,10 @@ export function Dialogue({
   reducedMotion?: boolean;
 }) {
   const sound = useGameSound();
+  const { leaving, exit } = usePanelExit(onAction, reducedMotion);
+  useEffect(() => {
+    sound("connect");
+  }, [sound]);
   const [nodeId, setNodeId] = useState(dialogue.start),
     root = useRef<HTMLElement>(null),
     speechId = useId();
@@ -152,14 +157,17 @@ export function Dialogue({
         ?.focus();
   }, [complete, nodeId]);
   const choose = (index: number) => {
-    if (!complete) return;
+    if (!complete || leaving) return;
     const choice = node.choices[index];
     if (!choice) return;
     sound("dialogue");
-    choice.next ? setNodeId(choice.next) : onAction(choice.action!);
+    choice.next ? setNodeId(choice.next) : exit(choice.action!);
   };
   return (
-    <div className="dialogue-backdrop" data-sfx-silent>
+    <div
+      className={`dialogue-backdrop feedback-panel${leaving ? " is-leaving" : ""}`}
+      data-sfx-silent
+    >
       <section
         ref={root}
         tabIndex={-1}
@@ -170,9 +178,13 @@ export function Dialogue({
         aria-describedby={speechId}
         onKeyDown={(e) => {
           e.stopPropagation();
+          if (leaving) {
+            e.preventDefault();
+            return;
+          }
           if (e.key === "Escape") {
             e.preventDefault();
-            onAction("close");
+            exit("close");
           }
           if (
             !complete &&
@@ -218,11 +230,14 @@ export function Dialogue({
         <Portrait speaker={node.speaker} />
         <div className="dialogue-body">
           <header className="dialogue-header">
-            <h2>{speaker}</h2>
+            <div>
+              <span className="dialogue-channel">{dialogue.title}</span>
+              <h2>{speaker}</h2>
+            </div>
             <button
               className="dialogue-close"
               aria-label="Close dialogue"
-              onClick={() => onAction("close")}
+              onClick={() => exit("close")}
             >
               <span aria-hidden="true">×</span>
             </button>
