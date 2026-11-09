@@ -19,6 +19,8 @@ import { useGameSound } from "./GameSound";
 import { enemyThreatName } from "../game/enemyIdentity";
 import { useGameParticles } from "./GameParticles";
 import { createCombatAudio } from "../game/combatAudio";
+import { useBattleFeedback } from "./useBattleFeedback";
+import "./BattleFeedback.css";
 import {
   Crosshair,
   ScanSearch,
@@ -95,6 +97,12 @@ export function BattleScreen(p: Props) {
   const { battle: b, save, question: q } = p,
     limits = stats(save, p.content);
   const reducedMotion = save.settings.reducedMotion || osReduced;
+  const changes = useBattleFeedback(b, save, p.content);
+  const changed = (target: string) =>
+    changes.filter((change) => change.target === target).at(-1);
+  const resultChanges = changes.filter((change) =>
+    ["boost", "limit", "effect", "stance"].includes(change.target),
+  );
   const [menu, setMenu] = useState<"skills" | "inspect" | "act" | null>(
     "skills",
   );
@@ -226,14 +234,29 @@ export function BattleScreen(p: Props) {
       ((label === "Enemy HP" && (motion === "player" || motion === "poison")) ||
         (label === "HP" && motion === "enemy"));
     const shown = pendingHit ? Math.min(max, value + p.cue!.amount) : value;
+    const change = pendingHit ? undefined : changed(kind);
     return (
-      <div className={`battle-meter ${kind}`}>
+      <div
+        key={`${kind}-${change?.sequence ?? 0}`}
+        className={`battle-meter ${kind}${change ? ` meter-changed change-${change.tone}` : ""}${kind === "health" && shown > 0 && shown <= max * 0.25 ? " health-critical" : ""}`}
+      >
         <div>
-          <span>{label}</span>
+          <span>
+            {label}
+            {kind === "health" && shown > 0 && shown <= max * 0.25
+              ? " · LOW"
+              : ""}
+          </span>
           <strong>
             {shown} / {max}
           </strong>
         </div>
+        {change?.delta !== undefined && (
+          <span className="battle-meter-delta" role="status">
+            {change.delta > 0 ? "+" : "−"}
+            {Math.abs(change.delta)} {label}
+          </span>
+        )}
         <div
           role="progressbar"
           aria-label={label}
@@ -241,6 +264,15 @@ export function BattleScreen(p: Props) {
           aria-valuemax={max}
           aria-valuenow={shown}
         >
+          {change?.delta !== undefined && change.delta < 0 && (
+            <span
+              className="battle-meter-trail"
+              aria-hidden="true"
+              style={{
+                width: `${Math.min(100, ((change.previous ?? value) / max) * 100)}%`,
+              }}
+            />
+          )}
           <i style={{ width: `${Math.max(0, shown / max) * 100}%` }} />
         </div>
       </div>
@@ -390,7 +422,14 @@ export function BattleScreen(p: Props) {
           {b.effects
             .filter((e) => e.id !== "shield")
             .map((e) => (
-              <span key={e.id}>
+              <span
+                key={`${e.id}-${e.remaining}-${e.magnitude}`}
+                className={
+                  changes.some((change) => change.id === `effect-${e.id}`)
+                    ? "effect-changed"
+                    : ""
+                }
+              >
                 {e.id} · {e.remaining} turns
               </span>
             ))}
@@ -454,18 +493,36 @@ export function BattleScreen(p: Props) {
               {b.effects
                 .filter((e) => e.id === "shield")
                 .map((e) => (
-                  <span key={e.id}>Shield · {e.remaining} turns</span>
+                  <span
+                    key={`${e.id}-${e.remaining}-${e.magnitude}`}
+                    className={
+                      changes.some((change) => change.id === `effect-${e.id}`)
+                        ? "effect-changed"
+                        : ""
+                    }
+                  >
+                    Shield · {e.remaining} turns
+                  </span>
                 ))}
             </div>
           </div>
 
-          <div className={`battle-intent intent-${intent.kind}`} role="status">
+          <div
+            className={`battle-intent intent-${intent.kind}${!motion && changed("intent") ? " intent-changed" : ""}`}
+            role="status"
+          >
             <span>
               TURN {b.turn} ·{" "}
               {b.phase === "won" ? "ENCOUNTER COMPLETE" : "INCOMING"}
             </span>
             {b.phase !== "won" && (
-              <strong>
+              <strong
+                key={
+                  !motion
+                    ? changed("intent")?.sequence
+                    : `cue-${p.cue?.sequence}`
+                }
+              >
                 {intent.label}
                 {intent.damage
                   ? ` · ${intent.damage} damage`
@@ -508,6 +565,22 @@ export function BattleScreen(p: Props) {
             </button>
           </div>
         </header>
+        {resultChanges.length > 0 && (
+          <div
+            className="battle-change-feed"
+            role="status"
+            aria-label="Turn changes"
+          >
+            {resultChanges.map((change) => (
+              <span
+                key={change.sequence}
+                className={`battle-change change-${change.tone}`}
+              >
+                {change.text}
+              </span>
+            ))}
+          </div>
+        )}
         {motion && (
           <div className="battle-console-transition" role="status">
             {impact}
@@ -525,20 +598,16 @@ export function BattleScreen(p: Props) {
           >
             {b.phase === "choose" && (
               <>
-                <header>
-                  <h2 ref={title} tabIndex={-1}>
-                    {menu === "skills"
-                      ? "Choose an action"
-                      : menu === "act"
-                        ? "Talk / ACT"
-                        : "Inspect"}
-                  </h2>
-                  {menu !== "skills" && (
+                {menu !== "skills" && (
+                  <header>
+                    <h2 ref={title} tabIndex={-1}>
+                      {menu === "act" ? "Talk / ACT" : "Inspect"}
+                    </h2>
                     <button onClick={() => setMenu("skills")}>
                       Back to actions
                     </button>
-                  )}
-                </header>
+                  </header>
+                )}
                 {menu === "skills" && (
                   <div
                     className="battle-skill-options"
@@ -585,6 +654,7 @@ export function BattleScreen(p: Props) {
                     <div className="battle-special-actions">
                       {(b.boost ?? 0) > 0 && (
                         <button
+                          className={changed("boost") ? "resource-changed" : ""}
                           onClick={() =>
                             p.onBoost(
                               ((b.boostSpend ?? 0) + 1) % ((b.boost ?? 0) + 1),
@@ -597,7 +667,7 @@ export function BattleScreen(p: Props) {
                       )}
                       {(b.limit ?? 0) > 0 && (
                         <button
-                          className={b.limit === 100 ? "limit-ready" : ""}
+                          className={`${b.limit === 100 ? "limit-ready" : ""}${changed("limit") ? " resource-changed" : ""}`}
                           disabled={b.limit !== 100}
                           onClick={p.onFinisher}
                         >

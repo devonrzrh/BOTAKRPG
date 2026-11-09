@@ -1,0 +1,165 @@
+.app .battle-meter {
+  position: relative;
+}
+.app .battle-meter [role="progressbar"] {
+  position: relative;
+  isolation: isolate;
+}
+.app .battle-meter i {
+  position: relative;
+  z-index: 1;
+}
+.app .battle-meter-trail {
+  position: absolute;
+  inset: 0 auto 0 0;
+  background: #f3d2a0;
+  animation: battle-meter-trail 1200ms ease-out both;
+}
+.app .battle-meter-delta {
+  position: absolute;
+  top: calc(100% + 2px);
+  right: 0;
+  color: #a9efdc;
+  white-space: nowrap;
+  font: 400 16px/1.15 var(--typewriter);
+  animation: battle-change-arrive 180ms ease-out both;
+}
+.app .battle-meter.change-loss .battle-meter-delta {
+  color: #ffd09a;
+}
+.app .battle-meter.health.change-loss .battle-meter-delta {
+  color: #ff9c8c;
+}
+.app .battle-meter.enemy.change-loss .battle-meter-delta {
+  color: #ffe3a4;
+}
+.app .meter-changed [role="progressbar"] {
+  animation: battle-stat-pulse 650ms ease-out both;
+}
+.app.gameplay-battle .battle-layout-console .battle-player-hud {
+  padding-bottom: 18px;
+  row-gap: 4px;
+}
+.app.gameplay-battle
+  .battle-layout-console
+  .battle-player-hud:has(.battle-status-effects:not(:empty)) {
+  padding-bottom: 0;
+}
+.app.gameplay-battle
+  .battle-layout-console
+  .battle-player-hud
+  .battle-status-effects {
+  margin-top: 0;
+}
+@media (min-width: 701px) {
+  .app.gameplay-battle {
+    --battle-console-height: min(420px, 58vh);
+  }
+}
+.app.gameplay-battle .battle-layout-console .battle-enemy-hud .battle-meter {
+  margin-bottom: 22px;
+}
+.app .battle-meter.health-critical [role="progressbar"] {
+  border-color: #ff9284;
+}
+.app .battle-meter.health-critical > div:first-child {
+  color: #ffb0a1;
+}
+.app .battle-intent.intent-changed > strong {
+  display: block;
+  color: #ffe5a5;
+  animation: battle-change-arrive 220ms ease-out both;
+}
+.app .battle-change-feed {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  flex: 0 0 auto;
+  max-height: 76px;
+  overflow-y: auto;
+  padding: 7px 16px;
+  border-bottom: 1px solid #60706a;
+  background: #1a292df2;
+  color: #e9e2c7;
+  font: 400 16px/1.4 var(--typewriter);
+}
+.app .battle-change {
+  animation: battle-change-arrive 180ms ease-out both;
+}
+.app .battle-change.change-gain {
+  color: #ade9cf;
+}
+.app .battle-change.change-loss {
+  color: #ffb7a0;
+}
+.app .battle-status-effects .effect-changed {
+  color: #d7ffe9;
+  background: #24463d;
+  outline: 1px solid #85bca3;
+  padding: 2px 6px;
+  animation: battle-change-arrive 180ms ease-out both;
+}
+.app .battle-change + .battle-change::before {
+  content: "·";
+  margin-right: 14px;
+  color: #a2ada7;
+}
+.app .battle-special-actions button.resource-changed {
+  border-color: #e2c080;
+  box-shadow: inset 0 0 16px #e2c08026;
+}
+@keyframes battle-meter-trail {
+  0%,
+  25% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes battle-stat-pulse {
+  0% {
+    box-shadow:
+      0 0 0 2px #ffe1a4,
+      0 0 18px #ffe1a477;
+  }
+  100% {
+    box-shadow: 0 0 0 0 transparent;
+  }
+}
+@keyframes battle-change-arrive {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.app.reduced-motion .battle-meter-trail {
+  display: none;
+}
+.app.reduced-motion .battle-meter-delta,
+.app.reduced-motion .meter-changed [role="progressbar"],
+.app.reduced-motion .battle-intent.intent-changed > strong,
+.app.reduced-motion .battle-change {
+  animation: none;
+}
+.app.reduced-motion .battle-status-effects .effect-changed {
+  animation: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .app .battle-meter-trail {
+    display: none;
+  }
+  .app .battle-meter-delta,
+  .app .meter-changed [role="progressbar"],
+  .app .battle-intent.intent-changed > strong,
+  .app .battle-change {
+    animation: none;
+  }
+  .app .battle-status-effects .effect-changed {
+    animation: none;
+  }
+}
