@@ -13,6 +13,7 @@ export interface BattleCue {
   defeated: boolean;
   special?: "weakness" | "break" | "limit" | "pacify" | "evade";
   phaseShift?: boolean;
+  comboBroken?: boolean;
 }
 export const combatCueDuration = (reducedMotion: boolean) =>
   reducedMotion ? 200 : 650;
@@ -47,6 +48,7 @@ export function battleCue(
     return {
       ...base,
       kind: amount ? "player" : "miss",
+      comboBroken: !amount && (before.combo ?? 0) > 0 && !after.combo,
       amount,
       phaseShift:
         before.tactics?.mechanic === "echo" &&

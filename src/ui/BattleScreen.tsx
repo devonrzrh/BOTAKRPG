@@ -3,6 +3,7 @@ import type { Content, Question, Skill } from "../content/schema";
 import {
   canSpare,
   previewDamage,
+  comboBonus,
   enemyIntent,
   bossReadout,
   type Battle,
@@ -187,7 +188,9 @@ export function BattleScreen(p: Props) {
                     : cue.kind === "poison"
                       ? "Poison"
                       : cue.kind === "miss"
-                        ? "Turn spent"
+                        ? cue.comboBroken
+                          ? "Combo broken · turn spent"
+                          : "Turn spent"
                         : cue.kind === "recover"
                           ? "Opening"
                           : cue.blocked
@@ -377,6 +380,12 @@ export function BattleScreen(p: Props) {
         </h2>
         <p className="enemy-threat">{enemyThreatName(b.enemyId)}</p>
         {meter("Enemy HP", b.hp, b.maxHp, "enemy")}
+        {(b.combo ?? 0) > 1 && (
+          <div className="battle-combo" role="status" key={`combo-${b.combo}`}>
+            <strong>{b.combo} HIT COMBO</strong>
+            <span>Last hit +{comboBonus(b.combo!)}%</span>
+          </div>
+        )}
         <div className="battle-status-effects">
           {b.effects
             .filter((e) => e.id !== "shield")
@@ -557,6 +566,11 @@ export function BattleScreen(p: Props) {
                         <b>
                           {s.cost ? `${s.cost} focus` : "Free"} ·{" "}
                           {previewDamage(b, save, s, p.content)} damage
+                          {(b.combo ?? 0) > 0 && (
+                            <span className="battle-combo-preview">
+                              +{comboBonus((b.combo ?? 0) + 1)}% combo
+                            </span>
+                          )}
                           {b.weaknessKnown && b.tactics?.weakness === s.id
                             ? " · WEAK"
                             : ""}
@@ -654,6 +668,12 @@ export function BattleScreen(p: Props) {
                     )}
                     <p>
                       Attack {b.attack} · Your defense {limits.defense}
+                    </p>
+                    <p>
+                      Consecutive successful attacks build a combo: +10% damage
+                      per hit after the first, capped at +30%. Wrong answers
+                      break it; defensive turns and taking damage preserve it.
+                      Combos reset each encounter.
                     </p>
                     <p>
                       Guard reduces the next hit and restores 4 focus. A wrong

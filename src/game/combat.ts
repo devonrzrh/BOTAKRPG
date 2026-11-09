@@ -45,6 +45,8 @@ export interface Battle {
   mechanicSkill?: string;
   archiveOpen?: boolean;
   phaseShiftTurn?: number;
+  /** Encounter-only successful attack streak; defensive turns preserve it. */
+  combo?: number;
 }
 export function createBattle(
   enemy: {
@@ -78,6 +80,7 @@ export function createBattle(
     effects: [],
     log: [`${enemy.title} encounter started.`],
     assisted: false,
+    combo: 0,
     asked: [],
     ...(enemy.tactics
       ? {
@@ -107,6 +110,11 @@ export function selectBoost(battle: Battle, amount: number): Battle {
     throw new Error("Boost unavailable");
   return { ...battle, boostSpend: amount };
 }
+/** Bonus on a hit: first +0%, second +10%, third +20%, fourth onward +30%. */
+export function comboBonus(hits: number): number {
+  return Math.min(3, Math.max(0, hits - 1)) * 10;
+}
+
 export function previewDamage(
   battle: Battle,
   save: Save,
@@ -129,7 +137,7 @@ export function previewDamage(
     damage = Math.max(1, Math.floor(damage * 0.5));
   if (battle.tactics?.mechanic === "echo" && battle.hp <= battle.maxHp / 2)
     damage = Math.floor(damage * 1.15);
-  return damage;
+  return Math.floor(damage * (1 + comboBonus((battle.combo ?? 0) + 1) / 100));
 }
 
 export function bossReadout(
@@ -308,6 +316,7 @@ export function answerBattle(
   player.character.focus -= skill.cost;
   if (correct) {
     let damage = previewDamage(next, save, skill, content);
+    next.combo = (next.combo ?? 0) + 1;
     const consumedStagger = Boolean(next.tactics && next.staggered);
     if (consumedStagger) {
       next.staggered = false;
@@ -342,6 +351,10 @@ export function answerBattle(
       );
     }
     next.log.push(`${skill.title} deals ${damage} damage.`);
+    if (next.combo > 1)
+      next.log.push(
+        `${next.combo}-hit combo · +${comboBonus(next.combo)}% damage.`,
+      );
     if (skill.effect) {
       const def = content.entities.find(
         (e): e is Effect => e.type === "effect" && e.id === skill.effect,
@@ -354,6 +367,8 @@ export function answerBattle(
       });
     }
   } else {
+    if ((next.combo ?? 0) > 0) next.log.push("Combo broken.");
+    next.combo = 0;
     next.log.push("Incorrect answer. Turn spent.");
   }
   if (next.tactics?.mechanic === "archive") next.archiveOpen = false;

@@ -129,7 +129,7 @@ describe("profiled combat depth", () => {
       nextQuestion.answer,
     ).battle;
     expect(damageBefore - staggerHit.hp).toBe(
-      Math.floor((6 + insight.power) * 1.5),
+      Math.floor(Math.floor((6 + insight.power) * 1.5) * 1.1),
     );
     expect(staggerHit.staggered).toBe(false);
     expect(staggerHit.resolve).toBe(0);
