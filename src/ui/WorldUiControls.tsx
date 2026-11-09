@@ -37,10 +37,24 @@ export function WorldUiControls({
   return (
     <section
       className="world-keyboard-ui"
+      data-game-navigation={model.graph ? "native" : undefined}
       aria-label={`${model.title} world controls`}
       inert={blocked}
       onKeyDown={(e) => {
-        if (!model.graph) return;
+        if (
+          !model.graph ||
+          e.defaultPrevented ||
+          e.ctrlKey ||
+          e.altKey ||
+          e.metaKey
+        )
+          return;
+        if (
+          (e.target as HTMLElement).closest(
+            "input,textarea,select,[contenteditable=true]",
+          )
+        )
+          return;
         const delta: Record<string, [number, number]> = {
           ArrowLeft: [60, 0],
           ArrowRight: [-60, 0],
@@ -122,8 +136,10 @@ export function WorldUiControls({
             onKeyDown={(e) => {
               e.stopPropagation();
               if (e.key === "Escape") onAction({ kind: "cancel-note", id: "" });
-              if (e.key === "Enter" && e.ctrlKey)
+              if (e.key === "Enter" && e.ctrlKey) {
+                e.preventDefault();
                 onAction({ kind: "save-note", id: "" });
+              }
             }}
           />
         </label>

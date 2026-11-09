@@ -50,6 +50,7 @@ export function RoomTurns({
   useEffect(() => {
     const key = (e: KeyboardEvent) => {
       if (
+        e.defaultPrevented ||
         latest.current.disabled ||
         e.repeat ||
         e.ctrlKey ||
@@ -58,8 +59,9 @@ export function RoomTurns({
       )
         return;
       if (
-        (e.target as HTMLElement).closest(
-          'input,textarea,select,[contenteditable="true"],.topbar,.dialogue-box,.prologue',
+        e.target instanceof Element &&
+        e.target.closest(
+          'input,textarea,select,button,a,summary,[role="menu"],[role="dialog"],[contenteditable="true"],.topbar,.dialogue-box,.prologue',
         )
       )
         return;

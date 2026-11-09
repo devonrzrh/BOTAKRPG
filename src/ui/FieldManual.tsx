@@ -36,6 +36,24 @@ export function FieldManual({
             </dd>
           </div>
           <div>
+            <dt>Keyboard navigation</dt>
+            <dd>
+              <kbd>Tab</kbd> / <kbd>Shift</kbd> + <kbd>Tab</kbd> cycle controls.
+              Arrows choose nearby options; <kbd>Enter</kbd> / <kbd>Space</kbd>{" "}
+              select. <kbd>F10</kbd> focuses the top menu; <kbd>Esc</kbd> goes
+              back.
+            </dd>
+          </div>
+          <div>
+            <dt>Controller</dt>
+            <dd>
+              Standard controller: D-pad / left stick navigate or move. A / ✕
+              confirms; B / ○ goes back. Start focuses the menu. Bumpers cycle
+              controls or turn book pages; X / □ focuses the world; right stick
+              scrolls. Press and release a button to connect.
+            </dd>
+          </div>
+          <div>
             <dt>Move in the network</dt>
             <dd>
               <kbd>W</kbd> <kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd> or arrow keys

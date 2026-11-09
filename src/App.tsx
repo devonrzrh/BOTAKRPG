@@ -822,8 +822,15 @@ export default function App() {
   };
   useEffect(() => {
     const escape = (event: KeyboardEvent) => {
-      if (event.key !== "Escape" || event.target?.toString().includes("SVG"))
+      if (
+        event.defaultPrevented ||
+        event.key !== "Escape" ||
+        event.target?.toString().includes("SVG") ||
+        (event.target instanceof Element &&
+          event.target.closest('[role="dialog"],.book-reader,.menu-bar,.evade'))
+      )
         return;
+      event.preventDefault();
       if (tutorialRef.current) {
         closeTutorial();
         return;

@@ -107,7 +107,17 @@ export function Evade({
   const timeLeft = state ? Math.max(0, 1 - state.elapsed / EVADE_DURATION) : 1;
 
   return (
-    <section className="evade" aria-label="Defensive dodge">
+    <section
+      className="evade"
+      aria-label="Defensive dodge"
+      onKeyDown={(event) => {
+        if (event.key === "Escape") {
+          event.preventDefault();
+          event.stopPropagation();
+          cancel();
+        }
+      }}
+    >
       {!state ? (
         <div className="evade-intro">
           <p>

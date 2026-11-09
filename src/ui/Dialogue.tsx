@@ -140,9 +140,17 @@ export function Dialogue({
     root.current?.focus();
   }, [nodeId]);
   useEffect(() => {
-    if (complete && document.activeElement === document.body)
-      root.current?.focus();
-  }, [complete]);
+    if (
+      complete &&
+      (document.activeElement === document.body ||
+        document.activeElement === root.current)
+    )
+      root.current
+        ?.querySelector<HTMLButtonElement>(
+          ".dialogue-choices button:not(:disabled)",
+        )
+        ?.focus();
+  }, [complete, nodeId]);
   const choose = (index: number) => {
     if (!complete) return;
     const choice = node.choices[index];

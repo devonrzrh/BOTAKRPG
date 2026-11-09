@@ -32,9 +32,23 @@ const menus = {
   ],
 } as const;
 const menuIcons = { Home: HomeIcon, Case: FileText, Game: Gamepad2 };
+const menuNames = Object.keys(menus);
 export function MenuBar({ onSelect }: { onSelect: (id: string) => void }) {
   const [active, setActive] = useState<string | null>(null);
   const root = useRef<HTMLElement>(null);
+  const focusTrigger = (name: string) =>
+    root.current
+      ?.querySelector<HTMLButtonElement>(`[data-menu-trigger="${name}"]`)
+      ?.focus();
+  const openMenu = (name: string, last = false) => {
+    setActive(name);
+    requestAnimationFrame(() => {
+      const items = root.current?.querySelectorAll<HTMLButtonElement>(
+        `#menu-${name} button`,
+      );
+      items?.[last ? items.length - 1 : 0]?.focus();
+    });
+  };
   useEffect(() => {
     const close = (e: PointerEvent) => {
       if (!root.current?.contains(e.target as Node)) setActive(null);
@@ -47,35 +61,79 @@ export function MenuBar({ onSelect }: { onSelect: (id: string) => void }) {
       ref={root}
       className="menu-bar"
       aria-label="Menu bar"
-      onKeyDown={(e) => {
-        if (e.key === "Escape") {
+      onBlur={(e) => {
+        if (!e.currentTarget.contains(e.relatedTarget as Node | null))
           setActive(null);
+      }}
+      onKeyDown={(e) => {
+        if (e.defaultPrevented || e.ctrlKey || e.altKey || e.metaKey) return;
+        const target = e.target as HTMLElement;
+        if (target.closest("input,textarea,select,[contenteditable=true]"))
+          return;
+        const name =
+          target.closest<HTMLElement>("[data-menu-name]")?.dataset.menuName;
+        if (!name) return;
+        const popup = target.closest(".menu-popup");
+        if (e.key === "Escape" && active) {
+          e.preventDefault();
           e.stopPropagation();
-          root.current
-            ?.querySelector<HTMLButtonElement>(`[aria-expanded="true"]`)
-            ?.focus();
+          focusTrigger(active);
+          setActive(null);
+        } else if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
+          e.preventDefault();
+          e.stopPropagation();
+          const next =
+            menuNames[
+              (menuNames.indexOf(name) +
+                (e.key === "ArrowRight" ? 1 : -1) +
+                menuNames.length) %
+                menuNames.length
+            ];
+          if (active) openMenu(next);
+          else focusTrigger(next);
+        } else if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+          e.preventDefault();
+          e.stopPropagation();
+          if (!popup) openMenu(name, e.key === "ArrowUp");
+          else {
+            const items = [
+              ...popup.querySelectorAll<HTMLButtonElement>(
+                "button:not(:disabled)",
+              ),
+            ];
+            const index = items.indexOf(
+              document.activeElement as HTMLButtonElement,
+            );
+            items[
+              (index + (e.key === "ArrowDown" ? 1 : -1) + items.length) %
+                items.length
+            ]?.focus();
+          }
+        } else if (e.key === "Home" || e.key === "End") {
+          e.preventDefault();
+          e.stopPropagation();
+          if (popup) {
+            const items = popup.querySelectorAll<HTMLButtonElement>(
+              "button:not(:disabled)",
+            );
+            items[e.key === "Home" ? 0 : items.length - 1]?.focus();
+          } else
+            focusTrigger(
+              menuNames[e.key === "Home" ? 0 : menuNames.length - 1],
+            );
         }
       }}
     >
       {Object.entries(menus).map(([name, entries]) => (
-        <div className="menu-group" key={name}>
+        <div className="menu-group" key={name} data-menu-name={name}>
           <button
             type="button"
             className="menu-trigger"
+            data-menu-trigger={name}
+            aria-haspopup="menu"
             aria-expanded={active === name}
             aria-controls={`menu-${name}`}
-            onClick={() => setActive(active === name ? null : name)}
-            onKeyDown={(e) => {
-              if (e.key === "ArrowDown") {
-                e.preventDefault();
-                setActive(name);
-                requestAnimationFrame(() =>
-                  root.current
-                    ?.querySelector<HTMLButtonElement>(`#menu-${name} button`)
-                    ?.focus(),
-                );
-              }
-            }}
+            onClick={() => (active === name ? setActive(null) : openMenu(name))}
           >
             {(() => {
               const Icon = menuIcons[name as keyof typeof menuIcons];
@@ -88,24 +146,16 @@ export function MenuBar({ onSelect }: { onSelect: (id: string) => void }) {
             <div
               id={`menu-${name}`}
               className="menu-popup"
-              onKeyDown={(e) => {
-                if (!["ArrowDown", "ArrowUp"].includes(e.key)) return;
-                e.preventDefault();
-                const buttons = [...e.currentTarget.querySelectorAll("button")];
-                const index = buttons.indexOf(
-                  document.activeElement as HTMLButtonElement,
-                );
-                buttons[
-                  (index + (e.key === "ArrowDown" ? 1 : -1) + buttons.length) %
-                    buttons.length
-                ]?.focus();
-              }}
+              role="menu"
+              aria-label={`${name} menu`}
             >
               {entries.map(([label, id, Icon]) => (
                 <button
                   key={id}
                   type="button"
+                  role="menuitem"
                   onClick={() => {
+                    focusTrigger(name);
                     setActive(null);
                     onSelect(id);
                   }}
