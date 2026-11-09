@@ -1,0 +1,73 @@
+.enemy-speech {
+  position: absolute;
+  z-index: 5;
+  bottom: calc(var(--battle-console-height) + 44px);
+  left: calc(50% + 112px);
+  width: min(268px, calc(50% - 132px));
+  pointer-events: none;
+}
+.enemy-speech-bubble {
+  position: relative;
+  margin: 0;
+  padding: 12px 16px;
+  border: 1px solid #c6d8d5;
+  border-radius: 15px 15px 15px 3px;
+  background: #e8eee8f5;
+  color: #172b31;
+  box-shadow: 0 5px 20px #0006;
+  font: 400 18px/1.4 var(--typewriter);
+  animation: enemy-speech-arrive 180ms ease-out;
+}
+.enemy-speech-bubble::before {
+  content: "";
+  position: absolute;
+  left: -11px;
+  bottom: 10px;
+  border: 6px solid transparent;
+  border-right-color: #e8eee8;
+}
+@keyframes enemy-speech-arrive {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.speech-reduced-motion .enemy-speech-bubble {
+  animation: none;
+}
+.enemy-speech-speaker {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+@media (prefers-reduced-motion: reduce) {
+  .enemy-speech-bubble {
+    animation: none;
+  }
+}
+@media (max-width: 700px) {
+  .enemy-speech {
+    left: 16px;
+    right: 16px;
+    width: auto;
+    bottom: calc(var(--battle-console-height) + 28px);
+  }
+  .enemy-speech-bubble {
+    padding: 9px 11px;
+  }
+  .enemy-speech-bubble::before {
+    left: 50%;
+    top: -12px;
+    bottom: auto;
+    border-right-color: transparent;
+    border-bottom-color: #e8eee8;
+  }
+}

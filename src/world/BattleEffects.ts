@@ -12,6 +12,8 @@ type EffectRig = {
   leftArm: TransformNode;
   rightArm: TransformNode;
   materials: StandardMaterial[];
+  animateIdle?: (seconds: number) => void;
+  resetIdle?: () => void;
 };
 type CueState = { cue: BattleCue | null; reducedMotion: boolean };
 type Flash = { mesh: Mesh; material: StandardMaterial };
@@ -127,6 +129,7 @@ export function attachBattleEffects(
       mesh.isVisible = false;
     });
   const restore = () => {
+    rig.resetIdle?.();
     rig.root.position.copyFrom(original.rootPosition);
     rig.root.rotation.copyFrom(original.rootRotation);
     rig.root.scaling.copyFrom(original.rootScaling);
@@ -151,7 +154,11 @@ export function attachBattleEffects(
       restore();
       if (activeCue) begin(activeCue);
     }
-    if (!activeCue) return;
+    if (!activeCue) {
+      restore();
+      if (!reduced) rig.animateIdle?.((performance.now() - startTime) / 1000);
+      return;
+    }
     const duration = combatCueDuration(reduced);
     const t = Math.min(1, (performance.now() - started) / duration);
     animate(activeCue, t);

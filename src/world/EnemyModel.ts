@@ -506,5 +506,83 @@ export function buildEnemyModel(scene: Scene, id: string) {
       box("foot", side * 0.43, 0.22, -0.16, 0.6, 0.2, 0.9, shell);
     }
   }
-  return { root, leftArm, rightArm, materials, meshes, archetype: kind };
+  const rest = meshes.map((mesh) => ({
+    position: mesh.position.clone(),
+    rotation: mesh.rotation.clone(),
+    scaling: mesh.scaling.clone(),
+  }));
+  const resetIdle = () =>
+    meshes.forEach((mesh, i) => {
+      mesh.position.copyFrom(rest[i].position);
+      mesh.rotation.copyFrom(rest[i].rotation);
+      mesh.scaling.copyFrom(rest[i].scaling);
+    });
+  // Absolute poses avoid drift and let combat cues take over without competing observers.
+  const animateIdle = (seconds: number) => {
+    resetIdle();
+    const breath = Math.sin(seconds * 1.8);
+    const floating = [
+      "drone",
+      "interceptor",
+      "mimic",
+      "decoy",
+      "echo",
+    ].includes(kind);
+    root.position.y += floating ? 0.08 + breath * 0.07 : 0;
+    root.rotation.y +=
+      Math.sin(seconds * 0.65) * (kind === "warden" ? 0.025 : 0.065);
+    leftArm.rotation.z -= breath * (kind === "warden" ? 0.025 : 0.07);
+    rightArm.rotation.z += Math.sin(seconds * 1.8 + 0.6) * 0.07;
+    meshes.forEach((mesh, i) => {
+      const name = mesh.name;
+      if (kind === "drone") {
+        if (name.includes("gyroscope"))
+          mesh.rotation.y += seconds * (name.includes("cross") ? -0.65 : 0.45);
+        if (name.includes("single iris"))
+          mesh.position.x += Math.sin(seconds * 0.9) * 0.12;
+      } else if (kind === "echo") {
+        if (name.includes("worm segment")) {
+          mesh.position.x += Math.sin(seconds * 2.1 - i * 0.65) * 0.14;
+          mesh.rotation.z += Math.sin(seconds * 2.1 - i * 0.65) * 0.14;
+        }
+        if (name.includes("network route ring"))
+          mesh.rotation.y += seconds * 0.22;
+      } else if (kind === "decoy" && i < 18) {
+        const phase = Math.floor(i / 6) * 1.8;
+        mesh.position.y += Math.sin(seconds * 2.2 + phase) * 0.09;
+        mesh.position.x += Math.sin(seconds * 0.9 + phase) * 0.06;
+      } else if (kind === "keeper") {
+        if (/folio|pages/.test(name))
+          mesh.position.y +=
+            Math.sin(seconds * 1.4 + (mesh.parent === leftArm ? 0 : 1.5)) *
+            0.09;
+        if (name.includes("crown key")) mesh.rotation.y += seconds * 0.5;
+      } else if (kind === "mimic") {
+        if (/mask (left|right)/.test(name))
+          mesh.rotation.z += Math.sin(seconds * 1.1) * 0.045;
+        if (name.includes("counterfeit credential"))
+          mesh.rotation.z += Math.sin(seconds * 1.7) * 0.09;
+      } else if (kind === "interceptor") {
+        if (name.includes("captured packet")) {
+          mesh.position.y += Math.sin(seconds * 2.5 + i) * 0.1;
+          mesh.rotation.y += seconds * 0.45;
+        }
+        leftArm.rotation.y = Math.sin(seconds * 2.3) * 0.09;
+        rightArm.rotation.y = -Math.sin(seconds * 2.3) * 0.09;
+      } else if (kind === "sentinel" && /head|visor/.test(name)) {
+        mesh.position.x += Math.sin(seconds * 0.8) * 0.055;
+        mesh.rotation.y += Math.sin(seconds * 0.8) * 0.12;
+      }
+    });
+  };
+  return {
+    root,
+    leftArm,
+    rightArm,
+    materials,
+    meshes,
+    archetype: kind,
+    animateIdle,
+    resetIdle,
+  };
 }

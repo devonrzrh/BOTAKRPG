@@ -17,6 +17,7 @@ import { combatCueDuration, type BattleCue } from "../game/combatPresentation";
 import { XpMeter } from "./XpMeter";
 import { useGameSound } from "./GameSound";
 import { enemyThreatName } from "../game/enemyIdentity";
+import { EnemySpeech } from "./EnemySpeech";
 import { useGameParticles } from "./GameParticles";
 import { createCombatAudio } from "../game/combatAudio";
 import { useBattleFeedback } from "./useBattleFeedback";
@@ -435,6 +436,13 @@ export function BattleScreen(p: Props) {
             ))}
         </div>
       </div>
+      <EnemySpeech
+        key={b.enemyId}
+        battle={b}
+        cue={p.cue}
+        hidden={evading || b.phase === "question"}
+        reducedMotion={reducedMotion}
+      />
       {evading && (
         <Evade
           muted={save.settings.combatMuted}
