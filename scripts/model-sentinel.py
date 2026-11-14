@@ -136,7 +136,9 @@ def export_model():
                 loop = mesh.loops[loop_index]
                 p = obj.matrix_world @ mesh.vertices[loop.vertex_index].co - origins[rig]
                 n = obj.matrix_world.to_3x3() @ mesh.corner_normals[loop_index].vector
-                vertex = tuple(round(value, 4) for value in (p.x, p.z, p.y, n.x, n.z, n.y))
+                position = tuple(round(value, 4) for value in (p.x, p.z, p.y))
+                normal = tuple(round(value, 3) for value in (n.x, n.z, n.y))
+                vertex = position + normal
                 if vertex not in lookup:
                     lookup[vertex] = len(positions) // 3
                     positions.extend(vertex[:3])
