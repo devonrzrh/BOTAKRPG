@@ -240,9 +240,6 @@ button.pinned-paper:hover:not(:disabled) {
   align-items: stretch;
   text-align: left;
 }
-.suspect-note:hover {
-  transform: rotate(-2deg);
-}
 .suspect-note strong {
   font: 20px monospace;
   letter-spacing: 2px;

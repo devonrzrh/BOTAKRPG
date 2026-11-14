@@ -18,18 +18,50 @@ export function HomeBoard({
   finaleReady: boolean;
   caseClosed: boolean;
 }) {
+  const threads = useRef<SVGSVGElement>(null);
+  useLayoutEffect(() => {
+    const svg = threads.current!;
+    const board = svg.parentElement!;
+    const pins = [...board.querySelectorAll(".paper-pin")];
+    const path = svg.querySelector("path")!;
+    const align = () => {
+      const matrix = svg.getScreenCTM();
+      if (!matrix || !svg.clientWidth || !svg.clientHeight) return;
+      const inverse = matrix.inverse();
+      const points = pins.map((pin) => {
+        const rect = pin.getBoundingClientRect();
+        const point = new DOMPoint(
+          rect.left + rect.width / 2,
+          rect.top + rect.height / 2,
+        ).matrixTransform(inverse);
+        return `${point.x},${point.y}`;
+      });
+      const [suspect, quest, books, ledger, terminal] = points;
+      path.setAttribute(
+        "d",
+        `M${suspect}L${quest}L${books}L${ledger}L${suspect}L${terminal}`,
+      );
+    };
+    const observer = new ResizeObserver(align);
+    observer.observe(board);
+    pins.forEach((pin) => observer.observe(pin.parentElement!));
+    align();
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <section className="investigation-board" aria-label="Investigation wall">
       <div className="board-label">
         CASE 007 <span>ECHO-7</span>
       </div>
       <svg
+        ref={threads}
         className="evidence-threads"
         viewBox="0 0 1000 600"
         preserveAspectRatio="none"
         aria-hidden="true"
       >
-        <path d="M200 290L500 135L820 220L500 470L200 290L820 460M500 135L500 470" />
+        <path />
       </svg>
       <button
         className="suspect-note pinned-paper"
@@ -111,3 +143,4 @@ export function HomeBoard({
     </section>
   );
 }
+import { useLayoutEffect, useRef } from "react";

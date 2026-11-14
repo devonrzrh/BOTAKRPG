@@ -180,7 +180,9 @@ export function attachOfficeSurfaces(
     p.rotation.x = Math.PI / 2;
     p.material = pinMat;
     p.isPickable = false;
+    return p;
   };
+  const evidencePins = new Map<TransformNode, Mesh>();
   const sheet = (
     name: string,
     wall: HomeWall,
@@ -226,7 +228,10 @@ export function attachOfficeSurfaces(
     };
     p.metadata = { propPage: widget };
     widgets.push(widget);
-    if (pinIt) pin(root, 0, h * 0.43, -0.04);
+    if (pinIt) {
+      const fastener = pin(root, 0, h * 0.43, -0.04);
+      if (wall === "investigation") evidencePins.set(root, fastener);
+    }
     return root;
   };
   const paper = (c: Ctx, color = "#d8c7a1") => {
@@ -263,30 +268,24 @@ export function attachOfficeSurfaces(
       board.isPickable = false;
     }
   }
-  const thread = (wall: HomeWall, points: [number, number][]) => {
-    const path = points.map(([x, y]) => new Vector3(x, y, 4.445));
+  const boardAnchor = anchors.get("investigation")!;
+  const thread = (...sheets: TransformNode[]) => {
+    const toBoard = boardAnchor.computeWorldMatrix(true).clone().invert();
+    const path = sheets.map((sheet) => {
+      const fastener = evidencePins.get(sheet)!;
+      fastener.computeWorldMatrix(true);
+      return Vector3.TransformCoordinates(fastener.getAbsolutePosition(), toBoard);
+    });
     const wire = MeshBuilder.CreateTube(
       "evidence thread",
       { path, radius: 0.009, tessellation: 6 },
       scene,
     );
-    wire.parent = anchors.get(wall)!;
+    wire.parent = boardAnchor;
     wire.material = pinMat;
     wire.isPickable = false;
   };
-  thread("investigation", [
-    [-2.25, 3.85],
-    [0.05, 3.95],
-    [2.2, 3.15],
-    [0.1, 1.95],
-    [-2.15, 1.2],
-  ]);
-  thread("investigation", [
-    [-2.25, 3.85],
-    [2.15, 1.2],
-    [2.2, 3.15],
-  ]);
-  sheet(
+  const photograph = sheet(
     "ECHO-7 evidence photograph",
     "investigation",
     -2.3,
@@ -334,7 +333,7 @@ export function attachOfficeSurfaces(
       return zone(m, "briefing");
     },
   );
-  sheet(
+  const report = sheet(
     "case report",
     "investigation",
     -0.05,
@@ -354,7 +353,7 @@ export function attachOfficeSurfaces(
       return zone(m, "quests");
     },
   );
-  sheet(
+  const routingMap = sheet(
     "transit routing map",
     "investigation",
     2.15,
@@ -391,7 +390,7 @@ export function attachOfficeSurfaces(
       return zone(m, "online");
     },
   );
-  sheet(
+  const archiveSlip = sheet(
     "library archive slip",
     "investigation",
     0,
@@ -409,7 +408,7 @@ export function attachOfficeSurfaces(
       return zone(m, "books");
     },
   );
-  sheet(
+  const ledgerIndex = sheet(
     "clue ledger index",
     "investigation",
     -2.25,
@@ -426,7 +425,7 @@ export function attachOfficeSurfaces(
       return zone(m, "inventory");
     },
   );
-  sheet(
+  const motive = sheet(
     "motive sticky note",
     "investigation",
     2.1,
@@ -441,6 +440,8 @@ export function attachOfficeSurfaces(
       return [];
     },
   );
+  thread(photograph, report, routingMap, archiveSlip, ledgerIndex);
+  thread(photograph, motive, routingMap);
   // A single luminous display mounted in the room; the same quest actions remain ray-picked.
   const display = sheet(
     "quest display",
