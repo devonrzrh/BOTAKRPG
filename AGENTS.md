@@ -6,6 +6,8 @@
 - Implement requests, verify behavior, then commit completed changes to Git.
 - Stage only task-owned changes. Preserve user files and `References/PythonWeb`.
 - Run `npm test` and `npm run build` for gameplay/rendering changes. Verify visual changes in the browser.
+- Keep testing proportional to the change. Run required checks once after edits settle. Repeat only when a fix or a specific uncertainty warrants it.
+- For 3D browser checks, use hardware acceleration and one short session at a time. Close the test browser and confirm its processes exited. If GPU rendering is unavailable, report the verification gap. Never force CPU rendering with SwiftShader.
 - Be brief and direct. Avoid narration, filler, and repeated summaries. Preserve technical accuracy and important warnings. Show only relevant code and test results. Explain decisions only when non-obvious.
 
 ## Game direction
