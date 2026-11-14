@@ -108,6 +108,55 @@ export function buildEnemyModel(scene: Scene, id: string) {
       material,
       parent,
     );
+  const armorPlate = (
+    name: string,
+    x: number,
+    y: number,
+    z: number,
+    width: number,
+    height: number,
+    depth: number,
+    material = alloy,
+    parent = root,
+  ) => {
+    const halfWidth = width / 2;
+    const halfHeight = height / 2;
+    const cut = Math.min(width, height) * 0.19;
+    // Octagonal rim with a recessed edge and a beveled face.
+    const outline = [
+      [-halfWidth + cut, -halfHeight], [-halfWidth, -halfHeight + cut],
+      [-halfWidth, halfHeight - cut], [-halfWidth + cut, halfHeight],
+      [halfWidth - cut, halfHeight], [halfWidth, halfHeight - cut],
+      [halfWidth, -halfHeight + cut], [halfWidth - cut, -halfHeight],
+    ];
+    const positions: number[] = [];
+    const indices: number[] = [];
+    const face = (points: number[][]) => {
+      const offset = positions.length / 3;
+      positions.push(...points.flat());
+      for (let i = 1; i < points.length - 1; i++)
+        indices.push(offset, offset + i, offset + i + 1);
+    };
+    const front = outline.map(([u, v]) => [u * 0.84, v * 0.88, -depth / 2]);
+    const rim = outline.map(([u, v]) => [u, v, -depth * 0.16]);
+    const back = outline.map(([u, v]) => [u * 0.92, v * 0.96, depth / 2]);
+    face([...front].reverse());
+    face(back);
+    for (const [outer, inner] of [[front, rim], [rim, back]]) {
+      for (let i = 0; i < outline.length; i++) {
+        const next = (i + 1) % outline.length;
+        face([outer[i], outer[next], inner[next], inner[i]]);
+      }
+    }
+    const vertices = new VertexData();
+    vertices.positions = positions;
+    vertices.indices = indices;
+    vertices.normals = [];
+    VertexData.ComputeNormals(positions, indices, vertices.normals);
+    const mesh = new Mesh(`${kind} ${name}`, scene);
+    vertices.applyToMesh(mesh);
+    return place(mesh, x, y, z, material, parent);
+  };
   const ring = (
     name: string,
     x: number,
@@ -254,28 +303,30 @@ export function buildEnemyModel(scene: Scene, id: string) {
       box("sensor boom", 0, -0.25, 0, 0.22, 0.8, 0.22, shell, pivot);
   } else if (kind === "keeper") {
     // An archive shrine: stacked drawers, floating folios and a crowned keyhole.
-    box("archive plinth", 0, 0.35, 0, 1.65, 0.5, 1.15, shell);
-    box("archive cabinet", 0, 1.6, 0, 1.25, 2.15, 0.9, alloy);
+    armorPlate("archive plinth", 0, 0.36, 0, 1.58, 0.52, 1.1, shell);
+    armorPlate("archive cabinet", 0, 1.58, 0, 1.42, 2.32, 0.98);
+    armorPlate("archive crown", 0, 2.67, 0, 1.58, 0.33, 1.0, shell);
+    ring("key halo", 0, 2.99, 0.12, 0.87, 0.063, alloy);
     for (let i = 0; i < 4; i++) {
-      box("drawer", 0, 0.88 + i * 0.43, -0.48, 1.1, 0.33, 0.12, shell);
-      box("drawer seal", 0, 0.88 + i * 0.43, -0.56, 0.18, 0.07, 0.035, signal);
+      armorPlate("drawer", 0, 0.88 + i * 0.43, -0.49, 1.08, 0.38, 0.17, shell);
+      box("drawer seal", 0.28, 0.88 + i * 0.43, -0.60, 0.15, 0.065, 0.045, signal);
       box(
         "cache file tab",
-        -0.25,
-        1.08 + i * 0.43,
-        -0.53,
-        0.42,
-        0.09,
-        0.13,
+        -0.23,
+        0.88 + i * 0.43,
+        -0.59,
+        0.32,
+        0.065,
+        0.11,
         alloy,
       );
     }
-    shard("crown key", 0, 2.92, 0, 0.42, signal);
+    shard("crown key", 0, 2.99, -0.06, 0.31, signal).scaling.set(0.72, 1.48, 0.68);
     for (const [pivot, side] of [
       [leftArm, -1],
       [rightArm, 1],
     ] as const) {
-      const folio = box(
+      const folio = armorPlate(
         "floating folio cover",
         side * 0.1,
         0.05,
@@ -287,7 +338,7 @@ export function buildEnemyModel(scene: Scene, id: string) {
         pivot,
       );
       folio.rotation.z = side * -0.18;
-      const pages = box(
+      const pages = armorPlate(
         "folio pages",
         side * 0.1,
         0.05,
@@ -295,30 +346,36 @@ export function buildEnemyModel(scene: Scene, id: string) {
         0.61,
         1.1,
         0.08,
-        signal,
+        alloy,
         pivot,
       );
       pages.rotation.z = side * -0.18;
+      box("folio illuminated clasp", side * 0.1, 0.05, -0.30, 0.14, 0.5, 0.07, signal, pivot)
+        .rotation.z = side * -0.18;
     }
   } else if (kind === "warden") {
     // A gate on four heavy pylons, with a shield dominating one side.
-    box("gate body", 0, 1.45, 0, 1.55, 1.65, 1.15, alloy);
-    box("narrow slit", 0, 2.05, -0.61, 0.95, 0.14, 0.1, signal);
+    armorPlate("gate body", 0, 1.51, 0, 1.76, 1.71, 1.18);
+    armorPlate("gate visor housing", 0, 2.06, -0.54, 1.38, 0.47, 0.25, shell);
+    box("narrow slit", 0, 2.06, -0.681, 1.04, 0.095, 0.044, signal);
     for (const side of [-1, 1]) {
-      box("gate battlement", side * 0.58, 2.67, 0, 0.38, 0.9, 0.6, shell);
-      for (const z of [-0.38, 0.38])
-        box("pylon foot", side * 0.63, 0.35, z, 0.5, 0.65, 0.5, shell);
+      armorPlate("gate battlement", side * 0.62, 2.58, 0, 0.48, 0.82, 0.68, shell);
+      for (const z of [-0.4, 0.39]) {
+        const foot = armorPlate("pylon foot", side * 0.64, 0.45, z, 0.58, 0.9, 0.57, shell);
+        foot.rotation.z = side * 0.17;
+      }
     }
-    box("tower shield", -0.12, -0.1, -0.42, 0.8, 1.9, 0.2, shell, leftArm);
-    box("shield stripe", -0.12, -0.1, -0.55, 0.12, 1.7, 0.06, signal, leftArm);
+    armorPlate("tower shield", -0.14, -0.1, -0.43, 1.06, 2.16, 0.32, alloy, leftArm);
+    armorPlate("shield inset", -0.14, -0.10, -0.60, 0.85, 1.92, 0.13, shell, leftArm);
+    box("shield bus", -0.14, -0.10, -0.676, 0.06, 1.60, 0.035, signal, leftArm);
     for (let i = 0; i < 3; i++)
       box(
         "blocked port",
-        -0.12,
+        -0.14,
         -0.65 + i * 0.55,
-        -0.59,
-        0.52,
-        0.25,
+        -0.70,
+        0.56,
+        0.13,
         0.06,
         alloy,
         leftArm,
@@ -335,7 +392,8 @@ export function buildEnemyModel(scene: Scene, id: string) {
         shell,
       );
     box("breaker hammer", 0, -0.15, 0, 0.2, 1.25, 0.2, shell, rightArm);
-    box("hammer block", 0, 0.45, 0, 0.75, 0.45, 0.55, signal, rightArm);
+    armorPlate("hammer block", 0.12, 0.45, 0, 0.97, 0.64, 0.72, alloy, rightArm);
+    armorPlate("hammer core", 0.12, 0.45, -0.37, 0.52, 0.30, 0.12, signal, rightArm);
   } else if (kind === "mimic") {
     // A phishing mask dangles a counterfeit credential from a visible hook.
     const mask = box("mask left", -0.36, 2.1, -0.1, 0.62, 1.5, 0.3, alloy);
@@ -561,7 +619,7 @@ export function buildEnemyModel(scene: Scene, id: string) {
         mesh.position.y += Math.sin(seconds * 2.2 + phase) * 0.09;
         mesh.position.x += Math.sin(seconds * 0.9 + phase) * 0.06;
       } else if (kind === "keeper") {
-        if (/folio|pages/.test(name))
+        if (name.includes("folio"))
           mesh.position.y +=
             Math.sin(seconds * 1.4 + (mesh.parent === leftArm ? 0 : 1.5)) *
             0.09;
