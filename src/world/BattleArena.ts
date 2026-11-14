@@ -220,8 +220,35 @@ export function buildBattleArena(scene: Scene, enemyId: string) {
           accent,
         );
       }
-    box("vault axle", 0, 2, 3.52, 0.2, 1.3, 0.1, "backdrop", accent);
-    box("vault latch", 0, 2, 3.5, 1.3, 0.2, 0.1, "backdrop", accent);
+    const hub = place(
+      MeshBuilder.CreateCylinder(
+        "cache-vault recessed lock hub",
+        { diameter: 1.45, height: 0.18, tessellation: 12 },
+        scene,
+      ),
+      0,
+      2,
+      3.6,
+      "backdrop",
+      floor,
+    );
+    hub.rotation.x = Math.PI / 2;
+    ring("lock dial", 0, 2, 3.49, 1.08, "backdrop", shell).rotation.x =
+      Math.PI / 2;
+    for (let i = 0; i < 6; i++) {
+      const angle = (i + 0.25) * (Math.PI / 3);
+      box(
+        "lock contact",
+        Math.cos(angle) * 0.87,
+        2 + Math.sin(angle) * 0.87,
+        3.65,
+        0.19,
+        0.09,
+        0.07,
+        "backdrop",
+        shell,
+      ).rotation.z = angle;
+    }
   } else if (kind === "browser-net") {
     box("browser grid plane", 0, -0.22, 0, 12, 0.3, 12, "floor", floor);
     for (let i = -3; i <= 3; i++) {
