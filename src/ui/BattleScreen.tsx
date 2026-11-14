@@ -245,7 +245,7 @@ export function BattleScreen(p: Props) {
     };
   }, [p.cue, reducedMotion]);
   useEffect(() => {
-    if (motion) return;
+    if (motion || evading) return;
     if (menu === "skills")
       skillList.current
         ?.querySelector<HTMLButtonElement>("button:not(:disabled)")
@@ -254,7 +254,7 @@ export function BattleScreen(p: Props) {
       defenseList.current?.querySelector<HTMLButtonElement>("button")?.focus();
     else if (menu || b.phase !== "choose") title.current?.focus();
     else skillsButton.current?.focus();
-  }, [b.phase, menu, motion]);
+  }, [b.phase, b.turn, evading, menu, motion]);
   const skills = p.content.entities.filter(
     (e): e is Skill =>
       e.type === "skill" && save.character.skills.includes(e.id),
@@ -633,27 +633,31 @@ export function BattleScreen(p: Props) {
           </div>
           <details className="battle-playback">
             <summary>Battle options</summary>
-            <button
-              onClick={p.onToggleSound}
-              aria-label={
-                save.settings.combatMuted
-                  ? "Enable battle sound"
-                  : "Mute battle sound"
-              }
-            >
-              {save.settings.combatMuted ? (
-                <VolumeX size={18} />
-              ) : (
-                <Volume2 size={18} />
-              )}
-              {save.settings.combatMuted ? "Sound off" : "Sound on"}
-            </button>
-            <button
-              aria-pressed={save.settings.battleAutoAdvance}
-              onClick={p.onToggleAutoAdvance}
-            >
-              {save.settings.battleAutoAdvance ? "Auto turns" : "Manual turns"}
-            </button>
+            <div className="battle-playback-options">
+              <button
+                onClick={p.onToggleSound}
+                aria-label={
+                  save.settings.combatMuted
+                    ? "Enable battle sound"
+                    : "Mute battle sound"
+                }
+              >
+                {save.settings.combatMuted ? (
+                  <VolumeX size={18} />
+                ) : (
+                  <Volume2 size={18} />
+                )}
+                {save.settings.combatMuted ? "Sound off" : "Sound on"}
+              </button>
+              <button
+                aria-pressed={save.settings.battleAutoAdvance}
+                onClick={p.onToggleAutoAdvance}
+              >
+                {save.settings.battleAutoAdvance
+                  ? "Auto turns"
+                  : "Manual turns"}
+              </button>
+            </div>
           </details>
         </header>
         {resultChanges.length > 0 && (
@@ -682,6 +686,7 @@ export function BattleScreen(p: Props) {
         )}
         {activeCard && (
           <section
+            key={`${b.turn}:${b.phase}:${menu}`}
             className={`battle-decision ${b.phase === "choose" ? "command-panel" : "quiz-panel"} ${menu === "analyze" ? "analysis-panel" : ""} ${b.phase === "feedback" ? "feedback-panel" : ""} ${correctFeedback ? "answer-correct" : ""}`}
             aria-label={
               b.phase === "question" ? "Battle question" : "Battle decision"
@@ -894,12 +899,11 @@ export function BattleScreen(p: Props) {
                       className={p.answer.includes(index) ? "selected" : ""}
                       onClick={() => selectAnswer(index)}
                     >
-                      <span>{position + 1}</span>
-                      {q.format === "ordering" && p.answer.includes(index) && (
-                        <strong className="answer-order">
-                          #{p.answer.indexOf(index) + 1}
-                        </strong>
-                      )}
+                      <span>
+                        {q.format === "ordering" && p.answer.includes(index)
+                          ? `#${p.answer.indexOf(index) + 1}`
+                          : position + 1}
+                      </span>
                       {text}
                     </button>
                   ))}

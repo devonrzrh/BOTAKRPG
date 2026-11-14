@@ -10,17 +10,13 @@
   font-size: 16px;
 }
 /* Contact starts these classes; the persistent menu bar stays still. */
-.app:not(.reduced-motion):has(.battle-screen.impact-damage) .world-canvas,
-.app:not(.reduced-motion) .battle-screen.impact-damage {
+.app:not(.reduced-motion):has(.battle-screen.impact-damage) .world-canvas {
   animation: battle-screen-hit 240ms steps(1, end) both;
 }
-.app:not(.reduced-motion):has(.battle-screen.impact-defeat) .world-canvas,
-.app:not(.reduced-motion) .battle-screen.impact-defeat {
+.app:not(.reduced-motion):has(.battle-screen.impact-defeat) .world-canvas {
   animation: battle-screen-defeat 420ms steps(1, end) both;
 }
 .app:not(.reduced-motion) .impact-damage .battle-player-hud {
-  animation: battle-hp-hit 240ms steps(1, end) both;
-  border-color: #ff776a;
   box-shadow: 0 0 28px #e2463d88;
 }
 .impact-damage .battle-meter.health i {
@@ -41,23 +37,6 @@
   }
   72% {
     translate: -3px 1px;
-  }
-  100% {
-    translate: 0 0;
-  }
-}
-@keyframes battle-hp-hit {
-  0% {
-    translate: 7px -2px;
-  }
-  25% {
-    translate: -9px 1px;
-  }
-  50% {
-    translate: 6px 0;
-  }
-  75% {
-    translate: -4px 0;
   }
   100% {
     translate: 0 0;
@@ -140,10 +119,7 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .app:has(.battle-screen.impact-damage) .world-canvas,
-  .app:has(.battle-screen.impact-defeat) .world-canvas,
-  .app .battle-screen.impact-damage,
-  .app .battle-screen.impact-defeat,
-  .app .impact-damage .battle-player-hud {
+  .app:has(.battle-screen.impact-defeat) .world-canvas {
     animation: none !important;
   }
 }
