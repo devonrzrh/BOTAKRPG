@@ -328,6 +328,7 @@ export default function App() {
   const [blocksExpanded, setBlocksExpanded] = useState(true);
   const [maze, setMaze] = useState<Maze>(() => createMaze(defaultSave().seed)),
     mazeRef = useRef(maze),
+    mazeScreenStep = useRef<((direction: Direction) => void) | null>(null),
     [mazeSession, setMazeSession] = useState(0),
     [mode, setMode] = useState<"manual" | "blocks" | "python">("manual"),
     [generated, setGenerated] = useState(""),
@@ -1483,6 +1484,7 @@ export default function App() {
             }
             onInteract={open}
             onMove={manualMove}
+            mazeScreenStep={mazeScreenStep}
             onMetrics={onMetrics}
           />
         </Suspense>
@@ -1784,17 +1786,19 @@ export default function App() {
                       <div className="dpad">
                         {(
                           [
-                            ["north", ArrowUp],
-                            ["west", ArrowLeft],
-                            ["south", ArrowDown],
-                            ["east", ArrowRight],
+                            ["north", ArrowUp, "up"],
+                            ["west", ArrowLeft, "left"],
+                            ["south", ArrowDown, "down"],
+                            ["east", ArrowRight, "right"],
                           ] as const
-                        ).map(([d, Icon]) => (
+                        ).map(([d, Icon, label]) => (
                           <button
                             key={d}
                             disabled={trialExpired}
-                            aria-label={`Move ${d}`}
-                            onClick={() => manualMove(d)}
+                            aria-label={`Move ${label}`}
+                            onClick={() =>
+                              (mazeScreenStep.current ?? manualMove)(d)
+                            }
                           >
                             <Icon size={18} />
                           </button>

@@ -1,4 +1,11 @@
-import { Component, useEffect, useRef, useState, type ReactNode } from "react";
+import {
+  Component,
+  useEffect,
+  useRef,
+  useState,
+  type ReactNode,
+  type RefObject,
+} from "react";
 import { useGameSound } from "../ui/GameSound";
 import { Engine } from "@babylonjs/core/Engines/engine";
 import { WebGPUEngine } from "@babylonjs/core/Engines/webgpuEngine";
@@ -64,6 +71,7 @@ interface Props {
   locked: boolean;
   onInteract: (id: string) => void;
   onMove: (direction: Direction) => void;
+  mazeScreenStep: RefObject<((direction: Direction) => void) | null>;
   onMetrics: (metrics: WorldMetrics) => void;
 }
 const locations = [
@@ -744,6 +752,8 @@ function WorldCanvas(props: Props) {
         } else sound("blocked");
       }
     };
+    const mazeScreenStep = props.mazeScreenStep;
+    if (props.scene === "maze") mazeScreenStep.current = step;
     const down = (event: KeyboardEvent) => {
       if (
         event.defaultPrevented ||
@@ -787,6 +797,7 @@ function WorldCanvas(props: Props) {
     window.addEventListener("blur", clearMovement);
     document.addEventListener("visibilitychange", clearMovement);
     return () => {
+      if (mazeScreenStep.current === step) mazeScreenStep.current = null;
       window.removeEventListener("keydown", down);
       window.removeEventListener("keyup", up);
       window.removeEventListener("blur", clearMovement);
