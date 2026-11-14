@@ -1,0 +1,50 @@
+.app .viewport-warning {
+  position: fixed;
+  inset: calc(var(--top-height, 56px) + 8px) 8px auto auto;
+  z-index: 91;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 10px;
+  width: min(410px, calc(100% - 16px));
+  padding: 10px;
+  border: 1px solid #ad915c;
+  background: #17242b;
+  box-shadow: 0 6px 20px #0008;
+  color: #eee3cb;
+  font: 400 16px/1.35 var(--typewriter);
+}
+
+.viewport-warning > svg {
+  margin-top: 2px;
+  color: #e4bd77;
+}
+
+.viewport-warning strong {
+  color: #f1cd8e;
+  font-size: 18px;
+  font-weight: 400;
+}
+
+.app .viewport-warning p {
+  margin: 4px 0 0;
+  color: inherit;
+  font-size: 16px;
+}
+
+.app .viewport-warning button {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 1px solid #7e7155;
+  background: #101b22;
+  color: #f1cd8e;
+}
+
+.app .viewport-warning button:hover,
+.app .viewport-warning button:focus-visible {
+  outline: 2px solid #f1cd8e;
+  outline-offset: 2px;
+}

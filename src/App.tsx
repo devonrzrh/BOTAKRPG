@@ -81,6 +81,7 @@ import {
 import { Cutscene } from "./ui/Cutscene";
 import { Dialogue } from "./ui/Dialogue";
 import { MenuBar } from "./ui/MenuBar";
+import { ViewportWarning } from "./ui/ViewportWarning";
 import { chooseMusic, createMusic } from "./game/music";
 import { HomeBoard } from "./ui/HomeBoard";
 import { WorldUiControls } from "./ui/WorldUiControls";
@@ -1353,6 +1354,7 @@ export default function App() {
           </button>
         </div>
       </header>
+      {booted && !intakeOpen && <ViewportWarning />}
       {!booted && (
         <div className="boot-screen" role="status">
           Loading journal…
