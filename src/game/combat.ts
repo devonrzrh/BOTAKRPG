@@ -2,11 +2,13 @@ import type {
   CombatTactics,
   Content,
   Effect,
+  Item,
   Question,
   Skill,
 } from "../content/schema";
 export type { CombatTactics } from "../content/schema";
 import { stats, type Save } from "./state";
+import { useConsumable } from "./gacha";
 export interface ActiveEffect {
   id: "shield" | "poison";
   remaining: number;
@@ -529,6 +531,29 @@ export function guardTurn(
   );
   return enemyTurn(guarded, player, content);
 }
+
+export function itemTurn(
+  battle: Battle,
+  save: Save,
+  content: Content,
+  item: Item,
+) {
+  if (battle.phase !== "choose") return null;
+  const used = useConsumable(save, item);
+  if (used === save) return null;
+  const result = enemyTurn(
+    {
+      ...battle,
+      phase: "feedback",
+      momentumSpend: 0,
+      log: [...battle.log, `You use ${item.title}.`],
+    },
+    used,
+    content,
+  );
+  return { ...result, used };
+}
+
 export function analyzeBattle(
   battle: Battle,
   save: Save,

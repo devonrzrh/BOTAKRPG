@@ -6362,6 +6362,86 @@
       "body": ""
     },
     {
+      "id": "patch-kit",
+      "title": "Patch Kit",
+      "type": "item",
+      "description": "Seal damaged circuits with conductive gel.",
+      "kind": "healing",
+      "amount": 18,
+      "rarity": "common",
+      "weight": 22
+    },
+    {
+      "id": "focus-cell",
+      "title": "Focus Cell",
+      "type": "item",
+      "description": "Recharge the field terminal during an encounter.",
+      "kind": "focus",
+      "amount": 6,
+      "rarity": "common",
+      "weight": 18
+    },
+    {
+      "id": "pulse-baton",
+      "title": "Pulse Baton",
+      "type": "item",
+      "description": "Deliver a short pulse through exposed contacts.",
+      "kind": "weapon",
+      "amount": 2,
+      "rarity": "common",
+      "weight": 18
+    },
+    {
+      "id": "insulated-coat",
+      "title": "Insulated Coat",
+      "type": "item",
+      "description": "Ground stray current through a woven lining.",
+      "kind": "armor",
+      "amount": 1,
+      "rarity": "common",
+      "weight": 16
+    },
+    {
+      "id": "arc-projector",
+      "title": "Arc Projector",
+      "type": "item",
+      "description": "Project an arc across a damaged shield.",
+      "kind": "weapon",
+      "amount": 4,
+      "rarity": "rare",
+      "weight": 8
+    },
+    {
+      "id": "mesh-vest",
+      "title": "Mesh Vest",
+      "type": "item",
+      "description": "Disperse incoming surges through layered mesh.",
+      "kind": "armor",
+      "amount": 2,
+      "rarity": "rare",
+      "weight": 8
+    },
+    {
+      "id": "phase-driver",
+      "title": "Phase Driver",
+      "type": "item",
+      "description": "Tune each pulse to the target's shielding frequency.",
+      "kind": "weapon",
+      "amount": 6,
+      "rarity": "epic",
+      "weight": 5
+    },
+    {
+      "id": "faraday-rig",
+      "title": "Faraday Rig",
+      "type": "item",
+      "description": "Route incoming current around the body and into ground.",
+      "kind": "armor",
+      "amount": 3,
+      "rarity": "epic",
+      "weight": 5
+    },
+    {
       "id": "source-guide",
       "title": "Module guide and review notes",
       "type": "lesson",

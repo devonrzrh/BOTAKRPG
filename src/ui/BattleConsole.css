@@ -223,8 +223,8 @@
 .app.gameplay-battle .battle-layout-console .battle-command-menu {
   position: static;
   width: auto;
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 8px;
   padding: 8px 16px;
   border-top: 1px solid #60706a;
@@ -232,7 +232,6 @@
   flex: none;
 }
 .app.gameplay-battle .battle-layout-console .battle-command-menu button {
-  flex: 1 1 135px;
   min-height: 42px;
   justify-content: center;
   padding: 6px 8px;
@@ -325,9 +324,6 @@
 @media (max-width: 1050px) {
   .app.gameplay-battle .battle-layout-console .battle-console-status {
     gap: 10px 16px;
-  }
-  .app.gameplay-battle .battle-layout-console .battle-command-menu button {
-    flex-basis: 115px;
   }
 }
 @media (max-width: 700px) {
@@ -489,8 +485,6 @@
     gap: 4px;
   }
   .app.gameplay-battle .battle-layout-console .battle-command-menu {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
     padding-inline: 6px;
     gap: 4px;
   }
@@ -511,6 +505,11 @@
     button
     > span {
     font-size: 16px;
+  }
+}
+@media (max-width: 420px) {
+  .app.gameplay-battle .battle-layout-console .battle-command-menu {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 

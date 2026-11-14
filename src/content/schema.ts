@@ -42,9 +42,11 @@ export const questionSchema = z.object({
 export const itemSchema = z.object({
   ...base,
   type: z.literal("item"),
-  description: z.string(),
-  kind: z.enum(["healing", "focus", "equipment"]),
-  amount: z.number().int().positive(),
+  description: z.string().min(1),
+  kind: z.enum(["weapon", "armor", "healing", "focus"]),
+  amount: z.number().int().min(1).max(100),
+  rarity: z.enum(["common", "rare", "epic"]),
+  weight: z.number().int().min(1).max(100),
 });
 export const skillSchema = z.object({
   ...base,

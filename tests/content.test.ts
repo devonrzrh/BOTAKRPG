@@ -70,7 +70,7 @@ it("supports reusable cutscenes with different frame counts and pursuit steps", 
   expect(intro?.type === "story" && intro.frames[1].steps).toBe(6);
   expect(connection?.type === "story" && connection.frames.length).toBe(2);
 });
-it("compiles active curriculum types without retired inventory items", () => {
+it("compiles active curriculum types and the field supply catalog", () => {
   const c = validateContent(raw);
   expect(new Set(c.entities.map((x) => x.type))).toEqual(
     new Set([
@@ -80,9 +80,14 @@ it("compiles active curriculum types without retired inventory items", () => {
       "quest",
       "skill",
       "effect",
+      "item",
       "story",
       "dialogue",
     ]),
+  );
+  const items = c.entities.filter((e) => e.type === "item");
+  expect(new Set(items.map((item) => item.kind))).toEqual(
+    new Set(["healing", "focus", "weapon", "armor"]),
   );
   expect(
     c.entities

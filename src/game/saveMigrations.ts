@@ -1,7 +1,11 @@
 import type { Content, Quest } from "../content/schema";
 import type { Save } from "./state";
 
-export const CURRENT_SAVE_VERSION = 3;
+export const CURRENT_SAVE_VERSION = 4;
+
+export function starterSupply(): Save["supply"] {
+  return { tokens: 3, items: {}, equipped: { weapon: null, armor: null } };
+}
 
 /** Each breaking release adds one step; future formats must never be downgraded. */
 export function migrateSaveInput(input: unknown): {
@@ -49,6 +53,7 @@ export function migrateSaveInput(input: unknown): {
         },
       };
     },
+    3: (value) => ({ ...value, version: 4, supply: starterSupply() }),
   };
   for (let version = fromVersion; version < CURRENT_SAVE_VERSION; version++) {
     const upgrade = steps[version];

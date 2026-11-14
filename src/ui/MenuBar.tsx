@@ -10,6 +10,7 @@ import {
   Home as HomeIcon,
   Library,
   NotebookPen,
+  Package,
   Settings2,
 } from "lucide-react";
 import "./MenuBar.css";
@@ -19,6 +20,7 @@ const menus = {
     ["Bookshelf", "library", Library],
     ["Quest board", "quest", Compass],
     ["Clue ledger", "inventory", NotebookPen],
+    ["Supply Locker", "supplies", Package],
   ],
   Case: [
     ["Briefing", "briefing", FileText],

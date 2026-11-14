@@ -1,0 +1,125 @@
+{
+  "version": 3,
+  "curriculumVersion": 2,
+  "signalExperiment": {
+    "samples": [
+      {
+        "x": -0.5,
+        "y": 0.4,
+        "label": 1
+      }
+    ],
+    "network": {
+      "weights": [0.25, -0.1],
+      "bias": 0.2,
+      "epochs": 12
+    },
+    "rate": 0.2,
+    "epochs": 20,
+    "label": 1,
+    "tested": true
+  },
+  "chapterProgress": {
+    "chapter-source-alg-00": {
+      "introduced": true,
+      "practiced": true,
+      "attempts": 2
+    }
+  },
+  "story": {
+    "prologueSeen": true,
+    "briefingSeen": true,
+    "caseAccepted": true,
+    "networkIntroSeen": true,
+    "seenDialogues": ["routing-scene-0"]
+  },
+  "character": {
+    "name": "Rook",
+    "level": 3,
+    "xp": 245,
+    "hp": 57,
+    "focus": 7,
+    "skills": ["insight", "ward", "trace"]
+  },
+  "completed": ["puzzle-sort-log", "guardian-battle"],
+  "claimed": ["case-sort-log"],
+  "mastery": {
+    "graph-search": {
+      "correct": 1,
+      "attempted": 2,
+      "evidence": ["maze-chamber"],
+      "answered": ["bfs-shortest"]
+    }
+  },
+  "bookmarks": ["graph-search"],
+  "notes": {
+    "graph-search": "Preserve my route and shield notes."
+  },
+  "reading": {
+    "mode": "fullscreen",
+    "fontSize": 24,
+    "positions": {
+      "graph-search": {
+        "block": 3,
+        "offset": 0.4
+      }
+    }
+  },
+  "puzzleRuns": {
+    "puzzle-sort-log": {
+      "commands": [
+        {
+          "type": "swap",
+          "index": 0
+        },
+        {
+          "type": "swap",
+          "index": 2
+        },
+        {
+          "type": "swap",
+          "index": 3
+        },
+        {
+          "type": "swap",
+          "index": 1
+        },
+        {
+          "type": "swap",
+          "index": 2
+        },
+        {
+          "type": "swap",
+          "index": 1
+        },
+        {
+          "type": "swap",
+          "index": 0
+        }
+      ],
+      "assisted": false
+    }
+  },
+  "code": "print('preserve v2 code')",
+  "blocks": {
+    "blocks": {
+      "languageVersion": 0,
+      "blocks": []
+    }
+  },
+  "seed": 42,
+  "trialBest": 43.5,
+  "settings": {
+    "renderer": "webgl",
+    "reducedMotion": true,
+    "combatMuted": true,
+    "battleAutoAdvance": false,
+    "musicVolume": 0.2,
+    "sfxVolume": 0.4
+  },
+  "onboarding": {
+    "intakeComplete": true,
+    "tipsEnabled": false,
+    "seenTips": ["battle", "read"]
+  }
+}

@@ -572,6 +572,40 @@ export function attachOfficeSurfaces(
     false,
   );
 
+  const locker = sheet(
+    "supply locker label",
+    "desk",
+    2.2,
+    1.43,
+    4.46,
+    1.6,
+    0.86,
+    0,
+    (c, m) => {
+      c.fillStyle = "#273b3d";
+      c.fillRect(0, 0, 600, 260);
+      c.strokeStyle = "#b39862";
+      c.lineWidth = 4;
+      c.strokeRect(18, 18, 564, 224);
+      ink(c, "SUPPLY", 105, 43, 94, 485, "#ead6a4");
+      ink(c, "LOCKER", 105, 141, 94, 485, "#ead6a4");
+      return zone(m, "supply-locker", 0, 0, 600, 260);
+    },
+    false,
+    600,
+    260,
+  );
+  locker.rotation.x = Math.PI / 2;
+  const lockerBody = MeshBuilder.CreateBox(
+    "steel supply locker",
+    { width: 1.68, height: 0.93, depth: 0.32 },
+    scene,
+  );
+  lockerBody.parent = locker;
+  lockerBody.position.z = 0.16;
+  lockerBody.material = material("locker steel", "#34494a");
+  lockerBody.isPickable = false;
+
   // Books have a real spine and hinged cover. The library volume leaves its shelf.
   const makeBook = (name: string, wall: HomeWall) => {
     const root = new TransformNode(name, scene);
@@ -731,6 +765,7 @@ export function attachOfficeSurfaces(
         );
       }
       for (const b of model.buttons) {
+        if (b.prop) continue;
         c.globalAlpha = 1;
         if (wall === "desk" && b.x > 512) {
           c.fillStyle = selected === b.id ? "#b0b8a855" : "#f6efdf66";
@@ -998,7 +1033,7 @@ export function attachOfficeSurfaces(
         (page.wall === "desk" || libraryIsReady())
       )
         selected = hitControl(
-          modelFor(page.wall).buttons,
+          modelFor(page.wall).buttons.filter((button) => !button.prop),
           (uv.x + page.side) * 512,
           (1 - uv.y) * 576,
         );

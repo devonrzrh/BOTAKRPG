@@ -51,13 +51,16 @@ import {
   useGameParticlesReducedMotion,
 } from "./ui/GameParticles";
 import { PuzzleScreen } from "./ui/PuzzleScreen";
+import { SupplyLocker } from "./ui/SupplyLocker";
 import { rewardPuzzle } from "./game/puzzleProgress";
+import { drawSupply, equipGear } from "./game/gacha";
 import "./ui/PuzzleCases.css";
 import rawContent from "./generated/content.json";
 import {
   validateContent,
   type Lesson,
   type Activity,
+  type Item,
   type Question,
   type Quest,
   type Skill,
@@ -129,6 +132,7 @@ import {
   answerBattle,
   enemyTurn,
   guardTurn,
+  itemTurn,
   selectMomentum,
   selectFinisher,
   analyzeBattle,
@@ -205,6 +209,9 @@ const topicNames = {
   structures: "Data structures",
   ai: "Connectionist AI",
 };
+const supplyItems = content.entities.filter(
+  (entity): entity is Item => entity.type === "item",
+);
 type Panel =
   | "puzzles"
   | "library"
@@ -212,6 +219,7 @@ type Panel =
   | "battle"
   | "garden"
   | "inventory"
+  | "supplies"
   | "character"
   | "journal"
   | "settings"
@@ -354,6 +362,7 @@ export default function App() {
     saveRef.current = next;
     setSave(next);
   }, []);
+  const [supplyReward, setSupplyReward] = useState<Item | null>(null);
   const tutorialRef = useRef<TutorialId | null>(null);
   tutorialRef.current = tutorialId;
   const intakeOpen = booted && needsIntake(save);
@@ -418,6 +427,7 @@ export default function App() {
         seconds = timed ? (performance.now() - trialStart.current) / 1000 : 0;
       if (timed && seconds > 90) return;
       sound("clue");
+      const firstClear = !saveRef.current.completed.includes("maze-chamber");
       updateSave((previous) => {
         let next = completeActivity(previous, "maze-chamber");
         if (control !== "manual")
@@ -441,9 +451,7 @@ export default function App() {
       });
       if (timed) setElapsed(seconds);
       setToast(
-        timed
-          ? `Trial complete in ${seconds.toFixed(1)} seconds.`
-          : "Maze complete.",
+        `${timed ? `Trial complete in ${seconds.toFixed(1)} seconds.` : "Maze complete."}${firstClear ? " +1 Supply Token" : ""}`,
       );
     },
     [updateSave, sound],
@@ -734,15 +742,19 @@ export default function App() {
         trialRef.current = false;
         return;
       }
-      if (["desk", "library", "quest", "journal", "inventory"].includes(id)) {
+      if (["desk", "library", "quest", "journal", "inventory", "supplies"].includes(id)) {
         const wall: HomeWall =
           id === "library"
             ? "bookshelf"
             : id === "quest" || id === "journal"
               ? "quests"
-              : id === "inventory"
+              : id === "inventory" || id === "supplies"
                 ? "desk"
                 : "investigation";
+        if (id === "supplies") {
+          setBookOpen(false);
+          setSupplyReward(null);
+        }
         setHomeWall(wall);
         setRealm("desk");
         setScene("desk");
@@ -970,11 +982,12 @@ export default function App() {
     nextBattle: Battle,
     nextSave: Save,
     cause?: "guard" | "item" | "act" | "evade",
+    beforeResponse: Save = saveRef.current,
   ) => {
     const cue = battleCue(
       battleRef.current,
       nextBattle,
-      saveRef.current,
+      beforeResponse,
       nextSave,
       content,
       ++combatSequence.current,
@@ -1441,6 +1454,7 @@ export default function App() {
               intakeOpen ||
               bookOpen ||
               panel === "settings" ||
+              panel === "supplies" ||
               panel === "character" ||
               !save.story.prologueSeen ||
               prologueReplay ||
@@ -1500,6 +1514,7 @@ export default function App() {
         {panel &&
           (!useWorldUi ||
             panel === "settings" ||
+            panel === "supplies" ||
             panel === "character" ||
             panel === "manual") &&
           !(realm === "desk" && homeMoving) && (
@@ -1519,6 +1534,7 @@ export default function App() {
                           garden: "Perceptron lab",
                           puzzles: currentPuzzle?.title ?? "Field puzzles",
                           inventory: "Clue ledger",
+                          supplies: "Supply Locker",
                           character: "Detective skills",
                           journal: "Quest board",
                           settings: "Settings",
@@ -2010,6 +2026,19 @@ export default function App() {
                       notify(String(e));
                     }
                   }}
+                  onItem={(item) => {
+                    if (battleRef.current !== battle) return;
+                    const current = saveRef.current;
+                    const result = itemTurn(battle, current, content, item);
+                    if (!result) return;
+                    const resource = item.kind === "healing" ? "hp" : "focus";
+                    const restored =
+                      result.used.character[resource] - current.character[resource];
+                    applyBattle(result.battle, result.save, "item", result.used);
+                    notify(
+                      `${item.title} restored ${restored} ${resource === "hp" ? "HP" : "Focus"}.`,
+                    );
+                  }}
                   onMomentum={(amount) => {
                     if (battleRef.current !== battle) return;
                     try {
@@ -2152,11 +2181,15 @@ export default function App() {
                         }))
                       }
                       completed={save.completed.includes(currentPuzzle.id)}
-                      onComplete={(assisted) =>
-                        updateSave((s) =>
-                          rewardPuzzle(s, currentPuzzle, content, assisted),
-                        )
-                      }
+                      onComplete={(assisted) => {
+                        const current = saveRef.current;
+                        const next = rewardPuzzle(
+                          current, currentPuzzle, content, assisted,
+                        );
+                        updateSave(() => next);
+                        if (next.supply.tokens > current.supply.tokens)
+                          notify("Puzzle cleared. +1 Supply Token");
+                      }}
                       onContinue={() =>
                         storyBranch(content, currentPuzzle.id)
                           ? continueBranch(currentPuzzle.id)
@@ -2213,6 +2246,7 @@ export default function App() {
                     completed={save.completed.includes("perceptron-exhibit")}
                     onContinue={() => continueBranch("perceptron-exhibit")}
                     onComplete={() => {
+                      const firstClear = !saveRef.current.completed.includes("perceptron-exhibit");
                       updateSave((s) =>
                         evidence(
                           completeActivity(s, "perceptron-exhibit"),
@@ -2221,7 +2255,7 @@ export default function App() {
                         ),
                       );
                       notify(
-                        "Calibration complete. Continue the signal investigation.",
+                        firstClear ? "Calibration complete. +1 Supply Token" : "Calibration complete.",
                       );
                     }}
                     onLesson={() => openLesson("perceptron-basics")}
@@ -2341,6 +2375,24 @@ export default function App() {
                   save={save}
                   content={content}
                   onLesson={openLesson}
+                />
+              )}
+              {panel === "supplies" && (
+                <SupplyLocker
+                  save={save}
+                  content={content}
+                  reward={supplyReward}
+                  onDraw={() => {
+                    const result = drawSupply(saveRef.current, content);
+                    if (!result.item) return;
+                    updateSave(() => result.save);
+                    setSupplyReward(result.item);
+                    sound("clue");
+                  }}
+                  onEquip={(id) => {
+                    const item = supplyItems.find((entry) => entry.id === id);
+                    if (item) updateSave((current) => equipGear(current, item));
+                  }}
                 />
               )}
               {panel === "character" && (
@@ -2766,6 +2818,7 @@ export default function App() {
         )}
         {useWorldUi &&
           !bookOpen &&
+          panel !== "supplies" &&
           panel !== "character" &&
           panel !== "manual" && (
             <RoomTurns
@@ -2786,6 +2839,7 @@ export default function App() {
           )}
         {useWorldUi &&
           !bookOpen &&
+          panel !== "supplies" &&
           panel !== "character" &&
           panel !== "manual" && (
             <WorldUiControls

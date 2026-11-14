@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import type { Content, Question, Skill } from "../content/schema";
+import type { Content, Item, Question, Skill } from "../content/schema";
 import {
   canSpare,
   previewDamage,
@@ -27,6 +27,7 @@ import {
   Crosshair,
   ScanSearch,
   LogOut,
+  Package,
   ShieldCheck,
   Volume2,
   VolumeX,
@@ -44,6 +45,7 @@ interface Props {
   onAnswer: (answer: number[]) => void;
   onSkill: (skill: Skill) => void;
   onGuard: () => void;
+  onItem: (item: Item) => void;
   onMomentum: (amount: number) => void;
   onFinisher: () => void;
   onAct: (choice: number) => void;
@@ -106,9 +108,9 @@ export function BattleScreen(p: Props) {
   const resultChanges = changes.filter((change) =>
     ["momentum", "effect", "stance"].includes(change.target),
   );
-  const [menu, setMenu] = useState<"skills" | "analyze" | "defend" | null>(
-    "skills",
-  );
+  const [menu, setMenu] = useState<
+    "skills" | "analyze" | "defend" | "items" | null
+  >("skills");
   const [evading, setEvading] = useState(false);
   const skillList = useRef<HTMLDivElement>(null);
   const defenseList = useRef<HTMLDivElement>(null);
@@ -259,6 +261,12 @@ export function BattleScreen(p: Props) {
     (e): e is Skill =>
       e.type === "skill" && save.character.skills.includes(e.id),
   );
+  const items = p.content.entities.filter(
+    (entry): entry is Item =>
+      entry.type === "item" &&
+      (entry.kind === "healing" || entry.kind === "focus") &&
+      (save.supply.items[entry.id] ?? 0) > 0,
+  );
   const meter = (label: string, value: number, max: number, kind: string) => {
     const pendingHit =
       !impactLanded &&
@@ -358,6 +366,10 @@ export function BattleScreen(p: Props) {
   const gainedXp = Math.max(
     0,
     save.character.xp - startingSave.current.character.xp,
+  );
+  const gainedTokens = Math.max(
+    0,
+    save.supply.tokens - startingSave.current.supply.tokens,
   );
   useEffect(() => {
     if (
@@ -765,6 +777,40 @@ export function BattleScreen(p: Props) {
                     </button>
                   </div>
                 )}
+                {menu === "items" && (
+                  <>
+                    <header>
+                      <h2 ref={title} tabIndex={-1}>
+                        Items
+                      </h2>
+                    </header>
+                    <p>
+                      {items.length
+                        ? "Using an item spends your turn."
+                        : "No consumables in your kit."}
+                    </p>
+                    <div className="battle-skill-options">
+                      {items.map((item) => (
+                        <button
+                          key={item.id}
+                          disabled={
+                            item.kind === "healing"
+                              ? save.character.hp >= limits.maxHp
+                              : save.character.focus >= limits.maxFocus
+                          }
+                          onClick={() => p.onItem(item)}
+                        >
+                          <strong>
+                            {item.title} × {save.supply.items[item.id]}
+                          </strong>
+                          <span>
+                            Restore {item.amount} {item.kind === "healing" ? "HP" : "Focus"}
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+                  </>
+                )}
                 {menu === "analyze" && (
                   <>
                     <p>
@@ -988,6 +1034,7 @@ export function BattleScreen(p: Props) {
                     reducedMotion={reducedMotion}
                     label="Victory experience"
                   />
+                  {gainedTokens > 0 && <p>+{gainedTokens} Supply Token</p>}
                   {levelGain > 0 && (
                     <>
                       <h3>
@@ -1079,9 +1126,7 @@ export function BattleScreen(p: Props) {
             onClick={() => setMenu("skills")}
           >
             <Crosshair size={20} />
-            <span>
-              Attack<small>Choose skill</small>
-            </span>
+            <span>Skills</span>
           </button>
           <button
             disabled={b.phase !== "choose" || !!motion || evading}
@@ -1097,17 +1142,20 @@ export function BattleScreen(p: Props) {
             </span>
           </button>
           <button
+            aria-pressed={menu === "items"}
+            disabled={b.phase !== "choose" || !!motion || evading}
+            onClick={() => setMenu("items")}
+          >
+            <Package size={20} />
+            <span>Items</span>
+          </button>
+          <button
             aria-pressed={menu === "analyze"}
             disabled={b.phase !== "choose" || !!motion || evading}
             onClick={() => setMenu("analyze")}
           >
             <ScanSearch size={20} />
-            <span>
-              Analyze
-              <small>
-                {canSpare(b) ? "Stand down available" : "Read enemy"}
-              </small>
-            </span>
+            <span>Inspect</span>
           </button>
           <button
             disabled={!!motion || evading || b.phase === "lost"}

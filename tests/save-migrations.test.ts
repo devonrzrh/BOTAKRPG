@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import raw from "../src/generated/content.json";
 import legacy from "./fixtures/journal-v1.json";
 import legacyV2 from "./fixtures/journal-v2.json";
+import legacyV3 from "./fixtures/journal-v3.json";
 import { validateContent, type Quest } from "../src/content/schema";
 import { claimQuest, initialSave, parseSave } from "../src/game/state";
 import {
@@ -29,7 +30,7 @@ describe("journal migration", () => {
     const original = structuredClone(input);
     const save = parseSave(input, content);
     expect(input).toEqual(original);
-    expect(save.version).toBe(3);
+    expect(save.version).toBe(4);
     expect(save.character).toEqual(input.character);
     expect(save.code).toBe(input.code);
     expect(save.notes).toEqual(input.notes);
@@ -123,7 +124,7 @@ describe("journal migration", () => {
     expect(parseSave({ ...save, version: 2 }, content).completed).toEqual(
       save.completed,
     );
-    for (const version of [0, 4, 1.5, "1"])
+    for (const version of [0, 5, 1.5, "1"])
       expect(() => parseSave({ ...save, version }, content)).toThrow();
     expect(() =>
       parseSave({ ...save, version: 1, completed: ["unknown"] }, content),
@@ -137,7 +138,8 @@ describe("journal migration", () => {
     expect(input).toEqual(original);
     expect(save).toEqual({
       ...input,
-      version: 3,
+      version: 4,
+      supply: initialSave().supply,
       character: { ...input.character, skills: ["insight", "ward", "trace"] },
     });
     expect(parseSave(JSON.parse(JSON.stringify(save)), content)).toEqual(save);
@@ -193,7 +195,7 @@ describe("journal migration", () => {
       },
     };
     const save = parseSave(input, content);
-    expect(save.version).toBe(3);
+    expect(save.version).toBe(4);
     expect(save.character.skills).toEqual(["insight", "ward", "trace"]);
     expect(save.completed).toContain("puzzle-sort-log");
     expect(save.claimed).toContain("case-sort-log");
@@ -211,6 +213,21 @@ describe("journal migration", () => {
     expect(upgraded.completed).toEqual(["puzzle-hanoi-lock"]);
     expect(upgraded.claimed).toEqual([]);
     expect(nextObjective(upgraded, route)).toBe("maze-chamber");
+  });
+
+  it("adds starter tokens once to v3 journals loaded locally or imported", async () => {
+    const input = structuredClone(legacyV3);
+    await storeSave(input as unknown as ReturnType<typeof initialSave>);
+    const local = parseSave(await loadSave(), content);
+    expect(local).toEqual({
+      ...input,
+      version: 4,
+      supply: initialSave().supply,
+    });
+    expect(parseSave(JSON.parse(JSON.stringify(input)), content)).toEqual(local);
+    local.supply.tokens -= 1;
+    expect(parseSave(local, content)).toEqual(local);
+    expect(input).toEqual(legacyV3);
   });
 });
 

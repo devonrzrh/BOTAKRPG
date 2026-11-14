@@ -8,6 +8,7 @@ import { createPuzzle, puzzleCommand } from "./puzzles";
 import {
   CURRENT_SAVE_VERSION,
   migrateSaveInput,
+  starterSupply,
   upgradeCampaignProgress,
 } from "./saveMigrations";
 const puzzleRunSchema = z.object({
@@ -80,7 +81,7 @@ const signalExperimentSchema = z
   .default(null);
 export const saveSchema = z
   .object({
-    version: z.literal(3),
+    version: z.literal(CURRENT_SAVE_VERSION),
     curriculumVersion: z.union([z.literal(1), z.literal(2)]).default(1),
     signalExperiment: signalExperimentSchema,
     chapterProgress: z
@@ -116,6 +117,18 @@ export const saveSchema = z
       equipment: z.string().nullable().optional(),
     }),
     inventory: z.record(z.number().int().min(0).max(999)).optional(),
+    supply: z
+      .object({
+        tokens: z.number().int().nonnegative().safe(),
+        items: z.record(z.number().int().positive().safe()),
+        equipped: z
+          .object({
+            weapon: z.string().nullable(),
+            armor: z.string().nullable(),
+          })
+          .strict(),
+      })
+      .strict(),
     completed: z.array(z.string()),
     claimed: z.array(z.string()),
     mastery: z.record(masterySchema),
@@ -170,6 +183,7 @@ export function initialSave(): Save {
       focus: 12,
       skills: ["insight", "ward"],
     },
+    supply: starterSupply(),
     completed: [],
     claimed: [],
     mastery: {},
@@ -228,12 +242,18 @@ export function resetTutorials(save: Save): Save {
 export function setTipsEnabled(save: Save, tipsEnabled: boolean): Save {
   return { ...save, onboarding: { ...save.onboarding, tipsEnabled } };
 }
-export function stats(save: Save, _content?: Content) {
+export function stats(save: Save, content?: Content) {
+  const bonus = (slot: "weapon" | "armor") => {
+    const item = content?.entities.find(
+      (entity) => entity.id === save.supply.equipped[slot],
+    );
+    return item?.type === "item" && item.kind === slot ? item.amount : 0;
+  };
   return {
     maxHp: 60 + (save.character.level - 1) * 10,
     maxFocus: 12 + (save.character.level - 1) * 2,
-    attack: 6 + (save.character.level - 1) * 2,
-    defense: 2 + save.character.level - 1,
+    attack: 6 + (save.character.level - 1) * 2 + bonus("weapon"),
+    defense: 2 + save.character.level - 1 + bonus("armor"),
   };
 }
 export function recoverResources(save: Save): Save {
@@ -257,7 +277,14 @@ export function addXp(save: Save, amount: number): Save {
 export function completeActivity(save: Save, id: string): Save {
   return save.completed.includes(id)
     ? save
-    : { ...save, completed: [...save.completed, id] };
+    : {
+        ...save,
+        completed: [...save.completed, id],
+        supply: {
+          ...save.supply,
+          tokens: Math.min(Number.MAX_SAFE_INTEGER, save.supply.tokens + 1),
+        },
+      };
 }
 export function recordAnswer(
   save: Save,
@@ -357,6 +384,23 @@ export function parseSave(input: unknown, content: Content): Save {
     });
   check(save.completed, "activity");
   check(save.claimed, "quest");
+  check(Object.keys(save.supply.items), "item");
+  for (const item of content.entities) {
+    if (
+      item.type !== "item" ||
+      (item.kind !== "weapon" && item.kind !== "armor")
+    )
+      continue;
+    if ((save.supply.items[item.id] ?? 0) > 1)
+      throw new Error(`Save contains duplicate gear: ${item.id}`);
+  }
+  for (const slot of ["weapon", "armor"] as const) {
+    const id = save.supply.equipped[slot];
+    if (id === null) continue;
+    const item = content.entities.find((entity) => entity.id === id);
+    if (item?.type !== "item" || item.kind !== slot || !save.supply.items[id])
+      throw new Error(`Invalid equipped ${slot}: ${id}`);
+  }
   save = upgradeCampaignProgress(save, content, migrated.fromVersion);
   check(save.bookmarks, "lesson");
   check(Object.keys(save.notes), "lesson");

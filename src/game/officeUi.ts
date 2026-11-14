@@ -46,6 +46,7 @@ export interface SurfaceButton {
   label: string;
   action: OfficeAction;
   disabled?: boolean;
+  prop?: "supply-locker";
 }
 export interface SurfaceText {
   x: number;
@@ -671,6 +672,16 @@ export function createOfficeUi(input: OfficeUiInput): SurfaceModel[] {
   );
 
   const inventory = panel("desk", "CLUE LEDGER", "paper");
+  inventory.buttons.push({
+    id: "supply-locker",
+    label: "Supply Locker",
+    action: { kind: "open", id: "supplies" },
+    prop: "supply-locker",
+    x: 0,
+    y: 0,
+    w: 600,
+    h: 260,
+  });
   const clues = recoveredClues(save, content);
   const cluePages = Math.max(1, Math.ceil(clues.length / 2));
   const cluePage = Math.min(input.page, cluePages - 1);
