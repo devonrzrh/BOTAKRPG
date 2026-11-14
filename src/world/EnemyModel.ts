@@ -1,12 +1,14 @@
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
-import type { Mesh } from "@babylonjs/core/Meshes/mesh";
+import { Mesh } from "@babylonjs/core/Meshes/mesh";
+import { VertexData } from "@babylonjs/core/Meshes/mesh.vertexData";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import type { Scene } from "@babylonjs/core/scene";
 
 import { enemyArchetype } from "../game/enemyIdentity";
+import sentinelMesh from "./sentinelMesh.json";
 export { enemyArchetype, enemyThreatName } from "../game/enemyIdentity";
 
 /** Each enemy has its own silhouette, not a reskinned humanoid. Scene owns the rig. */
@@ -38,6 +40,7 @@ export function buildEnemyModel(scene: Scene, id: string) {
   root.metadata = { archetype: kind };
   const leftArm = new TransformNode("left shoulder pivot", scene);
   const rightArm = new TransformNode("right shoulder pivot", scene);
+  let sentinelHead: TransformNode | undefined;
   for (const [pivot, side] of [
     [leftArm, -1],
     [rightArm, 1],
@@ -491,19 +494,22 @@ export function buildEnemyModel(scene: Scene, id: string) {
       }
     }
   } else {
-    // The original patrol sentinel remains the one grounded humanoid chassis.
-    box("torso", 0, 1.55, 0, 1.35, 1.5, 0.85, alloy);
-    box("chest plate", 0, 1.6, -0.48, 1.05, 0.9, 0.15, shell);
-    box("head", 0, 2.7, 0, 1.05, 0.7, 0.8, shell);
-    box("visor", 0, 2.76, -0.43, 0.84, 0.16, 0.06, signal);
-    for (const [pivot, side] of [
-      [leftArm, -1],
-      [rightArm, 1],
-    ] as const) {
-      box("arm", 0, -0.35, 0, 0.42, 1.05, 0.55, alloy, pivot);
-      box("hand", 0, -0.98, 0, 0.5, 0.3, 0.6, shell, pivot);
-      box("leg", side * 0.43, 0.58, 0, 0.48, 0.75, 0.6, alloy);
-      box("foot", side * 0.43, 0.22, -0.16, 0.6, 0.2, 0.9, shell);
+    sentinelHead = new TransformNode("sentinel helmet swivel", scene);
+    sentinelHead.parent = root;
+    sentinelHead.position.y = 2.8;
+    const pivots = { body: root, head: sentinelHead, left: leftArm, right: rightArm };
+    for (const part of sentinelMesh) {
+      const pivot = pivots[part.rig as keyof typeof pivots];
+      const name = part.rig === "head" && part.material === 2
+        ? "visor"
+        : `${part.rig} armor ${part.material}`;
+      const mesh = new Mesh(`sentinel ${name}`, scene);
+      const vertices = new VertexData();
+      vertices.positions = part.positions;
+      vertices.normals = part.normals;
+      vertices.indices = part.indices;
+      vertices.applyToMesh(mesh);
+      place(mesh, 0, 0, 0, materials[part.material], pivot);
     }
   }
   const rest = meshes.map((mesh) => ({
@@ -511,12 +517,14 @@ export function buildEnemyModel(scene: Scene, id: string) {
     rotation: mesh.rotation.clone(),
     scaling: mesh.scaling.clone(),
   }));
-  const resetIdle = () =>
+  const resetIdle = () => {
+    if (sentinelHead) sentinelHead.rotation.y = 0;
     meshes.forEach((mesh, i) => {
       mesh.position.copyFrom(rest[i].position);
       mesh.rotation.copyFrom(rest[i].rotation);
       mesh.scaling.copyFrom(rest[i].scaling);
     });
+  };
   // Absolute poses avoid drift and let combat cues take over without competing observers.
   const animateIdle = (seconds: number) => {
     resetIdle();
@@ -533,6 +541,7 @@ export function buildEnemyModel(scene: Scene, id: string) {
       Math.sin(seconds * 0.65) * (kind === "warden" ? 0.025 : 0.065);
     leftArm.rotation.z -= breath * (kind === "warden" ? 0.025 : 0.07);
     rightArm.rotation.z += Math.sin(seconds * 1.8 + 0.6) * 0.07;
+    if (sentinelHead) sentinelHead.rotation.y = Math.sin(seconds * 0.8) * 0.2;
     meshes.forEach((mesh, i) => {
       const name = mesh.name;
       if (kind === "drone") {
@@ -569,9 +578,6 @@ export function buildEnemyModel(scene: Scene, id: string) {
         }
         leftArm.rotation.y = Math.sin(seconds * 2.3) * 0.09;
         rightArm.rotation.y = -Math.sin(seconds * 2.3) * 0.09;
-      } else if (kind === "sentinel" && /head|visor/.test(name)) {
-        mesh.position.x += Math.sin(seconds * 0.8) * 0.055;
-        mesh.rotation.y += Math.sin(seconds * 0.8) * 0.12;
       }
     });
   };
