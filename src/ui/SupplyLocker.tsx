@@ -1,15 +1,10 @@
-import { Coins, Crosshair, Package, Plus, Shield, Zap } from "lucide-react";
+import { Coins, Package, PackageOpen, Shield, Swords } from "lucide-react";
 import type { Content, Item } from "../content/schema";
 import { supplyPool } from "../game/gacha";
 import type { Save } from "../game/state";
+import { SupplyIcon } from "./SupplyIcon";
 import "./SupplyLocker.css";
 
-const itemIcons = {
-  weapon: Crosshair,
-  armor: Shield,
-  healing: Plus,
-  focus: Zap,
-};
 const itemEffects = {
   weapon: (amount: number) => `+${amount} Attack`,
   armor: (amount: number) => `+${amount} Defense`,
@@ -50,7 +45,6 @@ export function SupplyLocker({
   const owned = content.entities.filter(
     (entity): entity is Item => entity.type === "item" && items[entity.id] > 0,
   );
-  const RewardIcon = reward ? itemIcons[reward.kind] : Package;
   const drawAvailable = tokens > 0 && pool.length > 0;
 
   return (
@@ -58,7 +52,11 @@ export function SupplyLocker({
       <section className="supply-draw" aria-label="Supply draw">
         <div className="supply-result" role="status" aria-label="Draw result">
           <div className="supply-emblem" data-rarity={reward?.rarity}>
-            <RewardIcon size={32} aria-hidden="true" />
+            {reward ? (
+              <SupplyIcon item={reward} size={32} />
+            ) : (
+              <Package size={32} aria-hidden="true" />
+            )}
           </div>
           {reward ? (
             <>
@@ -86,6 +84,7 @@ export function SupplyLocker({
               if (drawAvailable) onDraw();
             }}
           >
+            <PackageOpen size={18} aria-hidden="true" />
             Draw · 1 token
           </button>
         </div>
@@ -98,7 +97,10 @@ export function SupplyLocker({
             <ul>
               {pool.map((item) => (
                 <li key={item.id}>
-                  <span>{item.title}</span>
+                  <span className="supply-icon-label">
+                    <SupplyIcon item={item} size={16} />
+                    {item.title}
+                  </span>
                   <span>{chanceFormat.format(item.weight / totalWeight)}</span>
                 </li>
               ))}
@@ -116,14 +118,18 @@ export function SupplyLocker({
         <h3 id="supply-loadout-title">Loadout</h3>
         <dl className="supply-slots">
           <div>
-            <dt>Weapon</dt>
+            <dt className="supply-icon-label">
+              <Swords size={16} aria-hidden="true" /> Weapon
+            </dt>
             <dd>
               {owned.find((item) => item.id === equipped.weapon)?.title ??
                 "Unequipped"}
             </dd>
           </div>
           <div>
-            <dt>Armor</dt>
+            <dt className="supply-icon-label">
+              <Shield size={16} aria-hidden="true" /> Armor
+            </dt>
             <dd>
               {owned.find((item) => item.id === equipped.armor)?.title ??
                 "Unequipped"}
@@ -134,13 +140,12 @@ export function SupplyLocker({
           <ul className="supply-owned" aria-label="Owned supplies">
             {owned.map((item) => {
               const kind = item.kind;
-              const Icon = itemIcons[kind];
               const gear = kind === "weapon" || kind === "armor";
               const worn = gear && equipped[kind] === item.id;
               const action = worn ? "Unequip" : "Equip";
               return (
                 <li key={item.id} data-equipped={worn || undefined}>
-                  <Icon size={22} aria-hidden="true" />
+                  <SupplyIcon item={item} size={22} />
                   <div className="supply-owned-detail">
                     <ItemDetails item={item} />
                     <p>{item.description}</p>

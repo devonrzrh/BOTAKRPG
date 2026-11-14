@@ -14,6 +14,7 @@ import "./BattleConsole.css";
 import { stats, type Save } from "../game/state";
 import { combatCueDuration, type BattleCue } from "../game/combatPresentation";
 import { XpMeter } from "./XpMeter";
+import { SupplyIcon } from "./SupplyIcon";
 import { useGameSound } from "./GameSound";
 import { enemyThreatName } from "../game/enemyIdentity";
 import { EnemySpeech } from "./EnemySpeech";
@@ -25,6 +26,11 @@ import { useBattleFeedback } from "./useBattleFeedback";
 import "./BattleFeedback.css";
 import {
   Crosshair,
+  ArrowRight,
+  Bookmark,
+  Footprints,
+  Lightbulb,
+  Syringe,
   ScanSearch,
   LogOut,
   Package,
@@ -722,40 +728,49 @@ export function BattleScreen(p: Props) {
                     ref={skillList}
                     aria-label="Available skills"
                   >
-                    {skills.map((s, index) => (
-                      <button
-                        key={s.id}
-                        title={s.description}
-                        aria-description={s.description}
-                        disabled={
-                          save.character.focus < s.cost ||
-                          save.character.hp === 0
-                        }
-                        onClick={() => {
-                          setMenu(null);
-                          p.onSkill(s);
-                        }}
-                      >
-                        <span>
-                          <strong>
-                            <kbd>{index + 1}</kbd> {s.title}
-                          </strong>
-                          <span className="skill-description">
-                            {s.description}
+                    {skills.map((s, index) => {
+                      const Icon =
+                        s.effect === "shield"
+                          ? ShieldCheck
+                          : s.effect === "poison"
+                            ? Syringe
+                            : Crosshair;
+                      return (
+                        <button
+                          key={s.id}
+                          title={s.description}
+                          aria-description={s.description}
+                          disabled={
+                            save.character.focus < s.cost ||
+                            save.character.hp === 0
+                          }
+                          onClick={() => {
+                            setMenu(null);
+                            p.onSkill(s);
+                          }}
+                        >
+                          <span>
+                            <strong className="battle-icon-label">
+                              <Icon size={20} aria-hidden="true" />
+                              {s.title} <kbd>{index + 1}</kbd>
+                            </strong>
+                            <span className="skill-description">
+                              {s.description}
+                            </span>
                           </span>
-                        </span>
-                        <b>
-                          {s.cost ? `${s.cost} focus` : "Free"} ·{" "}
-                          {previewDamage(b, save, s, p.content)} damage
-                          {b.momentumSpend > 0
-                            ? ` · +${b.momentumSpend}% powered`
-                            : ""}
-                          {b.weaknessKnown && b.tactics?.weakness === s.id
-                            ? " · WEAK"
-                            : ""}
-                        </b>
-                      </button>
-                    ))}
+                          <b>
+                            {s.cost ? `${s.cost} focus` : "Free"} ·{" "}
+                            {previewDamage(b, save, s, p.content)} damage
+                            {b.momentumSpend > 0
+                              ? ` · +${b.momentumSpend}% powered`
+                              : ""}
+                            {b.weaknessKnown && b.tactics?.weakness === s.id
+                              ? " · WEAK"
+                              : ""}
+                          </b>
+                        </button>
+                      );
+                    })}
                   </div>
                 )}
                 {menu === "defend" && (
@@ -764,6 +779,7 @@ export function BattleScreen(p: Props) {
                       onClick={p.onGuard}
                       aria-description="Spends a turn and banks 15 Momentum."
                     >
+                      <ShieldCheck size={20} aria-hidden="true" />
                       Brace · −70% damage · +4 focus
                     </button>
                     <button
@@ -773,6 +789,7 @@ export function BattleScreen(p: Props) {
                         setEvading(true);
                       }}
                     >
+                      <Footprints size={20} aria-hidden="true" />
                       Dodge · timing challenge
                     </button>
                   </div>
@@ -800,7 +817,8 @@ export function BattleScreen(p: Props) {
                           }
                           onClick={() => p.onItem(item)}
                         >
-                          <strong>
+                          <strong className="battle-icon-label">
+                            <SupplyIcon item={item} />
                             {item.title} × {save.supply.items[item.id]}
                           </strong>
                           <span>
@@ -967,8 +985,13 @@ export function BattleScreen(p: Props) {
                       <kbd>Enter</kbd>
                     </button>
                   )}
-                  <button onClick={p.onHint}>Hint · no mastery credit</button>
-                  <button onClick={p.onRetreat}>Retreat</button>
+                    <button onClick={p.onHint}>
+                      <Lightbulb size={18} aria-hidden="true" />
+                      Hint · no mastery credit
+                    </button>
+                    <button onClick={p.onRetreat}>
+                      <LogOut size={18} aria-hidden="true" /> Retreat
+                    </button>
                 </footer>
                 {p.notice && (
                   <p className="battle-explanation" role="status">
@@ -997,6 +1020,7 @@ export function BattleScreen(p: Props) {
                 )}
                 <footer>
                   <button className="primary" onClick={advance}>
+                    <ArrowRight size={18} aria-hidden="true" />
                     {correctFeedback ? "Next turn" : "Continue"}
                   </button>
                   {correctFeedback && !reviewing && (
@@ -1009,7 +1033,9 @@ export function BattleScreen(p: Props) {
                       Pause to review
                     </button>
                   )}
-                  <button onClick={p.onReview}>Bookmark chapter</button>
+                  <button onClick={p.onReview}>
+                    <Bookmark size={18} aria-hidden="true" /> Bookmark chapter
+                  </button>
                 </footer>
               </>
             )}

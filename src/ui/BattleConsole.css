@@ -200,6 +200,17 @@
   font: 400 18px/1.3 var(--typewriter);
   color: #efd49c;
 }
+.battle-icon-label {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+.battle-icon-label svg,
+.battle-defense-options svg,
+.battle-decision footer svg {
+  flex: none;
+}
 .app.gameplay-battle
   .battle-layout-console
   .battle-skill-options
