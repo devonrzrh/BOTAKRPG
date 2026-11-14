@@ -1,8 +1,9 @@
-import { Coins, Package, PackageOpen, Shield, Swords } from "lucide-react";
+import { Coins } from "lucide-react";
 import type { Content, Item } from "../content/schema";
 import { supplyPool } from "../game/gacha";
 import type { Save } from "../game/state";
 import { SupplyIcon } from "./SupplyIcon";
+import { RpgIcon } from "./RpgIcon";
 import "./SupplyLocker.css";
 
 const itemEffects = {
@@ -53,9 +54,9 @@ export function SupplyLocker({
         <div className="supply-result" role="status" aria-label="Draw result">
           <div className="supply-emblem" data-rarity={reward?.rarity}>
             {reward ? (
-              <SupplyIcon item={reward} size={32} />
+              <SupplyIcon item={reward} size={40} />
             ) : (
-              <Package size={32} aria-hidden="true" />
+              <RpgIcon name="items" size={40} />
             )}
           </div>
           {reward ? (
@@ -84,7 +85,7 @@ export function SupplyLocker({
               if (drawAvailable) onDraw();
             }}
           >
-            <PackageOpen size={18} aria-hidden="true" />
+            <RpgIcon name="items" />
             Draw · 1 token
           </button>
         </div>
@@ -98,7 +99,7 @@ export function SupplyLocker({
               {pool.map((item) => (
                 <li key={item.id}>
                   <span className="supply-icon-label">
-                    <SupplyIcon item={item} size={16} />
+                    <SupplyIcon item={item} size={20} />
                     {item.title}
                   </span>
                   <span>{chanceFormat.format(item.weight / totalWeight)}</span>
@@ -119,7 +120,7 @@ export function SupplyLocker({
         <dl className="supply-slots">
           <div>
             <dt className="supply-icon-label">
-              <Swords size={16} aria-hidden="true" /> Weapon
+              <RpgIcon name="skills" size={20} /> Weapon
             </dt>
             <dd>
               {owned.find((item) => item.id === equipped.weapon)?.title ??
@@ -128,7 +129,7 @@ export function SupplyLocker({
           </div>
           <div>
             <dt className="supply-icon-label">
-              <Shield size={16} aria-hidden="true" /> Armor
+              <RpgIcon name="brace" size={20} /> Armor
             </dt>
             <dd>
               {owned.find((item) => item.id === equipped.armor)?.title ??
@@ -145,7 +146,7 @@ export function SupplyLocker({
               const action = worn ? "Unequip" : "Equip";
               return (
                 <li key={item.id} data-equipped={worn || undefined}>
-                  <SupplyIcon item={item} size={22} />
+                  <SupplyIcon item={item} size={30} />
                   <div className="supply-owned-detail">
                     <ItemDetails item={item} />
                     <p>{item.description}</p>

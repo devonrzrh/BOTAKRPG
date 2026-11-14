@@ -1,34 +1,24 @@
-import {
-  BatteryCharging,
-  BriefcaseMedical,
-  Cable,
-  CircuitBoard,
-  Shield,
-  Shirt,
-  Swords,
-  WandSparkles,
-  Zap,
-  type LucideIcon,
-} from "lucide-react";
 import type { Item } from "../content/schema";
+import { RpgIcon, type RpgIconName } from "./RpgIcon";
 
-const itemIcons: Partial<Record<string, LucideIcon>> = {
-  "pulse-baton": WandSparkles,
-  "arc-projector": Cable,
-  "phase-driver": CircuitBoard,
-  "insulated-coat": Shirt,
-  "mesh-vest": Shield,
-  "faraday-rig": Zap,
+const itemArt: Partial<Record<string, RpgIconName>> = {
+  "patch-kit": "patch-kit",
+  "focus-cell": "focus-cell",
+  "pulse-baton": "pulse-baton",
+  "arc-projector": "arc-projector",
+  "phase-driver": "phase-driver",
+  "insulated-coat": "insulated-coat",
+  "mesh-vest": "mesh-vest",
+  "faraday-rig": "faraday-rig",
 };
 
-const kindIcons: Record<Item["kind"], LucideIcon> = {
-  weapon: Swords,
-  armor: Shield,
-  healing: BriefcaseMedical,
-  focus: BatteryCharging,
+const fallbackArt: Record<Item["kind"], RpgIconName> = {
+  weapon: "skills",
+  armor: "brace",
+  healing: "patch-kit",
+  focus: "focus-cell",
 };
 
-export function SupplyIcon({ item, size = 20 }: { item: Item; size?: number }) {
-  const Icon = itemIcons[item.id] ?? kindIcons[item.kind];
-  return <Icon size={size} aria-hidden="true" />;
+export function SupplyIcon({ item, size = 24 }: { item: Item; size?: number }) {
+  return <RpgIcon name={itemArt[item.id] ?? fallbackArt[item.kind]} size={size} />;
 }

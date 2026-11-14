@@ -15,6 +15,7 @@ import { stats, type Save } from "../game/state";
 import { combatCueDuration, type BattleCue } from "../game/combatPresentation";
 import { XpMeter } from "./XpMeter";
 import { SupplyIcon } from "./SupplyIcon";
+import { RpgIcon } from "./RpgIcon";
 import { useGameSound } from "./GameSound";
 import { enemyThreatName } from "../game/enemyIdentity";
 import { EnemySpeech } from "./EnemySpeech";
@@ -25,16 +26,6 @@ import { createCombatHaptics } from "../game/combatHaptics";
 import { useBattleFeedback } from "./useBattleFeedback";
 import "./BattleFeedback.css";
 import {
-  Crosshair,
-  ArrowRight,
-  Bookmark,
-  Footprints,
-  Lightbulb,
-  Syringe,
-  ScanSearch,
-  LogOut,
-  Package,
-  ShieldCheck,
   Volume2,
   VolumeX,
   BookOpen,
@@ -729,12 +720,12 @@ export function BattleScreen(p: Props) {
                     aria-label="Available skills"
                   >
                     {skills.map((s, index) => {
-                      const Icon =
+                      const icon =
                         s.effect === "shield"
-                          ? ShieldCheck
+                          ? "firewall"
                           : s.effect === "poison"
-                            ? Syringe
-                            : Crosshair;
+                            ? "trace"
+                            : "probe";
                       return (
                         <button
                           key={s.id}
@@ -751,7 +742,7 @@ export function BattleScreen(p: Props) {
                         >
                           <span>
                             <strong className="battle-icon-label">
-                              <Icon size={20} aria-hidden="true" />
+                              <RpgIcon name={icon} />
                               {s.title} <kbd>{index + 1}</kbd>
                             </strong>
                             <span className="skill-description">
@@ -779,7 +770,7 @@ export function BattleScreen(p: Props) {
                       onClick={p.onGuard}
                       aria-description="Spends a turn and banks 15 Momentum."
                     >
-                      <ShieldCheck size={20} aria-hidden="true" />
+                      <RpgIcon name="brace" />
                       Brace · −70% damage · +4 focus
                     </button>
                     <button
@@ -789,7 +780,7 @@ export function BattleScreen(p: Props) {
                         setEvading(true);
                       }}
                     >
-                      <Footprints size={20} aria-hidden="true" />
+                      <RpgIcon name="dodge" />
                       Dodge · timing challenge
                     </button>
                   </div>
@@ -986,11 +977,11 @@ export function BattleScreen(p: Props) {
                     </button>
                   )}
                     <button onClick={p.onHint}>
-                      <Lightbulb size={18} aria-hidden="true" />
+                      <RpgIcon name="hint" />
                       Hint · no mastery credit
                     </button>
                     <button onClick={p.onRetreat}>
-                      <LogOut size={18} aria-hidden="true" /> Retreat
+                      <RpgIcon name="retreat" /> Retreat
                     </button>
                 </footer>
                 {p.notice && (
@@ -1020,7 +1011,7 @@ export function BattleScreen(p: Props) {
                 )}
                 <footer>
                   <button className="primary" onClick={advance}>
-                    <ArrowRight size={18} aria-hidden="true" />
+                    <RpgIcon name="advance" />
                     {correctFeedback ? "Next turn" : "Continue"}
                   </button>
                   {correctFeedback && !reviewing && (
@@ -1034,7 +1025,7 @@ export function BattleScreen(p: Props) {
                     </button>
                   )}
                   <button onClick={p.onReview}>
-                    <Bookmark size={18} aria-hidden="true" /> Bookmark chapter
+                    <RpgIcon name="bookmark" /> Bookmark chapter
                   </button>
                 </footer>
               </>
@@ -1151,7 +1142,7 @@ export function BattleScreen(p: Props) {
             disabled={b.phase !== "choose" || !!motion || evading}
             onClick={() => setMenu("skills")}
           >
-            <Crosshair size={20} />
+            <RpgIcon name="skills" />
             <span>Skills</span>
           </button>
           <button
@@ -1162,7 +1153,7 @@ export function BattleScreen(p: Props) {
               else p.onGuard();
             }}
           >
-            <ShieldCheck size={20} />
+            <RpgIcon name="brace" />
             <span>
               Defend<small>Brace or dodge</small>
             </span>
@@ -1172,7 +1163,7 @@ export function BattleScreen(p: Props) {
             disabled={b.phase !== "choose" || !!motion || evading}
             onClick={() => setMenu("items")}
           >
-            <Package size={20} />
+            <RpgIcon name="items" />
             <span>Items</span>
           </button>
           <button
@@ -1180,14 +1171,14 @@ export function BattleScreen(p: Props) {
             disabled={b.phase !== "choose" || !!motion || evading}
             onClick={() => setMenu("analyze")}
           >
-            <ScanSearch size={20} />
+            <RpgIcon name="inspect" />
             <span>Inspect</span>
           </button>
           <button
             disabled={!!motion || evading || b.phase === "lost"}
             onClick={p.onRetreat}
           >
-            <LogOut size={20} />
+            <RpgIcon name="retreat" />
             <span>
               Retreat<small>Keep evidence</small>
             </span>

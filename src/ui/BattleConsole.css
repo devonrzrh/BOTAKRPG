@@ -500,6 +500,8 @@
     gap: 4px;
   }
   .app.gameplay-battle .battle-layout-console .battle-command-menu button {
+    flex-direction: column;
+    gap: 2px;
     min-height: 44px;
     padding-inline: 2px;
   }
@@ -507,8 +509,9 @@
     .battle-layout-console
     .battle-command-menu
     button
-    > svg {
-    display: none;
+    > .rpg-icon {
+    width: 22px;
+    height: 22px;
   }
   .app.gameplay-battle
     .battle-layout-console
