@@ -11,7 +11,7 @@ export function enemyArchetype(id: string) {
 
 export const enemyThreatName = (id: string) =>
   ({
-    echo: "Network Worm ECHO-7",
+    echo: "Reconstructed Chassis",
     warden: "Firewall Warden",
     keeper: "Cache Vault Keeper",
     mimic: "Phishing Mimic",

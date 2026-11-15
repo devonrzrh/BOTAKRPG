@@ -2,7 +2,7 @@ import { expect, it } from "vitest";
 import { enemyArchetype, enemyThreatName } from "../src/game/enemyIdentity";
 
 it.each([
-  ["echo-7", "echo", "Network Worm ECHO-7"],
+  ["echo-7", "echo", "Reconstructed Chassis"],
   ["route-warden", "warden", "Firewall Warden"],
   ["archive-keeper", "keeper", "Cache Vault Keeper"],
   ["signal-mimic", "mimic", "Phishing Mimic"],

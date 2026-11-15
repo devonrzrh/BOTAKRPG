@@ -16,7 +16,7 @@ export { enemyArchetype, enemyThreatName } from "../game/enemyIdentity";
 export function buildEnemyModel(scene: Scene, id: string) {
   const kind = enemyArchetype(id);
   const palettes = {
-    echo: ["#243747", "#91b4c5", "#ff394d"],
+    echo: ["#26333d", "#818b91", "#ff373c"],
     warden: ["#433025", "#bd8b51", "#ffc368"],
     keeper: ["#302b48", "#9d88be", "#d4b9ff"],
     mimic: ["#16424a", "#72c9c8", "#d5ffff"],
@@ -43,7 +43,6 @@ export function buildEnemyModel(scene: Scene, id: string) {
   const rightArm = new TransformNode("right shoulder pivot", scene);
   let sentinelHead: TransformNode | undefined;
   let echoHead: TransformNode | undefined;
-  const echoSpine: TransformNode[] = [];
   for (const [pivot, side] of [
     [leftArm, -1],
     [rightArm, 1],
@@ -513,21 +512,22 @@ export function buildEnemyModel(scene: Scene, id: string) {
     ).scaling.set(0.7, 1.6, 0.3);
   } else if (kind === "echo") {
     const pivots: Record<string, TransformNode> = {
+      body: root,
       left: leftArm,
       right: rightArm,
     };
     for (const [name, [x, y, z]] of Object.entries(echoMesh.pivots)) {
+      if (name === "body") continue;
       const pivot = pivots[name] ?? new TransformNode(`echo ${name} pivot`, scene);
       pivot.parent = root;
       pivot.position.set(x, y, z);
       pivots[name] = pivot;
       if (name === "head") echoHead = pivot;
-      if (name.startsWith("spine-")) echoSpine.push(pivot);
     }
     for (const part of echoMesh.parts) {
       const name =
         part.rig === "head" && part.material === 2
-          ? "visor"
+          ? "optics"
           : `${part.rig} armor ${part.material}`;
       loadPart(name, part, pivots[part.rig]);
     }
@@ -552,7 +552,6 @@ export function buildEnemyModel(scene: Scene, id: string) {
   const resetIdle = () => {
     if (sentinelHead) sentinelHead.rotation.y = 0;
     if (echoHead) echoHead.rotation.setAll(0);
-    echoSpine.forEach((pivot) => pivot.rotation.setAll(0));
     meshes.forEach((mesh, i) => {
       mesh.position.copyFrom(rest[i].position);
       mesh.rotation.copyFrom(rest[i].rotation);
@@ -568,7 +567,6 @@ export function buildEnemyModel(scene: Scene, id: string) {
       "interceptor",
       "mimic",
       "decoy",
-      "echo",
     ].includes(kind);
     root.position.y += floating ? 0.08 + breath * 0.07 : 0;
     root.rotation.y +=
@@ -580,11 +578,6 @@ export function buildEnemyModel(scene: Scene, id: string) {
       echoHead.rotation.x = breath * 0.065;
       echoHead.rotation.y = Math.sin(seconds * 1.1) * 0.14;
     }
-    echoSpine.forEach((pivot, i) => {
-      const wave = Math.sin(seconds * 2.1 + i * 0.55);
-      pivot.rotation.y = wave * 0.17;
-      pivot.rotation.z = wave * 0.13;
-    });
     meshes.forEach((mesh, i) => {
       const name = mesh.name;
       if (kind === "drone") {
