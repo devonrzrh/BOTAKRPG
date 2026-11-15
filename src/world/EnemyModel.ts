@@ -217,23 +217,24 @@ export function buildEnemyModel(scene: Scene, id: string) {
     // A packet-sniffing spider: swept claws surround stolen packet fragments.
     const core = shard("dart core", 0, 1.8, 0, 0.65);
     core.scaling.set(0.75, 0.65, 1.65);
-    sphere("target lens", 0, 1.8, -0.86, 0.36, signal);
+    armorPlate("optical housing", 0, 1.8, -0.76, 0.87, 0.53, 0.42);
+    armorPlate("target lens", 0, 1.8, -1.01, 0.62, 0.20, 0.10, signal);
     for (const [pivot, side] of [
       [leftArm, -1],
       [rightArm, 1],
     ] as const) {
-      const blade = box(
+      const blade = armorPlate(
         "swept blade",
         side * 0.05,
         0,
         0.2,
         1.5,
-        0.14,
         0.85,
+        0.22,
         alloy,
         pivot,
       );
-      blade.rotation.y = side * -0.5;
+      blade.rotation.set(1.15, side * -0.46, side * -0.18);
       box(
         "blade edge",
         side * 0.05,
@@ -257,7 +258,7 @@ export function buildEnemyModel(scene: Scene, id: string) {
           shell,
           pivot,
         ).rotation.z = side * -0.48;
-        box(
+        armorPlate(
           "claw tip",
           side * 0.7,
           -0.72,
@@ -297,19 +298,23 @@ export function buildEnemyModel(scene: Scene, id: string) {
       alloy,
     );
     cookie.rotation.x = Math.PI / 2;
+    ring("machined rim", 0, 1.9, -0.15, 1.82, 0.09, shell);
+    ring("lens bezel", 0, 1.9, -0.27, 0.89, 0.11);
     sphere("dark socket", 0, 1.9, -0.23, 0.85, shell).scaling.z = 0.32;
     sphere("single iris", 0, 1.9, -0.39, 0.5, signal).scaling.z = 0.3;
     for (let i = 0; i < 7; i++) {
       const angle = (i * Math.PI * 2) / 7;
-      const chip = shard(
+      const chip = armorPlate(
         "cookie chip",
         Math.cos(angle) * 0.7,
         1.9 + Math.sin(angle) * 0.7,
         -0.23,
-        0.12,
+        0.26,
+        0.15,
+        0.15,
         shell,
       );
-      chip.scaling.z = 0.4;
+      chip.rotation.z = angle + Math.PI / 2;
     }
     ring("vertical gyroscope", 0, 1.9, 0, 2.5, 0.12, alloy);
     const orbit = ring("cross gyroscope", 0, 1.9, 0, 2.5, 0.09);
@@ -321,6 +326,11 @@ export function buildEnemyModel(scene: Scene, id: string) {
     armorPlate("archive plinth", 0, 0.36, 0, 1.58, 0.52, 1.1, shell);
     armorPlate("archive cabinet", 0, 1.58, 0, 1.42, 2.32, 0.98);
     armorPlate("archive crown", 0, 2.67, 0, 1.58, 0.33, 1.0, shell);
+    for (const side of [-1, 1]) {
+      armorPlate("cabinet frame rail", side * 0.62, 1.57, -0.50, 0.15, 2.04, 0.20);
+      armorPlate("crown buttress", side * 0.66, 2.78, -0.02, 0.30, 0.55, 0.54)
+        .rotation.z = side * -0.24;
+    }
     ring("key halo", 0, 2.99, 0.12, 0.87, 0.063, alloy);
     for (let i = 0; i < 4; i++) {
       armorPlate("drawer", 0, 0.88 + i * 0.43, -0.49, 1.08, 0.38, 0.17, shell);
@@ -382,6 +392,11 @@ export function buildEnemyModel(scene: Scene, id: string) {
     }
     armorPlate("tower shield", -0.14, -0.1, -0.43, 1.06, 2.16, 0.32, alloy, leftArm);
     armorPlate("shield inset", -0.14, -0.10, -0.60, 0.85, 1.92, 0.13, shell, leftArm);
+    for (const side of [-1, 1]) {
+      armorPlate("shield brace", -0.14 + side * 0.36, -0.10, -0.68,
+        0.12, 1.66, 0.14, alloy, leftArm);
+      armorPlate("pylon toe", side * 0.74, 0.14, -0.68, 0.56, 0.26, 0.49);
+    }
     box("shield bus", -0.14, -0.10, -0.676, 0.06, 1.60, 0.035, signal, leftArm);
     for (let i = 0; i < 3; i++)
       box(
@@ -411,13 +426,13 @@ export function buildEnemyModel(scene: Scene, id: string) {
     armorPlate("hammer core", 0.12, 0.45, -0.37, 0.52, 0.30, 0.12, signal, rightArm);
   } else if (kind === "mimic") {
     // A phishing mask dangles a counterfeit credential from a visible hook.
-    const mask = box("mask left", -0.36, 2.1, -0.1, 0.62, 1.5, 0.3, alloy);
+    const mask = armorPlate("mask left", -0.34, 2.1, -0.1, 0.72, 1.55, 0.44, alloy);
     mask.rotation.z = -0.12;
-    const half = box("mask right", 0.36, 2.02, 0.03, 0.62, 1.45, 0.3, shell);
+    const half = armorPlate("mask right", 0.33, 2.02, 0.03, 0.72, 1.48, 0.44, shell);
     half.rotation.z = 0.12;
-    box("left eye", -0.34, 2.27, -0.29, 0.35, 0.13, 0.06, signal);
-    box("right eye", 0.34, 2.26, -0.17, 0.35, 0.13, 0.06, signal);
-    box("false smile", 0.09, 1.76, -0.22, 0.58, 0.08, 0.08, signal).rotation.z =
+    armorPlate("left eye", -0.34, 2.27, -0.34, 0.35, 0.14, 0.07, signal).rotation.z = -0.19;
+    armorPlate("right eye", 0.34, 2.26, -0.21, 0.35, 0.14, 0.07, signal).rotation.z = 0.19;
+    box("false smile", 0.09, 1.76, -0.32, 0.58, 0.08, 0.08, signal).rotation.z =
       -0.13;
     ring("broken collar", 0, 1.1, 0.1, 1.55, 0.1, alloy).rotation.x = 0;
     for (const [pivot, side] of [
@@ -467,13 +482,13 @@ export function buildEnemyModel(scene: Scene, id: string) {
       const x = (i - 1) * 0.57,
         y = 1.65 + (i % 2) * 0.55,
         z = (1 - i) * 0.2;
-      box("spam popup window", x, y, z, 1.55, 1.35, 0.12, shell);
-      box("popup title bar", x, y + 0.5, z - 0.09, 1.46, 0.21, 0.08, alloy);
+      armorPlate("spam popup window", x, y, z, 1.55, 1.35, 0.24, shell);
+      armorPlate("popup title bar", x, y + 0.5, z - 0.13, 1.34, 0.21, 0.10, alloy);
       box(
         "fake close button",
         x + 0.57,
         y + 0.5,
-        z - 0.15,
+        z - 0.19,
         0.15,
         0.13,
         0.045,
@@ -483,14 +498,14 @@ export function buildEnemyModel(scene: Scene, id: string) {
         "spam subject",
         x - 0.1,
         y + 0.12,
-        z - 0.09,
+        z - 0.135,
         1.02,
         0.09,
         0.045,
         signal,
       );
-      box("spam lure", x, y - 0.13, z - 0.09, 0.95, 0.07, 0.045, alloy);
-      box("fake download", x, y - 0.4, z - 0.09, 0.65, 0.2, 0.045, signal);
+      box("spam lure", x, y - 0.13, z - 0.135, 0.95, 0.07, 0.045, alloy);
+      armorPlate("fake download", x, y - 0.4, z - 0.135, 0.65, 0.2, 0.045, signal);
     }
     shard(
       "popup cursor claw",

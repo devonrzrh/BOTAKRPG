@@ -86,6 +86,12 @@ plate("Helmet shell", (0, 0.00, 2.80), (1.11, 0.88, 0.62), 1, 0.135, "head", 0.8
 plate("Inset faceplate", (0, -0.41, 2.79), (0.99, 0.23, 0.38), 0, 0.062, "head", 0.84)
 plate("Scan slit", (0, -0.532, 2.82), (0.78, 0.054, 0.105), 2, 0.022, "head")
 plate("Helmet brow", (0, -0.46, 2.94), (1.03, 0.24, 0.15), 1, 0.048, "head")
+for side in (-1, 1):
+    plate("Cheek armor", (side * 0.40, -0.45, 2.66),
+          (0.26, 0.22, 0.19), 1, 0.037, "head", 0.66)
+    for vent in range(3):
+        plate("Chest vent", (side * (0.34 + vent * 0.10), -0.552, 2.04),
+              (0.047, 0.055, 0.20), 0, 0.011)
 plate("Antenna", (-0.38, 0.17, 3.18), (0.077, 0.080, 0.29), 0, 0.012, "head").rotation_euler.y = -0.18
 plate("Antenna marker", (-0.408, 0.17, 3.34), (0.085, 0.089, 0.06), 2, 0.012, "head")
 
@@ -100,6 +106,11 @@ for side, arm in [(-1, "left"), (1, "right")]:
     joint("Elbow journal", (x, 0.03, 1.31), 0.18, 0.43, 1, rig=arm)
     plate("Forearm shield", (x + side * 0.06, -0.20, 1.06),
           (0.53, 0.63, 0.54), 1, 0.095, arm, 0.82)
+    if side < 0:
+        plate("Checkpoint gauntlet", (x - 0.10, -0.54, 1.10),
+              (0.61, 0.24, 0.65), 0, 0.08, arm, 0.76)
+        plate("Gauntlet stripe", (x - 0.10, -0.67, 1.10),
+              (0.38, 0.045, 0.075), 2, 0.012, arm)
     plate("Wrist block", (x, -0.25, 0.75), (0.39, 0.41, 0.27), 0, rig=arm)
     for finger in range(3):
         plate("Gripper jaw", (x + (finger - 1) * 0.115, -0.36, 0.59),
