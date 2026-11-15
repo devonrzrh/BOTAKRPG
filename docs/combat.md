@@ -16,7 +16,16 @@ The intent shows the actual incoming damage after current defenses. Defend spend
 
 HP and focus reset before each encounter. There are no consumables or equipment. Available skills show damage, focus cost and effect, including boss defenses. Number keys choose a skill or submit a multiple-choice answer; Enter confirms a multiple-answer or ordering response. Ordering keys follow displayed positions; # badges show the selected sequence. Short encounter banks use their chapter and prerequisite questions, without pulling in future chapters. Bookmark chapter saves the relevant library entry for later review.
 
-Probe deals direct damage at no focus cost. Firewall deals damage and grants a two-enemy-turn shield; it is the single defensive skill. Trace injection deals damage and applies three-turn poison. Journals that unlocked the retired Throttle skill migrate to Firewall without losing other skills or progress.
+Probe deals direct damage at no focus cost. Firewall deals damage and grants a two-enemy-turn shield. Additional skills can be learned in the Character menu as you level up.
+
+| Level | Skill | Tactic |
+| --- | --- | --- |
+| 2 | Trace injection | Apply three-turn poison. |
+| 4 | Packet Relay | Trade direct damage for 20 extra Momentum on a hit. |
+| 7 | Window Exploit | Add 12 base damage during an enemy Opening. |
+| 10 | Containment Burst | Spend 8 Focus on a heavy hit and a two-turn shield. |
+
+Journals that unlocked the retired Throttle skill migrate to Firewall without losing other skills or progress.
 
 ## Presentation
 

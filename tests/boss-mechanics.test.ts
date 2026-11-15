@@ -11,7 +11,7 @@ import {
   selectSkill,
   type CombatTactics,
 } from "../src/game/combat";
-import { initialSave } from "../src/game/state";
+import { addXp, initialSave, parseSave, unlockSkill } from "../src/game/state";
 import {
   validateContent,
   type Question,
@@ -48,6 +48,71 @@ const battle = (mechanic: CombatTactics["mechanic"], hp = 100) =>
     mixedQuestions: true,
     tactics: tactics(mechanic!),
   });
+
+describe("level-gated combat skills", () => {
+  it.each([
+    ["packet-relay", 300],
+    ["window-exploit", 600],
+    ["containment-burst", 900],
+  ] as const)("unlocks %s at %i XP and preserves it on import", (id, xp) => {
+    const entry = skill(id);
+    const before = addXp(initialSave(), xp - 1);
+    expect(unlockSkill(before, entry)).toBe(before);
+    const eligible = addXp(before, 1);
+    const learned = unlockSkill(eligible, entry);
+    expect(learned.character.skills).toContain(id);
+    expect(unlockSkill(learned, entry)).toBe(learned);
+    expect(parseSave(JSON.parse(JSON.stringify(learned)), content)).toEqual(
+      learned,
+    );
+  });
+
+  it("builds extra Momentum only when Packet Relay hits", () => {
+    const entry = skill("packet-relay");
+    const save = unlockSkill(addXp(initialSave(), 300), entry);
+    const selected = selectSkill(battle("mimic"), save, entry, questions);
+    const q = questions.find((q) => q.id === selected.question)!;
+    const hit = answerBattle(selected, save, content, q.answer);
+    expect(hit.battle.momentum).toBe(45);
+    expect(hit.save.character.focus).toBe(save.character.focus - 2);
+    expect(answerBattle(selected, save, content, []).battle.momentum).toBe(0);
+    expect(
+      answerBattle({ ...selected, momentum: 90 }, save, content, q.answer)
+        .battle.momentum,
+    ).toBe(100);
+  });
+
+  it("previews and applies Window Exploit's bonus on recovery turns", () => {
+    const entry = skill("window-exploit");
+    const save = unlockSkill(addXp(initialSave(), 600), entry);
+    const strike = battle("mimic");
+    const opening = { ...strike, turn: 3 };
+    const damage = previewDamage(opening, save, entry, content);
+    expect(damage).toBe(previewDamage(strike, save, entry, content) + 12);
+    expect(
+      previewDamage({ ...strike, breakFresh: true }, save, entry, content),
+    ).toBe(previewDamage(strike, save, entry, content));
+    const selected = selectSkill(opening, save, entry, questions);
+    const q = questions.find((q) => q.id === selected.question)!;
+    expect(answerBattle(selected, save, content, q.answer).battle.hp).toBe(
+      opening.hp - damage,
+    );
+  });
+
+  it("applies Containment Burst's damage and shield for eight Focus", () => {
+    const entry = skill("containment-burst");
+    const save = unlockSkill(addXp(initialSave(), 900), entry);
+    const base = battle("mimic");
+    const selected = selectSkill(base, save, entry, questions);
+    const q = questions.find((q) => q.id === selected.question)!;
+    const hit = answerBattle(selected, save, content, q.answer);
+    expect(hit.save.character.focus).toBe(save.character.focus - 8);
+    expect(hit.battle.hp).toBe(base.hp - 37);
+    expect(hit.battle.effects).toEqual([
+      { id: "shield", remaining: 2, magnitude: 5 },
+    ]);
+  });
+});
 
 describe("distinct boss mechanics", () => {
   it("keeps every boss readout compact for the battle HUD", () => {

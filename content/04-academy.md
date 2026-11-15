@@ -113,3 +113,42 @@ parent: insight
 effect: poison
 lesson: perceptron-basics
 ```
+
+```entity
+type: skill
+id: packet-relay
+title: Packet Relay
+description: Trade damage for 20 extra Momentum on a hit.
+cost: 2
+power: 2
+level: 4
+parent: insight
+bonusMomentum: 20
+lesson: graph-search
+```
+
+```entity
+type: skill
+id: window-exploit
+title: Window Exploit
+description: Deals 12 bonus base damage during an enemy Opening.
+cost: 4
+power: 3
+level: 7
+parent: insight
+openingPower: 12
+lesson: stacks-queues
+```
+
+```entity
+type: skill
+id: containment-burst
+title: Containment Burst
+description: Hit hard and gain a two-turn shield.
+cost: 8
+power: 13
+level: 10
+parent: ward
+effect: shield
+lesson: perceptron-basics
+```

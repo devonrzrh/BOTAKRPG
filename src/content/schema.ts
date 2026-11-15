@@ -57,6 +57,8 @@ export const skillSchema = z.object({
   level: z.number().int().positive(),
   parent: id.optional(),
   effect: effectId.optional(),
+  bonusMomentum: z.number().int().min(1).max(100).optional(),
+  openingPower: z.number().int().positive().optional(),
   lesson: id,
 });
 export const effectSchema = z.object({

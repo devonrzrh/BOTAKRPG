@@ -730,6 +730,14 @@ export function BattleScreen(p: Props) {
                           : s.effect === "poison"
                             ? "trace"
                             : "probe";
+                      const effects = [
+                        s.bonusMomentum && `+${s.bonusMomentum} Momentum`,
+                        s.openingPower && `+${s.openingPower} on Opening`,
+                        s.effect === "shield" && "Shield",
+                        s.effect === "poison" && "Poison",
+                      ]
+                        .filter(Boolean)
+                        .join(" · ");
                       return (
                         <button
                           key={s.id}
@@ -762,6 +770,12 @@ export function BattleScreen(p: Props) {
                             {b.weaknessKnown && b.tactics?.weakness === s.id
                               ? " · WEAK"
                               : ""}
+                            {effects && (
+                              <>
+                                <br />
+                                {effects}
+                              </>
+                            )}
                           </b>
                         </button>
                       );

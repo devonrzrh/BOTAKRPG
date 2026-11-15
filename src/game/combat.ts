@@ -112,6 +112,12 @@ export function previewDamage(
   content: Content,
 ): number {
   let damage = stats(save, content).attack + skill.power;
+  if (
+    skill.openingPower &&
+    !battle.breakFresh &&
+    enemyIntent(battle, save, content).kind === "recover"
+  )
+    damage += skill.openingPower;
   damage = Math.floor(
     damage * (1 + (battle.finisher ? 0 : battle.momentumSpend) / 100),
   );
@@ -326,7 +332,10 @@ export function answerBattle(
       next.tactics && skill.id === next.tactics.weakness,
     );
     if (!battle.finisher)
-      next.momentum = Math.min(100, next.momentum + 25 + (matching ? 10 : 0));
+      next.momentum = Math.min(
+        100,
+        next.momentum + 25 + (matching ? 10 : 0) + (skill.bonusMomentum ?? 0),
+      );
     if (next.tactics) {
       next.correctAnswers = (next.correctAnswers ?? 0) + 1;
       if (matching) next.weaknessKnown = true;
