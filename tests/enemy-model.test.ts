@@ -15,7 +15,7 @@ const cases = [
   ["archive-keeper", "keeper", "archive cabinet"],
   ["routing-warden", "warden", "tower shield"],
   ["signal-mimic", "mimic", "phishing hook"],
-  ["echo-7", "echo", "optics"],
+  ["echo-7", "echo", "visor"],
 ] as const;
 
 describe("enemy silhouettes", () => {

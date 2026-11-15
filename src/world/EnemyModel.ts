@@ -16,7 +16,7 @@ export { enemyArchetype, enemyThreatName } from "../game/enemyIdentity";
 export function buildEnemyModel(scene: Scene, id: string) {
   const kind = enemyArchetype(id);
   const palettes = {
-    echo: ["#26333d", "#818b91", "#ff373c"],
+    echo: ["#3c5666", "#64848f", "#8adce7"],
     warden: ["#433025", "#bd8b51", "#ffc368"],
     keeper: ["#302b48", "#9d88be", "#d4b9ff"],
     mimic: ["#16424a", "#72c9c8", "#d5ffff"],
@@ -527,7 +527,7 @@ export function buildEnemyModel(scene: Scene, id: string) {
     for (const part of echoMesh.parts) {
       const name =
         part.rig === "head" && part.material === 2
-          ? "optics"
+          ? "visor"
           : `${part.rig} armor ${part.material}`;
       loadPart(name, part, pivots[part.rig]);
     }

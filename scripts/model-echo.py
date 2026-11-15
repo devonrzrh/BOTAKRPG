@@ -13,16 +13,16 @@ from mathutils import Vector
 
 ROOT = Path(__file__).resolve().parents[1]
 PALETTE = [
-    ("Graphite", (0.09, 0.13, 0.16, 1)),
-    ("Brushed alloy", (0.42, 0.45, 0.48, 1)),
-    ("Red signal", (1.0, 0.15, 0.22, 1)),
+    ("Blue steel", (0.19, 0.29, 0.35, 1)),
+    ("Brushed alloy", (0.38, 0.53, 0.58, 1)),
+    ("Pale cyan visor", (0.53, 0.86, 0.91, 1)),
 ]
 # Positions in Blender's X/depth/elevation axes. The TypeScript rig swaps Y and Z.
 ORIGINS = {
     "body": (0, 0, 0),
     "head": (0, -0.02, 3.09),
-    "left": (-0.96, 0, 2.44),
-    "right": (0.96, 0, 2.44),
+    "left": (-0.88, 0, 2.44),
+    "right": (0.88, 0, 2.44),
 }
 
 
@@ -86,71 +86,38 @@ def build():
         ]
         plate(name, rig, center, outline, depth, surface, 0.009)
 
-    block("Neck", "body", (0, 0.08, 2.80), 0.35, 0.35, 0.40, 0)
-    plate("Helmet shell", "head", (0, 0, 0), [
-        (-0.44, 0.17), (-0.31, 0.36), (0.28, 0.36), (0.43, 0.16),
-        (0.40, -0.15), (0.23, -0.31), (-0.20, -0.31), (-0.39, -0.16),
-    ], 0.68, 0, 0.04)
-    plate("Face mask", "head", (0, -0.32, 0.03), [
-        (-0.37, 0.20), (-0.24, 0.27), (0.26, 0.25), (0.36, 0.14),
-        (0.27, -0.04), (0.12, -0.03), (0, -0.14), (-0.12, -0.03), (-0.28, -0.05),
-    ], 0.24, 1, 0.024)
-    plate("Dark optic recess", "head", (0, -0.445, 0), [
-        (-0.32, 0.095), (-0.13, 0.07), (0, 0.035), (0.13, 0.07),
-        (0.32, 0.095), (0.29, -0.065), (0, -0.13), (-0.29, -0.065),
-    ], 0.09, 0, 0.012)
-    plate("Lower jaw", "head", (0, -0.34, -0.19), [
-        (-0.27, 0.10), (-0.14, 0.02), (0.14, 0.02), (0.27, 0.10),
-        (0.18, -0.13), (-0.18, -0.13),
-    ], 0.26, 1, 0.025)
-    block("Antenna", "head", (0.27, 0.15, 0.39), 0.09, 0.23, 0.12, 0)
-    block("Antenna lamp", "head", (0.27, 0.15, 0.51), 0.09, 0.035, 0.12, 2)
+    # The pursuit silhouette and evidence photograph share a square helmet,
+    # continuous horizontal visor, and broad, slightly tapered chest plate.
+    block("Neck", "body", (0, 0.05, 2.72), 0.42, 0.28, 0.42, 0)
+    block("Square helmet", "head", (0, 0, 0.06), 1.05, 0.90, 0.75, 1, bevel=0.042)
+    block("Inset faceplate", "head", (0, -0.37, 0.058), 0.90, 0.73, 0.14, 0, bevel=0.024)
+    block("Continuous visor", "head", (0, -0.457, 0.15), 0.81, 0.115, 0.047, 2, bevel=0.008)
 
-    plate("Chest frame", "body", (0, 0.045, 2.23), [
-        (-0.90, 0.32), (-0.52, 0.56), (0.52, 0.56), (0.90, 0.32),
-        (0.72, -0.25), (0.36, -0.52), (-0.36, -0.52), (-0.72, -0.25),
-    ], 0.92, 0, 0.05)
-    block("Waist swivel", "body", (0, 0, 1.63), 0.66, 0.34, 0.51, 0)
-    for i in range(3):
-        block("Abdomen rib", "body", (0, -0.26, 1.51 + i * 0.11), 0.62, 0.065, 0.18, 1)
+    block("Chest housing", "body", (0, 0.02, 2.23), 1.82, 0.91, 0.85, 1,
+          bevel=0.055, taper=0.83)
+    block("Chest panel", "body", (0, -0.375, 2.24), 1.57, 0.71, 0.20, 0,
+          bevel=0.031, taper=0.88)
+    block("Waist swivel", "body", (0, 0, 1.65), 0.77, 0.32, 0.51, 0)
+    for i in range(2):
+        block("Abdomen rib", "body", (0, -0.26, 1.58 + i * 0.10), 0.72, 0.049, 0.15, 1)
     block("Pelvis", "body", (0, 0.03, 1.34), 1.02, 0.35, 0.64, 0, taper=0.79)
     block("Hip guard", "body", (0, -0.30, 1.34), 0.48, 0.26, 0.12, 1, taper=0.66)
-    hub("Reactor collar", "body", (0, -0.42, 2.24), 0.32, 0.23, 1, sides=8)
-    hub("Reactor well", "body", (0, -0.535, 2.24), 0.23, 0.095, 0, sides=8)
-    hub("Reactor lens", "body", (0, -0.59, 2.24), 0.165, 0.08, 2, sides=8)
 
     for side, arm in [(-1, "left"), (1, "right")]:
         def mirror(outline):
             return [(side * x, z) for x, z in outline]
 
-        plate("Eye", "head", (side * 0.17, -0.49, 0.015), mirror([
-            (-0.105, -0.01), (0.12, 0.057), (0.10, -0.025), (-0.087, -0.055),
-        ]), 0.05, 2, 0.006)
-        hub("Temple bearing", "head", (side * 0.366, -0.14, 0), 0.13, 0.25, 1)
-        plate("Breastplate", "body", (side * 0.42, -0.34, 2.45), mirror([
-            (-0.36, 0.11), (-0.17, 0.30), (0.26, 0.24), (0.43, 0.01),
-            (0.18, -0.24), (-0.10, -0.23),
-        ]), 0.28, 1, 0.028)
-        for i in range(2):
-            block("Chest vent", "body", (side * 0.49, -0.415, 2.06 + i * 0.09),
-                  0.29, 0.046, 0.10, 0, bevel=0.011)
-
         block("Upper arm actuator", arm, (side * 0.12, 0.02, -0.31), 0.34, 0.60, 0.44, 0)
         hub("Shoulder bearing", arm, (side * 0.07, 0, -0.04), 0.28, 0.55, 0)
-        ridge = 0.34 if side < 0 else 0.23
-        plate("Shoulder armor", arm, (side * 0.12, -0.15, 0.04), mirror([
-            (-0.26, 0.10), (-0.08, ridge), (0.26, ridge - 0.06), (0.44, 0.025),
-            (0.31, -0.23), (-0.22, -0.23),
-        ]), 0.62, 1, 0.045)
-        block("Shoulder inset", arm, (side * 0.16, -0.46, 0.13), 0.29, 0.09, 0.08, 0)
-        block("Shoulder lamp", arm, (side * 0.16, -0.505, 0.13), 0.20, 0.038, 0.048, 2)
+        block("Shoulder armor", arm, (side * 0.19, -0.10, 0.02), 0.44, 0.42, 0.56, 1,
+              bevel=0.04, taper=0.91)
+        block("Shoulder inset", arm, (side * 0.19, -0.385, 0.04), 0.26, 0.20, 0.08, 0)
         hub("Elbow bearing", arm, (side * 0.23, -0.07, -0.57), 0.17, 0.45, 1)
         block("Forearm casing", arm, (side * 0.23, -0.115, -0.81), 0.45, 0.53, 0.51, 0, taper=0.72)
         plate("Forearm guard", arm, (side * 0.23, -0.34, -0.82), mirror([
             (-0.18, 0.23), (0.18, 0.25), (0.26, 0.06),
             (0.13, -0.25), (-0.12, -0.19),
         ]), 0.20, 1, 0.025)
-        block("Forearm inlay", arm, (side * 0.26, -0.45, -0.80), 0.06, 0.26, 0.055, 2)
         block("Hand", arm, (side * 0.24, -0.19, -1.15), 0.34, 0.28, 0.33, 0)
         for finger in range(3):
             block("Finger knuckle", arm, (side * (0.13 + finger * 0.11), -0.31, -1.23),
@@ -168,7 +135,6 @@ def build():
             (-0.15, 0.25), (0.15, 0.25), (0.23, 0.11),
             (0.20, -0.24), (-0.20, -0.24),
         ]), 0.25, 1, 0.035)
-        block("Ankle seal", "body", (boot, -0.39, 0.36), 0.07, 0.21, 0.05, 2)
         block("Boot", "body", (boot, -0.14, 0.14), 0.53, 0.28, 0.87, 0, taper=1.08)
         block("Boot toe", "body", (boot, -0.48, 0.15), 0.49, 0.19, 0.30, 1)
     return collection
