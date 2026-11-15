@@ -8,6 +8,7 @@ import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import type { Scene } from "@babylonjs/core/scene";
 
 import { enemyArchetype } from "../game/enemyIdentity";
+import echoMesh from "./echoMesh.json";
 import sentinelMesh from "./sentinelMesh.json";
 export { enemyArchetype, enemyThreatName } from "../game/enemyIdentity";
 
@@ -15,7 +16,7 @@ export { enemyArchetype, enemyThreatName } from "../game/enemyIdentity";
 export function buildEnemyModel(scene: Scene, id: string) {
   const kind = enemyArchetype(id);
   const palettes = {
-    echo: ["#19232e", "#b9d7e2", "#ff535d"],
+    echo: ["#243747", "#91b4c5", "#ff394d"],
     warden: ["#433025", "#bd8b51", "#ffc368"],
     keeper: ["#302b48", "#9d88be", "#d4b9ff"],
     mimic: ["#16424a", "#72c9c8", "#d5ffff"],
@@ -41,6 +42,8 @@ export function buildEnemyModel(scene: Scene, id: string) {
   const leftArm = new TransformNode("left shoulder pivot", scene);
   const rightArm = new TransformNode("right shoulder pivot", scene);
   let sentinelHead: TransformNode | undefined;
+  let echoHead: TransformNode | undefined;
+  const echoSpine: TransformNode[] = [];
   for (const [pivot, side] of [
     [leftArm, -1],
     [rightArm, 1],
@@ -197,6 +200,19 @@ export function buildEnemyModel(scene: Scene, id: string) {
       material,
       parent,
     );
+  const loadPart = (
+    name: string,
+    part: (typeof echoMesh.parts)[number],
+    pivot: TransformNode,
+  ) => {
+    const mesh = new Mesh(`${kind} ${name}`, scene);
+    const vertices = new VertexData();
+    vertices.positions = part.positions;
+    vertices.normals = part.normals;
+    vertices.indices = part.indices;
+    vertices.applyToMesh(mesh);
+    place(mesh, 0, 0, 0, materials[part.material], pivot);
+  };
 
   if (kind === "interceptor") {
     // A packet-sniffing spider: swept claws surround stolen packet fragments.
@@ -496,60 +512,24 @@ export function buildEnemyModel(scene: Scene, id: string) {
       rightArm,
     ).scaling.set(0.7, 1.6, 0.3);
   } else if (kind === "echo") {
-    // The escaped program is now a fragmented network worm, not a robot chassis.
-    for (let i = 0; i < 7; i++) {
-      const segment = shard(
-        "worm segment",
-        Math.sin(i * 0.9) * 0.58,
-        0.72 + i * 0.36,
-        Math.cos(i * 0.9) * 0.16,
-        0.35 + i * 0.017,
-        i % 2 ? alloy : shell,
-      );
-      segment.rotation.z = Math.cos(i * 0.9) * 0.5;
-      box(
-        "segment packet seam",
-        segment.position.x,
-        segment.position.y,
-        segment.position.z - 0.34,
-        0.38,
-        0.075,
-        0.045,
-        signal,
-      );
+    const pivots: Record<string, TransformNode> = {
+      left: leftArm,
+      right: rightArm,
+    };
+    for (const [name, [x, y, z]] of Object.entries(echoMesh.pivots)) {
+      const pivot = pivots[name] ?? new TransformNode(`echo ${name} pivot`, scene);
+      pivot.parent = root;
+      pivot.position.set(x, y, z);
+      pivots[name] = pivot;
+      if (name === "head") echoHead = pivot;
+      if (name.startsWith("spine-")) echoSpine.push(pivot);
     }
-    const headX = Math.sin(6 * 0.9) * 0.58;
-    for (const side of [-1, 1]) {
-      sphere("worm eye", headX + side * 0.18, 2.98, -0.35, 0.18, signal);
-      box(
-        "worm antenna",
-        headX + side * 0.25,
-        3.34,
-        0,
-        0.06,
-        0.5,
-        0.06,
-        signal,
-      ).rotation.z = side * -0.4;
-    }
-    ring("network route ring", 0, 1.85, 0.4, 2.9, 0.055, alloy);
-    for (const [pivot, side] of [
-      [leftArm, -1],
-      [rightArm, 1],
-    ] as const) {
-      for (let i = 0; i < 2; i++) {
-        const fragment = shard(
-          "fragmented packet",
-          side * (0.2 + i * 0.11),
-          -0.5 + i * 1.1,
-          0.12,
-          0.32,
-          i % 2 ? shell : alloy,
-          pivot,
-        );
-        fragment.scaling.set(0.5, 1.6, 0.4);
-        fragment.rotation.z = side * (0.25 + i * 0.12);
-      }
+    for (const part of echoMesh.parts) {
+      const name =
+        part.rig === "head" && part.material === 2
+          ? "visor"
+          : `${part.rig} armor ${part.material}`;
+      loadPart(name, part, pivots[part.rig]);
     }
   } else {
     sentinelHead = new TransformNode("sentinel helmet swivel", scene);
@@ -561,13 +541,7 @@ export function buildEnemyModel(scene: Scene, id: string) {
       const name = part.rig === "head" && part.material === 2
         ? "visor"
         : `${part.rig} armor ${part.material}`;
-      const mesh = new Mesh(`sentinel ${name}`, scene);
-      const vertices = new VertexData();
-      vertices.positions = part.positions;
-      vertices.normals = part.normals;
-      vertices.indices = part.indices;
-      vertices.applyToMesh(mesh);
-      place(mesh, 0, 0, 0, materials[part.material], pivot);
+      loadPart(name, part, pivot);
     }
   }
   const rest = meshes.map((mesh) => ({
@@ -577,6 +551,8 @@ export function buildEnemyModel(scene: Scene, id: string) {
   }));
   const resetIdle = () => {
     if (sentinelHead) sentinelHead.rotation.y = 0;
+    if (echoHead) echoHead.rotation.setAll(0);
+    echoSpine.forEach((pivot) => pivot.rotation.setAll(0));
     meshes.forEach((mesh, i) => {
       mesh.position.copyFrom(rest[i].position);
       mesh.rotation.copyFrom(rest[i].rotation);
@@ -600,6 +576,15 @@ export function buildEnemyModel(scene: Scene, id: string) {
     leftArm.rotation.z -= breath * (kind === "warden" ? 0.025 : 0.07);
     rightArm.rotation.z += Math.sin(seconds * 1.8 + 0.6) * 0.07;
     if (sentinelHead) sentinelHead.rotation.y = Math.sin(seconds * 0.8) * 0.2;
+    if (echoHead) {
+      echoHead.rotation.x = breath * 0.065;
+      echoHead.rotation.y = Math.sin(seconds * 1.1) * 0.14;
+    }
+    echoSpine.forEach((pivot, i) => {
+      const wave = Math.sin(seconds * 2.1 + i * 0.55);
+      pivot.rotation.y = wave * 0.17;
+      pivot.rotation.z = wave * 0.13;
+    });
     meshes.forEach((mesh, i) => {
       const name = mesh.name;
       if (kind === "drone") {
@@ -607,13 +592,6 @@ export function buildEnemyModel(scene: Scene, id: string) {
           mesh.rotation.y += seconds * (name.includes("cross") ? -0.65 : 0.45);
         if (name.includes("single iris"))
           mesh.position.x += Math.sin(seconds * 0.9) * 0.12;
-      } else if (kind === "echo") {
-        if (name.includes("worm segment")) {
-          mesh.position.x += Math.sin(seconds * 2.1 - i * 0.65) * 0.14;
-          mesh.rotation.z += Math.sin(seconds * 2.1 - i * 0.65) * 0.14;
-        }
-        if (name.includes("network route ring"))
-          mesh.rotation.y += seconds * 0.22;
       } else if (kind === "decoy" && i < 18) {
         const phase = Math.floor(i / 6) * 1.8;
         mesh.position.y += Math.sin(seconds * 2.2 + phase) * 0.09;

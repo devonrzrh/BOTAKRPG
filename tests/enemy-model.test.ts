@@ -15,7 +15,7 @@ const cases = [
   ["archive-keeper", "keeper", "archive cabinet"],
   ["routing-warden", "warden", "tower shield"],
   ["signal-mimic", "mimic", "phishing hook"],
-  ["echo-7", "echo", "worm segment"],
+  ["echo-7", "echo", "visor"],
 ] as const;
 
 describe("enemy silhouettes", () => {
@@ -69,6 +69,29 @@ describe("enemy silhouettes", () => {
           .join(",");
       });
       expect(new Set(fingerprints).size).toBe(cases.length);
+    } finally {
+      scene.dispose();
+      engine.dispose();
+    }
+  });
+
+  it("moves ECHO-7's spine armor and lights together and resets their pose", () => {
+    const engine = new NullEngine();
+    const scene = new Scene(engine);
+    try {
+      const rig = buildEnemyModel(scene, "echo-7");
+      const spine = rig.meshes.filter((mesh) => mesh.name.startsWith("echo spine-3 "));
+      expect(spine).toHaveLength(3);
+      const pivot = spine[0].parent!;
+      expect(spine.every((mesh) => mesh.parent === pivot)).toBe(true);
+      const rest = pivot.computeWorldMatrix(true).clone();
+      rig.animateIdle(0.5);
+      expect(pivot.computeWorldMatrix(true).equals(rest)).toBe(false);
+      rig.resetIdle();
+      // Battle effects restore the root transform independently of the idle joints.
+      rig.root.position.y = 0;
+      rig.root.rotation.y = 0;
+      expect(pivot.computeWorldMatrix(true).equals(rest)).toBe(true);
     } finally {
       scene.dispose();
       engine.dispose();
