@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   analyzeBattle,
   answerBattle,
+  battleQuizDuration,
   createBattle,
   enemyTurn,
   guardTurn,
@@ -51,6 +52,24 @@ const tactics: CombatTactics = {
 };
 
 describe("one combat momentum resource", () => {
+  it("decreases correct attack damage to zero without awarding hit bonuses at expiry", () => {
+    const save = initialSave();
+    const selected = selectSkill(encounter(tactics), save, skill, questions);
+    const question = questions.find((q) => q.id === selected.question)!;
+    const duration = battleQuizDuration(question.format);
+    const fast = answerBattle(selected, save, content, question.answer, 0);
+    const slow = answerBattle(selected, save, content, question.answer, duration / 2);
+    const expired = answerBattle(selected, save, content, question.answer, duration + 1);
+
+    expect(selected.hp - slow.battle.hp).toBe(Math.ceil((selected.hp - fast.battle.hp) / 2));
+    expect(expired.correct).toBe(true);
+    expect(expired.battle.hp).toBe(selected.hp);
+    expect(expired.battle.momentum).toBe(0);
+    expect(expired.battle.resolve).toBe(selected.resolve);
+    expect(expired.battle.phase).toBe("feedback");
+    expect(answerBattle(selected, save, content, [], 0).battle.hp).toBe(selected.hp);
+  });
+
   it("earns 25 per correct hit, caps at 100, and has no hidden consecutive-hit damage multiplier", () => {
     let battle = encounter(),
       save = initialSave();

@@ -2,6 +2,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import type { Content, Item, Question, Skill } from "../content/schema";
 import {
   canSpare,
+  battleQuizDuration,
   previewDamage,
   enemyIntent,
   bossReadout,
@@ -50,7 +51,7 @@ interface Props {
   onAct: (choice: number) => void;
   onSpare: () => void;
   onEvade: (collisions: number) => void;
-  onSubmit: (answer?: number[]) => void;
+  onSubmit: (answer?: number[], elapsedMs?: number) => void;
   onToggleSound: () => void;
   onToggleAutoAdvance: () => void;
   onHint: () => void;
@@ -161,6 +162,36 @@ export function BattleScreen(p: Props) {
     resolved.current = b;
     continuation.current();
   };
+  const quizDuration = b.phase === "question" && q ? battleQuizDuration(q.format) : 0;
+  const quizClock = useRef({ elapsed: 0, started: null as number | null });
+  const [quizElapsed, setQuizElapsed] = useState(0);
+  useLayoutEffect(() => {
+    quizClock.current = { elapsed: 0, started: null };
+    setQuizElapsed(0);
+  }, [quizDuration, b.turn, b.question]);
+  useLayoutEffect(() => {
+    if (!quizDuration || p.paused) return;
+    const clock = quizClock.current;
+    const started = performance.now();
+    clock.started = started;
+    const timer = window.setInterval(() => {
+      const elapsed = Math.min(quizDuration, clock.elapsed + performance.now() - started);
+      setQuizElapsed(elapsed);
+      if (elapsed >= quizDuration) window.clearInterval(timer);
+    }, 100);
+    return () => {
+      window.clearInterval(timer);
+      clock.elapsed = Math.min(quizDuration, clock.elapsed + performance.now() - started);
+      clock.started = null;
+    };
+  }, [quizDuration, b.turn, b.question, p.paused]);
+  const submitQuiz = (answer?: number[]) => {
+    const clock = quizClock.current;
+    if (!quizDuration || p.paused) return;
+    const running = clock.started === null ? 0 : performance.now() - clock.started;
+    p.onSubmit(answer, clock.elapsed + running);
+  };
+  const remaining = Math.max(0, quizDuration - quizElapsed);
   const correctFeedback = b.phase === "feedback" && p.notice === "Correct";
   useEffect(() => {
     if (q && (b.phase === "feedback" || b.phase === "won"))
@@ -348,7 +379,7 @@ export function BattleScreen(p: Props) {
       if (submitted.current === b) return;
       submitted.current = b;
       p.onAnswer([index]);
-      p.onSubmit([index]);
+      submitQuiz([index]);
       return;
     }
     p.onAnswer(
@@ -444,7 +475,7 @@ export function BattleScreen(p: Props) {
         ) {
           e.preventDefault();
           e.stopPropagation();
-          p.onSubmit();
+          submitQuiz();
         }
       }}
     >
@@ -763,7 +794,7 @@ export function BattleScreen(p: Props) {
                           </span>
                           <b>
                             {s.cost ? `${s.cost} focus` : "Free"} ·{" "}
-                            {previewDamage(b, save, s, p.content)} damage
+                            {previewDamage(b, save, s, p.content)} max damage
                             {b.momentumSpend > 0
                               ? ` · +${b.momentumSpend}% powered`
                               : ""}
@@ -948,13 +979,21 @@ export function BattleScreen(p: Props) {
             )}
             {b.phase === "question" && q && (
               <>
-                <p className="battle-selected-action">
+                <p className="battle-quiz-time">
                   {b.finisher
                     ? "FINISHER"
                     : (skills.find((s) => s.id === b.skill)?.title ??
                       "ATTACK")}{" "}
-                  · Answer correctly to use this skill.
+                  · {remaining > 0
+                    ? `${Math.ceil(remaining / 1000)}s · Faster answers deal more damage`
+                    : "Time expired · 0 damage"}
                 </p>
+                <progress
+                  className="battle-quiz-timer"
+                  aria-label="Time remaining for damage"
+                  max={quizDuration}
+                  value={remaining}
+                />
                 <h2 ref={title} tabIndex={-1}>
                   {q.prompt}
                 </h2>
@@ -986,7 +1025,7 @@ export function BattleScreen(p: Props) {
                     <button
                       className="primary"
                       disabled={!answerReady}
-                      onClick={() => p.onSubmit()}
+                      onClick={() => submitQuiz()}
                     >
                       {b.finisher
                         ? "Use finisher"

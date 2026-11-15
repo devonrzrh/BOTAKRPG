@@ -301,11 +301,16 @@ export function isCorrect(question: Question, answer: number[]): boolean {
     question.answer.every((x, i) => x === answer[i])
   );
 }
+export function battleQuizDuration(format: Question["format"]): number {
+  return format === "choice" ? 30_000 : 45_000;
+}
+
 export function answerBattle(
   battle: Battle,
   save: Save,
   content: Content,
   answer: number[],
+  elapsedMs = 0,
 ): { battle: Battle; save: Save; correct: boolean } {
   if (battle.phase !== "question") throw new Error("No pending question");
   const skill = content.entities.find(
@@ -321,8 +326,14 @@ export function answerBattle(
   next.momentum = battle.finisher
     ? 0
     : Math.max(0, battle.momentum - battle.momentumSpend);
-  if (correct) {
-    let damage = previewDamage(next, save, skill, content);
+  const duration = battleQuizDuration(question.format);
+  const remaining = Number.isFinite(elapsedMs)
+    ? Math.max(0, duration - Math.max(0, elapsedMs))
+    : 0;
+  const damage = correct
+    ? Math.ceil((previewDamage(next, save, skill, content) * remaining) / duration)
+    : 0;
+  if (correct && damage > 0) {
     const consumedStagger = Boolean(next.tactics && next.staggered);
     if (consumedStagger) {
       next.staggered = false;
@@ -373,7 +384,7 @@ export function answerBattle(
       });
     }
   } else {
-    next.log.push("Incorrect answer. Turn spent.");
+    next.log.push(correct ? "Time expired. No damage dealt." : "Incorrect answer. Turn spent.");
   }
   if (next.tactics?.mechanic === "archive") next.archiveOpen = false;
   next.momentumSpend = 0;

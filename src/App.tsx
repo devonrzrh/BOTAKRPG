@@ -1088,7 +1088,7 @@ export default function App() {
     setBattle(nextBattle);
     updateSave(() => nextSave);
   };
-  const submitAnswer = (chosenAnswer?: number[]) => {
+  const submitAnswer = (chosenAnswer?: number[], elapsedMs = 0) => {
     if (battleRef.current !== battle || battle.phase !== "question") return;
     try {
       const result = answerBattle(
@@ -1096,6 +1096,7 @@ export default function App() {
         saveRef.current,
         content,
         chosenAnswer ?? answer,
+        elapsedMs,
       );
       const q = questions.find((q) => q.id === battle.question)!;
       const next = recordAnswer(
@@ -1106,7 +1107,11 @@ export default function App() {
         battle.assisted,
       );
       applyBattle(result.battle, next);
-      setBattleNotice(result.correct ? "Correct" : "Incorrect · turn spent");
+      setBattleNotice(
+        !result.correct ? "Incorrect · turn spent"
+          : result.battle.hp === battle.hp ? "Correct · time expired, no damage"
+          : "Correct",
+      );
     } catch (e) {
       notify(String(e));
     }
