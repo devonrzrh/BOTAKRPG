@@ -20,6 +20,7 @@ import { Color3, Color4 } from "@babylonjs/core/Maths/math.color";
 import { DynamicTexture } from "@babylonjs/core/Materials/Textures/dynamicTexture";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { attachBattleEffects } from "./BattleEffects";
+import { createBattleSpeechAnchor } from "./BattleSpeechAnchor";
 import { buildEnemyModel } from "./EnemyModel";
 import { buildBattleArena } from "./BattleArena";
 import { attachWorldParticles } from "./WorldParticles";
@@ -510,6 +511,29 @@ function WorldCanvas(props: Props) {
         cue: latest.current.combatCue ?? null,
         reducedMotion: latest.current.reducedMotion || motionQuery.matches,
       }));
+      const projectSpeech = createBattleSpeechAnchor(enemyRig.meshes);
+      const stage = canvas.current!.parentElement!;
+      let previousX = NaN;
+      let previousY = NaN;
+      scene.onAfterRenderObservable.add(() => {
+        const anchor = projectSpeech(scene.getTransformMatrix());
+        if (!anchor) return;
+        // The canvas and battle overlay share this positioned stage.
+        const x = Math.round(anchor.x * 1000);
+        const y = Math.round(anchor.y * 1000);
+        if (x !== previousX)
+          stage.style.setProperty("--enemy-speech-x", `${x / 10}%`);
+        if (y !== previousY)
+          stage.style.setProperty("--enemy-speech-y", String(y / 1000));
+        if (Number.isNaN(previousX)) stage.dataset.enemySpeechAnchor = "";
+        previousX = x;
+        previousY = y;
+      });
+      scene.onDisposeObservable.addOnce(() => {
+        stage.style.removeProperty("--enemy-speech-x");
+        stage.style.removeProperty("--enemy-speech-y");
+        delete stage.dataset.enemySpeechAnchor;
+      });
     } else {
       box("floating foundation", 0, -1.1, 0, 20, 2, 17, edge);
       box("academy grounds", 0, -0.1, 0, 20, 0.25, 17, grass);

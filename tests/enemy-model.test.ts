@@ -1,4 +1,5 @@
 import { NullEngine } from "@babylonjs/core/Engines/nullEngine";
+import { Matrix } from "@babylonjs/core/Maths/math.vector";
 import { Scene } from "@babylonjs/core/scene";
 import { describe, expect, it } from "vitest";
 import {
@@ -6,6 +7,7 @@ import {
   enemyArchetype,
   enemyThreatName,
 } from "../src/world/EnemyModel";
+import { createBattleSpeechAnchor } from "../src/world/BattleSpeechAnchor";
 
 const cases = [
   ["sentinel-a-03", "sentinel", "visor"],
@@ -90,6 +92,34 @@ describe("enemy silhouettes", () => {
       // Battle effects restore the root transform independently of the idle joints.
       rig.root.rotation.y = 0;
       expect(pivot.computeWorldMatrix(true).equals(rest)).toBe(true);
+    } finally {
+      scene.dispose();
+      engine.dispose();
+    }
+  });
+
+  it("projects distinct anchors from enemy geometry and follows a rig's pose", () => {
+    const engine = new NullEngine();
+    const scene = new Scene(engine);
+    try {
+      const projection = Matrix.OrthoOffCenterLH(0, 10, 0, 5, -10, 10);
+      const anchors = cases.map(([id]) => {
+        const rig = buildEnemyModel(scene, id);
+        const project = createBattleSpeechAnchor(rig.meshes);
+        rig.meshes.forEach((mesh) => mesh.computeWorldMatrix(true));
+        const rest = { ...project(projection)! };
+        expect(rest.x).toBeGreaterThan(0.5);
+        expect(rest.y).toBeGreaterThan(0);
+        expect(rest.y).toBeLessThan(1);
+
+        rig.root.position.addInPlaceFromFloats(1, 0.5, 0);
+        rig.meshes.forEach((mesh) => mesh.computeWorldMatrix(true));
+        const moved = project(projection)!;
+        expect(moved.x - rest.x).toBeCloseTo(0.1);
+        expect(moved.y - rest.y).toBeCloseTo(-0.1);
+        return rest;
+      });
+      expect(new Set(anchors.map(({ x, y }) => `${x}:${y}`)).size).toBe(cases.length);
     } finally {
       scene.dispose();
       engine.dispose();

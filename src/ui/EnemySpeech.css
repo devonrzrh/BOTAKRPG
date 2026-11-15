@@ -1,9 +1,12 @@
 .enemy-speech {
   position: absolute;
   z-index: 5;
-  bottom: calc(var(--battle-console-height) + 44px);
-  left: calc(50% + 112px);
-  width: min(268px, calc(50% - 132px));
+  bottom: calc(var(--battle-console-height) + 20px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: min(420px, calc(100% - 32px));
+  text-align: center;
   pointer-events: none;
 }
 .enemy-speech-bubble {
@@ -11,20 +14,38 @@
   margin: 0;
   padding: 12px 16px;
   border: 1px solid #c6d8d5;
-  border-radius: 15px 15px 15px 3px;
+  border-radius: 12px;
   background: #e8eee8f5;
   color: #172b31;
   box-shadow: 0 5px 20px #0006;
   font: 400 18px/1.4 var(--typewriter);
   animation: enemy-speech-arrive 180ms ease-out;
 }
-.enemy-speech-bubble::before {
-  content: "";
-  position: absolute;
-  left: -11px;
-  bottom: 10px;
-  border: 6px solid transparent;
-  border-right-color: #e8eee8;
+@media (min-width: 701px) and (min-height: 551px) {
+  [data-enemy-speech-anchor] .enemy-speech {
+    --speech-left: calc(var(--enemy-speech-x) + 14px);
+    --speech-anchor-y: calc(var(--enemy-speech-y) * var(--battle-stage-height));
+    --speech-top: clamp(
+      82px,
+      calc(var(--speech-anchor-y) - 20px),
+      max(82px, calc(var(--battle-stage-height) - 104px))
+    );
+    top: var(--speech-top);
+    bottom: auto;
+    left: var(--speech-left);
+    transform: none;
+    max-width: min(268px, calc(100% - var(--speech-left) - 16px));
+    text-align: left;
+  }
+  [data-enemy-speech-anchor] .enemy-speech-bubble::before {
+    content: "";
+    position: absolute;
+    left: -13px;
+    top: clamp(11px, calc(var(--speech-anchor-y) - var(--speech-top)), calc(100% - 11px));
+    transform: translateY(-50%);
+    border: 6px solid transparent;
+    border-right-color: #e8eee8;
+  }
 }
 @keyframes enemy-speech-arrive {
   from {
@@ -54,20 +75,7 @@
   }
 }
 @media (max-width: 700px) {
-  .enemy-speech {
-    left: 16px;
-    right: 16px;
-    width: auto;
-    bottom: calc(var(--battle-console-height) + 28px);
-  }
   .enemy-speech-bubble {
     padding: 9px 11px;
-  }
-  .enemy-speech-bubble::before {
-    left: 50%;
-    top: -12px;
-    bottom: auto;
-    border-right-color: transparent;
-    border-bottom-color: #e8eee8;
   }
 }

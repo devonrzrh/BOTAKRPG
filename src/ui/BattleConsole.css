@@ -1,10 +1,18 @@
 .app.gameplay-battle {
   --battle-console-height: min(320px, 54%);
+  --battle-stage-height: calc(100% - var(--battle-console-height) - 28px);
 }
 .app.gameplay-battle:has(.battle-screen.battle-layout-console)
   .world-canvas.boss-world {
   top: 0;
-  height: calc(100% - var(--battle-console-height) - 28px);
+  height: var(--battle-stage-height);
+}
+@media (max-width: 700px) and (min-height: 600px) {
+  .app.gameplay-battle:has(.battle-screen.battle-layout-console)
+    .world-canvas.boss-world {
+    top: 50px;
+    height: calc(var(--battle-stage-height) - 104px);
+  }
 }
 .app.gameplay-battle .battle-layout-console .battle-enemy-hud {
   top: 6px;
