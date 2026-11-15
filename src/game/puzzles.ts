@@ -35,13 +35,14 @@ function sameMultiset(a: number[], b: number[]) {
   );
 }
 
-function shortestRoute(
+export function shortestPuzzleRoute(
   values: number[],
   edges: z.infer<typeof edgeSchema>[],
   start: number,
   goal: number,
 ) {
   const distances = new Map<number, number>([[start, 0]]);
+  const previous = new Map<number, number>();
   const pending = new Set(values);
   while (pending.size) {
     let current: number | undefined;
@@ -53,7 +54,12 @@ function shortestRoute(
         current = node;
     if (current === undefined || !distances.has(current)) break;
     pending.delete(current);
-    if (current === goal) return distances.get(current)!;
+    if (current === goal) {
+      const path: number[] = [];
+      for (let node = goal; node !== start; node = previous.get(node)!)
+        path.push(node);
+      return { cost: distances.get(goal)!, path: path.reverse() };
+    }
     for (const edge of edges) {
       const next =
         edge.from === current
@@ -63,10 +69,13 @@ function shortestRoute(
             : undefined;
       if (next === undefined || !pending.has(next)) continue;
       const cost = distances.get(current)! + edge.cost;
-      if (cost < (distances.get(next) ?? Infinity)) distances.set(next, cost);
+      if (cost < (distances.get(next) ?? Infinity)) {
+        distances.set(next, cost);
+        previous.set(next, current);
+      }
     }
   }
-  return Infinity;
+  return { cost: Infinity, path: [] };
 }
 
 function stackCanProduce(values: number[], target: number[]) {
@@ -156,7 +165,8 @@ export const puzzleConfigSchema = rawPuzzleConfigSchema.superRefine(
       if (
         nodes.has(start) &&
         nodes.has(goal) &&
-        shortestRoute(config.values, config.edges, start, goal) > config.budget
+        shortestPuzzleRoute(config.values, config.edges, start, goal).cost >
+          config.budget
       ) {
         ctx.addIssue({
           code: "custom",

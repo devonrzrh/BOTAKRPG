@@ -32,6 +32,8 @@ import {
 } from "lucide-react";
 
 interface Props {
+  paused?: boolean;
+  previewVictory?: boolean;
   battle: Battle;
   cue: BattleCue | null;
   save: Save;
@@ -174,6 +176,7 @@ export function BattleScreen(p: Props) {
   useEffect(() => {
     if (
       sceneLeaving ||
+      p.paused ||
       !correctFeedback ||
       reviewing ||
       !save.settings.battleAutoAdvance
@@ -188,6 +191,7 @@ export function BattleScreen(p: Props) {
     reducedMotion,
     save.settings.battleAutoAdvance,
     sceneLeaving,
+    p.paused,
   ]);
   useLayoutEffect(() => {
     const cue = p.cue;
@@ -244,7 +248,7 @@ export function BattleScreen(p: Props) {
     };
   }, [p.cue, reducedMotion]);
   useEffect(() => {
-    if (motion || evading) return;
+    if (motion || evading || p.paused) return;
     if (menu === "skills")
       skillList.current
         ?.querySelector<HTMLButtonElement>("button:not(:disabled)")
@@ -253,7 +257,7 @@ export function BattleScreen(p: Props) {
       defenseList.current?.querySelector<HTMLButtonElement>("button")?.focus();
     else if (menu || b.phase !== "choose") title.current?.focus();
     else skillsButton.current?.focus();
-  }, [b.phase, b.turn, evading, menu, motion]);
+  }, [b.phase, b.turn, evading, menu, motion, p.paused]);
   const skills = p.content.entities.filter(
     (e): e is Skill =>
       e.type === "skill" && save.character.skills.includes(e.id),
@@ -1043,7 +1047,9 @@ export function BattleScreen(p: Props) {
                   <strong role="status">
                     {gainedXp
                       ? `+${gainedXp} XP`
-                      : "Practice victory · XP already earned"}
+                      : p.previewVictory
+                        ? "Debug victory · no reward"
+                        : "Practice victory · XP already earned"}
                   </strong>
                   <XpMeter
                     xp={save.character.xp}

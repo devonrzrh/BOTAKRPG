@@ -82,6 +82,8 @@ import { Cutscene } from "./ui/Cutscene";
 import { Dialogue } from "./ui/Dialogue";
 import { MenuBar } from "./ui/MenuBar";
 import { ViewportWarning } from "./ui/ViewportWarning";
+import { DebugMenu } from "./ui/DebugMenu";
+import { solvePuzzleForDebug } from "./game/debugPuzzle";
 import { chooseMusic, createMusic } from "./game/music";
 import { HomeBoard } from "./ui/HomeBoard";
 import { WorldUiControls } from "./ui/WorldUiControls";
@@ -187,7 +189,7 @@ const quest = content.entities.find(
   (e): e is Quest => e.type === "quest" && e.id === "first-principles",
 )!;
 const echoActivity = content.entities.find(
-  (e) => e.type === "activity" && e.id === "echo-battle",
+  (e): e is Activity => e.type === "activity" && e.id === "echo-battle",
 )!;
 const activityDestination = (id: string) =>
   ({
@@ -205,6 +207,18 @@ const story = content.entities.find(
 const dialogueContent = content.entities.filter(
   (e): e is DialogueContent => e.type === "dialogue",
 );
+const debugSequence = [
+  "ArrowUp",
+  "ArrowDown",
+  "ArrowUp",
+  "ArrowDown",
+  "ArrowLeft",
+  "ArrowRight",
+  "ArrowLeft",
+  "ArrowRight",
+  "b",
+  "a",
+];
 const topicNames = {
   algorithms: "Algorithms",
   structures: "Data structures",
@@ -326,6 +340,10 @@ export default function App() {
     [panel, setPanel] = useState<Panel>(null),
     [toast, setToast] = useState(""),
     [metrics, setMetrics] = useState<WorldMetrics | null>(null);
+  const [debugOpen, setDebugOpen] = useState(false);
+  const debugCheckpoint = useRef<Save | null>(null);
+  const [debugBattleRun, setDebugBattleRun] = useState(0);
+  const [debugPuzzleRun, setDebugPuzzleRun] = useState(0);
   const [blocksExpanded, setBlocksExpanded] = useState(true);
   const [maze, setMaze] = useState<Maze>(() => createMaze(defaultSave().seed)),
     mazeRef = useRef(maze),
@@ -583,7 +601,7 @@ export default function App() {
     setOutput([]);
   };
   const open = useCallback(
-    (id: string) => {
+    (id: string, debugTravel = false) => {
       setCombatEvent(null);
       setReturnPuzzleId(null);
       if (tutorialRef.current) closeTutorial();
@@ -621,6 +639,7 @@ export default function App() {
         )[id] ?? id;
       const chapter = chapterForActivity(content, activityId);
       if (
+        !debugTravel &&
         chapter &&
         needsGuidedPractice(saveRef.current, chapter) &&
         activityUnlocked(saveRef.current, activityId, content)
@@ -632,6 +651,7 @@ export default function App() {
         return;
       }
       if (
+        !debugTravel &&
         saveRef.current.story.networkIntroSeen &&
         activityUnlocked(saveRef.current, activityId, content)
       ) {
@@ -651,16 +671,17 @@ export default function App() {
         (e) => e.type === "activity" && e.template === "puzzle" && e.id === id,
       );
       if (id === "puzzles" || puzzle) {
-        if (!saveRef.current.story.caseAccepted) {
+        if (!debugTravel && !saveRef.current.story.caseAccepted) {
           setDialogueId("case-briefing");
           return;
         }
-        if (!saveRef.current.story.networkIntroSeen) {
+        if (!debugTravel && !saveRef.current.story.networkIntroSeen) {
           setPendingActivity(id);
           setCutsceneId("first-connection");
           return;
         }
         if (
+          !debugTravel &&
           puzzle &&
           !saveRef.current.completed.includes(id) &&
           !activityUnlocked(saveRef.current, id, content)
@@ -678,7 +699,7 @@ export default function App() {
         return;
       }
       if (encounter?.type === "activity") {
-        if (!activityUnlocked(saveRef.current, id, content)) {
+        if (!debugTravel && !activityUnlocked(saveRef.current, id, content)) {
           notify("Follow the preceding lead on the quest board first.");
           return;
         }
@@ -709,6 +730,7 @@ export default function App() {
       setSearchEditing(false);
       setOfficeFocused(null);
       if (
+        !debugTravel &&
         id === "echo" &&
         !saveRef.current.completed.includes("echo-battle") &&
         !finaleAvailable(saveRef.current, content)
@@ -728,6 +750,12 @@ export default function App() {
         return;
       }
       if (id === "network") {
+        if (debugTravel) {
+          setRealm("hub");
+          setScene("hub");
+          setPanel(null);
+          return;
+        }
         if (!saveRef.current.story.caseAccepted) {
           setDialogueId("case-briefing");
           return;
@@ -768,6 +796,7 @@ export default function App() {
         return;
       }
       if (
+        !debugTravel &&
         ["battle", "maze", "garden", "echo"].includes(id) &&
         !saveRef.current.story.caseAccepted
       ) {
@@ -775,6 +804,7 @@ export default function App() {
         return;
       }
       if (
+        !debugTravel &&
         ["battle", "maze", "garden", "echo"].includes(id) &&
         !saveRef.current.story.networkIntroSeen
       ) {
@@ -839,6 +869,55 @@ export default function App() {
     setTrial(false);
     trialRef.current = false;
   };
+  const debugAtHome =
+    booted &&
+    realm === "desk" &&
+    !intakeOpen &&
+    !bookOpen &&
+    save.story.prologueSeen &&
+    !dialogueId &&
+    !cutsceneId &&
+    !chapterId &&
+    !prologueReplay &&
+    !tutorialId;
+  useEffect(() => {
+    let position = 0;
+    let lastKeyAt = 0;
+    const listen = (event: KeyboardEvent) => {
+      if (event.repeat || event.ctrlKey || event.altKey || event.metaKey) return;
+      if (event.key === "F9" && debugCheckpoint.current) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        setDebugOpen((open) => !open);
+        return;
+      }
+      if (debugOpen || !debugAtHome) return;
+      if (
+        event.target instanceof Element &&
+        event.target.closest("input, textarea, select, [contenteditable=true]")
+      )
+        return;
+      const key = event.key.length === 1 ? event.key.toLowerCase() : event.key;
+      const now = performance.now();
+      if (now - lastKeyAt > 3000) position = 0;
+      lastKeyAt = now;
+      position =
+        key === debugSequence[position]
+          ? position + 1
+          : Number(key === debugSequence[0]);
+      // The matching left/right keys would otherwise turn the office camera.
+      if (position >= 5) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+      }
+      if (position !== debugSequence.length) return;
+      position = 0;
+      debugCheckpoint.current ??= structuredClone(saveRef.current);
+      setDebugOpen(true);
+    };
+    window.addEventListener("keydown", listen, true);
+    return () => window.removeEventListener("keydown", listen, true);
+  }, [debugAtHome, debugOpen]);
   useEffect(() => {
     const escape = (event: KeyboardEvent) => {
       if (
@@ -996,7 +1075,10 @@ export default function App() {
       cause,
     );
     if (cue) setCombatEvent(cue);
-    if (nextBattle.phase === "won") {
+    if (
+      nextBattle.phase === "won" &&
+      (nextBattle.enemyId !== echoActivity.enemy?.id || finaleAvailable(nextSave, content))
+    ) {
       const activity =
         content.entities.find(
           (e) => e.type === "activity" && e.enemy?.id === nextBattle.enemyId,
@@ -1043,6 +1125,113 @@ export default function App() {
     a.download = "botak-journal.json";
     a.click();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
+  };
+  const debugTravelTo = (target: string) => {
+    const [type, id] = target.split(":", 2);
+    setDebugOpen(false);
+    stop();
+    setBookOpen(false);
+    setChapterId(null);
+    setDialogueId(null);
+    setCutsceneId(null);
+    setPendingActivity(null);
+    setPrologueReplay(false);
+    setTutorialId(null);
+    if (type === "lesson") openLesson(id);
+    else if (type === "dialogue" || type === "story") {
+      if (dialogueContent.some((entry) => entry.id === id)) setDialogueId(id);
+      else if (id === story.id) setPrologueReplay(true);
+      else setCutsceneId(id);
+    } else if (type === "cutscene") {
+      if (id === story.id) setPrologueReplay(true);
+      else setCutsceneId(id);
+    } else {
+      const destination = type === "activity" ? activityDestination(id) : id;
+      if (destination === "maze") {
+        setMode("manual");
+        resetMaze(saveRef.current.seed, false);
+      }
+      setDebugBattleRun((run) => run + 1);
+      open(destination, true);
+    }
+  };
+  const replaceDebugSave = (next: Save) => {
+    const validated = parseSave(next, content);
+    if (validated.seed !== saveRef.current.seed)
+      resetMaze(validated.seed, false);
+    updateSave(() => validated);
+  };
+  const debugBattleAction = (
+    action: "win" | "lose" | "reset" | "reveal" | "focus" | "momentum",
+  ) => {
+    if (panel !== "battle") return;
+    const current = battleRef.current;
+    if (action === "reset") {
+      debugTravelTo(`activity:${battleActivityId}`);
+      return;
+    }
+    if (action === "reveal") {
+      const question = questions.find((item) => item.id === current.question);
+      if (current.phase === "question" && question) {
+        setAnswer(question.answer);
+      } else if (current.tactics) {
+        const next = { ...current, weaknessKnown: true };
+        battleRef.current = next;
+        setBattle(next);
+      }
+      return;
+    }
+    if (action === "focus") {
+      updateSave((save) => ({
+        ...save,
+        character: { ...save.character, focus: stats(save).maxFocus },
+      }));
+      return;
+    }
+    if (current.phase === "won" || current.phase === "lost") return;
+    if (action === "momentum") {
+      const next = { ...current, momentum: 100 };
+      battleRef.current = next;
+      setBattle(next);
+      return;
+    }
+    setCombatEvent(null);
+    if (action === "win") {
+      applyBattle(
+        { ...current, phase: "won", hp: 0, resolution: "defeated", question: null },
+        saveRef.current,
+      );
+    } else {
+      applyBattle(
+        { ...current, phase: "lost", question: null },
+        { ...saveRef.current, character: { ...saveRef.current.character, hp: 0 } },
+      );
+    }
+    setDebugOpen(false);
+  };
+  const solveDebugMaze = () => {
+    stop();
+    const model = mazeRef.current;
+    const solved = shortestPath(model, model.position).reduce(move, model);
+    trialRef.current = false;
+    setTrial(false);
+    setTrialExpired(false);
+    updateMaze(solved);
+    finishMaze(solved, "manual");
+    setDebugOpen(false);
+  };
+  const solveDebugPuzzle = () => {
+    if (!currentPuzzle?.puzzle) return;
+    const commands = solvePuzzleForDebug(currentPuzzle.puzzle);
+    updateSave((save) => ({
+      ...save,
+      puzzleRuns: {
+        ...save.puzzleRuns,
+        [currentPuzzle.id]: { commands, assisted: true },
+      },
+    }));
+    setDebugPuzzleRun((run) => run + 1);
+    setDebugOpen(false);
   };
   const importSave = async (file: File) => {
     try {
@@ -1455,6 +1644,7 @@ export default function App() {
             homeWall={homeWall}
             homeLookLocked={
               intakeOpen ||
+              debugOpen ||
               bookOpen ||
               panel === "settings" ||
               panel === "supplies" ||
@@ -1474,6 +1664,7 @@ export default function App() {
             reducedMotion={save.settings.reducedMotion}
             locked={
               intakeOpen ||
+              debugOpen ||
               (panel !== null && panel !== "maze") ||
               busy ||
               (scene === "maze" && mode !== "manual") ||
@@ -1974,7 +2165,13 @@ export default function App() {
               )}
               {panel === "battle" && (
                 <BattleScreen
-                  key={battle.enemyId}
+                  key={`${battle.enemyId}:${debugBattleRun}`}
+                  paused={debugOpen}
+                  previewVictory={
+                    battle.enemyId === echoActivity.enemy?.id &&
+                    !save.completed.includes("echo-battle") &&
+                    !finaleAvailable(save, content)
+                  }
                   battle={battle}
                   cue={combatEvent}
                   save={save}
@@ -2174,7 +2371,7 @@ export default function App() {
                 (currentPuzzle ? (
                   <>
                     <PuzzleScreen
-                      key={currentPuzzle.id}
+                      key={`${currentPuzzle.id}:${debugPuzzleRun}`}
                       activity={currentPuzzle}
                       run={save.puzzleRuns[currentPuzzle.id]}
                       onRun={(run) =>
@@ -2830,6 +3027,7 @@ export default function App() {
             <RoomTurns
               wall={homeWall}
               disabled={
+                debugOpen ||
                 intakeOpen ||
                 !booted ||
                 panel === "settings" ||
@@ -2851,6 +3049,7 @@ export default function App() {
             <WorldUiControls
               model={officeUi.find((m) => m.id === homeWall)!}
               blocked={
+                debugOpen ||
                 intakeOpen ||
                 !booted ||
                 panel === "settings" ||
@@ -3136,6 +3335,39 @@ export default function App() {
             updateSave((s) => setTipsEnabled(s, false));
             setTutorialId(null);
             notify("Field tips off. Replay them from Game → How to play.");
+          }}
+        />
+      )}
+      {debugOpen && (
+        <DebugMenu
+          save={save}
+          content={content}
+          battle={panel === "battle" ? battle : null}
+          answer={
+            panel === "battle" && battle.phase === "question" ? currentQuestion : undefined
+          }
+          onClose={() => setDebugOpen(false)}
+          onTravel={debugTravelTo}
+          onSave={replaceDebugSave}
+          onBattle={debugBattleAction}
+          onExport={exportSave}
+          onMaze={panel === "maze" ? solveDebugMaze : undefined}
+          onPuzzle={panel === "puzzles" && currentPuzzle?.puzzle ? solveDebugPuzzle : undefined}
+          onRestore={() => {
+            if (!debugCheckpoint.current) return;
+            replaceDebugSave(debugCheckpoint.current);
+            resetMaze(debugCheckpoint.current.seed, false);
+            setCombatEvent(null);
+            setDialogueId(null);
+            setChapterId(null);
+            setCutsceneId(null);
+            setPendingActivity(null);
+            setPrologueReplay(false);
+            setTutorialId(null);
+            setBookOpen(false);
+            setDebugOpen(false);
+            close();
+            notify("Debug checkpoint restored.");
           }}
         />
       )}
