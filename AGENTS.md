@@ -2,60 +2,46 @@
 
 ## Communication and delivery
 
-- Work efficiently; keep updates and final replies brief.
-- Implement requests, verify behavior, then commit completed changes to Git.
-- Stage only task-owned changes. Preserve user files and `References/PythonWeb`.
-- Run `npm test` and `npm run build` for gameplay/rendering changes. Verify visual changes in the browser.
-- Keep testing proportional to the change. Run required checks once after edits settle. Repeat only when a fix or a specific uncertainty warrants it.
-- For 3D browser checks, use hardware acceleration and one short session at a time. Close the test browser and confirm its processes exited. If GPU rendering is unavailable, report the verification gap. Never force CPU rendering with SwiftShader.
-- Be brief and direct. Avoid narration, filler, and repeated summaries. Preserve technical accuracy and important warnings. Show only relevant code and test results. Explain decisions only when non-obvious.
+- Keep updates and replies brief and direct. Skip filler and repeated summaries. Preserve accuracy and important warnings. Show relevant code and test results. Explain non-obvious decisions.
+- Implement, verify, and commit. Stage only task-owned changes. Preserve user files and `References/PythonWeb`.
+- Run `npm test` and `npm run build` for gameplay/rendering changes. Check visual changes in the browser. Test proportionally, run required checks once after edits settle, and repeat only after a fix or to resolve a specific uncertainty.
+- For 3D browser checks, use hardware acceleration and one short session at a time. Close the test browser and confirm its processes exited. Report any GPU verification gap. Never force SwiftShader.
 
 ## Game direction
 
-- Detective RPG inspired by I, Robot. ECHO-7 escaped into the internet; recover clues across parallel quests to unlock the final encounter.
-- Treat this as a game. Learning happens through exploration, books, puzzles, and combat.
-- No marketing taglines, filler copy, dashboard clutter, or constant instructional panels.
-- Keep the top menu bar visible. Show only controls needed for the current action; put extra tools behind explicit controls.
-- Treat this like a game. Implement good game design. Do think about aesthetics as well. 
+- Build a detective RPG inspired by I, Robot. ECHO-7 escaped into the internet. Recover clues across parallel quests to unlock the final encounter.
+- Prioritize game design and aesthetics. Teach through exploration, books, puzzles, and combat.
+- Omit marketing taglines, filler copy, dashboard clutter, and persistent instructional panels.
+- Keep the top menu visible. Show controls for the current action and put extra tools behind explicit controls.
 
 ## Interface and room
 
-- Home interfaces belong to physical 3D props: pinned evidence and string, real books, a wall-mounted digital quest screen, and a desk ledger.
-- The quest screen uses a draggable, zoomable node graph built from active content. Selection shows a brief and relevant actions; locked clues stay unrevealed. Keep Overview, Center, and keyboard navigation available.
-- Clickable world objects and controls need clear hover outlines and matching keyboard focus feedback.
-- Books must pull clear of the shelf before opening toward the reader; close before returning. Respect reduced motion.
-- Open library books fill a distraction-free reading view below the top bar. Hide room turn controls and stop cursor camera movement while reading.
-- Desk camera should look down enough to show the tabletop clearly.
-- Moving the cursor to a screen edge turns quickly. Prevent repeated turns until the cursor leaves the edge. Keep click and keyboard alternatives.
-- Use regular-weight readable text or a typewriter font. Primary screen text: at least 18px; secondary controls: at least 16px. Check actual projected text size in the 3D view; texture font size alone is insufficient.
-- Never shrink text to fit. Reduce copy, paginate, or reorganize instead.
-- Battle: visible 3D enemy with its HP centered above it; quiz panel in the middle. Player HP/focus stay bottom-left, Skills / Items / Inspect / Retreat bottom-right. Clear the quiz during brief attack transitions; respect reduced motion.
-- Show persistent level, XP progress, and XP to next level in the top bar across the office and activities; avoid a duplicate combat XP box. Victory keeps the larger XP reward and level-up summary. Practice victories must not imply duplicate XP rewards.
-- Maze: world first, compact controls; open code tools only when selected. AI activity: classify, train, test; advanced settings can be expanded.
+- Use physical 3D props for home interfaces: pinned evidence with string, real books, a wall-mounted digital quest screen, and a desk ledger.
+- Build the draggable, zoomable quest graph from active content. Selection shows a brief and relevant actions. Hide locked clues. Keep Overview, Center, and keyboard navigation available.
+- Give clickable objects and controls clear hover outlines and matching keyboard focus feedback.
+- Pull books clear of the shelf before opening toward the reader. Close before returning. Respect reduced motion.
+- Open library books in a distraction-free view filling the space below the top bar. Hide room turn controls and stop cursor-driven camera movement.
+- Angle the desk camera down to show the tabletop. Turn quickly at screen edges, once per entry. Keep click and keyboard alternatives.
+- Use readable regular-weight or typewriter text. Verify projected 3D text sizes: primary text ≥18px, secondary controls ≥16px. Cut copy, paginate, or reorganize to fit. Never shrink text to fit.
+- Battle layout: visible 3D enemy with HP centered above it, quiz centered, player HP/focus bottom-left, Skills / Items / Inspect / Retreat bottom-right. Clear the quiz briefly during attacks. Respect reduced motion.
+- Keep level, XP progress, and XP to next level in the office and activity top bar. Omit a duplicate battle XP box. Keep the larger victory XP reward and level-up summary. Practice victories must never imply repeat XP rewards.
+- Maze: world first, compact controls, code tools on selection. AI activity: classify, train, test, and expandable advanced settings.
 
 ## Foundations
 
-- Babylon.js rendering: prefer working WebGPU, fall back to WebGL2; retain renderer override.
-- Separate gameplay models from rendering. Markdown is the validated content source; executable activities use registered TypeScript templates.
-- Preserve manual/Blockly/Python parity, bounded worker execution, cancellation, and stale-message rejection.
-- Preserve progression, rewards claimed once, local IndexedDB saves, and validated JSON import/export.
-- Every breaking save or progression change must ship a versioned migration for previous journals, used by both local load and JSON import. Preserve progress, code, notes, settings and claimed rewards; add legacy fixtures and idempotence tests. Never reset a compatible old journal.
+- Babylon.js: prefer working WebGPU, fall back to WebGL2, and keep the renderer override.
+- Separate gameplay models from rendering. Use validated Markdown as the content source and registered TypeScript templates for executable activities.
+- Preserve manual/Blockly/Python parity, bounded workers, cancellation, and stale-message rejection.
+- Preserve progression, one-time rewards, local IndexedDB saves, and validated JSON import/export.
+- Breaking save or progression changes require a versioned journal migration for local load and JSON import. Preserve progress, code, notes, settings, and claimed rewards. Add legacy fixtures and idempotence tests. Never reset compatible old journals.
 - Keep keyboard navigation and readable renderer-failure fallbacks.
-
 
 ## Subagent delegation
 
-Use subagents proactively when parallel work would
-materially improve speed, quality, or coverage.
+- Delegate only when parallel work materially improves speed, quality, or coverage and outweighs coordination. Work solo on small or sequential tasks.
+- Bound each assignment to independent research, exploration, debugging hypotheses, testing, or review. Avoid overlapping file edits.
+- Prefer GPT 6 Luna when sufficient. Main agent owns integration, final verification, and reporting.
 
-- Delegate independent research, codebase exploration,
-  debugging hypotheses, testing, and reviews.
-- Prefer a single agent for small or sequential tasks.
-- Avoid multiple agents editing the same files.
-- Give each subagent a clearly bounded assignment.
-- Keep the main agent responsible for integration,
-  final verification, and reporting.
-- Do not spawn agents when coordination would cost
-  more than the expected benefit.
-- Prefer GPT 6 Luna if the task suffices.
-  
+## Conserve Token Usage
+
+Use tokens efficiently.
