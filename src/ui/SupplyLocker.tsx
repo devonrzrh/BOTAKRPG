@@ -1,7 +1,9 @@
-import { Coins } from "lucide-react";
+import { Box, Coins } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import type { Content, Item } from "../content/schema";
 import { supplyPool } from "../game/gacha";
 import type { Save } from "../game/state";
+import { useGameSound } from "./GameSound";
 import { SupplyIcon } from "./SupplyIcon";
 import { RpgIcon } from "./RpgIcon";
 import "./SupplyLocker.css";
@@ -16,6 +18,13 @@ const chanceFormat = new Intl.NumberFormat(undefined, {
   style: "percent",
   maximumFractionDigits: 1,
 });
+const openingDuration = 820;
+
+type Draw = {
+  item: Item;
+  sequence: number;
+  before?: Save["supply"];
+};
 
 function ItemDetails({ item }: { item: Item }) {
   return (
@@ -30,47 +39,112 @@ function ItemDetails({ item }: { item: Item }) {
 export function SupplyLocker({
   save,
   content,
-  reward,
   onDraw,
   onEquip,
 }: {
   save: Save;
   content: Content;
-  reward?: Item | null;
-  onDraw: () => void;
+  onDraw: () => Item | undefined;
   onEquip: (rewardId: string) => void;
 }) {
-  const { tokens, items, equipped } = save.supply;
-  const pool = supplyPool(save, content);
+  const [draw, setDraw] = useState<Draw>();
+  const timer = useRef<number | undefined>(undefined);
+  const sound = useGameSound();
+  useEffect(() => () => window.clearTimeout(timer.current), []);
+
+  const opening = !!draw?.before;
+  const reward = opening ? undefined : draw?.item;
+  const { tokens, equipped } = save.supply;
+  const { items } = draw?.before ?? save.supply;
+  const pool = supplyPool(
+    draw?.before ? { ...save, supply: draw.before } : save,
+    content,
+  );
   const totalWeight = pool.reduce((total, item) => total + item.weight, 0);
   const owned = content.entities.filter(
     (entity): entity is Item => entity.type === "item" && items[entity.id] > 0,
   );
   const drawAvailable = tokens > 0 && pool.length > 0;
 
+  function startDraw() {
+    if (!drawAvailable || opening || timer.current !== undefined) return;
+    const item = onDraw();
+    if (!item) return;
+
+    const result = { item, sequence: (draw?.sequence ?? 0) + 1 };
+    if (
+      save.settings.reducedMotion ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) {
+      setDraw(result);
+      sound("clue");
+      return;
+    }
+
+    setDraw({ ...result, before: save.supply });
+    timer.current = window.setTimeout(() => {
+      timer.current = undefined;
+      setDraw(result);
+      sound("clue");
+    }, openingDuration);
+  }
+
   return (
     <div className="supply-locker">
       <section className="supply-draw" aria-label="Supply draw">
-        <div className="supply-result" role="status" aria-label="Draw result">
-          <div className="supply-emblem" data-rarity={reward?.rarity}>
+        <div
+          className="supply-result"
+          data-phase={opening ? "opening" : reward ? "revealed" : "ready"}
+          data-rarity={reward?.rarity}
+          style={
+            {
+              "--supply-opening-time": `${openingDuration}ms`,
+            } as React.CSSProperties
+          }
+        >
+          <div
+            className="supply-stage"
+            aria-hidden="true"
+            key={draw?.sequence ?? 0}
+          >
+            <div className="supply-reticle" />
+            {reward && <div className="supply-burst" />}
             {reward ? (
-              <SupplyIcon item={reward} size={40} />
+              <div className="supply-emblem">
+                <SupplyIcon item={reward} size={70} />
+              </div>
             ) : (
-              <RpgIcon name="items" size={40} />
+              <div className="supply-crate">
+                <div className="supply-crate-door" />
+                <div className="supply-crate-door" />
+                <span className="supply-crate-lock">
+                  <Box size={24} />
+                </span>
+              </div>
             )}
           </div>
-          {reward ? (
-            <>
-              <ItemDetails item={reward} />
-              {(reward.kind === "healing" || reward.kind === "focus") && (
-                <span className="supply-count">
-                  {items[reward.id]} in locker
-                </span>
-              )}
-            </>
-          ) : (
-            <p>Draw a weapon, armor, or consumable.</p>
-          )}
+          <div
+            className="supply-result-copy"
+            role="status"
+            aria-label="Draw result"
+          >
+            {reward ? (
+              <div className="supply-reward-copy" key={draw?.sequence}>
+                <ItemDetails item={reward} />
+                {(reward.kind === "healing" || reward.kind === "focus") && (
+                  <span className="supply-count">
+                    {items[reward.id]} in locker
+                  </span>
+                )}
+              </div>
+            ) : (
+              <p>
+                {opening
+                  ? "Opening crate…"
+                  : "Draw a weapon, armor, or consumable."}
+              </p>
+            )}
+          </div>
         </div>
         <div className="supply-controls">
           <p className="supply-balance">
@@ -80,10 +154,8 @@ export function SupplyLocker({
           <button
             type="button"
             className="primary"
-            aria-disabled={!drawAvailable}
-            onClick={() => {
-              if (drawAvailable) onDraw();
-            }}
+            aria-disabled={!drawAvailable || opening}
+            onClick={startDraw}
           >
             <RpgIcon name="items" />
             Draw · 1 token

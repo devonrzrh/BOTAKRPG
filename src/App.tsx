@@ -382,7 +382,6 @@ export default function App() {
     saveRef.current = next;
     setSave(next);
   }, []);
-  const [supplyReward, setSupplyReward] = useState<Item | null>(null);
   const tutorialRef = useRef<TutorialId | null>(null);
   tutorialRef.current = tutorialId;
   const intakeOpen = booted && needsIntake(save);
@@ -781,10 +780,7 @@ export default function App() {
               : id === "inventory" || id === "supplies"
                 ? "desk"
                 : "investigation";
-        if (id === "supplies") {
-          setBookOpen(false);
-          setSupplyReward(null);
-        }
+        if (id === "supplies") setBookOpen(false);
         setHomeWall(wall);
         setRealm("desk");
         setScene("desk");
@@ -2584,13 +2580,11 @@ export default function App() {
                 <SupplyLocker
                   save={save}
                   content={content}
-                  reward={supplyReward}
                   onDraw={() => {
                     const result = drawSupply(saveRef.current, content);
                     if (!result.item) return;
                     updateSave(() => result.save);
-                    setSupplyReward(result.item);
-                    sound("clue");
+                    return result.item;
                   }}
                   onEquip={(id) => {
                     const item = supplyItems.find((entry) => entry.id === id);
