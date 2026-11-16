@@ -401,9 +401,6 @@ export function PuzzleScreen(p: {
                               x2={b.x}
                               y2={b.y}
                             />
-                            <text x={(a.x + b.x) / 2} y={(a.y + b.y) / 2 - 7}>
-                              {e.cost}
-                            </text>
                           </g>
                         );
                       })}
@@ -424,6 +421,32 @@ export function PuzzleScreen(p: {
                       </button>
                     ))}
                   </div>
+                  <svg
+                    className="route-labels"
+                    viewBox="0 0 600 320"
+                    aria-hidden="true"
+                  >
+                    {config.edges.map((e, i) => {
+                      const a = routePositions.find((n) => n.node === e.from)!;
+                      const b = routePositions.find((n) => n.node === e.to)!;
+                      const x = (a.x + b.x) / 2;
+                      const y = (a.y + b.y) / 2 - 7;
+                      return (
+                        <g key={i}>
+                          <rect
+                            x={x - 16}
+                            y={y - 12}
+                            width="32"
+                            height="24"
+                            rx="6"
+                          />
+                          <text x={x} y={y + 6}>
+                            {e.cost}
+                          </text>
+                        </g>
+                      );
+                    })}
+                  </svg>
                 </div>
                 <div className="route-status">
                   <span>
