@@ -35,6 +35,10 @@ const puzzleRunSchema = z.object({
     .max(1000),
   assisted: z.boolean(),
 });
+const puzzleProgramSchema = z.object({
+  code: z.string().max(200000),
+  blocks: z.unknown().nullable().default(null),
+});
 const masterySchema = z.object({
   correct: z.number().int().nonnegative(),
   attempted: z.number().int().nonnegative(),
@@ -141,6 +145,7 @@ export const saveSchema = z
     notes: z.record(z.string().max(20000)),
     reading: readingSchema,
     puzzleRuns: z.record(puzzleRunSchema).default({}),
+    puzzlePrograms: z.record(puzzleProgramSchema).default({}),
     code: z.string().max(200000),
     blocks: z.unknown().nullable(),
     seed: z.number().int().min(0).max(2147483647),
@@ -198,6 +203,7 @@ export function initialSave(): Save {
     notes: {},
     reading: { mode: "book", fontSize: 22, positions: {} },
     puzzleRuns: {},
+    puzzlePrograms: {},
     code: STARTER_CODE,
     blocks: null,
     seed: 42,
@@ -434,6 +440,15 @@ export function parseSave(input: unknown, content: Content): Save {
         throw new Error(`Invalid puzzle command in ${id}: ${next.message}`);
       state = next;
     }
+  }
+  for (const id of Object.keys(save.puzzlePrograms)) {
+    const activity = content.entities.find((e) => e.id === id);
+    if (
+      activity?.type !== "activity" ||
+      activity.template !== "puzzle" ||
+      !activity.puzzle?.program
+    )
+      throw new Error(`Save contains unknown puzzle program: ${id}`);
   }
   check(Object.keys(save.mastery), "lesson");
   check(save.character.skills, "skill");

@@ -95,6 +95,7 @@ self.onmessage = async ({ data }) => {
   pausedMs = 0;
   outputCount = 0;
   python.globals.set("__source__", data.code);
+  python.globals.set("__api_json__", JSON.stringify(data.api ?? null));
   try {
     await python.runPythonAsync(`
 import sys, json
@@ -108,7 +109,17 @@ def __trace(frame, event, arg):
         __bridge__.line(frame.f_lineno)
     return __trace
 __environment = {'__builtins__': __builtins__}
-for __name in ['position', 'goal', 'neighbors', 'move', 'can_move', 'at_goal']:
+__available = ['position', 'goal', 'neighbors', 'move', 'can_move', 'at_goal',
+               'priorities', 'swap', 'slot_count', 'probe', 'current_node',
+               'connection_cost', 'move_to', 'route_cost', 'is_safe']
+__requested = json.loads(__api_json__)
+if __requested is None:
+    __requested = __available[:6]
+if not isinstance(__requested, list):
+    __requested = []
+for __name in __requested:
+    if __name not in __available:
+        continue
     __environment[__name] = (lambda name: lambda *args: __game_call(name, *args))(__name)
 sys.settrace(__trace)
 try:

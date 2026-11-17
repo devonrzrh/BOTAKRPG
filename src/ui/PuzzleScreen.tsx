@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import {
   BookOpen,
   ArrowLeftRight,
@@ -6,24 +6,35 @@ import {
   Lightbulb,
   ArrowRight,
   Check,
+  Play,
+  Pause,
+  Square,
+  SkipForward,
 } from "lucide-react";
 import type { Activity } from "../content/schema";
 import {
   createPuzzle,
   puzzleCommand,
+  puzzleProgramCall,
+  puzzlePrograms,
   puzzleSolved,
   type PuzzleCommand,
   type PuzzleState,
 } from "../game/puzzles";
+import { PythonRunner, type RunPhase } from "../runtime/python";
 import "./PuzzleScreen.css";
 import { useGameSound } from "./GameSound";
 import { useGameParticles } from "./GameParticles";
+const CodeEditor = lazy(() => import("./CodeEditor"));
+const Blocks = lazy(() => import("./Blocks"));
 
 export function PuzzleScreen(p: {
   activity: Activity;
   completed: boolean;
   run?: { commands: PuzzleCommand[]; assisted: boolean };
+  programState?: { code: string; blocks?: unknown | null };
   onRun: (run: { commands: PuzzleCommand[]; assisted: boolean }) => void;
+  onProgramChange: (program: { code: string; blocks: unknown | null }) => void;
   onComplete: (assisted: boolean) => void;
   onContinue: () => void;
   onLesson: () => void;
@@ -40,6 +51,26 @@ export function PuzzleScreen(p: {
       .slice(0, 1000)
       .reduce((current, command) => puzzleCommand(current, command), initial);
   });
+  const [programCode, setProgramCode] = useState(
+    () => p.programState?.code ?? (config?.program ? puzzlePrograms[config.program].starter : ""),
+  );
+  const [programBlocks, setProgramBlocks] = useState<unknown | null>(
+    () => p.programState?.blocks ?? null,
+  );
+  const [generated, setGenerated] = useState("");
+  const [mode, setMode] = useState<"manual" | "blocks" | "python">("manual");
+  const [phase, setPhase] = useState<RunPhase>("idle");
+  const [line, setLine] = useState(0);
+  const [output, setOutput] = useState<string[]>([]);
+  const runner = useRef<PythonRunner | null>(null);
+  const stateRef = useRef(state);
+  stateRef.current = state;
+  const applyRef = useRef<(command: PuzzleCommand) => void>(() => undefined);
+  const saveProgram = (next: { code: string; blocks: unknown | null }) => {
+    setProgramCode(next.code);
+    setProgramBlocks(next.blocks);
+    p.onProgramChange(next);
+  };
   const [hintLevel, setHintLevel] = useState(p.run?.assisted ? 1 : 0);
   const [selectedPeg, setSelectedPeg] = useState<number | null>(null);
   const assisted = useRef(p.run?.assisted ?? false);
@@ -48,6 +79,59 @@ export function PuzzleScreen(p: {
   );
   const completeSent = useRef(false);
   const [rewardEarned, setRewardEarned] = useState(false);
+  const act = (command: PuzzleCommand) => {
+    const current = stateRef.current;
+    const next = puzzleCommand(current, command);
+    if (!puzzleSolved(current)) {
+      if (next.moves === current.moves) sound("error");
+      else if (puzzleSolved(next)) sound("success");
+      else sound(command.type === "move" ? "move" : "puzzleAction");
+      if (next.moves !== current.moves) {
+        const rect = board.current?.getBoundingClientRect();
+        particles(
+          puzzleSolved(next) ? "success" : "train",
+          rect
+            ? { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 }
+            : undefined,
+        );
+      }
+    }
+    if (next.moves !== current.moves && commands.current.length < 1000) {
+      commands.current = [...commands.current, command];
+      p.onRun({ commands: commands.current, assisted: assisted.current });
+    }
+    stateRef.current = next;
+    setState(next);
+    return next;
+  };
+  applyRef.current = act;
+  useEffect(() => {
+    if (!config?.program) return;
+    const instance = new PythonRunner(
+      async ({ method, args }) => {
+        const result = puzzleProgramCall(
+          stateRef.current,
+          config.program!,
+          method,
+          args,
+        );
+        if (result.command) applyRef.current(result.command);
+        return result.value;
+      },
+      (event) => {
+        if (event.phase) setPhase(event.phase);
+        if (event.line !== undefined) setLine(event.line);
+        if (event.message)
+          setOutput((previous) => [...previous.slice(-39), event.message!]);
+        if (event.done) setLine(0);
+      },
+    );
+    runner.current = instance;
+    return () => {
+      instance.dispose();
+      if (runner.current === instance) runner.current = null;
+    };
+  }, [config?.program]);
   useEffect(() => {
     if (puzzleSolved(state) && !completeSent.current) {
       completeSent.current = true;
@@ -67,34 +151,15 @@ export function PuzzleScreen(p: {
     );
   const label = (value: number) =>
     config.labels?.[config.values.indexOf(value)] ?? String(value);
-  const act = (command: PuzzleCommand) => {
-    const next = puzzleCommand(state, command);
-    if (!puzzleSolved(state)) {
-      if (next.moves === state.moves) sound("error");
-      else if (puzzleSolved(next)) sound("success");
-      else sound(command.type === "move" ? "move" : "puzzleAction");
-      if (next.moves !== state.moves) {
-        const rect = board.current?.getBoundingClientRect();
-        particles(
-          puzzleSolved(next) ? "success" : "train",
-          rect
-            ? { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 }
-            : undefined,
-        );
-      }
-    }
-    if (next.moves !== state.moves && commands.current.length < 1000) {
-      commands.current = [...commands.current, command];
-      p.onRun({ commands: commands.current, assisted: assisted.current });
-    }
-    setState(next);
-  };
   const reset = () => {
+    runner.current?.stop();
     sound("open");
     commands.current = [];
     assisted.current = false;
     p.onRun({ commands: [], assisted: false });
-    setState(createPuzzle(config));
+    const initial = createPuzzle(config);
+    stateRef.current = initial;
+    setState(initial);
     setHintLevel(0);
     setSelectedPeg(null);
     completeSent.current = false;
@@ -126,6 +191,20 @@ export function PuzzleScreen(p: {
             cost: e.cost,
           }))
       : [];
+  const puzzleProgram = config.program
+    ? puzzlePrograms[config.program]
+    : undefined;
+  const busy = phase === "loading" || phase === "running" || phase === "paused";
+  const runProgram = () => {
+    if (!config.program) return;
+    const code = mode === "blocks" ? generated : programCode;
+    setOutput([]);
+    void runner.current?.run(code, puzzleProgram!.api);
+  };
+  const chooseMode = (next: "manual" | "blocks" | "python") => {
+    if (busy) runner.current?.stop();
+    setMode(next);
+  };
   return (
     <div className="puzzle-backdrop" data-sfx-silent>
       <section className="detective-puzzle" aria-label={p.activity.title}>
@@ -134,6 +213,101 @@ export function PuzzleScreen(p: {
             {p.activity.brief ||
               "A damaged trace remains in the system. Reconstruct its sequence to recover the evidence."}
           </p>
+          {puzzleProgram && config.program && (
+            <section className="puzzle-program" aria-label="Puzzle programming">
+              <div className="puzzle-program-modes" role="group" aria-label="Solve mode">
+                {(["manual", "blocks", "python"] as const).map((option) => (
+                  <button
+                    key={option}
+                    type="button"
+                    aria-pressed={mode === option}
+                    onClick={() => chooseMode(option)}
+                  >
+                    {option === "manual" ? "Manual" : option === "blocks" ? "Blockly" : "Python"}
+                  </button>
+                ))}
+              </div>
+              {mode !== "manual" && (
+                <div className="puzzle-program-workbench">
+                  <div className="puzzle-program-editor">
+                    <Suspense fallback={<p>Opening the programming desk…</p>}>
+                      {mode === "blocks" ? (
+                        <Blocks
+                          program={config.program}
+                          initial={programBlocks}
+                          onChange={(blocks) => {
+                            setProgramBlocks(blocks);
+                            p.onProgramChange({ code: programCode, blocks });
+                          }}
+                          onCode={setGenerated}
+                        />
+                      ) : (
+                        <CodeEditor
+                          value={programCode}
+                          onChange={(code) => {
+                            setProgramCode(code);
+                            p.onProgramChange({ code, blocks: programBlocks });
+                          }}
+                          line={line}
+                          onRun={runProgram}
+                        />
+                      )}
+                    </Suspense>
+                  </div>
+                  <div className="puzzle-program-controls">
+                    <button
+                      className="puzzle-primary"
+                      disabled={busy || solved || !(mode === "blocks" ? generated : programCode).trim()}
+                      onClick={runProgram}
+                    >
+                      <Play size={16} /> Run
+                    </button>
+                    <button
+                      disabled={phase !== "running" && phase !== "paused"}
+                      onClick={() => phase === "paused" ? runner.current?.resume() : runner.current?.pause()}
+                    >
+                      <Pause size={16} /> {phase === "paused" ? "Resume" : "Pause"}
+                    </button>
+                    <button
+                      disabled={phase !== "paused"}
+                      onClick={() => runner.current?.step()}
+                    >
+                      <SkipForward size={16} /> Step
+                    </button>
+                    <button
+                      disabled={!busy}
+                      onClick={() => runner.current?.stop()}
+                    >
+                      <Square size={14} /> Stop
+                    </button>
+                    <span className={`puzzle-runner-status puzzle-runner-${phase}`} role="status">{phase}</span>
+                  </div>
+                  {output.length > 0 && (
+                    <pre className="puzzle-program-output" aria-live="polite">{output.slice(-5).join("\n")}</pre>
+                  )}
+                  <details className="puzzle-api-reference">
+                    <summary>Available puzzle API</summary>
+                    <p>{puzzleProgram.reference}</p>
+                    {mode === "blocks" && generated && (
+                      <>
+                        <pre>{generated}</pre>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setProgramCode(generated);
+                            p.onProgramChange({ code: generated, blocks: programBlocks });
+                            chooseMode("python");
+                          }}
+                        >
+                          Open generated code in Python
+                        </button>
+                      </>
+                    )}
+                  </details>
+                </div>
+              )}
+            </section>
+          )}
           <section
             ref={board}
             className={`puzzle-board puzzle-${config.kind}`}
@@ -155,7 +329,7 @@ export function PuzzleScreen(p: {
                         className={`search-slot ${excluded ? "search-excluded" : ""} ${revealed && value === config.target[0] ? "tile-done" : ""}`}
                         aria-label={`Probe slot ${i + 1}${revealed ? `, record ${value}` : ""}${excluded ? ", excluded" : ""}`}
                         disabled={
-                          solved || excluded || state.moves >= config.budget
+                          mode !== "manual" || solved || excluded || state.moves >= config.budget
                         }
                         onClick={() => act({ type: "probe", index: i })}
                       >
@@ -186,7 +360,7 @@ export function PuzzleScreen(p: {
                       className="transfer-peg"
                       aria-label={`Peg ${i + 1}: ${peg.length ? peg.join(", ") + ", bottom to top" : "empty"}${selectedPeg === i ? ", selected" : ""}`}
                       aria-pressed={selectedPeg === i}
-                      disabled={solved || state.moves >= config.budget}
+                      disabled={mode !== "manual" || solved || state.moves >= config.budget}
                       onClick={() => {
                         if (selectedPeg === null) {
                           if (peg.length) {
@@ -263,13 +437,13 @@ export function PuzzleScreen(p: {
                   </div>
                   <div className="stack-controls">
                     <button
-                      disabled={!state.input.length || solved}
+                      disabled={mode !== "manual" || !state.input.length || solved}
                       onClick={() => act({ type: "push" })}
                     >
                       Push next
                     </button>
                     <button
-                      disabled={!state.buffer.length || solved}
+                      disabled={mode !== "manual" || !state.buffer.length || solved}
                       onClick={() => act({ type: "pop" })}
                     >
                       Pop top
@@ -312,13 +486,13 @@ export function PuzzleScreen(p: {
                 </div>
                 <div className="stack-controls">
                   <button
-                    disabled={state.input.length < 2 || solved}
+                    disabled={mode !== "manual" || state.input.length < 2 || solved}
                     onClick={() => act({ type: "rotate" })}
                   >
                     Rotate front to back
                   </button>
                   <button
-                    disabled={!state.input.length || solved}
+                    disabled={mode !== "manual" || !state.input.length || solved}
                     onClick={() => act({ type: "dispatch" })}
                   >
                     Dispatch front
@@ -355,7 +529,7 @@ export function PuzzleScreen(p: {
                       {i < state.input.length - 1 && (
                         <button
                           aria-label={`Swap positions ${i + 1} and ${i + 2}`}
-                          disabled={solved || state.moves >= config.budget}
+                          disabled={mode !== "manual" || solved || state.moves >= config.budget}
                           onClick={() => act({ type: "swap", index: i })}
                         >
                           <ArrowLeftRight size={18} aria-hidden="true" />
@@ -416,7 +590,7 @@ export function PuzzleScreen(p: {
                         style={{ left: `${x / 6}%`, top: `${y / 3.2}%` }}
                         aria-label={`${label(node)}${node === currentNode ? ", current location" : ""}`}
                         disabled={
-                          solved || !neighbors.some((neighbor) => neighbor.node === node)
+                          mode !== "manual" || solved || !neighbors.some((neighbor) => neighbor.node === node)
                         }
                         onClick={() =>
                           node !== currentNode && act({ type: "move", node })
@@ -462,7 +636,7 @@ export function PuzzleScreen(p: {
                   {neighbors.map(({ node, cost }) => (
                     <button
                       key={node}
-                      disabled={solved || state.cost + cost > config.budget}
+                      disabled={mode !== "manual" || solved || state.cost + cost > config.budget}
                       onClick={() => act({ type: "move", node })}
                     >
                       Move to {label(node)} · cost {cost}
@@ -537,7 +711,7 @@ export function PuzzleScreen(p: {
             ) : (
               <div className="puzzle-win">
                 <span>
-                  <Check size={18} /> Evidence recovered · 25 XP
+                  <Check size={18} /> Evidence recovered · Case filed
                 </span>
                 <button className="puzzle-primary" onClick={p.onContinue}>
                   Continue <ArrowRight size={18} />

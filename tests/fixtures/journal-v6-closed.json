@@ -1,0 +1,212 @@
+{
+  "version": 6,
+  "curriculumVersion": 3,
+  "signalExperiment": {
+    "samples": [
+      {
+        "x": -0.5,
+        "y": 0.4,
+        "label": 1
+      }
+    ],
+    "network": {
+      "weights": [
+        0.25,
+        -0.1
+      ],
+      "bias": 0.2,
+      "epochs": 12
+    },
+    "rate": 0.2,
+    "epochs": 20,
+    "label": 1,
+    "tested": true
+  },
+  "chapterProgress": {
+    "chapter-source-alg-00": {
+      "introduced": true,
+      "practiced": true,
+      "attempts": 2
+    }
+  },
+  "story": {
+    "prologueSeen": true,
+    "briefingSeen": true,
+    "caseAccepted": true,
+    "networkIntroSeen": true,
+    "seenDialogues": [
+      "routing-scene-0"
+    ],
+    "legacyFinale": true
+  },
+  "character": {
+    "name": "Rook",
+    "level": 3,
+    "xp": 245,
+    "hp": 57,
+    "focus": 7,
+    "skills": [
+      "insight",
+      "ward",
+      "trace"
+    ]
+  },
+  "completed": [
+    "maze-chamber",
+    "encounter-source-alg-00",
+    "encounter-source-alg-01",
+    "encounter-source-alg-02",
+    "puzzle-sort-log",
+    "encounter-source-alg-03",
+    "puzzle-search-archive",
+    "encounter-source-alg-04",
+    "puzzle-hanoi-lock",
+    "encounter-source-alg-05",
+    "encounter-source-alg-06",
+    "puzzle-route-packet",
+    "encounter-source-alg-07",
+    "encounter-source-alg-08",
+    "encounter-source-alg-09",
+    "encounter-source-alg-10",
+    "route-warden",
+    "guardian-battle",
+    "encounter-source-ds-01",
+    "encounter-source-ds-02",
+    "encounter-source-ds-03",
+    "encounter-source-ds-04",
+    "encounter-source-ds-05",
+    "puzzle-stack-buffer",
+    "encounter-source-ds-06",
+    "puzzle-queue-relay",
+    "encounter-source-ds-07",
+    "encounter-source-ds-08",
+    "encounter-source-ds-09",
+    "encounter-source-ds-10",
+    "archive-keeper",
+    "perceptron-exhibit",
+    "encounter-source-ai-01",
+    "encounter-source-ai-02",
+    "encounter-source-ai-03",
+    "puzzle-signal-confidence",
+    "encounter-source-ai-04",
+    "encounter-source-ai-05",
+    "encounter-source-ai-06",
+    "encounter-source-ai-07",
+    "puzzle-signal-index",
+    "encounter-source-ai-08",
+    "encounter-source-ai-09",
+    "encounter-source-ai-10",
+    "signal-mimic",
+    "echo-battle",
+    "quartermaster",
+    "warden",
+    "reserve-plan",
+    "depot-search",
+    "policy-stress-test",
+    "evidence-chain"
+  ],
+  "claimed": [
+    "case-sort-log",
+    "routing-trace",
+    "access-records",
+    "signal-identification",
+    "confront-echo"
+  ],
+  "mastery": {
+    "graph-search": {
+      "correct": 1,
+      "attempted": 2,
+      "evidence": [
+        "maze-chamber"
+      ],
+      "answered": [
+        "bfs-shortest"
+      ]
+    }
+  },
+  "bookmarks": [
+    "graph-search"
+  ],
+  "notes": {
+    "graph-search": "Preserve my route and shield notes."
+  },
+  "reading": {
+    "mode": "fullscreen",
+    "fontSize": 24,
+    "positions": {
+      "graph-search": {
+        "block": 3,
+        "offset": 0.4
+      }
+    }
+  },
+  "puzzleRuns": {
+    "puzzle-sort-log": {
+      "commands": [
+        {
+          "type": "swap",
+          "index": 0
+        },
+        {
+          "type": "swap",
+          "index": 2
+        },
+        {
+          "type": "swap",
+          "index": 3
+        },
+        {
+          "type": "swap",
+          "index": 1
+        },
+        {
+          "type": "swap",
+          "index": 2
+        },
+        {
+          "type": "swap",
+          "index": 1
+        },
+        {
+          "type": "swap",
+          "index": 0
+        }
+      ],
+      "assisted": false
+    }
+  },
+  "code": "print('preserve v2 code')",
+  "blocks": {
+    "blocks": {
+      "languageVersion": 0,
+      "blocks": []
+    }
+  },
+  "seed": 42,
+  "trialBest": 43.5,
+  "settings": {
+    "renderer": "webgl",
+    "reducedMotion": true,
+    "combatMuted": true,
+    "battleAutoAdvance": false,
+    "musicVolume": 0.2,
+    "sfxVolume": 0.4
+  },
+  "onboarding": {
+    "intakeComplete": true,
+    "tipsEnabled": false,
+    "seenTips": [
+      "battle",
+      "read"
+    ]
+  },
+  "supply": {
+    "items": {},
+    "tokens": 3,
+    "equipped": {
+      "weapon": null,
+      "armor": null
+    }
+  },
+  "finaleOutcome": null
+}

@@ -597,6 +597,7 @@
           5
         ],
         "budget": 4,
+        "program": "adjacent-sort",
         "labels": [
           "Verified handshake",
           "Signed archive audit",
@@ -6650,6 +6651,7 @@
           4
         ],
         "budget": 3,
+        "program": "adjacent-sort",
         "labels": [
           "Archive backup",
           "Emergency beacon",
@@ -6723,6 +6725,7 @@
           214
         ],
         "budget": 3,
+        "program": "binary-search",
         "labels": [
           "Dispatch order",
           "Charging bay sheet",
@@ -6927,6 +6930,7 @@
           6
         ],
         "budget": 4,
+        "program": "weighted-route",
         "edges": [
           {
             "from": 3,

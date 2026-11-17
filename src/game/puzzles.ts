@@ -10,6 +10,7 @@ const base = {
   values: z.array(z.number().int()).min(1).max(32),
   target: z.array(z.number().int()).min(1).max(32),
   budget: z.number().finite().positive().max(1000),
+  program: z.enum(["adjacent-sort", "binary-search", "weighted-route"]).optional(),
   edges: z.array(edgeSchema).max(128).optional(),
   labels: z.array(z.string().min(1)).max(32).optional(),
 };
@@ -109,6 +110,19 @@ function queueMinimumMoves(values: number[], target: number[]) {
 
 export const puzzleConfigSchema = rawPuzzleConfigSchema.superRefine(
   (config, ctx) => {
+    const expectedProgram = config.kind === "sorting"
+      ? "adjacent-sort"
+      : config.kind === "search"
+        ? "binary-search"
+        : config.kind === "routing"
+          ? "weighted-route"
+          : undefined;
+    if (config.program && config.program !== expectedProgram)
+      ctx.addIssue({
+        code: "custom",
+        path: ["program"],
+        message: "This coding API does not match the puzzle type.",
+      });
     if (
       config.labels &&
       (config.labels.length !== config.values.length ||
@@ -310,6 +324,104 @@ export const puzzleConfigSchema = rawPuzzleConfigSchema.superRefine(
 );
 
 export type PuzzleConfig = z.infer<typeof puzzleConfigSchema>;
+export const puzzlePrograms = {
+  "adjacent-sort": {
+    api: ["priorities", "swap"],
+    starter: "values = priorities()\n# Compare adjacent values and swap any pair that is out of order.\n",
+    reference: "priorities() returns the current numbers. swap(position) exchanges that position with the next; positions start at 1.",
+  },
+  "binary-search": {
+    api: ["slot_count", "probe"],
+    starter: "low = 1\nhigh = slot_count()\n# Probe the middle slot and narrow the range from the result.\n",
+    reference: "slot_count() returns the number of records. probe(slot) compares a one-based slot to the target: -1 means search lower, 1 means search higher, and 0 means found.",
+  },
+  "weighted-route": {
+    api: ["current_node", "neighbors", "connection_cost", "move_to", "route_cost", "is_safe"],
+    starter: "# Follow connected nodes until the safe subnet is reached.\n# Use neighbors() and route_cost() to guide your choices.\n",
+    reference: "current_node() returns your node ID. neighbors() lists directly connected node IDs. connection_cost(node) returns that link's cost, or -1 if disconnected. move_to(node) traverses a link. route_cost() returns spent budget; is_safe() is true at the goal.",
+  },
+} as const;
+export type PuzzleProgramId = keyof typeof puzzlePrograms;
+
+export function puzzleProgramCall(
+  state: PuzzleState,
+  program: PuzzleProgramId,
+  method: string,
+  args: unknown[],
+): { command?: PuzzleCommand; value: unknown } {
+  if (state.config.program !== program)
+    throw new Error("This program API is not available for the current puzzle.");
+  const numberArg = () => {
+    if (args.length !== 1 || typeof args[0] !== "number" || !Number.isFinite(args[0]))
+      throw new Error(`${method} expects one finite number.`);
+    return args[0];
+  };
+  const act = (command: PuzzleCommand) => {
+    const next = puzzleCommand(state, command);
+    if (next.moves === state.moves) throw new Error(next.message);
+    return { command, value: null };
+  };
+  if (program === "adjacent-sort" && method === "priorities") {
+    if (args.length) throw new Error("priorities expects no arguments.");
+    return { value: [...state.input] };
+  }
+  if (program === "adjacent-sort" && method === "swap")
+    return act({ type: "swap", index: numberArg() - 1 });
+  if (program === "binary-search" && method === "slot_count") {
+    if (args.length) throw new Error("slot_count expects no arguments.");
+    return { value: state.config.values.length };
+  }
+  if (program === "binary-search" && method === "probe") {
+    const slot = numberArg();
+    if (!Number.isInteger(slot)) throw new Error("probe expects a whole-number slot.");
+    const index = slot - 1;
+    const next = puzzleCommand(state, { type: "probe", index });
+    if (next.moves === state.moves) throw new Error(next.message);
+    return {
+      command: { type: "probe", index },
+      value: Math.sign(state.config.target[0] - state.config.values[index]),
+    };
+  }
+  if (program === "weighted-route" && method === "current_node") {
+    if (args.length) throw new Error("current_node expects no arguments.");
+    return { value: state.route.at(-1) };
+  }
+  if (program === "weighted-route" && method === "neighbors") {
+    if (args.length) throw new Error("neighbors expects no arguments.");
+    const current = state.route.at(-1);
+    return {
+      value: state.config.kind === "routing"
+        ? state.config.edges
+            .filter((edge) => edge.from === current || edge.to === current)
+            .map((edge) => edge.from === current ? edge.to : edge.from)
+        : [],
+    };
+  }
+  if (program === "weighted-route" && method === "connection_cost") {
+    const node = numberArg();
+    const current = state.route.at(-1);
+    return {
+      value: state.config.kind === "routing"
+        ? state.config.edges.find((edge) =>
+            (edge.from === current && edge.to === node) ||
+            (edge.to === current && edge.from === node),
+          )?.cost ?? -1
+        : -1,
+    };
+  }
+  if (program === "weighted-route" && method === "move_to")
+    return act({ type: "move", node: numberArg() });
+  if (program === "weighted-route" && method === "route_cost") {
+    if (args.length) throw new Error("route_cost expects no arguments.");
+    return { value: state.cost };
+  }
+  if (program === "weighted-route" && method === "is_safe") {
+    if (args.length) throw new Error("is_safe expects no arguments.");
+    return { value: state.route.at(-1) === state.config.target[1] };
+  }
+  throw new Error(`${method} is not available in this puzzle program.`);
+}
+
 export type PuzzleState = {
   config: PuzzleConfig;
   moves: number;

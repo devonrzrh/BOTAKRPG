@@ -180,6 +180,7 @@ hint: Start with the signed audit and receipt, then use the handshake to verify 
 solution: Audit → receipt → handshake → handoff window → safe containment condition.
 puzzle:
   kind: sorting
+  program: adjacent-sort
   values: [3, 1, 5, 2, 4]
   target: [1, 2, 3, 4, 5]
   budget: 4

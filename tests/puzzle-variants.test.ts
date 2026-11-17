@@ -75,6 +75,12 @@ describe("binary search archive", () => {
     expect(
       puzzleConfigSchema.safeParse({ ...labeled, values: [4, 9, 15, 22, 31, 43, 43] }).success,
     ).toBe(false);
+    expect(
+      puzzleConfigSchema.safeParse({ ...search, program: "binary-search" }).success,
+    ).toBe(true);
+    expect(
+      puzzleConfigSchema.safeParse({ ...search, program: "adjacent-sort" }).success,
+    ).toBe(false);
   });
 });
 

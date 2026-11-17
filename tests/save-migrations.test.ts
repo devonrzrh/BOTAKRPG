@@ -5,6 +5,7 @@ import legacyV2 from "./fixtures/journal-v2.json";
 import legacyV3 from "./fixtures/journal-v3.json";
 import legacyV4Closed from "./fixtures/journal-v4-closed.json";
 import legacyV5Closed from "./fixtures/journal-v5-closed.json";
+import legacyV6Closed from "./fixtures/journal-v6-closed.json";
 import { validateContent, type Quest } from "../src/content/schema";
 import { claimQuest, initialSave, parseSave } from "../src/game/state";
 import {
@@ -32,7 +33,7 @@ describe("journal migration", () => {
     const original = structuredClone(input);
     const save = parseSave(input, content);
     expect(input).toEqual(original);
-    expect(save.version).toBe(6);
+    expect(save.version).toBe(7);
     expect(save.character).toEqual(input.character);
     expect(save.code).toBe(input.code);
     expect(save.notes).toEqual(input.notes);
@@ -132,7 +133,7 @@ describe("journal migration", () => {
     expect(parseSave({ ...save, version: 2 }, content).completed).toEqual(
       save.completed,
     );
-    for (const version of [0, 7, 1.5, "1"])
+    for (const version of [0, 8, 1.5, "1"])
       expect(() => parseSave({ ...save, version }, content)).toThrow();
     expect(() =>
       parseSave({ ...save, version: 1, completed: ["unknown"] }, content),
@@ -146,7 +147,8 @@ describe("journal migration", () => {
     expect(input).toEqual(original);
     expect(save).toEqual({
       ...input,
-      version: 6,
+      version: 7,
+      puzzlePrograms: {},
       finaleOutcome: null,
       curriculumVersion: 3,
       story: { ...input.story, legacyFinale: false },
@@ -206,7 +208,7 @@ describe("journal migration", () => {
       },
     };
     const save = parseSave(input, content);
-    expect(save.version).toBe(6);
+    expect(save.version).toBe(7);
     expect(save.character.skills).toEqual(["insight", "ward", "trace"]);
     expect(save.completed).toContain("puzzle-sort-log");
     expect(save.claimed).toContain("case-sort-log");
@@ -232,7 +234,8 @@ describe("journal migration", () => {
     const local = parseSave(await loadSave(), content);
     expect(local).toEqual({
       ...input,
-      version: 6,
+      version: 7,
+      puzzlePrograms: {},
       finaleOutcome: null,
       curriculumVersion: 3,
       story: { ...input.story, legacyFinale: false },
@@ -253,7 +256,7 @@ describe("journal migration", () => {
     const imported = parseSave(JSON.parse(JSON.stringify(input)), content);
     expect(local).toEqual(imported);
     const migrated = local;
-    expect(migrated.version).toBe(6);
+    expect(migrated.version).toBe(7);
     expect(migrated.curriculumVersion).toBe(3);
     expect(finaleAvailable(migrated, content)).toBe(true);
     expect(migrated.story.legacyFinale).toBe(true);
@@ -273,7 +276,7 @@ describe("journal migration", () => {
     expect(migrated).toEqual(
       parseSave(JSON.parse(JSON.stringify(input)), content),
     );
-    expect(migrated.version).toBe(6);
+    expect(migrated.version).toBe(7);
     expect(migrated.finaleOutcome).toBeNull();
     expect(migrated.completed).toEqual(
       expect.arrayContaining([
@@ -286,6 +289,23 @@ describe("journal migration", () => {
     expect(migrated.character.xp).toBe(input.character.xp);
     expect(migrated.claimed).toEqual(input.claimed);
     expect(parseSave(migrated, content)).toEqual(migrated);
+  });
+
+  it("adds per-puzzle program storage to v6 journals without losing progress", async () => {
+    const input = structuredClone(legacyV6Closed);
+    await storeSave(input as unknown as ReturnType<typeof initialSave>);
+    const local = parseSave(await loadSave(), content);
+    const imported = parseSave(JSON.parse(JSON.stringify(input)), content);
+    expect(local).toEqual(imported);
+    expect(local.version).toBe(7);
+    expect(local.puzzlePrograms).toEqual({});
+    expect(local.code).toBe(input.code);
+    expect(local.blocks).toEqual(input.blocks);
+    expect(local.puzzleRuns).toEqual(input.puzzleRuns);
+    expect(local.notes).toEqual(input.notes);
+    expect(local.completed).toEqual(input.completed);
+    expect(local.claimed).toEqual(input.claimed);
+    expect(parseSave(local, content)).toEqual(local);
   });
 
   it("keeps an old unclaimed finale reward claimable after the new gates", () => {

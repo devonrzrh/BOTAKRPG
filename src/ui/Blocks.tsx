@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useGameSound } from "./GameSound";
+import type { PuzzleProgramId } from "../game/puzzles";
 import * as Blockly from "blockly/core";
 import "blockly/blocks";
 import * as En from "blockly/msg/en";
@@ -75,6 +76,16 @@ if (!Blockly.Blocks["academy_move"]) {
       output: "Array",
       style: "explore_blocks",
     },
+    { type: "puzzle_priorities", message0: "current priorities", output: "Array", style: "puzzle_blocks" },
+    { type: "puzzle_swap", message0: "swap position %1", args0: [{ type: "input_value", name: "POSITION", check: "Number" }], previousStatement: null, nextStatement: null, style: "puzzle_blocks" },
+    { type: "puzzle_slot_count", message0: "number of slots", output: "Number", style: "puzzle_blocks" },
+    { type: "puzzle_probe", message0: "probe slot %1", args0: [{ type: "input_value", name: "SLOT", check: "Number" }], output: "Number", style: "puzzle_blocks" },
+    { type: "puzzle_current_node", message0: "current node", output: "Number", style: "puzzle_blocks" },
+    { type: "puzzle_neighbors", message0: "connected nodes", output: "Array", style: "puzzle_blocks" },
+    { type: "puzzle_connection_cost", message0: "cost to node %1", args0: [{ type: "input_value", name: "NODE", check: "Number" }], output: "Number", style: "puzzle_blocks" },
+    { type: "puzzle_move_to", message0: "move to node %1", args0: [{ type: "input_value", name: "NODE", check: "Number" }], previousStatement: null, nextStatement: null, style: "puzzle_blocks" },
+    { type: "puzzle_route_cost", message0: "current route cost", output: "Number", style: "puzzle_blocks" },
+    { type: "puzzle_is_safe", message0: "at the safe subnet?", output: "Boolean", style: "puzzle_blocks" },
   ]);
   pythonGenerator.forBlock["academy_move"] = (block) =>
     `move('${block.getFieldValue("DIRECTION")}')\n`;
@@ -98,6 +109,24 @@ if (!Blockly.Blocks["academy_move"]) {
     `neighbors(${generator.valueToCode(block, "CELL", Order.NONE) || "position()"})`,
     Order.FUNCTION_CALL,
   ];
+  pythonGenerator.forBlock["puzzle_priorities"] = () => ["priorities()", Order.FUNCTION_CALL];
+  pythonGenerator.forBlock["puzzle_swap"] = (block, generator) =>
+    `swap(${generator.valueToCode(block, "POSITION", Order.NONE) || "1"})\n`;
+  pythonGenerator.forBlock["puzzle_slot_count"] = () => ["slot_count()", Order.FUNCTION_CALL];
+  pythonGenerator.forBlock["puzzle_probe"] = (block, generator) => [
+    `probe(${generator.valueToCode(block, "SLOT", Order.NONE) || "1"})`,
+    Order.FUNCTION_CALL,
+  ];
+  pythonGenerator.forBlock["puzzle_current_node"] = () => ["current_node()", Order.FUNCTION_CALL];
+  pythonGenerator.forBlock["puzzle_neighbors"] = () => ["neighbors()", Order.FUNCTION_CALL];
+  pythonGenerator.forBlock["puzzle_connection_cost"] = (block, generator) => [
+    `connection_cost(${generator.valueToCode(block, "NODE", Order.NONE) || "1"})`,
+    Order.FUNCTION_CALL,
+  ];
+  pythonGenerator.forBlock["puzzle_move_to"] = (block, generator) =>
+    `move_to(${generator.valueToCode(block, "NODE", Order.NONE) || "1"})\n`;
+  pythonGenerator.forBlock["puzzle_route_cost"] = () => ["route_cost()", Order.FUNCTION_CALL];
+  pythonGenerator.forBlock["puzzle_is_safe"] = () => ["is_safe()", Order.FUNCTION_CALL];
 }
 const toolbox = {
   kind: "categoryToolbox",
@@ -171,6 +200,36 @@ const toolbox = {
     { kind: "category", name: "Functions", colour: "290", custom: "PROCEDURE" },
   ],
 };
+const puzzleToolboxBlocks: Record<PuzzleProgramId, string[]> = {
+  "adjacent-sort": ["puzzle_priorities", "puzzle_swap"],
+  "binary-search": ["puzzle_slot_count", "puzzle_probe"],
+  "weighted-route": [
+    "puzzle_current_node",
+    "puzzle_neighbors",
+    "puzzle_connection_cost",
+    "puzzle_move_to",
+    "puzzle_route_cost",
+    "puzzle_is_safe",
+  ],
+};
+const toolboxFor = (program?: PuzzleProgramId) =>
+  program
+    ? {
+        ...toolbox,
+        contents: [
+          {
+            kind: "category" as const,
+            name: "Puzzle API",
+            colour: "160",
+            contents: puzzleToolboxBlocks[program].map((type) => ({
+              kind: "block" as const,
+              type,
+            })),
+          },
+          ...toolbox.contents.slice(1),
+        ],
+      }
+    : toolbox;
 const editorTheme = Blockly.Theme.defineTheme("academy-readable", {
   base: Blockly.Themes.Classic,
   name: "academy-readable",
@@ -180,6 +239,11 @@ const editorTheme = Blockly.Theme.defineTheme("academy-readable", {
       colourPrimary: "#275d50",
       colourSecondary: "#204d42",
       colourTertiary: "#173d34",
+    },
+    puzzle_blocks: {
+      colourPrimary: "#67552e",
+      colourSecondary: "#564626",
+      colourTertiary: "#45391f",
     },
     logic_blocks: { colourPrimary: "#2a4f75" },
     loop_blocks: { colourPrimary: "#365e30" },
@@ -193,10 +257,12 @@ const editorTheme = Blockly.Theme.defineTheme("academy-readable", {
 });
 export default function Blocks({
   initial,
+  program,
   onChange,
   onCode,
 }: {
   initial: unknown;
+  program?: PuzzleProgramId;
   onChange: (value: unknown) => void;
   onCode: (value: string) => void;
 }) {
@@ -211,7 +277,7 @@ export default function Blocks({
   const [zoom, setZoom] = useState(115);
   useEffect(() => {
     const workspace = Blockly.inject(host.current!, {
-      toolbox,
+      toolbox: toolboxFor(program),
       sounds: false,
       media: "/blockly-media/",
       theme: editorTheme,
@@ -231,7 +297,7 @@ export default function Blocks({
     workspaceRef.current = workspace;
     try {
       if (initial) Blockly.serialization.workspaces.load(initial, workspace);
-      else {
+      else if (!program) {
         const block = workspace.newBlock("academy_move");
         block.setFieldValue("east", "DIRECTION");
         block.initSvg();
@@ -276,7 +342,7 @@ export default function Blocks({
       workspace.dispose();
       workspaceRef.current = null;
     };
-  }, [sound]);
+  }, [sound, program]);
   const changeScale = (delta: number) => {
     const workspace = workspaceRef.current;
     if (workspace)

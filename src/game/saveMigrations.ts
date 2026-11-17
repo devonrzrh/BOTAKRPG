@@ -1,7 +1,7 @@
 import type { Content, Quest } from "../content/schema";
 import type { Save } from "./state";
 
-export const CURRENT_SAVE_VERSION = 6;
+export const CURRENT_SAVE_VERSION = 7;
 
 export function starterSupply(): Save["supply"] {
   return { tokens: 3, items: {}, equipped: { weapon: null, armor: null } };
@@ -74,6 +74,7 @@ export function migrateSaveInput(input: unknown): {
       };
     },
     5: (value) => ({ ...value, version: 6, finaleOutcome: null }),
+    6: (value) => ({ ...value, version: 7, puzzlePrograms: {} }),
   };
   for (let version = fromVersion; version < CURRENT_SAVE_VERSION; version++) {
     const upgrade = steps[version];

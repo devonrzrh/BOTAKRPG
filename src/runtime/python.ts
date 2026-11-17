@@ -143,7 +143,7 @@ export class PythonRunner {
     Atomics.store(this.header, 0, 2);
     Atomics.notify(this.header, 0);
   }
-  async run(code: string) {
+  async run(code: string, api?: readonly string[]) {
     if (
       this.phase === "running" ||
       this.phase === "paused" ||
@@ -159,7 +159,7 @@ export class PythonRunner {
       Atomics.store(this.header, 5, this.runId);
       this.emit({ phase: "running", line: 0 });
       this.watchdog(35000);
-      this.worker.postMessage({ type: "run", runId: this.runId, code });
+      this.worker.postMessage({ type: "run", runId: this.runId, code, api });
     } catch (error) {
       if (request === this.request)
         this.emit({ phase: "error", message: String(error) });

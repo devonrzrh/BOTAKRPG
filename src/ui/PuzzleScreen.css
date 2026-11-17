@@ -649,6 +649,109 @@
 .puzzle-status {
   font-size: 18px;
 }
+.puzzle-program {
+  margin: 0 0 18px;
+  border: 1px solid #45635f;
+  background: #0c1c20;
+}
+.puzzle-program-modes {
+  display: flex;
+  gap: 4px;
+  padding: 6px;
+  border-bottom: 1px solid #34505b;
+  background: #10232b;
+}
+.puzzle-program-modes button {
+  min-height: 42px;
+  padding-inline: 18px;
+  border-color: transparent;
+  background: transparent;
+  color: #b9c9c4;
+}
+.puzzle-program-modes button[aria-pressed="true"] {
+  border-color: #71c6b4;
+  background: #17332f;
+  color: #e4f2e9;
+}
+.puzzle-program-workbench {
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+}
+.puzzle-program-editor {
+  order: 2;
+  height: 220px;
+  min-height: 220px;
+  border: 1px solid #34525b;
+  background: #142622;
+}
+.puzzle-program-editor .code-editor {
+  height: 100%;
+}
+.puzzle-program-controls {
+  order: 1;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 10px;
+}
+.puzzle-program-controls button {
+  min-height: 42px;
+  padding: 8px 12px;
+  font-size: 16px;
+}
+.puzzle-program-controls .puzzle-primary {
+  background: #164339;
+  border-color: #71cdaa;
+}
+.puzzle-runner-status {
+  margin-left: auto;
+  color: #9db1aa;
+  font-size: 16px;
+  text-transform: capitalize;
+}
+.puzzle-runner-running {
+  color: #83d6bd;
+}
+.puzzle-runner-error {
+  color: #f0a49a;
+}
+.puzzle-program-output,
+.puzzle-api-reference pre {
+  max-height: 96px;
+  overflow: auto;
+  margin: 8px 0 0;
+  padding: 8px 10px;
+  background: #071114;
+  color: #d7e5dc;
+  font-size: 16px;
+  line-height: 1.4;
+  white-space: pre-wrap;
+}
+.puzzle-program-output {
+  order: 3;
+}
+.puzzle-api-reference {
+  order: 4;
+  margin-top: 8px;
+  color: #a9c0b7;
+  font-size: 16px;
+}
+.puzzle-api-reference summary {
+  min-height: 32px;
+  cursor: pointer;
+  color: #d9c98d;
+}
+.puzzle-api-reference p {
+  max-width: 90ch;
+  margin: 6px 0;
+  line-height: 1.45;
+}
+.puzzle-api-reference button {
+  margin-top: 8px;
+  font-size: 16px;
+}
 @media (prefers-reduced-motion: reduce) {
   .detective-puzzle * {
     scroll-behavior: auto !important;

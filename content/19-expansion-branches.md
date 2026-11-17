@@ -65,6 +65,7 @@ hint: Keep the emergency beacon ahead of the archive and public charger.
 solution: Emergency beacon → transit relay → archive backup → public charger.
 puzzle:
   kind: sorting
+  program: adjacent-sort
   values: [3, 1, 4, 2]
   target: [1, 2, 3, 4]
   budget: 3
@@ -110,6 +111,7 @@ hint: The ledger is sorted by time. Probe the middle record first and narrow the
 solution: Probe 02:16 first, then 02:12, then 02:14.
 puzzle:
   kind: search
+  program: binary-search
   values: [210, 212, 214, 216, 218, 220, 222]
   target: [214]
   budget: 3
@@ -234,6 +236,7 @@ hint: The familiar short route crosses the offline relay. Follow the staging cac
 solution: Start → Staging → Subnet → Safe.
 puzzle:
   kind: routing
+  program: weighted-route
   values: [1, 2, 3, 4, 5, 6]
   target: [1, 6]
   budget: 4

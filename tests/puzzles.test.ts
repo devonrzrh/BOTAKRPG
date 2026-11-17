@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   createPuzzle,
   puzzleCommand,
+  puzzleProgramCall,
   puzzleConfigSchema,
   puzzleSolved,
   type PuzzleConfig,
@@ -216,5 +217,68 @@ describe("detective learning puzzles", () => {
       ],
     };
     expect(puzzleConfigSchema.safeParse(config).success).toBe(true);
+  });
+
+  it("runs an adjacent-sort program through the shared reducer", () => {
+    const program = "adjacent-sort" as const;
+    const config: PuzzleConfig = {
+      kind: "sorting",
+      program,
+      values: [4, 1, 3, 2],
+      target: [1, 2, 3, 4],
+      budget: 4,
+    };
+    let state = createPuzzle(config);
+    expect(puzzleProgramCall(state, program, "priorities", []).value).toEqual([4, 1, 3, 2]);
+    for (const position of [1, 2, 3, 2]) {
+      const result = puzzleProgramCall(state, program, "swap", [position]);
+      state = puzzleCommand(state, result.command!);
+    }
+    expect(state.input).toEqual(config.target);
+    expect(state.solved).toBe(true);
+    expect(() => puzzleProgramCall(state, program, "swap", [1])).toThrow(/already solved/);
+  });
+
+  it("runs a binary-search program without exposing unprobed records", () => {
+    const program = "binary-search" as const;
+    const config: PuzzleConfig = {
+      kind: "search",
+      program,
+      values: [4, 9, 15, 22, 31, 43, 58],
+      target: [43],
+      budget: 3,
+    };
+    let state = createPuzzle(config);
+    expect(puzzleProgramCall(state, program, "slot_count", []).value).toBe(7);
+    const lower = puzzleProgramCall(state, program, "probe", [4]);
+    expect(lower.value).toBe(1);
+    state = puzzleCommand(state, lower.command!);
+    expect(() => puzzleProgramCall(state, program, "probe", [4])).toThrow(/remaining range/);
+    const found = puzzleProgramCall(state, program, "probe", [6]);
+    expect(found.value).toBe(0);
+    state = puzzleCommand(state, found.command!);
+    expect(state.solved).toBe(true);
+  });
+
+  it("runs a weighted-route program over the same budgeted graph", () => {
+    const program = "weighted-route" as const;
+    const config: PuzzleConfig = {
+      kind: "routing",
+      program,
+      values: [1, 2, 3, 4],
+      target: [1, 4],
+      budget: 6,
+      edges: routeConfig.kind === "routing" ? routeConfig.edges : [],
+    };
+    let state = createPuzzle(config);
+    expect(puzzleProgramCall(state, program, "neighbors", []).value).toEqual([2, 3]);
+    expect(puzzleProgramCall(state, program, "connection_cost", [4]).value).toBe(-1);
+    for (const node of [3, 4]) {
+      const result = puzzleProgramCall(state, program, "move_to", [node]);
+      state = puzzleCommand(state, result.command!);
+    }
+    expect(state.cost).toBe(2);
+    expect(puzzleProgramCall(state, program, "is_safe", []).value).toBe(true);
+    expect(puzzleProgramCall(state, program, "route_cost", []).value).toBe(2);
   });
 });

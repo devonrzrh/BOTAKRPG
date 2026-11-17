@@ -2391,12 +2391,22 @@ export default function App() {
                       key={`${currentPuzzle.id}:${debugPuzzleRun}`}
                       activity={currentPuzzle}
                       run={save.puzzleRuns[currentPuzzle.id]}
+                      programState={save.puzzlePrograms[currentPuzzle.id]}
                       onRun={(run) =>
                         updateSave((s) => ({
                           ...s,
                           puzzleRuns: {
                             ...s.puzzleRuns,
                             [currentPuzzle.id]: run,
+                          },
+                        }))
+                      }
+                      onProgramChange={(program) =>
+                        updateSave((s) => ({
+                          ...s,
+                          puzzlePrograms: {
+                            ...s.puzzlePrograms,
+                            [currentPuzzle.id]: program,
                           },
                         }))
                       }
