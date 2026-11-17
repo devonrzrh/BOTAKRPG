@@ -705,7 +705,7 @@ export function PuzzleScreen(p: {
           <span className="puzzle-footer-spacer" />
           {solved ? (
             !rewardEarned ? (
-              <button className="puzzle-primary" onClick={p.onContinue}>
+              <button className="puzzle-primary puzzle-proceed" onClick={p.onContinue}>
                 Continue <ArrowRight size={18} />
               </button>
             ) : (
@@ -713,7 +713,7 @@ export function PuzzleScreen(p: {
                 <span>
                   <Check size={18} /> Evidence recovered · Case filed
                 </span>
-                <button className="puzzle-primary" onClick={p.onContinue}>
+                <button className="puzzle-primary puzzle-proceed" onClick={p.onContinue}>
                   Continue <ArrowRight size={18} />
                 </button>
               </div>

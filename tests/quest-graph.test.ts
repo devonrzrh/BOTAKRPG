@@ -15,23 +15,24 @@ import { validateContent, type Quest } from "../src/content/schema";
 import raw from "../src/generated/content.json";
 const content = validateContent(raw);
 
-it("keeps locked nodes inspectable without revealing evidence or unlocking the boss", () => {
+it("keeps the overview compact and hides locked clues without unlocking the boss", () => {
   const save = initialSave(),
     graph = createQuestGraph(save, content);
   expect(graph.selected).toBe("case");
   expect(graph.nodes.find((n) => n.id === "routing-trace")?.status).toBe(
     "locked",
   );
-  expect(graph.nodes.find((n) => n.id === "clue-routing-trace")?.title).toBe(
-    "Unrecovered clue",
-  );
+  expect(graph.nodes.some((n) => n.kind === "clue")).toBe(false);
+  expect(graph.nodes).toHaveLength(7);
+  expect(graph.nodes.every((n) => n.x >= 100 && n.x <= 540)).toBe(true);
+  expect(graph.nodes.every((n) => n.y >= 44 && n.y <= 401)).toBe(true);
   expect(graph.nodes.find((n) => n.id === "finale")?.title).toBe("Hidden host");
   for (const [from, to] of graph.edges) {
     expect(graph.nodes.some((n) => n.id === from)).toBe(true);
     expect(graph.nodes.some((n) => n.id === to)).toBe(true);
   }
 });
-it("reveals clues and unlocks the finale from completion rather than reward claims", () => {
+it("shows recovered clue names on branches and unlocks the finale from completion", () => {
   let save = initialSave();
   save.story.caseAccepted = true;
   expect(
@@ -42,9 +43,21 @@ it("reveals clues and unlocks the finale from completion rather than reward clai
   if (routing?.type === "quest")
     for (const id of routing.objectives) save = completeActivity(save, id);
   let graph = createQuestGraph(save, content);
+  const routingEvidence = content.entities.find(
+    (e) =>
+      e.type === "activity" &&
+      e.id === (routing?.type === "quest" ? routing.objectives.at(-1) : ""),
+  );
+  const evidenceTitle =
+    routingEvidence?.type === "activity"
+      ? routingEvidence.clue?.title ?? "Evidence"
+      : "Evidence";
   expect(
-    graph.nodes.find((n) => n.id === "clue-routing-trace")?.description,
-  ).toContain("maintenance");
+    graph.nodes.find((n) => n.id === "routing-trace")?.description,
+  ).toContain(evidenceTitle);
+  expect(graph.nodes.find((n) => n.id === "routing-trace")?.actions).toContain(
+    "claim-routing-trace",
+  );
   expect(graph.nodes.find((n) => n.id === "finale")?.status).toBe("locked");
   for (const branch of content.entities.filter(
     (e) => e.type === "quest" && e.kind === "branch",

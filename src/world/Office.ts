@@ -7,8 +7,6 @@ import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 import { PointLight } from "@babylonjs/core/Lights/pointLight";
-import { attachTurnMotionBlur } from "./TurnMotionBlur";
-import { turnBlur } from "../game/turnBlur";
 
 export type HomeWall = "investigation" | "bookshelf" | "quests" | "desk";
 export const wallYaw: Record<HomeWall, number> = {
@@ -45,9 +43,7 @@ export function buildOffice(
     camera.position.set(-1.25, 4.3, 0);
     camera.rotation.x = 0.98;
   }
-  const motionBlur = attachTurnMotionBlur(camera);
-  let previousWall = state().wall,
-    turning = false;
+  let previousWall = state().wall;
   const ambient = new HemisphericLight(
     "office ambient",
     new Vector3(0, 1, 0),
@@ -293,7 +289,6 @@ export function buildOffice(
       dt = Math.min(0.05, frameTime);
     if (s.wall !== previousWall) {
       previousWall = s.wall;
-      turning = true;
       onCameraTurn?.();
     }
     const steady =
@@ -311,8 +306,6 @@ export function buildOffice(
       eye,
       s.reducedMotion ? 1 : 1 - Math.exp(-dt * 12),
     );
-    const beforeYaw = camera.rotation.y,
-      beforePitch = camera.rotation.x;
     camera.rotation.y += turn * blend;
     camera.rotation.x +=
       ((s.wall === "desk" ? 0.98 : 0) +
@@ -324,22 +317,9 @@ export function buildOffice(
       Math.abs(shortestTurn(camera.rotation.y, target)) < 0.0015
     ) {
       camera.rotation.y = target;
-      turning = false;
     }
-    motionBlur.update(
-      turnBlur(
-        camera.rotation.y - beforeYaw,
-        camera.rotation.x - beforePitch,
-        frameTime,
-        scene.getEngine().getRenderWidth(),
-        scene.getEngine().getRenderHeight(),
-        camera.fov,
-        turning && !s.reducedMotion && !s.locked,
-      ),
-    );
   });
   return () => {
-    motionBlur.dispose();
     surface.removeEventListener("pointermove", pointer);
     surface.removeEventListener("pointerleave", leave);
     scene.onBeforeRenderObservable.remove(observer);

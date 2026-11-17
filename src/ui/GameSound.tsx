@@ -40,13 +40,28 @@ export function GameSoundProvider({ children }: { children: ReactNode }) {
         return;
       audio.play("click");
     };
+    const hover = (event: PointerEvent) => {
+      if (event.pointerType !== "mouse") return;
+      const target = event.target instanceof Element
+        ? event.target.closest("button,a,summary")
+        : null;
+      if (
+        !target?.closest(".app") ||
+        target.closest("[data-sfx-silent]") ||
+        target.matches(":disabled,[aria-disabled=true]") ||
+        (event.relatedTarget instanceof Node && target.contains(event.relatedTarget))
+      ) return;
+      audio.play("hover");
+    };
     document.addEventListener("pointerdown", unlock, true);
     document.addEventListener("keydown", unlock, true);
     document.addEventListener("click", click, true);
+    document.addEventListener("pointerover", hover, true);
     return () => {
       document.removeEventListener("pointerdown", unlock, true);
       document.removeEventListener("keydown", unlock, true);
       document.removeEventListener("click", click, true);
+      document.removeEventListener("pointerover", hover, true);
       audio.dispose();
       engine.current = null;
     };

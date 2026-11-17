@@ -138,7 +138,7 @@ describe("combat audio", () => {
     audio.play(cue);
     vi.advanceTimersByTime(300);
     expect(gain.gain.exponentialRampToValueAtTime).toHaveBeenCalledWith(
-      0.0275,
+      0.04675,
       0.012,
     );
 
@@ -246,7 +246,7 @@ describe("combat audio", () => {
     vi.advanceTimersByTime(1);
     expect(noiseSource.start).toHaveBeenCalledTimes(1);
     expect(gain.gain.exponentialRampToValueAtTime).toHaveBeenCalledWith(
-      0.18,
+      0.306,
       0.006,
     );
     expect(oscillator.stop).toHaveBeenCalledWith(0.23);
@@ -257,7 +257,7 @@ describe("combat audio", () => {
     vi.advanceTimersByTime(403);
     expect(oscillator.type).toBe("square");
     expect(gain.gain.exponentialRampToValueAtTime).toHaveBeenCalledWith(
-      0.07,
+      0.11900000000000001,
       0.006,
     );
     expect(filter.type).toBe("bandpass");

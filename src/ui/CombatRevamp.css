@@ -47,6 +47,10 @@
   grid-template-columns: repeat(4, 1fr);
   gap: 6px;
 }
+.app.battle-in-settings .world-canvas.boss-world {
+  top: 0;
+  height: calc(100% - 220px);
+}
 .app .battle-command-menu > span {
   font-size: 16px;
 }
@@ -131,7 +135,7 @@
 }
 .app .battle-decision.quiz-panel {
   top: 45%;
-  max-height: calc(100% - 354px);
+  max-height: calc(100% - 220px);
   width: min(840px, calc(100% - 64px));
   padding: 22px 26px;
   scrollbar-gutter: stable;
@@ -143,6 +147,10 @@
 .app .battle-decision.quiz-panel:has(.battle-xp-reward) {
   top: 43%;
   max-height: calc(100% - 300px);
+}
+.app .battle-screen.phase-question .battle-command-menu,
+.app .battle-screen.phase-feedback .battle-command-menu {
+  display: none;
 }
 .app .battle-decision.command-panel {
   bottom: 108px;
@@ -217,7 +225,7 @@
 }
 @media (max-height: 650px) {
   .app .battle-decision.quiz-panel {
-    max-height: calc(100% - 300px);
+    max-height: calc(100% - 190px);
     top: 43%;
   }
   .app .battle-skill-tray button {
@@ -225,6 +233,7 @@
   }
 }
 .app.gameplay-battle .world-canvas.boss-world,
+.app.battle-in-settings .world-canvas.boss-world,
 .app.gameplay-battle:has(.quiz-panel) .world-canvas.boss-world {
   top: 0;
   height: calc(100% - 220px);
@@ -259,6 +268,45 @@
   top: auto;
   bottom: 225px;
   color: #ffa290;
+}
+.battle-abandon-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: #03090edb;
+}
+.battle-abandon-dialog {
+  width: min(480px, 100%);
+  padding: 28px;
+  color: #e5e9de;
+  background: #142630;
+  border: 1px solid #839a99;
+  box-shadow: 0 18px 56px #000b;
+}
+.battle-abandon-dialog h2 {
+  font: 400 25px/1.35 var(--typewriter);
+}
+.battle-abandon-dialog p {
+  font-size: 18px;
+  line-height: 1.5;
+}
+.battle-abandon-dialog > div {
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 22px;
+}
+.battle-abandon-dialog button {
+  min-height: 48px;
+  padding: 10px 16px;
+}
+.battle-abandon-dialog button:focus-visible {
+  outline: 2px solid #f0c98d;
+  outline-offset: 3px;
 }
 .battle-damage-number.is-blocked {
   color: #a2e6ee;

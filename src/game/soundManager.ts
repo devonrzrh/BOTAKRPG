@@ -14,7 +14,6 @@ import digitalLowDown from "../../sounds/sfx/kenney_digital-audio_2/Audio/lowDow
 import digitalHighDown from "../../sounds/sfx/kenney_digital-audio_2/Audio/highDown.ogg?url";
 import digitalTone from "../../sounds/sfx/kenney_digital-audio_2/Audio/tone1.ogg?url";
 import digitalTwoTone from "../../sounds/sfx/kenney_digital-audio_2/Audio/twoTone1.ogg?url";
-import digitalPowerUp from "../../sounds/sfx/kenney_digital-audio_2/Audio/powerUp1.ogg?url";
 import digitalPhaseJump from "../../sounds/sfx/kenney_digital-audio_2/Audio/phaseJump1.ogg?url";
 import digitalZap from "../../sounds/sfx/kenney_digital-audio_2/Audio/zapThreeToneUp.ogg?url";
 import digitalPhaser from "../../sounds/sfx/kenney_digital-audio_2/Audio/phaserUp1.ogg?url";
@@ -22,7 +21,8 @@ import impactPunch from "../../sounds/sfx/kenney_impact-sounds/Audio/impactPunch
 import cameraSwoosh from "../../sounds/sfx/swoosh.mp3?url";
 
 export const SFX_CUES = {
-  click: { label: "Menu click", source: uiClick, cooldown: 45 },
+  click: { label: "Menu click", source: uiClick, cooldown: 90 },
+  hover: { label: "Button hover", source: uiSwitch, cooldown: 70 },
   open: { label: "Open", source: interfaceOpen, cooldown: 110 },
   close: { label: "Close", source: interfaceClose, cooldown: 110 },
   page: { label: "Page turn", source: rpgBookFlip, cooldown: 120 },
@@ -33,13 +33,13 @@ export const SFX_CUES = {
   puzzleAction: { label: "Puzzle action", source: uiSwitch, cooldown: 80 },
   success: { label: "Success", source: interfaceConfirm, cooldown: 180 },
   error: { label: "Error", source: interfaceError, cooldown: 130 },
-  clue: { label: "Clue", source: digitalPowerUp, cooldown: 220 },
-  levelUp: { label: "Level up", source: digitalPowerUp, cooldown: 300 },
-  dialogue: { label: "Dialogue", source: digitalTone, cooldown: 90 },
-  speechHuman: { label: "Human speech", source: digitalTwoTone, cooldown: 48 },
-  speechRobot: { label: "Robot speech", source: digitalTone, cooldown: 48 },
-  speechEcho: { label: "ECHO speech", source: digitalLowDown, cooldown: 55 },
-  speechSoft: { label: "Soft speech", source: digitalHighDown, cooldown: 55 },
+  clue: { label: "Clue", source: digitalTwoTone, cooldown: 260 },
+  levelUp: { label: "Level up", source: digitalPhaseJump, cooldown: 320 },
+  dialogue: { label: "Dialogue", source: digitalTone, cooldown: 240 },
+  speechHuman: { label: "Human speech", source: digitalTwoTone, cooldown: 120 },
+  speechRobot: { label: "Robot speech", source: digitalTone, cooldown: 120 },
+  speechEcho: { label: "ECHO speech", source: digitalLowDown, cooldown: 120 },
+  speechSoft: { label: "Soft speech", source: digitalHighDown, cooldown: 120 },
   connect: { label: "Connect", source: digitalZap, cooldown: 250 },
   pursuit: { label: "Pursuit", source: rpgFootstepRun, cooldown: 120 },
   train: { label: "Train", source: digitalPhaseJump, cooldown: 180 },
@@ -50,10 +50,22 @@ export const SFX_CUES = {
   cameraMove: {
     label: "Camera turn swoosh",
     source: cameraSwoosh,
-    cooldown: 800,
+    cooldown: 1300,
   },
 } as const;
 export type SfxName = keyof typeof SFX_CUES;
+export const SFX_GAINS: Partial<Record<SfxName, number>> = {
+  click: 0.55,
+  hover: 0.12,
+  clue: 0.7,
+  levelUp: 0.7,
+  dialogue: 0.22,
+  speechHuman: 0.12,
+  speechRobot: 0.12,
+  speechEcho: 0.12,
+  speechSoft: 0.12,
+  cameraMove: 0.05,
+};
 
 type Voice = { audio: HTMLAudioElement; gain: number };
 const MAX_VOICES = 12;
@@ -92,10 +104,11 @@ export function createSoundManager() {
     try {
       const voice = {
         audio: new Audio(SFX_CUES[name].source),
-        gain: name === "cameraMove" ? 0.12 : 1,
+        gain: (SFX_GAINS[name] ?? 1) * (0.97 + Math.random() * 0.06),
       };
       voice.audio.preload = "auto";
-      voice.audio.volume = volume * voice.gain;
+      voice.audio.playbackRate = 0.98 + Math.random() * 0.04;
+      voice.audio.volume = Math.min(1, volume * voice.gain);
       voices.add(voice);
       const release = () => stop(voice);
       voice.audio.addEventListener("ended", release, { once: true });
@@ -112,7 +125,7 @@ export function createSoundManager() {
   const setVolume = (next: number) => {
     volume = Number.isFinite(next) ? Math.max(0, Math.min(1, next)) : 0;
     voices.forEach((voice) => {
-      voice.audio.volume = volume * voice.gain;
+      voice.audio.volume = Math.min(1, volume * voice.gain);
     });
     if (volume === 0) cancelAll();
   };

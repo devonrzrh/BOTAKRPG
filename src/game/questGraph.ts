@@ -223,8 +223,9 @@ export function createQuestGraph(
     };
   }
   const accepted = save.story.caseAccepted;
-  const branchGap = branches.length > 3 ? 78 : 140;
-  const mid = 80 + Math.max(0, branches.length - 1) * branchGap;
+  const branchGap = branches.length > 3 ? 88 : 140;
+  const branchStart = (GRAPH_AREA.h - (branches.length - 1) * branchGap) / 2;
+  const mid = GRAPH_AREA.h / 2;
   const nodes: QuestNode[] = [
     {
       id: "case",
@@ -257,38 +258,14 @@ export function createQuestGraph(
             : branch.id === "signal-identification"
               ? "Connectionist AI"
               : branch.title,
-      description: `${branch.objectives.filter((id) => save.completed.includes(id)).length}/${branch.objectives.length} complete. ${activity ? (activityStory(content, activity.id, "before")?.title ?? activity.title) : branch.description}`,
+      description: `${branch.objectives.filter((id) => save.completed.includes(id)).length}/${branch.objectives.length} complete. ${done && activity?.type === "activity" ? `Evidence: ${activity.clue?.title ?? "recovered"}` : activity ? (activityStory(content, activity.id, "before")?.title ?? activity.title) : branch.description}`,
       x: 320,
-      y: 80 + i * branchGap,
+      y: branchStart + i * branchGap,
       kind: "activity",
       status: done ? "completed" : accepted ? "available" : "locked",
-      actions: [
-        `chapters-${branch.id}`,
-        `branch-${branch.id}`,
-        `material-${branch.id}`,
-      ],
+      actions: [`chapters-${branch.id}`, `branch-${branch.id}`, `material-${branch.id}`, ...(done ? [`claim-${branch.id}`] : [])],
     });
-    nodes.push({
-      id: `clue-${branch.id}`,
-      title:
-        done && activity?.type === "activity"
-          ? (activity.clue?.title ?? "Evidence recovered")
-          : "Unrecovered clue",
-      description:
-        done && activity?.type === "activity"
-          ? (activity.clue?.text ?? "Evidence recovered.")
-          : `Complete ${branch.title} to reveal this evidence.`,
-      x: 540,
-      y: 80 + i * branchGap,
-      kind: "clue",
-      status: done ? "completed" : "locked",
-      actions: [`claim-${branch.id}`, `material-${branch.id}`],
-    });
-    edges.push(
-      ["case", branch.id],
-      [branch.id, `clue-${branch.id}`],
-      [`clue-${branch.id}`, "finale"],
-    );
+    edges.push(["case", branch.id], [branch.id, "finale"]);
   });
   const closed = save.completed.includes("echo-battle"),
     ready = finaleAvailable(save, content);
@@ -305,7 +282,7 @@ export function createQuestGraph(
           ? "The evidence chain is verified. Confront ECHO-7."
           : "The five clues are filed. Reconstruct the route before entering the subnet."
         : `Recover evidence from: ${missing.join(", ")}.`,
-    x: 760,
+    x: 540,
     y: mid,
     kind: "boss",
     status: closed ? "completed" : ready ? "available" : "locked",

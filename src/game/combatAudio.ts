@@ -1,6 +1,7 @@
 import { combatCueDuration, type BattleCue } from "./combatPresentation";
 
 type AudioContextLike = AudioContext;
+const PROCEDURAL_GAIN = 1.7;
 
 const previewCueBase = {
   skill: null,
@@ -123,7 +124,7 @@ export function createCombatAudio() {
       filter.type = filterType;
       filter.frequency.setValueAtTime(frequency, now);
       filter.Q.setValueAtTime(resonance, now);
-      gain.gain.setValueAtTime(level * volume, now);
+      gain.gain.setValueAtTime(level * volume * PROCEDURAL_GAIN, now);
       gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
       source.connect(filter);
       filter.connect(gain);
@@ -207,7 +208,7 @@ export function createCombatAudio() {
         oscillator.frequency.exponentialRampToValueAtTime(endHz, now + length);
         gain.gain.setValueAtTime(0.0001, now);
         gain.gain.exponentialRampToValueAtTime(
-          peak * volume,
+          peak * volume * PROCEDURAL_GAIN,
           now + (damage ? 0.006 : 0.012),
         );
         gain.gain.exponentialRampToValueAtTime(0.0001, now + length);
@@ -234,7 +235,7 @@ export function createCombatAudio() {
               pulse.frequency.setValueAtTime(92, now);
               pulseGain.gain.setValueAtTime(0.0001, now);
               pulseGain.gain.exponentialRampToValueAtTime(
-                0.024 * volume,
+                0.024 * volume * PROCEDURAL_GAIN,
                 now + 0.008,
               );
               pulseGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.16);
@@ -274,7 +275,7 @@ export function createCombatAudio() {
               note.frequency.setValueAtTime(hz, now + offset);
               noteGain.gain.setValueAtTime(0.0001, now + offset);
               noteGain.gain.exponentialRampToValueAtTime(
-                0.022 * volume,
+                0.022 * volume * PROCEDURAL_GAIN,
                 now + offset + 0.01,
               );
               noteGain.gain.exponentialRampToValueAtTime(

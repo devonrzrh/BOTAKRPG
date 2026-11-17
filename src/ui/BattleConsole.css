@@ -2,6 +2,10 @@
   --battle-console-height: min(320px, 54%);
   --battle-stage-height: calc(100% - var(--battle-console-height) - 28px);
 }
+.app.gameplay-battle:has(.battle-screen.phase-question),
+.app.gameplay-battle:has(.battle-screen.phase-feedback) {
+  --battle-console-height: min(400px, 62%);
+}
 .app.gameplay-battle:has(.battle-screen.battle-layout-console)
   .world-canvas.boss-world {
   top: 0;

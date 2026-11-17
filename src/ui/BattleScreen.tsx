@@ -439,7 +439,7 @@ export function BattleScreen(p: Props) {
       onKeyDown={(e) => {
         if (evading) return;
         if (e.repeat || e.ctrlKey || e.altKey || e.metaKey) return;
-        if (e.key === "Escape" && menu) {
+        if (e.key === "Escape" && menu !== null && menu !== "skills") {
           e.preventDefault();
           e.stopPropagation();
           setMenu("skills");

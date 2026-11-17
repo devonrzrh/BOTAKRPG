@@ -541,6 +541,24 @@
   color: #e4f5e8;
   padding-inline: 20px;
 }
+.detective-puzzle .puzzle-proceed {
+  animation: puzzle-proceed 1.2s ease-in-out 3;
+  box-shadow: 0 0 0 2px #e5c783;
+}
+@keyframes puzzle-proceed {
+  50% {
+    background: #27624e;
+    box-shadow: 0 0 0 4px #e5c783a6;
+  }
+}
+.reduced-motion .puzzle-proceed {
+  animation: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .detective-puzzle .puzzle-proceed {
+    animation: none;
+  }
+}
 @media (max-width: 620px) {
   .puzzle-header {
     align-items: flex-start;

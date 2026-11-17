@@ -343,6 +343,13 @@ export default function App() {
   ]);
   const [scene, setScene] = useState<SceneId>("desk"),
     [panel, setPanel] = useState<Panel>(null),
+    [settingsFromBattle, setSettingsFromBattle] = useState(false),
+    [pendingBattleExit, setPendingBattleExit] = useState<
+      | { kind: "open"; id: string; debugTravel: boolean }
+      | { kind: "close" }
+      | { kind: "import"; file: File }
+      | null
+    >(null),
     [toast, setToast] = useState(""),
     [metrics, setMetrics] = useState<WorldMetrics | null>(null);
   const [debugOpen, setDebugOpen] = useState(false);
@@ -373,6 +380,7 @@ export default function App() {
     [battleNotice, setBattleNotice] = useState("");
   const battleRef = useRef(battle);
   battleRef.current = battle;
+  const battleExitFocus = useRef<HTMLElement | null>(null);
   const [combatEvent, setCombatEvent] = useState<BattleCue | null>(null);
   const combatSequence = useRef(0);
   const [lessonId, setLessonId] = useState(lessons[0].id),
@@ -605,7 +613,18 @@ export default function App() {
     setOutput([]);
   };
   const open = useCallback(
-    (id: string, debugTravel = false) => {
+    (id: string, debugTravel = false, confirmedExit = false) => {
+      const activeBattle =
+        (panel === "battle" || settingsFromBattle) &&
+        battleRef.current.phase !== "won" &&
+        battleRef.current.phase !== "lost";
+      if (activeBattle && id !== "settings" && id !== "exit" && !confirmedExit) {
+        battleExitFocus.current = document.activeElement as HTMLElement | null;
+        setPendingBattleExit({ kind: "open", id, debugTravel });
+        return;
+      }
+      if (id === "settings" && panel === "battle") setSettingsFromBattle(true);
+      else if (id !== "settings") setSettingsFromBattle(false);
       setCombatEvent(null);
       setReturnPuzzleId(null);
       if (tutorialRef.current) closeTutorial();
@@ -862,17 +881,48 @@ export default function App() {
         trialRef.current = false;
       }
     },
-    [realm, officeFallback, sound],
+    [realm, officeFallback, sound, panel, settingsFromBattle],
   );
-  const close = () => {
+  const close = useCallback((confirmedExit = false) => {
+    if (settingsFromBattle && !confirmedExit) {
+      sound("close");
+      setSettingsFromBattle(false);
+      setPanel("battle");
+      return;
+    }
+    if (
+      !confirmedExit &&
+      panel === "battle" &&
+      battleRef.current.phase !== "won" &&
+      battleRef.current.phase !== "lost"
+    ) {
+      battleExitFocus.current = document.activeElement as HTMLElement | null;
+      setPendingBattleExit({ kind: "close" });
+      return;
+    }
     if (panel || realm !== "desk") sound("close");
-    stop();
+    generation.current++;
+    runner.current?.reset();
+    setLine(0);
+    setSettingsFromBattle(false);
     setPanel(null);
     setRealm("desk");
     setScene("desk");
     if (realm !== "desk") setHomeWall("quests");
     setTrial(false);
     trialRef.current = false;
+  }, [panel, settingsFromBattle, realm, sound]);
+  const cancelBattleExit = () => {
+    setPendingBattleExit(null);
+    requestAnimationFrame(() => battleExitFocus.current?.focus());
+  };
+  const confirmBattleExit = () => {
+    const pending = pendingBattleExit;
+    setPendingBattleExit(null);
+    setSettingsFromBattle(false);
+    if (pending?.kind === "open") open(pending.id, pending.debugTravel, true);
+    else if (pending?.kind === "close") close(true);
+    else if (pending?.kind === "import") void importSave(pending.file, true);
   };
   const debugAtHome =
     booted &&
@@ -930,7 +980,7 @@ export default function App() {
         event.key !== "Escape" ||
         event.target?.toString().includes("SVG") ||
         (event.target instanceof Element &&
-          event.target.closest('[role="dialog"],.book-reader,.menu-bar,.evade'))
+          event.target.closest('[role="dialog"],[role="alertdialog"],.book-reader,.menu-bar,.evade'))
       )
         return;
       event.preventDefault();
@@ -942,7 +992,7 @@ export default function App() {
     };
     window.addEventListener("keydown", escape);
     return () => window.removeEventListener("keydown", escape);
-  }, [realm]);
+  }, [close]);
   useEffect(() => {
     if (
       !booted ||
@@ -1249,13 +1299,19 @@ export default function App() {
     setDebugPuzzleRun((run) => run + 1);
     setDebugOpen(false);
   };
-  const importSave = async (file: File) => {
+  const importSave = async (file: File, confirmedExit = false) => {
     try {
       if (file.size > 1500000) throw new Error("Save file is too large");
       const importedInput = JSON.parse(await file.text());
       const parsed = parseSave(importedInput, content);
+      if (settingsFromBattle && !confirmedExit) {
+        battleExitFocus.current = document.activeElement as HTMLElement | null;
+        setPendingBattleExit({ kind: "import", file });
+        return;
+      }
       await storeSave(parsed);
       stop();
+      setSettingsFromBattle(false);
       previousLevel.current = parsed.character.level;
       updateSave(() => parsed);
       setDialogueId(null);
@@ -1347,22 +1403,24 @@ export default function App() {
     ],
   );
   const useWorldUi = realm === "desk" && !officeFallback;
-  const bossBattle = FINAL_BOSS_IDS.includes(battle.enemyId);
+  const bossBattle = FINAL_BOSS_IDS.includes(battle.enemyId),
+    battleView = panel === "battle" || settingsFromBattle;
   const musicMix = useMemo(
     () =>
       chooseMusic({
         intake: intakeOpen,
-        panel,
+        panel: battleView ? "battle" : panel,
         reading: bookOpen && homeWall === "bookshelf",
         boss: bossBattle,
         battleResolved:
-          panel === "battle" &&
+          battleView &&
           (battle.phase === "won" || battle.phase === "lost"),
         dialogue: Boolean(dialogueId || cutsceneId || chapterId),
       }),
     [
       intakeOpen,
       panel,
+      battleView,
       bookOpen,
       homeWall,
       bossBattle,
@@ -1400,7 +1458,10 @@ export default function App() {
     }));
   const handleOfficeAction = (action: OfficeAction) => {
     const id = action.id;
-    if (action.kind === "graph-select" || action.kind === "graph-view")
+    if (
+      action.kind === "graph-select" ||
+      (action.kind === "graph-view" && !action.view)
+    )
       sound("click");
     if (action.kind === "graph-select") {
       setQuestSelection(id);
@@ -1494,7 +1555,7 @@ export default function App() {
   ).length;
   return (
     <div
-      className={`app gameplay-${panel ?? "explore"} maze-${mode} ${blocksExpanded ? "blocks-expanded" : "blocks-docked"} ${useWorldUi ? "world-ui-view" : ""} ${realm === "desk" ? "home-view" : "network-view"} ${homeMoving && realm === "desk" ? "home-panning" : ""} ${save.settings.reducedMotion ? "reduced-motion" : ""}`}
+      className={`app gameplay-${panel ?? "explore"} maze-${mode} ${blocksExpanded ? "blocks-expanded" : "blocks-docked"} ${useWorldUi ? "world-ui-view" : ""} ${realm === "desk" ? "home-view" : "network-view"} ${homeMoving && realm === "desk" ? "home-panning" : ""} ${settingsFromBattle ? "battle-in-settings" : ""} ${save.settings.reducedMotion ? "reduced-motion" : ""}`}
     >
       {intakeOpen && (
         <Onboarding
@@ -1618,8 +1679,10 @@ export default function App() {
       <SceneTransition
         battleEntry={panel === "battle"}
         sceneKey={
-          panel === "battle"
+          battleView
             ? `battle:${battle.enemyId}`
+            : realm === "desk"
+              ? "home"
             : panel === "maze"
               ? "maze"
               : panel === "garden"
@@ -1672,7 +1735,7 @@ export default function App() {
               Boolean(dialogueId) ||
               Boolean(cutsceneId)
             }
-            encounter={panel === "battle"}
+            encounter={battleView}
             combatCue={panel === "battle" ? combatEvent : null}
             finalBoss={FINAL_BOSS_IDS.includes(battle.enemyId)}
             enemyId={battle.enemyId}
@@ -1769,7 +1832,7 @@ export default function App() {
                     aria-label={
                       realm === "desk" ? "Return to desk" : "Return to network"
                     }
-                    onClick={close}
+                    onClick={() => close()}
                   >
                     <X size={21} />
                   </button>
@@ -2347,7 +2410,7 @@ export default function App() {
                     }));
                     notify("Chapter bookmarked for review.");
                   }}
-                  onRetreat={close}
+                  onRetreat={() => close()}
                   victoryActionLabel={
                     narratedBattle
                       ? activityStory(content, battleActivityId, "after")
@@ -3201,7 +3264,7 @@ export default function App() {
         <div className="sidebar-bottom">
           <button
             className="rest-button"
-            disabled={panel === "battle"}
+            disabled={battleView}
             onClick={() => {
               updateSave((s) => ({
                 ...s,
@@ -3396,6 +3459,50 @@ export default function App() {
             notify("Debug checkpoint restored.");
           }}
         />
+      )}
+      {pendingBattleExit && (
+        <div
+          className="battle-abandon-backdrop"
+          onKeyDown={(event) => {
+            if (event.key === "Escape") {
+              event.preventDefault();
+              cancelBattleExit();
+            } else if (event.key === "Tab") {
+              const buttons = event.currentTarget.querySelectorAll<HTMLButtonElement>("button:not(:disabled)");
+              const first = buttons[0], last = buttons[buttons.length - 1];
+              if (event.shiftKey && document.activeElement === first) {
+                event.preventDefault();
+                last.focus();
+              } else if (!event.shiftKey && document.activeElement === last) {
+                event.preventDefault();
+                first.focus();
+              }
+            }
+          }}
+        >
+          <section
+            role="alertdialog"
+            aria-modal="true"
+            aria-labelledby="battle-abandon-title"
+            aria-describedby="battle-abandon-copy"
+            className="battle-abandon-dialog"
+          >
+            <h2 id="battle-abandon-title">
+              {pendingBattleExit.kind === "import" ? "Leave battle to import?" : "Leave this battle?"}
+            </h2>
+            <p id="battle-abandon-copy">
+              {pendingBattleExit.kind === "import"
+                ? "Importing a journal replaces this save and ends the encounter."
+                : "Leaving ends the encounter. Your investigation progress and recovered evidence are safe."}
+            </p>
+            <div>
+              <button autoFocus onClick={cancelBattleExit}>Stay in battle</button>
+              <button className="primary" onClick={confirmBattleExit}>
+                {pendingBattleExit.kind === "import" ? "Import journal" : "Leave battle"}
+              </button>
+            </div>
+          </section>
+        </div>
       )}
       {toast && !(panel === "battle" && battle.phase === "lost") && (
         <GameNotice
