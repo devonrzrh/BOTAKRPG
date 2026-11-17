@@ -1616,6 +1616,7 @@ export default function App() {
         </button>
       </aside>
       <SceneTransition
+        battleEntry={panel === "battle"}
         sceneKey={
           panel === "battle"
             ? `battle:${battle.enemyId}`
@@ -1625,7 +1626,7 @@ export default function App() {
                 ? "garden"
                 : panel === "puzzles"
                   ? `puzzle:${puzzleId ?? "index"}`
-                  : scene
+                  : `${scene}:${panel ?? "world"}`
         }
         reducedMotion={save.settings.reducedMotion}
         className="world-shell"

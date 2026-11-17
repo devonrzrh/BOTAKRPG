@@ -31,6 +31,88 @@
     opacity: 0;
   }
 }
+
+.scene-curtain.battle-entry-curtain {
+  background: transparent;
+  animation: none;
+}
+.battle-entry-curtain::before,
+.battle-entry-curtain::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    repeating-linear-gradient(0deg, #a8d8df0e 0 1px, transparent 1px 5px),
+    radial-gradient(ellipse at center, #18323a 0%, #0b171f 47%, #070e14 82%);
+  animation: battle-shutter var(--battle-curtain-duration)
+    cubic-bezier(0.18, 0.72, 0.3, 1) both;
+}
+.battle-entry-curtain::before {
+  --shutter-offscreen: -62%;
+  clip-path: polygon(0 0, 100% 0, 100% 45%, 54% 45%, 46% 55%, 0 55%);
+}
+.battle-entry-curtain::after {
+  --shutter-offscreen: 62%;
+  clip-path: polygon(
+    0 54.8%,
+    46% 54.8%,
+    54% 44.8%,
+    100% 44.8%,
+    100% 100%,
+    0 100%
+  );
+}
+.battle-entry-reticle {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  width: clamp(64px, 11vmin, 102px);
+  aspect-ratio: 1;
+  margin: auto;
+  border: 1px solid #b99961;
+  border-radius: 50%;
+  background:
+    linear-gradient(#d9b579, #d9b579) center / 1px 100% no-repeat,
+    linear-gradient(90deg, #d9b579, #d9b579) center / 100% 1px no-repeat;
+  box-shadow:
+    0 0 30px #d9b57926,
+    inset 0 0 18px #d9b57921;
+  animation: battle-reticle var(--battle-curtain-duration) ease-out both;
+}
+.battle-entry-reticle::after {
+  content: "";
+  position: absolute;
+  inset: 34%;
+  border: 1px solid #e8c98d;
+  background: #17282d;
+  transform: rotate(45deg);
+}
+.scene-arriving.battle-entry-curtain::before,
+.scene-arriving.battle-entry-curtain::after,
+.scene-arriving .battle-entry-reticle {
+  animation-direction: reverse;
+  animation-timing-function: cubic-bezier(0.62, 0.03, 0.47, 0.81);
+}
+@keyframes battle-shutter {
+  from {
+    transform: translateY(var(--shutter-offscreen));
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+@keyframes battle-reticle {
+  0%,
+  50% {
+    opacity: 0;
+    transform: scale(1.18);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .scene-curtain {
     display: none;

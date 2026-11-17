@@ -20,7 +20,7 @@ import { RpgIcon } from "./RpgIcon";
 import { useGameSound } from "./GameSound";
 import { enemyThreatName } from "../game/enemyIdentity";
 import { EnemySpeech } from "./EnemySpeech";
-import { useSceneLeaving } from "./SceneTransition";
+import { useSceneTransitioning } from "./SceneTransition";
 import { useGameParticles } from "./GameParticles";
 import { createCombatAudio } from "../game/combatAudio";
 import { createCombatHaptics } from "../game/combatHaptics";
@@ -86,7 +86,7 @@ function enemySigil(id: string) {
   }[enemyKind(id)];
 }
 export function BattleScreen(p: Props) {
-  const sceneLeaving = useSceneLeaving();
+  const sceneTransitioning = useSceneTransitioning();
   const sound = useGameSound();
   const [osReduced, setOsReduced] = useState(
     () => window.matchMedia("(prefers-reduced-motion: reduce)").matches,
@@ -206,7 +206,7 @@ export function BattleScreen(p: Props) {
   }, [b.turn, b.phase]);
   useEffect(() => {
     if (
-      sceneLeaving ||
+      sceneTransitioning ||
       p.paused ||
       !correctFeedback ||
       reviewing ||
@@ -221,7 +221,7 @@ export function BattleScreen(p: Props) {
     reviewing,
     reducedMotion,
     save.settings.battleAutoAdvance,
-    sceneLeaving,
+    sceneTransitioning,
     p.paused,
   ]);
   useLayoutEffect(() => {
@@ -279,7 +279,7 @@ export function BattleScreen(p: Props) {
     };
   }, [p.cue, reducedMotion]);
   useEffect(() => {
-    if (motion || evading || p.paused) return;
+    if (motion || evading || p.paused || sceneTransitioning) return;
     if (menu === "skills")
       skillList.current
         ?.querySelector<HTMLButtonElement>("button:not(:disabled)")
@@ -288,7 +288,7 @@ export function BattleScreen(p: Props) {
       defenseList.current?.querySelector<HTMLButtonElement>("button")?.focus();
     else if (menu || b.phase !== "choose") title.current?.focus();
     else skillsButton.current?.focus();
-  }, [b.phase, b.turn, evading, menu, motion, p.paused]);
+  }, [b.phase, b.turn, evading, menu, motion, p.paused, sceneTransitioning]);
   const skills = p.content.entities.filter(
     (e): e is Skill =>
       e.type === "skill" && save.character.skills.includes(e.id),

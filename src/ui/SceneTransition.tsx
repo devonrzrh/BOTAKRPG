@@ -4,33 +4,41 @@ import {
   useLayoutEffect,
   useRef,
   useState,
+  type CSSProperties,
   type ReactNode,
   type HTMLAttributes,
 } from "react";
 import "./SceneTransition.css";
 
-const SceneLeaving = createContext(false);
-export const useSceneLeaving = () => useContext(SceneLeaving);
+const SceneTransitioning = createContext(false);
+export const useSceneTransitioning = () => useContext(SceneTransitioning);
 
-/** Hold the departing scene through a short fade, then reveal the latest destination. */
+const battleCloseMs = 230;
+const battleOpenMs = 380;
+
+/** Cover the departing scene before swapping in the latest destination. */
 export function SceneTransition({
   sceneKey,
+  battleEntry = false,
   reducedMotion,
   children,
   ...surfaceProps
 }: {
   sceneKey: string;
+  battleEntry?: boolean;
   reducedMotion: boolean;
   children: ReactNode;
 } & HTMLAttributes<HTMLElement>) {
   const [displayed, setDisplayed] = useState(sceneKey);
-  const [revealing, setRevealing] = useState(false);
+  const [reveal, setReveal] = useState<"fade" | "battle" | null>(null);
   const [osReduced, setOsReduced] = useState(
     () => window.matchMedia("(prefers-reduced-motion: reduce)").matches,
   );
   const previous = useRef(children);
   const leaving = displayed !== sceneKey;
   const instant = reducedMotion || osReduced;
+  const transitioning = !instant && (leaving || reveal !== null);
+  const battleCurtain = leaving ? battleEntry : reveal === "battle";
   useLayoutEffect(() => {
     const query = window.matchMedia("(prefers-reduced-motion: reduce)");
     const change = () => setOsReduced(query.matches);
@@ -42,28 +50,34 @@ export function SceneTransition({
   }, [children, leaving]);
   useLayoutEffect(() => {
     if (!leaving) return;
+    setReveal(null);
     if (instant) {
       setDisplayed(sceneKey);
-      setRevealing(false);
       return;
     }
-    const timer = window.setTimeout(() => {
-      setDisplayed(sceneKey);
-      setRevealing(true);
-    }, 140);
+    const timer = window.setTimeout(
+      () => {
+        setDisplayed(sceneKey);
+        setReveal(battleEntry ? "battle" : "fade");
+      },
+      battleEntry ? battleCloseMs : 140,
+    );
     return () => window.clearTimeout(timer);
-  }, [sceneKey, leaving, instant]);
+  }, [sceneKey, leaving, instant, battleEntry]);
   useLayoutEffect(() => {
-    if (!revealing) return;
+    if (!reveal) return;
     if (instant) {
-      setRevealing(false);
+      setReveal(null);
       return;
     }
-    const timer = window.setTimeout(() => setRevealing(false), 300);
+    const timer = window.setTimeout(
+      () => setReveal(null),
+      reveal === "battle" ? battleOpenMs : 300,
+    );
     return () => window.clearTimeout(timer);
-  }, [revealing, displayed, instant]);
+  }, [reveal, instant]);
   useLayoutEffect(() => {
-    if ((!leaving && !revealing) || instant) return;
+    if (!transitioning) return;
     // Inert blocks pointer/focus; also stop window-level movement shortcuts.
     const block = (event: KeyboardEvent) => {
       if (event.target instanceof Element && event.target.closest(".topbar"))
@@ -73,20 +87,32 @@ export function SceneTransition({
     };
     window.addEventListener("keydown", block, true);
     return () => window.removeEventListener("keydown", block, true);
-  }, [leaving, revealing, instant]);
+  }, [transitioning]);
   return (
     <main {...surfaceProps}>
-      <div className="scene-content" inert={!instant && leaving}>
-        <SceneLeaving.Provider value={leaving}>
+      <div
+        className="scene-content"
+        inert={!instant && transitioning}
+      >
+        <SceneTransitioning.Provider value={transitioning}>
           {leaving && !instant ? previous.current : children}
-        </SceneLeaving.Provider>
+        </SceneTransitioning.Provider>
       </div>
-      {!instant && (leaving || revealing) && (
+      {transitioning && (
         <div
-          key={`${displayed}-${leaving}`}
-          className={`scene-curtain ${leaving ? "scene-departing" : "scene-arriving"}`}
+          key={`${displayed}-${leaving}-${battleCurtain}`}
+          className={`scene-curtain ${leaving ? "scene-departing" : "scene-arriving"}${battleCurtain ? " battle-entry-curtain" : ""}`}
+          style={
+            battleCurtain
+              ? ({
+                  "--battle-curtain-duration": `${leaving ? battleCloseMs : battleOpenMs}ms`,
+                } as CSSProperties)
+              : undefined
+          }
           aria-hidden="true"
-        />
+        >
+          {battleCurtain && <span className="battle-entry-reticle" />}
+        </div>
       )}
     </main>
   );
