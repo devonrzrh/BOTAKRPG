@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { createSfx, evadeSoundCues, type SfxName } from "../src/game/sfx";
+import { evadeSoundCues } from "../src/game/sfx";
+import { createSoundManager, SFX_CUES } from "../src/game/soundManager";
 import { createEvade, stepEvade } from "../src/game/evade";
 
 describe("dodge sound timing", () => {
@@ -61,35 +62,8 @@ describe("bundled interface SFX", () => {
     }
     vi.stubGlobal("Audio", AudioMock);
 
-    const names: SfxName[] = [
-      "click",
-      "open",
-      "close",
-      "page",
-      "bookOpen",
-      "bookClose",
-      "move",
-      "blocked",
-      "puzzleAction",
-      "success",
-      "error",
-      "clue",
-      "levelUp",
-      "dialogue",
-      "speechHuman",
-      "speechRobot",
-      "speechEcho",
-      "speechSoft",
-      "connect",
-      "pursuit",
-      "train",
-      "scan",
-      "hazard",
-      "dodge",
-      "hit",
-      "cameraMove",
-    ];
-    const sfx = createSfx();
+    const names = Object.keys(SFX_CUES) as (keyof typeof SFX_CUES)[];
+    const sfx = createSoundManager();
     sfx.play("bookOpen");
     expect(clips).toHaveLength(0);
 

@@ -7,7 +7,7 @@ import {
   useRef,
   type ReactNode,
 } from "react";
-import { createSfx, type SfxName } from "../game/sfx";
+import { createSoundManager, type SfxName } from "../game/soundManager";
 
 const SoundContext = createContext({
   play: (_name: SfxName) => {},
@@ -15,7 +15,7 @@ const SoundContext = createContext({
 });
 
 export function GameSoundProvider({ children }: { children: ReactNode }) {
-  const engine = useRef<ReturnType<typeof createSfx> | null>(null);
+  const engine = useRef<ReturnType<typeof createSoundManager> | null>(null);
   const volume = useRef(0.65);
   const play = useCallback((name: SfxName) => engine.current?.play(name), []);
   const setVolume = useCallback((next: number) => {
@@ -23,7 +23,7 @@ export function GameSoundProvider({ children }: { children: ReactNode }) {
     engine.current?.setVolume(next);
   }, []);
   useEffect(() => {
-    const audio = createSfx();
+    const audio = createSoundManager();
     engine.current = audio;
     audio.setVolume(volume.current);
     const unlock = () => audio.unlock();

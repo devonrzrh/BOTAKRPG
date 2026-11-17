@@ -1,4 +1,4 @@
-import type { SfxName } from "./sfx";
+import type { SfxName } from "./soundManager";
 
 export function dialogueVoice(speaker: string): SfxName {
   if (/\b(echo|mimic|warden|keeper)\b/i.test(speaker)) return "speechEcho";

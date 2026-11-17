@@ -2,6 +2,62 @@ import { combatCueDuration, type BattleCue } from "./combatPresentation";
 
 type AudioContextLike = AudioContext;
 
+const previewCueBase = {
+  skill: null,
+  amount: 1,
+  heavy: false,
+  blocked: false,
+  defeated: false,
+} as const;
+export const BATTLE_CUE_PREVIEWS: {
+  label: string;
+  cue: Omit<BattleCue, "sequence">;
+}[] = [
+  {
+    label: "Player hit",
+    cue: { ...previewCueBase, kind: "player", skill: "strike" },
+  },
+  {
+    label: "Insight hit",
+    cue: { ...previewCueBase, kind: "player", skill: "insight" },
+  },
+  {
+    label: "Ward hit",
+    cue: { ...previewCueBase, kind: "player", skill: "ward" },
+  },
+  {
+    label: "Trace hit",
+    cue: { ...previewCueBase, kind: "player", skill: "trace" },
+  },
+  { label: "Poison hit", cue: { ...previewCueBase, kind: "poison" } },
+  { label: "Enemy hit", cue: { ...previewCueBase, kind: "enemy" } },
+  {
+    label: "Heavy enemy hit",
+    cue: { ...previewCueBase, kind: "enemy", heavy: true },
+  },
+  {
+    label: "Blocked hit",
+    cue: { ...previewCueBase, kind: "enemy", blocked: true },
+  },
+  { label: "Miss", cue: { ...previewCueBase, kind: "miss" } },
+  {
+    label: "Weakness hit",
+    cue: { ...previewCueBase, kind: "player", special: "weakness" },
+  },
+  {
+    label: "Stance break",
+    cue: { ...previewCueBase, kind: "player", special: "break" },
+  },
+  {
+    label: "Finisher",
+    cue: { ...previewCueBase, kind: "player", special: "finisher" },
+  },
+  {
+    label: "Victory / pacify",
+    cue: { ...previewCueBase, kind: "player", defeated: true },
+  },
+];
+
 /** Small synthesized battle cues. AudioContext is created only from unlock(). */
 export function createCombatAudio() {
   let context: AudioContextLike | null = null;
