@@ -78,7 +78,7 @@ export function FinaleCard({
 }: {
   save: Save;
   content: Content;
-  onStart: () => void;
+  onStart: (activityId: string) => void;
   onClaim: (q: Quest) => void;
 }) {
   const finale = content.entities.find(
@@ -89,25 +89,38 @@ export function FinaleCard({
       e.type === "quest" && finale.prerequisites.includes(e.id),
   );
   const count = branches.filter((q) => questComplete(save, q)).length,
-    done = questComplete(save, finale);
+    done = questComplete(save, finale),
+    next = nextObjective(save, finale);
   return (
     <section className="finale-card" aria-label="Final encounter">
       <h3>Final encounter: ECHO-7</h3>
       {done ? (
-        <p className="case-closed">Robot contained. Case closed.</p>
+        <p className="case-closed">
+          {save.finaleOutcome === "pacified"
+            ? "ECHO-7 accepted a verified safe channel and was contained intact."
+            : save.finaleOutcome === "defeated"
+              ? "ECHO-7 was disabled and contained in the abandoned subnet."
+              : "Robot contained. Case closed."}
+        </p>
       ) : (
         <p>
           {count === branches.length
-            ? "All clues recovered. ECHO-7 is in the abandoned subnet."
+            ? save.completed.includes("evidence-chain")
+              ? "The evidence chain is verified. ECHO-7 is in the abandoned subnet."
+              : "All five clues recovered. Reconstruct the verified route before entering the subnet."
             : `${count} / ${branches.length} clues recovered. Follow the remaining branches to locate the robot.`}
         </p>
       )}
       <button
         className="primary"
         disabled={!done && !finaleAvailable(save, content)}
-        onClick={onStart}
+        onClick={() => onStart(next)}
       >
-        {done ? "Replay final encounter" : "Confront ECHO-7"}
+        {done
+          ? "Replay final encounter"
+          : next === "evidence-chain"
+            ? "Reconstruct the evidence"
+            : "Confront ECHO-7"}
       </button>
       {done && (
         <button

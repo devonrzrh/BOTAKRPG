@@ -737,9 +737,13 @@ export default function App() {
         !debugTravel &&
         id === "echo" &&
         !saveRef.current.completed.includes("echo-battle") &&
-        !finaleAvailable(saveRef.current, content)
+        !activityUnlocked(saveRef.current, "echo-battle", content)
       ) {
-        setToast("Recover all five clues first.");
+        setToast(
+          finaleAvailable(saveRef.current, content)
+            ? "Reconstruct the evidence before entering the subnet."
+            : "Recover all five clues first.",
+        );
         return;
       }
       generation.current++;
@@ -1086,6 +1090,12 @@ export default function App() {
         )?.id ?? "guardian-battle";
       const first = !nextSave.completed.includes(activity);
       nextSave = completeActivity(nextSave, activity);
+      if (activity === "echo-battle")
+        nextSave = {
+          ...nextSave,
+          finaleOutcome:
+            nextBattle.resolution === "pacified" ? "pacified" : "defeated",
+        };
       if (first)
         nextSave = addXp(nextSave, activity === "echo-battle" ? 60 : 20);
     }
@@ -2521,7 +2531,7 @@ export default function App() {
                   <FinaleCard
                     save={save}
                     content={content}
-                    onStart={() => open("echo")}
+                    onStart={(id) => open(id)}
                     onClaim={claimWithFeedback}
                   />
                   {content.entities.some(

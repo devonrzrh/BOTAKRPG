@@ -1,7 +1,7 @@
 import type { Content, Quest } from "../content/schema";
 import type { Save } from "./state";
 
-export const CURRENT_SAVE_VERSION = 5;
+export const CURRENT_SAVE_VERSION = 6;
 
 export function starterSupply(): Save["supply"] {
   return { tokens: 3, items: {}, equipped: { weapon: null, armor: null } };
@@ -73,6 +73,7 @@ export function migrateSaveInput(input: unknown): {
         },
       };
     },
+    5: (value) => ({ ...value, version: 6, finaleOutcome: null }),
   };
   for (let version = fromVersion; version < CURRENT_SAVE_VERSION; version++) {
     const upgrade = steps[version];
@@ -89,45 +90,56 @@ export function upgradeCampaignProgress(
   content: Content,
   fromVersion: number,
 ): Save {
-  if (fromVersion >= 2) return save;
   const completed = new Set(save.completed);
   const claimed = new Set(save.claimed);
-  for (const branch of content.entities.filter(
-    (e): e is Quest => e.type === "quest" && e.kind === "branch",
-  )) {
-    branch.objectives.forEach((id, index) => {
-      const activity = content.entities.find((e) => e.id === id);
-      if (
-        activity?.type !== "activity" ||
-        activity.template !== "puzzle" ||
-        completed.has(id)
-      )
-        return;
-      if (
-        !branch.objectives
-          .slice(index + 1)
-          .some(
-            (later) =>
-              save.completed.includes(later) &&
-              content.entities.some(
-                (e) =>
-                  e.id === later &&
-                  e.type === "activity" &&
-                  e.template !== "puzzle",
-              ),
-          )
-      )
-        return;
-      completed.add(id);
-      // The legacy encounter already paid its reward; inherited gates pay nothing twice.
-      for (const quest of content.entities)
+  if (fromVersion < 2) {
+    for (const branch of content.entities.filter(
+      (e): e is Quest => e.type === "quest" && e.kind === "branch",
+    )) {
+      branch.objectives.forEach((id, index) => {
+        const activity = content.entities.find((e) => e.id === id);
         if (
-          quest.type === "quest" &&
-          quest.kind === "case" &&
-          quest.objectives.includes(id)
+          activity?.type !== "activity" ||
+          activity.template !== "puzzle" ||
+          completed.has(id)
         )
-          claimed.add(quest.id);
-    });
+          return;
+        if (
+          !branch.objectives
+            .slice(index + 1)
+            .some(
+              (later) =>
+                save.completed.includes(later) &&
+                content.entities.some(
+                  (e) =>
+                    e.id === later &&
+                    e.type === "activity" &&
+                    e.template !== "puzzle",
+                ),
+            )
+        )
+          return;
+        completed.add(id);
+        // The legacy encounter already paid its reward; inherited gates pay nothing twice.
+        for (const quest of content.entities)
+          if (
+            quest.type === "quest" &&
+            quest.kind === "case" &&
+            quest.objectives.includes(id)
+          )
+            claimed.add(quest.id);
+      });
+    }
   }
+  if (fromVersion < 6) {
+    const newBranchActivities = [
+      ["reserve-plan", ["forecast-auditor", "quartermaster"]],
+      ["depot-search", ["quartermaster"]],
+      ["policy-stress-test", ["warden"]],
+    ] as const;
+    for (const [added, later] of newBranchActivities)
+      if (later.some((id) => completed.has(id))) completed.add(added);
+    if (completed.has("echo-battle")) completed.add("evidence-chain");
+  } else return save;
   return { ...save, completed: [...completed], claimed: [...claimed] };
 }

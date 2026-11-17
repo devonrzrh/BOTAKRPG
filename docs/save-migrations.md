@@ -1,6 +1,6 @@
 # Journal compatibility
 
-Save format 2 adds required evidence cases to the original three clue branches. Save format 5 adds the supply and simulation branches to the finale gate while preserving already completed cases. Both local
+Save format 2 adds required evidence cases to the original three clue branches. Save format 5 adds the supply and simulation branches to the finale gate while preserving already completed cases. Save format 6 records the final ECHO-7 outcome and adds the evidence-chain activity. Existing journals that already cleared a later encounter count the inserted activities as completed, without receiving their rewards again. Both local
 IndexedDB restoration and JSON import run `parseSave`, using the versioned steps
 in `src/game/saveMigrations.ts` before validating the current schema and content.
 The normal autosave persists the upgraded journal.

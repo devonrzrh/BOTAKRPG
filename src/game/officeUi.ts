@@ -673,9 +673,13 @@ export function createOfficeUi(input: OfficeUiInput): SurfaceModel[] {
     45,
     closed
       ? "Replay ECHO-7"
-      : `Confront ECHO-7 (${completed}/${branches.length})`,
+      : finaleAvailable(save, content)
+        ? save.completed.includes("evidence-chain")
+          ? "Confront ECHO-7"
+          : "Reconstruct evidence"
+        : `Confront ECHO-7 (${completed}/${branches.length})`,
     "open",
-    "echo",
+    nextObjective(save, finale),
     !closed && !finaleAvailable(save, content),
   );
   button(

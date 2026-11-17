@@ -95,7 +95,9 @@ description: Trace a stolen battery shipment through the automated depot and fin
 objectives:
   - dispatch-drone
   - reserve-guard
+  - reserve-plan
   - forecast-auditor
+  - depot-search
   - quartermaster
 xp: 40
 rewards: []
@@ -113,6 +115,7 @@ objectives:
   - training-dummy
   - reward-seeker
   - checkpoint-echo
+  - policy-stress-test
   - warden
 xp: 40
 rewards: []
@@ -160,11 +163,36 @@ clue:
 ```
 
 ```entity
+type: activity
+id: evidence-chain
+title: Reconstruct the route
+template: puzzle
+lesson: source-ai-10
+brief: >-
+  File the five recovered records in the order that establishes the route.
+  FOLIO's signed audit shows ECHO-7 used M-04 and erased its gateway entry.
+  PATCH's signed receipt places it at R-17 at 02:14. LUMA's verified
+  handshake confirms M-04 forwarded ECHO-7 from R-17 to the abandoned subnet.
+  The battery ledger predicts a reconnect window, and the Warden's log gives a
+  safe containment condition. Establish the access, movement, destination,
+  intercept window, then containment protocol.
+hint: Start with the signed audit and receipt, then use the handshake to verify the destination.
+solution: Audit → receipt → handshake → handoff window → safe containment condition.
+puzzle:
+  kind: sorting
+  values: [3, 1, 5, 2, 4]
+  target: [1, 2, 3, 4, 5]
+  budget: 4
+  labels: ["Verified handshake", "Signed archive audit", "Safe containment condition", "PATCH receipt", "Battery handoff forecast"]
+```
+
+```entity
 id: confront-echo
 title: Confront ECHO-7
 type: quest
 description: Combine all five clues to reach the robot in the abandoned subnet.
 objectives:
+  - evidence-chain
   - echo-battle
 xp: 100
 rewards: []

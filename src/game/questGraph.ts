@@ -301,7 +301,9 @@ export function createQuestGraph(
     description: closed
       ? "ECHO-7 contained. The case is closed."
       : ready
-        ? "The clues identify the abandoned subnet. Confront ECHO-7."
+        ? save.completed.includes("evidence-chain")
+          ? "The evidence chain is verified. Confront ECHO-7."
+          : "The five clues are filed. Reconstruct the route before entering the subnet."
         : `Recover evidence from: ${missing.join(", ")}.`,
     x: 760,
     y: mid,

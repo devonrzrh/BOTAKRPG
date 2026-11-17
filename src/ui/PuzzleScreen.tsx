@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import {
   BookOpen,
+  ArrowLeftRight,
   RotateCcw,
   Lightbulb,
   ArrowRight,
@@ -64,6 +65,8 @@ export function PuzzleScreen(p: {
         </section>
       </div>
     );
+  const label = (value: number) =>
+    config.labels?.[config.values.indexOf(value)] ?? String(value);
   const act = (command: PuzzleCommand) => {
     const next = puzzleCommand(state, command);
     if (!puzzleSolved(state)) {
@@ -102,9 +105,9 @@ export function PuzzleScreen(p: {
     1: { x: 65, y: 160 },
     2: { x: 220, y: 65 },
     3: { x: 220, y: 255 },
-    4: { x: 375, y: 160 },
-    5: { x: 530, y: 255 },
-    6: { x: 530, y: 65 },
+    4: { x: 400, y: 65 },
+    5: { x: 420, y: 255 },
+    6: { x: 550, y: 160 },
   };
   const routePositions = config.values.map((node, i) => ({
     node,
@@ -156,7 +159,7 @@ export function PuzzleScreen(p: {
                         }
                         onClick={() => act({ type: "probe", index: i })}
                       >
-                        <span>Slot {i + 1}</span>
+                        <span>{config.labels?.[i] ?? `Slot ${i + 1}`}</span>
                         <b>{revealed ? value : "?"}</b>
                       </button>
                     );
@@ -236,7 +239,7 @@ export function PuzzleScreen(p: {
                   <div className="puzzle-tiles">
                     {state.input.map((v, i) => (
                       <span className="puzzle-tile" key={`${i}-${v}`}>
-                        {v}
+                        {label(v)}
                       </span>
                     ))}
                     {!state.input.length && (
@@ -250,7 +253,7 @@ export function PuzzleScreen(p: {
                     {state.buffer.length ? (
                       [...state.buffer].reverse().map((v, i) => (
                         <span className="puzzle-tile" key={`${i}-${v}`}>
-                          {v}
+                          {label(v)}
                         </span>
                       ))
                     ) : (
@@ -281,7 +284,7 @@ export function PuzzleScreen(p: {
                         className={`puzzle-tile ${state.output[i] !== undefined ? "tile-done" : i === state.output.length ? "tile-next" : ""}`}
                         key={i}
                       >
-                        {v}
+                        {label(v)}
                       </span>
                     ))}
                   </div>
@@ -300,7 +303,7 @@ export function PuzzleScreen(p: {
                       className={`queue-slot ${i === 0 ? "queue-front" : ""}`}
                       key={`${i}-${v}`}
                     >
-                      <span>{v}</span>
+                      <span>{label(v)}</span>
                     </div>
                   ))}
                   {!state.input.length && (
@@ -329,7 +332,7 @@ export function PuzzleScreen(p: {
                         className={`puzzle-tile ${state.output[i] !== undefined ? "tile-done" : i === state.output.length ? "tile-next" : ""}`}
                         key={i}
                       >
-                        {v}
+                        {label(v)}
                       </span>
                     ))}
                   </div>
@@ -339,8 +342,7 @@ export function PuzzleScreen(p: {
             {config.kind === "sorting" && (
               <>
                 <p className="board-instruction">
-                  Swap neighboring values until the evidence is in ascending
-                  order.
+                  Swap neighboring entries until they match the target order.
                 </p>
                 <div className="sort-row">
                   {state.input.map((v, i) => (
@@ -348,7 +350,7 @@ export function PuzzleScreen(p: {
                       <span
                         className={`sort-tile ${v === config.target[i] ? "tile-done" : ""}`}
                       >
-                        {v}
+                        {label(v)}
                       </span>
                       {i < state.input.length - 1 && (
                         <button
@@ -356,14 +358,14 @@ export function PuzzleScreen(p: {
                           disabled={solved || state.moves >= config.budget}
                           onClick={() => act({ type: "swap", index: i })}
                         >
-                          ↔
+                          <ArrowLeftRight size={18} aria-hidden="true" />
                         </button>
                       )}
                     </div>
                   ))}
                 </div>
                 <p className="sort-target">
-                  TARGET <b>{config.target.join(" · ")}</b>
+                  TARGET <b>{config.target.map(label).join(" · ")}</b>
                 </p>
               </>
             )}
@@ -410,14 +412,17 @@ export function PuzzleScreen(p: {
                     {routePositions.map(({ node, x, y }) => (
                       <button
                         key={node}
-                        className={`${node === config.target[0] ? "route-start" : ""} ${node === config.target[1] ? "route-goal" : ""} ${state.route.includes(node) ? "route-visited" : ""}`}
+                        className={`${node === config.target[0] ? "route-start" : ""} ${node === config.target[1] ? "route-goal" : ""} ${state.route.includes(node) ? "route-visited" : ""} ${node === currentNode ? "route-current" : ""}`}
                         style={{ left: `${x / 6}%`, top: `${y / 3.2}%` }}
-                        aria-label={`Node ${node}${node === currentNode ? ", current location" : ""}`}
+                        aria-label={`${label(node)}${node === currentNode ? ", current location" : ""}`}
+                        disabled={
+                          solved || !neighbors.some((neighbor) => neighbor.node === node)
+                        }
                         onClick={() =>
                           node !== currentNode && act({ type: "move", node })
                         }
                       >
-                        {node}
+                        {label(node)}
                       </button>
                     ))}
                   </div>
@@ -450,13 +455,7 @@ export function PuzzleScreen(p: {
                 </div>
                 <div className="route-status">
                   <span>
-                    Current node <b>{currentNode}</b>
-                  </span>
-                  <span>
-                    Route cost{" "}
-                    <b>
-                      {state.cost} / {config.budget}
-                    </b>
+                    Current node <b>{label(currentNode)}</b>
                   </span>
                 </div>
                 <div className="route-neighbors">
@@ -466,7 +465,7 @@ export function PuzzleScreen(p: {
                       disabled={solved || state.cost + cost > config.budget}
                       onClick={() => act({ type: "move", node })}
                     >
-                      Move to {node} · cost {cost}
+                      Move to {label(node)} · cost {cost}
                     </button>
                   ))}
                 </div>

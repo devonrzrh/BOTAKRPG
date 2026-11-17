@@ -11,6 +11,7 @@ const base = {
   target: z.array(z.number().int()).min(1).max(32),
   budget: z.number().finite().positive().max(1000),
   edges: z.array(edgeSchema).max(128).optional(),
+  labels: z.array(z.string().min(1)).max(32).optional(),
 };
 
 const rawPuzzleConfigSchema = z.discriminatedUnion("kind", [
@@ -108,6 +109,16 @@ function queueMinimumMoves(values: number[], target: number[]) {
 
 export const puzzleConfigSchema = rawPuzzleConfigSchema.superRefine(
   (config, ctx) => {
+    if (
+      config.labels &&
+      (config.labels.length !== config.values.length ||
+        new Set(config.values).size !== config.values.length)
+    )
+      ctx.addIssue({
+        code: "custom",
+        path: ["labels"],
+        message: "Labels need one unique value for each puzzle value.",
+      });
     if (config.kind !== "routing" && !Number.isInteger(config.budget))
       ctx.addIssue({
         code: "custom",

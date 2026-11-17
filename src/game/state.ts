@@ -134,6 +134,7 @@ export const saveSchema = z
       })
       .strict(),
     completed: z.array(z.string()),
+    finaleOutcome: z.enum(["defeated", "pacified"]).nullable().default(null),
     claimed: z.array(z.string()),
     mastery: z.record(masterySchema),
     bookmarks: z.array(z.string()),
@@ -190,6 +191,7 @@ export function initialSave(): Save {
     },
     supply: starterSupply(),
     completed: [],
+    finaleOutcome: null,
     claimed: [],
     mastery: {},
     bookmarks: [],
@@ -451,7 +453,17 @@ export function parseSave(input: unknown, content: Content): Save {
       !finaleAvailable(save, content)
     )
       throw new Error("Final encounter requires all clue branches");
+    if (
+      quest.objectives.some((id) => id === "echo-battle") &&
+      save.completed.includes("echo-battle") &&
+      !quest.objectives
+        .slice(0, quest.objectives.indexOf("echo-battle"))
+        .every((id) => save.completed.includes(id))
+    )
+      throw new Error("Final encounter requires the evidence chain");
   }
+  if (save.finaleOutcome && !save.completed.includes("echo-battle"))
+    throw new Error("Final outcome requires a completed encounter");
   const s = stats(save, content);
   if (
     save.character.level !==

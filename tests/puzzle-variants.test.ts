@@ -62,6 +62,20 @@ describe("binary search archive", () => {
     ])
       expect(puzzleConfigSchema.safeParse(config).success).toBe(false);
   });
+
+  it("validates labels for searchable field records", () => {
+    const labeled = {
+      ...search,
+      labels: ["Order", "Bay sheet", "Relay", "Handoff", "Counter", "Memo", "Note"],
+    };
+    expect(puzzleConfigSchema.safeParse(labeled).success).toBe(true);
+    expect(
+      puzzleConfigSchema.safeParse({ ...labeled, labels: ["one"] }).success,
+    ).toBe(false);
+    expect(
+      puzzleConfigSchema.safeParse({ ...labeled, values: [4, 9, 15, 22, 31, 43, 43] }).success,
+    ).toBe(false);
+  });
 });
 
 describe("recursive transfer lock", () => {

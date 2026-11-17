@@ -12,7 +12,11 @@ import {
   claimQuest,
   parseSave,
 } from "../src/game/state";
-import { finaleAvailable, questUnlocked } from "../src/game/investigation";
+import {
+  activityUnlocked,
+  finaleAvailable,
+  questUnlocked,
+} from "../src/game/investigation";
 import {
   createBattle,
   selectSkill,
@@ -78,6 +82,17 @@ it("rejects premature finale saves and rewards", () => {
   };
   expect(() => parseSave(forged, content)).toThrow(/all clue branches/);
 });
+it("requires the five-clue evidence chain before ECHO-7", () => {
+  let save = initialSave();
+  save.story.caseAccepted = true;
+  for (const branch of branches)
+    for (const id of branch.objectives) save = completeActivity(save, id);
+  expect(activityUnlocked(save, "evidence-chain", content)).toBe(true);
+  expect(activityUnlocked(save, "echo-battle", content)).toBe(false);
+  expect(finaleAvailable(save, content)).toBe(true);
+  save = completeActivity(save, "evidence-chain");
+  expect(activityUnlocked(save, "echo-battle", content)).toBe(true);
+});
 it("uses all material topics in the final boss and can complete the case", () => {
   let save = initialSave();
   save.story.caseAccepted = true;
@@ -107,9 +122,12 @@ it("uses all material topics in the final boss and can complete the case", () =>
         .map((e) => (e?.type === "lesson" ? e.topic : "")),
     ),
   ).toEqual(new Set(["algorithms", "structures", "ai"]));
+  save = completeActivity(save, "evidence-chain");
   save = completeActivity(save, "echo-battle");
   save = claimQuest(save, finale, content);
   expect(save.claimed).toContain(finale.id);
   expect(claimQuest(save, finale, content)).toBe(save);
+  save.finaleOutcome = "pacified";
   expect(parseSave(save, content).completed).toContain("echo-battle");
+  expect(parseSave(save, content).finaleOutcome).toBe("pacified");
 });

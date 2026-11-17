@@ -53,6 +53,26 @@ enemy:
 
 ```entity
 type: activity
+id: reserve-plan
+title: The reserve schedule
+template: puzzle
+lesson: source-alg-10
+brief: >-
+  The outage schedule lists four dispatches. Stage the most urgent powered
+  sites first while preserving the reserve for later demand. Use the signed
+  outage order and forecast to sort the battery assignments by priority.
+hint: Keep the emergency beacon ahead of the archive and public charger.
+solution: Emergency beacon → transit relay → archive backup → public charger.
+puzzle:
+  kind: sorting
+  values: [3, 1, 4, 2]
+  target: [1, 2, 3, 4]
+  budget: 3
+  labels: ["Archive backup", "Emergency beacon", "Public charger", "Transit relay"]
+```
+
+```entity
+type: activity
 id: forecast-auditor
 title: The false demand report
 template: battle
@@ -74,6 +94,26 @@ enemy:
       explanation: Expected cost weighs possible outcomes by their probabilities while keeping forecast uncertainty visible.
     spare: true
     boss: false
+```
+
+```entity
+type: activity
+id: depot-search
+title: The handoff ledger
+template: puzzle
+lesson: source-alg-09
+brief: >-
+  Search the cold depot. The dispatch order, charging-bay sheet, relay reader,
+  handoff ledger, door counter, thermal memo and technician note are filed by
+  time in HHMM format. Find the relay handoff recorded at 02:14.
+hint: The ledger is sorted by time. Probe the middle record first and narrow the range.
+solution: Probe 02:16 first, then 02:12, then 02:14.
+puzzle:
+  kind: search
+  values: [210, 212, 214, 216, 218, 220, 222]
+  target: [214]
+  budget: 3
+  labels: ["Dispatch order", "Charging bay sheet", "Relay reader", "Handoff ledger", "Door counter", "Thermal memo", "Technician note"]
 ```
 
 ```entity
@@ -182,6 +222,32 @@ enemy:
 
 ```entity
 type: activity
+id: policy-stress-test
+title: Test the learned route
+template: puzzle
+lesson: source-ai-10
+brief: >-
+  The copied policy expects Relay A, but that relay is now offline. Test its
+  route under the changed conditions and reach the safe subnet gate within the
+  evaluation budget.
+hint: The familiar short route crosses the offline relay. Follow the staging cache instead.
+solution: Start → Staging → Subnet → Safe.
+puzzle:
+  kind: routing
+  values: [1, 2, 3, 4, 5, 6]
+  target: [1, 6]
+  budget: 4
+  labels: ["Start", "Offline", "Relay B", "Staging", "Subnet", "Safe"]
+  edges:
+    - {from: 3, to: 6, cost: 4}
+    - {from: 1, to: 4, cost: 2}
+    - {from: 4, to: 5, cost: 1}
+    - {from: 5, to: 6, cost: 1}
+    - {from: 4, to: 3, cost: 1}
+```
+
+```entity
+type: activity
 id: warden
 title: Warden
 template: battle
@@ -241,6 +307,21 @@ nodes:
 
 ```entity
 type: dialogue
+id: supply-scene-plan
+title: The reserve schedule
+trigger: { activity: reserve-plan, when: before }
+start: contact
+nodes:
+  - id: contact
+    speaker: Mara
+    text: The depot's shutdown board shows four loads and only enough charge for three. Keep the emergency beacon and transit relay live, then protect the archive before the public charger.
+    choices:
+      - { label: Set the dispatch order, action: continue }
+      - { label: Return to the office, action: close }
+```
+
+```entity
+type: dialogue
 id: supply-scene-2
 title: The demand range
 trigger: { activity: forecast-auditor, when: before }
@@ -251,6 +332,21 @@ nodes:
     text: The audit predicts three possible demand levels. The dispatch used only the largest one and hid its probability range. That is not a schedule.
     choices:
       - { label: Audit the forecast, action: continue }
+      - { label: Return to the office, action: close }
+```
+
+```entity
+type: dialogue
+id: supply-scene-depot
+title: The cold depot
+trigger: { activity: depot-search, when: before }
+start: contact
+nodes:
+  - id: contact
+    speaker: LUMA
+    text: The loading floor is empty. The order desk, charging-bay sheet, relay reader and handoff ledger still have local timestamps. Search the records for the 02:14 transfer.
+    choices:
+      - { label: Search the depot records, action: continue }
       - { label: Return to the office, action: close }
 ```
 
@@ -326,6 +422,21 @@ nodes:
     text: I know this corridor. I do not know the one with the changed relay. The training record ends before the new route.
     choices:
       - { label: Test the copy, action: continue }
+      - { label: Return to the office, action: close }
+```
+
+```entity
+type: dialogue
+id: simulation-scene-test
+title: The changed relay
+trigger: { activity: policy-stress-test, when: before }
+start: contact
+nodes:
+  - id: contact
+    speaker: Checkpoint Echo
+    text: Relay A is dark. The route I learned ends there. A staging cache remains reachable, but I cannot predict what lies beyond it.
+    choices:
+      - { label: Test the changed route, action: continue }
       - { label: Return to the office, action: close }
 ```
 

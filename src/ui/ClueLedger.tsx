@@ -27,7 +27,13 @@ export function ClueLedger({
             FILE {String(index + 1).padStart(2, "0")} · {clue.source}
           </span>
           <h3>{clue.title}</h3>
-          <p>{clue.text}</p>
+          <p>
+            {clue.id === "echo-battle" && save.finaleOutcome === "pacified"
+              ? "ECHO-7 accepted a verified safe channel and was contained intact."
+              : clue.id === "echo-battle" && save.finaleOutcome === "defeated"
+                ? "ECHO-7 was disabled and contained in the abandoned subnet."
+                : clue.text}
+          </p>
           <button onClick={() => onLesson(clue.lesson)}>Open reference</button>
         </article>
       ))}

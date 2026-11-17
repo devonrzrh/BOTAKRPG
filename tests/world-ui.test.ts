@@ -85,6 +85,20 @@ it("keeps finale and reward gates on the 3D quest board", () => {
         data.save = completeActivity(data.save, id);
   quest = createOfficeUi(data).find((m) => m.id === "quests")!;
   expect(quest.buttons.find((b) => b.id === "finale")?.disabled).toBe(false);
+  expect(quest.buttons.find((b) => b.id === "finale")?.label).toBe(
+    "Reconstruct evidence",
+  );
+  expect(quest.buttons.find((b) => b.id === "finale")?.action).toMatchObject({
+    id: "evidence-chain",
+  });
+  data.save = completeActivity(data.save, "evidence-chain");
+  quest = createOfficeUi(data).find((m) => m.id === "quests")!;
+  expect(quest.buttons.find((b) => b.id === "finale")?.label).toBe(
+    "Confront ECHO-7",
+  );
+  expect(quest.buttons.find((b) => b.id === "finale")?.action).toMatchObject({
+    id: "echo-battle",
+  });
   expect(
     quest.buttons.find((b) => b.id === "claim-routing-trace")?.disabled,
   ).toBe(false);

@@ -230,7 +230,15 @@ it("restores previous completed cases without fabricating new chapter completion
     ],
   };
   delete legacy.curriculumVersion;
-  expect(parseSave(legacy, content).completed).toHaveLength(4);
+  expect(parseSave(legacy, content).completed).toEqual(
+    expect.arrayContaining([
+      "maze-chamber",
+      "guardian-battle",
+      "perceptron-exhibit",
+      "echo-battle",
+      "evidence-chain",
+    ]),
+  );
   expect(() =>
     parseSave({ ...legacy, version: 5, curriculumVersion: 2 }, content),
   ).toThrow(/all clue branches/);
