@@ -46,6 +46,9 @@ export function finaleAvailable(save: Save, content: Content) {
     (e): e is Quest => e.type === "quest" && e.kind === "finale",
   );
   return Boolean(
-    save.story.caseAccepted && finale && questUnlocked(save, finale, content),
+    save.story.caseAccepted &&
+    finale &&
+    ((save.story.legacyFinale && save.completed.includes("echo-battle")) ||
+      questUnlocked(save, finale, content)),
   );
 }

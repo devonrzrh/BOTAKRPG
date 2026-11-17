@@ -1,6 +1,6 @@
 # Story, questlines, and enemies
 
-Status: design plan for expansion. These encounters are not yet implemented. The five questline bosses and ECHO-7 finale are the intended structure; the motive and supporting cast below remain story proposals.
+Status: five playable clue branches. Supply district and Simulation facility use the proposed Quartermaster and Warden, with the existing curriculum question pools. The alternate boss roster, its puzzle interludes and the three-phase ECHO-7 fight below remain expansion proposals.
 
 Current curriculum integration uses three subject branches with 31 chapter encounters and three playable bosses (Route Warden, Archive Keeper, Signal Mimic). See `source-coverage.md`. The five questlines below remain a separate narrative expansion proposal.
 
@@ -30,7 +30,7 @@ Questline availability does not depend on claiming rewards. Introduce required c
 | Recommendation network | Why do unrelated leads point to the same suspect? | Planted recommendations reveal ECHO-7's signal fingerprint. | The Curator |
 | Simulation facility | How does the robot anticipate pursuit? | Its training history exposes the escape policy and a containment weakness. | The Warden |
 
-The clues answer different questions: route, access, timing, identity, and behavior. They should change the player's understanding, as well as unlock the finale.
+The playable clues answer different questions: route, access, identity, timing, and behavior. They unlock the finale and add evidence to the player's case.
 
 ## Enemy design rules
 

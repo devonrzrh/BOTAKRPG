@@ -26,7 +26,7 @@ General Python examples are reading material; the maze worker exposes its existi
 
 ## Saves and refresh
 
-Chapter IDs and bank IDs are stable. Existing bookmarks, notes, mastery and rewards keep their IDs. New saves mark `curriculumVersion: 2` and require the expanded branches before ECHO-7. Older completed-case saves retain their closure if all three original orientation activities were completed; no chapter completions are fabricated. Old claims are never awarded again. Imports still validate before replacing the existing save.
+Chapter IDs and bank IDs are stable. Existing bookmarks, notes, mastery and rewards keep their IDs. Save format 5 marks `curriculumVersion: 3` and requires all five branches before ECHO-7. Previously completed finales remain closed; the migration does not fabricate progress in the new branches. Old claims are never awarded again. Imports still validate before replacing the existing save.
 
 Run `npm run source:import` to refresh from the supplied files. Poppler's `pdftotext` is needed only for this explicit import. It rebuilds the book snapshot, archive, still diagrams, manifest and authored encounters. `npm run content` recursively validates Markdown and references; ordinary development/builds need only the committed snapshot.
 

@@ -1,6 +1,6 @@
 # Routing trace: The dead relay
 
-Implemented story branch. Start from **Home → Quest board → Routing trace → Pursue lead** after taking the case. Existing saves resume the next unfinished stage. The other two branches remain independent.
+Implemented story branch. Start from **Home → Quest board → Routing trace → Pursue lead** after taking the case. Existing saves resume the next unfinished stage. The other four leads remain independent.
 
 ## Story and playable sequence
 

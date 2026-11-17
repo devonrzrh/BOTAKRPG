@@ -39,22 +39,24 @@ const probe = content.entities.find(
   (e): e is Skill => e.type === "skill" && e.id === "insight",
 )!;
 it("allows all branch orders and unlocks the boss only after every clue", () => {
-  for (const order of [
-    [0, 1, 2],
-    [0, 2, 1],
-    [1, 0, 2],
-    [1, 2, 0],
-    [2, 0, 1],
-    [2, 1, 0],
-  ]) {
+  const orders = (ids: string[]): string[][] =>
+    ids.length
+      ? ids.flatMap((id) =>
+          orders(ids.filter((other) => other !== id)).map((rest) => [
+            id,
+            ...rest,
+          ]),
+        )
+      : [[]];
+  for (const order of orders(branches.map((branch) => branch.id))) {
     let save = initialSave();
     save.story.caseAccepted = true;
     expect(branches.every((q) => questUnlocked(save, q, content))).toBe(true);
     expect(finaleAvailable(save, content)).toBe(false);
-    order.forEach((index, step) => {
-      for (const id of branches[index].objectives)
-        save = completeActivity(save, id);
-      expect(finaleAvailable(save, content)).toBe(step === 2);
+    order.forEach((branchId, step) => {
+      const branch = branches.find((q) => q.id === branchId)!;
+      for (const id of branch.objectives) save = completeActivity(save, id);
+      expect(finaleAvailable(save, content)).toBe(step === order.length - 1);
     });
     // Claiming rewards is optional for unlocking the encounter.
     expect(save.claimed).toEqual([]);
@@ -62,7 +64,7 @@ it("allows all branch orders and unlocks the boss only after every clue", () => 
       save = claimQuest(save, q, content);
       expect(claimQuest(save, q, content)).toBe(save);
     }
-    expect(save.character.xp).toBe(60);
+    expect(save.character.xp).toBe(branches.reduce((sum, q) => sum + q.xp, 0));
   }
 });
 it("rejects premature finale saves and rewards", () => {
@@ -70,6 +72,11 @@ it("rejects premature finale saves and rewards", () => {
   save = completeActivity(save, "echo-battle");
   expect(() => parseSave(save, content)).toThrow(/all clue branches/);
   expect(claimQuest(save, finale, content)).toBe(save);
+  const forged = {
+    ...save,
+    story: { ...save.story, caseAccepted: true },
+  };
+  expect(() => parseSave(forged, content)).toThrow(/all clue branches/);
 });
 it("uses all material topics in the final boss and can complete the case", () => {
   let save = initialSave();

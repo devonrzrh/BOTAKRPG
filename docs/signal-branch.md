@@ -7,7 +7,7 @@ traffic reports left by ECHO-7's departure from relay R-17. A classifier marks
 some packets as the robot's, but its training labels were tampered with. The
 branch follows that false certainty back through its data, then tests the final
 claim against an independent relay trust record. The branch is playable without
-evidence from the courier or archive investigations.
+evidence from the other four investigations.
 
 The perceptron exhibit introduces a movable decision boundary. The ten source
 AI encounters then follow the chapter sequence below. Each scene identifies the

@@ -53,7 +53,7 @@ lesson: perceptron-basics
 type: quest
 id: first-principles
 title: Trace ECHO-7
-description: Pursue three clue branches in any order. Combine their evidence to locate ECHO-7.
+description: Pursue five clue branches in any order. Combine their evidence to locate ECHO-7.
 objectives: [maze-chamber, guardian-battle, perceptron-exhibit]
 xp: 120
 rewards: []

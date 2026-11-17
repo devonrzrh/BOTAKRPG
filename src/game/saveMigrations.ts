@@ -1,7 +1,7 @@
 import type { Content, Quest } from "../content/schema";
 import type { Save } from "./state";
 
-export const CURRENT_SAVE_VERSION = 4;
+export const CURRENT_SAVE_VERSION = 5;
 
 export function starterSupply(): Save["supply"] {
   return { tokens: 3, items: {}, equipped: { weapon: null, armor: null } };
@@ -54,6 +54,25 @@ export function migrateSaveInput(input: unknown): {
       };
     },
     3: (value) => ({ ...value, version: 4, supply: starterSupply() }),
+    4: (value) => {
+      const story = value.story;
+      const oldStory =
+        story && typeof story === "object" && !Array.isArray(story)
+          ? (story as Record<string, unknown>)
+          : {};
+      return {
+        ...value,
+        version: 5,
+        curriculumVersion: 3,
+        story: {
+          ...oldStory,
+          legacyFinale:
+            oldStory.caseAccepted === true &&
+            Array.isArray(value.completed) &&
+            value.completed.includes("echo-battle"),
+        },
+      };
+    },
   };
   for (let version = fromVersion; version < CURRENT_SAVE_VERSION; version++) {
     const upgrade = steps[version];

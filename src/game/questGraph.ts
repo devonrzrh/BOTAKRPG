@@ -80,10 +80,7 @@ export function createQuestGraph(
       b.objectives.some(
         (id) =>
           id === selected &&
-          content.entities.some(
-            (e) =>
-              e.id === id && e.type === "activity" && e.template === "puzzle",
-          ),
+          content.entities.some((e) => e.id === id && e.type === "activity"),
       ),
   );
   if (detail) {
@@ -155,6 +152,32 @@ export function createQuestGraph(
         actions: [`evidence-${id}`],
       });
     }
+    const chapterActivities = new Set(chapters.flatMap((c) => c.objectives));
+    for (const id of detail.objectives.slice(1, -1)) {
+      const activity = content.entities.find((e) => e.id === id);
+      if (
+        activity?.type !== "activity" ||
+        activity.template === "puzzle" ||
+        chapterActivities.has(id)
+      )
+        continue;
+      nodes.push({
+        id,
+        title: activity.title,
+        description: activityUnlocked(save, id, content)
+          ? (activityStory(content, id, "before")?.title ?? activity.title)
+          : "Follow the preceding lead to reach this encounter.",
+        x: 0,
+        y: 0,
+        kind: "activity",
+        status: save.completed.includes(id)
+          ? "completed"
+          : activityUnlocked(save, id, content)
+            ? "available"
+            : "locked",
+        actions: [`activity-${id}`],
+      });
+    }
     // Place evidence gates beside the encounters that lead to them.
     nodes.sort((a, b) => {
       const index = (node: QuestNode) =>
@@ -192,12 +215,7 @@ export function createQuestGraph(
       : nodes[0].id;
     return {
       branch: detail.id,
-      title:
-        detail.id === "routing-trace"
-          ? "Algorithms"
-          : detail.id === "access-records"
-            ? "Data structures"
-            : "AI chapters",
+      title: detail.title,
       nodes,
       edges: nodes.slice(1).map((n, i) => [nodes[i].id, n.id]),
       selected: selection,
@@ -205,7 +223,8 @@ export function createQuestGraph(
     };
   }
   const accepted = save.story.caseAccepted;
-  const mid = 80 + Math.max(0, branches.length - 1) * 70;
+  const branchGap = branches.length > 3 ? 78 : 140;
+  const mid = 80 + Math.max(0, branches.length - 1) * branchGap;
   const nodes: QuestNode[] = [
     {
       id: "case",
@@ -235,13 +254,19 @@ export function createQuestGraph(
           ? "Algorithms"
           : branch.id === "access-records"
             ? "Data structures"
-            : "Connectionist AI",
+            : branch.id === "signal-identification"
+              ? "Connectionist AI"
+              : branch.title,
       description: `${branch.objectives.filter((id) => save.completed.includes(id)).length}/${branch.objectives.length} complete. ${activity ? (activityStory(content, activity.id, "before")?.title ?? activity.title) : branch.description}`,
       x: 320,
-      y: 80 + i * 140,
+      y: 80 + i * branchGap,
       kind: "activity",
       status: done ? "completed" : accepted ? "available" : "locked",
-      actions: [`chapters-${branch.id}`, `branch-${branch.id}`],
+      actions: [
+        `chapters-${branch.id}`,
+        `branch-${branch.id}`,
+        `material-${branch.id}`,
+      ],
     });
     nodes.push({
       id: `clue-${branch.id}`,
@@ -254,7 +279,7 @@ export function createQuestGraph(
           ? (activity.clue?.text ?? "Evidence recovered.")
           : `Complete ${branch.title} to reveal this evidence.`,
       x: 540,
-      y: 80 + i * 140,
+      y: 80 + i * branchGap,
       kind: "clue",
       status: done ? "completed" : "locked",
       actions: [`claim-${branch.id}`, `material-${branch.id}`],

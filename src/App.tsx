@@ -188,6 +188,9 @@ const skills = content.entities.filter((e): e is Skill => e.type === "skill");
 const quest = content.entities.find(
   (e): e is Quest => e.type === "quest" && e.id === "first-principles",
 )!;
+const branches = content.entities.filter(
+  (e): e is Quest => e.type === "quest" && e.kind === "branch",
+);
 const echoActivity = content.entities.find(
   (e): e is Activity => e.type === "activity" && e.id === "echo-battle",
 )!;
@@ -267,6 +270,8 @@ const FINAL_BOSS_IDS = [
   "route-warden",
   "archive-keeper",
   "signal-mimic",
+  "dispatch-quartermaster",
+  "simulation-warden",
 ];
 export default function App() {
   const sound = useGameSound();
@@ -734,7 +739,7 @@ export default function App() {
         !saveRef.current.completed.includes("echo-battle") &&
         !finaleAvailable(saveRef.current, content)
       ) {
-        setToast("Recover all three clues first.");
+        setToast("Recover all five clues first.");
         return;
       }
       generation.current++;
@@ -1688,9 +1693,10 @@ export default function App() {
             accepted={save.story.caseAccepted}
             finaleReady={finaleAvailable(save, content)}
             caseClosed={save.completed.includes("echo-battle")}
-            completed={save.completed.filter((id) =>
-              quest.objectives.includes(id),
-            )}
+            total={branches.length}
+            completed={branches
+              .filter((branch) => branch.objectives.every((id) => save.completed.includes(id)))
+              .map((branch) => branch.id)}
           />
         )}
         {homeMoving && realm === "desk" && officeFallback && (

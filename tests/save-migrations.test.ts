@@ -3,6 +3,7 @@ import raw from "../src/generated/content.json";
 import legacy from "./fixtures/journal-v1.json";
 import legacyV2 from "./fixtures/journal-v2.json";
 import legacyV3 from "./fixtures/journal-v3.json";
+import legacyV4Closed from "./fixtures/journal-v4-closed.json";
 import { validateContent, type Quest } from "../src/content/schema";
 import { claimQuest, initialSave, parseSave } from "../src/game/state";
 import {
@@ -30,7 +31,7 @@ describe("journal migration", () => {
     const original = structuredClone(input);
     const save = parseSave(input, content);
     expect(input).toEqual(original);
-    expect(save.version).toBe(4);
+    expect(save.version).toBe(5);
     expect(save.character).toEqual(input.character);
     expect(save.code).toBe(input.code);
     expect(save.notes).toEqual(input.notes);
@@ -78,7 +79,10 @@ describe("journal migration", () => {
     const save = initialSave();
     save.story.caseAccepted = true;
     const branches = content.entities.filter(
-      (e): e is Quest => e.type === "quest" && e.kind === "branch",
+      (e): e is Quest =>
+        e.type === "quest" &&
+        e.kind === "branch" &&
+        !["supply-district", "simulation-facility"].includes(e.id),
     );
     const old = {
       ...save,
@@ -95,6 +99,8 @@ describe("journal migration", () => {
     expect(branches.every((b) => questComplete(migrated, b))).toBe(true);
     expect(finaleAvailable(migrated, content)).toBe(true);
     expect(migrated.completed).toContain("echo-battle");
+    expect(migrated.completed).not.toContain("dispatch-drone");
+    expect(migrated.completed).not.toContain("training-dummy");
     expect(migrated.character.xp).toBe(save.character.xp);
     expect(migrated.claimed).toEqual(expect.arrayContaining(old.claimed));
   });
@@ -124,7 +130,7 @@ describe("journal migration", () => {
     expect(parseSave({ ...save, version: 2 }, content).completed).toEqual(
       save.completed,
     );
-    for (const version of [0, 5, 1.5, "1"])
+    for (const version of [0, 6, 1.5, "1"])
       expect(() => parseSave({ ...save, version }, content)).toThrow();
     expect(() =>
       parseSave({ ...save, version: 1, completed: ["unknown"] }, content),
@@ -138,7 +144,9 @@ describe("journal migration", () => {
     expect(input).toEqual(original);
     expect(save).toEqual({
       ...input,
-      version: 4,
+      version: 5,
+      curriculumVersion: 3,
+      story: { ...input.story, legacyFinale: false },
       supply: initialSave().supply,
       character: { ...input.character, skills: ["insight", "ward", "trace"] },
     });
@@ -195,7 +203,7 @@ describe("journal migration", () => {
       },
     };
     const save = parseSave(input, content);
-    expect(save.version).toBe(4);
+    expect(save.version).toBe(5);
     expect(save.character.skills).toEqual(["insight", "ward", "trace"]);
     expect(save.completed).toContain("puzzle-sort-log");
     expect(save.claimed).toContain("case-sort-log");
@@ -221,13 +229,47 @@ describe("journal migration", () => {
     const local = parseSave(await loadSave(), content);
     expect(local).toEqual({
       ...input,
-      version: 4,
+      version: 5,
+      curriculumVersion: 3,
+      story: { ...input.story, legacyFinale: false },
       supply: initialSave().supply,
     });
-    expect(parseSave(JSON.parse(JSON.stringify(input)), content)).toEqual(local);
+    expect(parseSave(JSON.parse(JSON.stringify(input)), content)).toEqual(
+      local,
+    );
     local.supply.tokens -= 1;
     expect(parseSave(local, content)).toEqual(local);
     expect(input).toEqual(legacyV3);
+  });
+
+  it("migrates a closed v4 fixture through import and local storage without new progress", async () => {
+    const input = structuredClone(legacyV4Closed);
+    await storeSave(input as unknown as ReturnType<typeof initialSave>);
+    const local = parseSave(await loadSave(), content);
+    const imported = parseSave(JSON.parse(JSON.stringify(input)), content);
+    expect(local).toEqual(imported);
+    const migrated = local;
+    expect(migrated.version).toBe(5);
+    expect(migrated.curriculumVersion).toBe(3);
+    expect(finaleAvailable(migrated, content)).toBe(true);
+    expect(migrated.story.legacyFinale).toBe(true);
+    expect(migrated.completed).not.toContain("dispatch-drone");
+    expect(migrated.completed).not.toContain("training-dummy");
+    expect(migrated.claimed).toContain("confront-echo");
+    expect(parseSave(migrated, content)).toEqual(migrated);
+    await storeSave(migrated);
+    expect(parseSave(await loadSave(), content)).toEqual(migrated);
+  });
+
+  it("keeps an old unclaimed finale reward claimable after the new gates", () => {
+    const old = structuredClone(legacyV4Closed);
+    old.claimed = old.claimed.filter((id) => id !== "confront-echo");
+    const migrated = parseSave(old, content);
+    const finale = content.entities.find(
+      (entity): entity is Quest =>
+        entity.type === "quest" && entity.kind === "finale",
+    )!;
+    expect(claimQuest(migrated, finale, content).claimed).toContain(finale.id);
   });
 });
 

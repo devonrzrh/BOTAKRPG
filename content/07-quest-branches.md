@@ -88,6 +88,40 @@ lesson: perceptron-basics
 ```
 
 ```entity
+id: supply-district
+title: Supply district
+type: quest
+description: Trace a stolen battery shipment through the automated depot and find when ECHO-7's hidden host must reconnect.
+objectives:
+  - dispatch-drone
+  - reserve-guard
+  - forecast-auditor
+  - quartermaster
+xp: 40
+rewards: []
+kind: branch
+prerequisites: []
+lesson: source-alg-09
+```
+
+```entity
+id: simulation-facility
+title: Simulation facility
+type: quest
+description: Reconstruct the pursuit model ECHO-7 learned from and find the conditions that can contain it.
+objectives:
+  - training-dummy
+  - reward-seeker
+  - checkpoint-echo
+  - warden
+xp: 40
+rewards: []
+kind: branch
+prerequisites: []
+lesson: source-ai-09
+```
+
+```entity
 id: echo-battle
 title: ECHO-7
 type: activity
@@ -129,7 +163,7 @@ clue:
 id: confront-echo
 title: Confront ECHO-7
 type: quest
-description: Combine the three clues to reach the robot in the abandoned subnet.
+description: Combine all five clues to reach the robot in the abandoned subnet.
 objectives:
   - echo-battle
 xp: 100
@@ -139,4 +173,6 @@ prerequisites:
   - routing-trace
   - access-records
   - signal-identification
+  - supply-district
+  - simulation-facility
 ```

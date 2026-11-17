@@ -53,7 +53,7 @@ export const tutorials: Tutorial[] = [
       },
       {
         title: "Follow the thread",
-        body: "Pursue lead opens the next encounter. Materials opens its chapter. Recover all three clues, then the final node unlocks ECHO-7.",
+        body: "Pursue lead opens the next encounter. Materials opens its chapter. Recover all five clues, then the final node unlocks ECHO-7.",
       },
     ],
   },
@@ -171,7 +171,7 @@ export const manualSections: ManualSection[] = [
     title: "The case",
     lines: [
       "Take the briefing, then open the quest board. Each lead links a chapter, an encounter, and a clue.",
-      "Recover all three clues to reach ECHO-7. Claim rewards once per quest.",
+      "Recover all five clues to reach ECHO-7. Claim rewards once per quest.",
     ],
   },
   {

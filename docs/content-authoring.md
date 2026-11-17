@@ -74,7 +74,7 @@ Activities may supply `clue: { title, text }`. Completed quest objectives expose
 
 ## Quest branches and finale
 
-Quest `kind` is `case` (default), `branch`, or `finale`. Each branch may link a `lesson`. Quest `prerequisites` reference other quests; the compiler rejects missing references and cycles. A prerequisite is satisfied when its objectives are complete; reward claiming is optional for unlocks. See `content/07-quest-branches.md`.
+Quest `kind` is `case` (default), `branch`, or `finale`. Each branch may link a `lesson`. Quest `prerequisites` reference other quests; the compiler rejects missing references and cycles. A prerequisite is satisfied when its objectives are complete; reward claiming is optional for unlocks. Finale prerequisites list every branch. See `content/07-quest-branches.md`.
 
 Battle activities may configure an `enemy` with `id`, `title`, positive integer `hp` and `attack`, and `mixedQuestions` (default false). Mixed encounters select from the full question bank; ordinary encounters select by skill lesson. The finale uses this shared battle implementation.
 

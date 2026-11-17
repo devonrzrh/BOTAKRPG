@@ -9,12 +9,14 @@ export function HomeBoard({
   onSelect,
   accepted,
   completed,
+  total,
   finaleReady,
   caseClosed,
 }: {
   onSelect: (id: string) => void;
   accepted: boolean;
   completed: string[];
+  total: number;
   finaleReady: boolean;
   caseClosed: boolean;
 }) {
@@ -89,7 +91,9 @@ export function HomeBoard({
           <strong>Quest board</strong>
           <small>
             {accepted
-              ? `${completed.length} / 3 clues recovered`
+              ? caseClosed
+                ? "Case closed"
+                : `${completed.length} / ${total} clues recovered`
               : "Case awaiting acceptance"}
           </small>
           <ArrowUpRight size={17} />

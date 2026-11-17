@@ -1,7 +1,7 @@
 import { z } from "zod";
 import type { Content, Quest, Skill } from "../content/schema";
 import { STARTER_CODE } from "./maze";
-import { questUnlocked } from "./investigation";
+import { finaleAvailable, questUnlocked } from "./investigation";
 import { DEFAULT_PLAYER_NAME, assertPlayerName } from "./player";
 import { TUTORIAL_IDS, type TutorialId } from "./tutorials";
 import { createPuzzle, puzzleCommand } from "./puzzles";
@@ -82,7 +82,9 @@ const signalExperimentSchema = z
 export const saveSchema = z
   .object({
     version: z.literal(CURRENT_SAVE_VERSION),
-    curriculumVersion: z.union([z.literal(1), z.literal(2)]).default(1),
+    curriculumVersion: z
+      .union([z.literal(1), z.literal(2), z.literal(3)])
+      .default(1),
     signalExperiment: signalExperimentSchema,
     chapterProgress: z
       .record(
@@ -99,6 +101,7 @@ export const saveSchema = z
         briefingSeen: z.boolean().default(false),
         caseAccepted: z.boolean().default(false),
         networkIntroSeen: z.boolean().default(false),
+        legacyFinale: z.boolean().default(false),
         seenDialogues: z.array(z.string()).default([]),
       })
       .default({
@@ -106,6 +109,7 @@ export const saveSchema = z
         briefingSeen: false,
         caseAccepted: false,
         networkIntroSeen: false,
+        legacyFinale: false,
       }),
     character: z.object({
       name: z.string().min(1).max(40),
@@ -165,13 +169,14 @@ export type Save = z.infer<typeof saveSchema>;
 export function initialSave(): Save {
   return {
     version: CURRENT_SAVE_VERSION,
-    curriculumVersion: 2,
+    curriculumVersion: 3,
     signalExperiment: null,
     chapterProgress: {},
     story: {
       prologueSeen: false,
       briefingSeen: false,
       caseAccepted: false,
+      legacyFinale: false,
       networkIntroSeen: false,
       seenDialogues: [],
     },
@@ -332,7 +337,14 @@ export function evidence(save: Save, lesson: string, proof: string): Save {
 export function claimQuest(save: Save, quest: Quest, content?: Content): Save {
   if (
     (quest.prerequisites.length > 0 &&
-      (!content || !questUnlocked(save, quest, content))) ||
+      (!content ||
+        (!questUnlocked(save, quest, content) &&
+          !(
+            quest.kind === "finale" &&
+            save.story.legacyFinale &&
+            save.story.caseAccepted &&
+            save.completed.includes("echo-battle")
+          )))) ||
     save.claimed.includes(quest.id) ||
     !quest.objectives.every((id) => save.completed.includes(id))
   )
@@ -436,13 +448,7 @@ export function parseSave(input: unknown, content: Content): Save {
   )) {
     if (
       quest.objectives.some((id) => save.completed.includes(id)) &&
-      !questUnlocked(save, quest, content) &&
-      !(
-        save.curriculumVersion === 1 &&
-        ["maze-chamber", "guardian-battle", "perceptron-exhibit"].every((id) =>
-          save.completed.includes(id),
-        )
-      )
+      !finaleAvailable(save, content)
     )
       throw new Error("Final encounter requires all clue branches");
   }

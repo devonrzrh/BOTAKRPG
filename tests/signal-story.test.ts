@@ -244,7 +244,7 @@ it("plays the signal investigation through ordered chapter practice, combat, sav
   ).toContain("signal-resolution");
 });
 
-it("preserves the unresolved signal ending across saves and keeps the final encounter locked until all three branches resolve", () => {
+it("preserves the unresolved signal ending and gates the finale on all five branches", () => {
   let save = initialSave();
   save.story.caseAccepted = true;
   const finale = content.entities.find(
@@ -272,6 +272,11 @@ it("preserves the unresolved signal ending across saves and keeps the final enco
     const branch = branches.find((q) => q.id === branchId)!;
     for (const id of branch.objectives) save = completeActivity(save, id);
     save = claimQuest(save, branch, content);
+  }
+  expect(finaleAvailable(save, content)).toBe(false);
+  for (const branchId of ["supply-district", "simulation-facility"]) {
+    const branch = branches.find((q) => q.id === branchId)!;
+    for (const id of branch.objectives) save = completeActivity(save, id);
   }
   expect(branches.every((q) => questUnlocked(save, q, content))).toBe(true);
   expect(finaleAvailable(save, content)).toBe(true);

@@ -26,7 +26,7 @@ Browser QA used a completed three-clue journal at 1280 × 720: keyboard Firewall
 
 ## Signal identification branch
 
-84 tests pass; production build validates 282 records. Three Luna subagents authored the signal narrative, added branch playthrough tests, and audited integration plus experiment persistence. Signal identification now has LUMA, twelve introductory scenes, ten chapter-aligned opponents, Signal Mimic, and a recoverable ending. Its independently verified handshake identifies M-04, R-17 and the abandoned subnet. The story supports pursuing this branch before the other two.
+84 tests pass; production build validates 282 records. Three Luna subagents authored the signal narrative, added branch playthrough tests, and audited integration plus experiment persistence. Signal identification now has LUMA, twelve introductory scenes, ten chapter-aligned opponents, Signal Mimic, and a recoverable ending. Its independently verified handshake identifies M-04, R-17 and the abandoned subnet. The story supports pursuing this branch before any other lead.
 
 The lab now offers Continue investigation after successful calibration. Samples, weights, training settings and test state persist through IndexedDB and JSON exports. Missing experiment data in older saves defaults to null; malformed imported experiments are rejected. A long chapter brief now keeps its footer within the viewport.
 
@@ -172,7 +172,7 @@ Browser checks covered textured home surfaces in WebGPU and forced WebGL2; ray-p
 
 38 tests pass. New coverage exercises all six branch completion orders, optional reward claiming for unlocks, prerequisite validation/cycles, duplicate rewards, premature finale-save rejection, and a complete final battle across all material topics.
 
-Browser checks confirmed the boss was locked at one clue, unlocked at three clues, and completed successfully. Branch rewards and the case reward were claimed once; reloading restored the closed case and disabled reward buttons. Text now uses local regular-weight UI fonts and typewriter headings.
+347 tests pass; the production build validates 344 content records. Five-branch order, graph activity visibility, finale gating, and v4 save compatibility are covered in tests. The browser check could not reach the local Vite server in this restricted environment, so the 3D board and GPU rendering were not verified here.
 
 ![Quest branches](screenshots/branches.jpg)
 

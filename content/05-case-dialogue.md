@@ -16,7 +16,7 @@ nodes:
         action: close
   - id: obstacles
     speaker: Dispatch
-    text: 'Three leads: a routing maze, a security archive, and a signal classifier. Follow them in any order. Their materials are on your bookshelf. Once all three clues are recovered, we can reach ECHO-7.'
+    text: 'Five leads: the transit route, deleted archive, signal classifier, supply depot, and pursuit simulation. Follow them in any order. Their materials are on your bookshelf. Once all five clues are recovered, we can reach ECHO-7.'
     choices:
       - label: Why did it run?
         next: motive

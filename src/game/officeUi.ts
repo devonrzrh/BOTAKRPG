@@ -446,27 +446,28 @@ export function createOfficeUi(input: OfficeUiInput): SurfaceModel[] {
       "briefing",
     );
   branches.forEach((branch, index) => {
-    const x = 28 + index * 330,
-      done = questComplete(save, branch);
+    const y = 62 + index * 76,
+      done = questComplete(save, branch),
+      nextId = nextObjective(save, branch),
+      activity = content.entities.find(
+        (e) => e.type === "activity" && e.id === nextId,
+      );
     text(
       quests,
-      x + 12,
-      85,
-      `BRANCH ${index + 1} / ${done ? "CLUE FOUND" : "OPEN"}`,
+      32,
+      y + 12,
+      `${index + 1} / ${done ? "CLUE FILED" : "OPEN"}`,
       16,
-      295,
+      210,
     );
-    text(quests, x + 12, 122, branch.title, 21, 295);
-    const activity = content.entities.find(
-      (e) => e.type === "activity" && e.id === nextObjective(save, branch),
-    );
+    text(quests, 32, y + 38, branch.title, 21, 220);
     const description =
       done && activity?.type === "activity" && activity.clue
         ? activity.clue.text
         : branch.description;
-    wrapLines(description, 27)
-      .slice(0, 4)
-      .forEach((line, n) => text(quests, x + 12, 169 + n * 23, line, 17, 295));
+    wrapLines(description, 42)
+      .slice(0, 2)
+      .forEach((line, n) => text(quests, 270, y + 18 + n * 22, line, 18, 400));
     const destination =
       (
         {
@@ -474,25 +475,40 @@ export function createOfficeUi(input: OfficeUiInput): SurfaceModel[] {
           "guardian-battle": "battle",
           "perceptron-exhibit": "garden",
         } as Record<string, string>
-      )[nextObjective(save, branch)] ?? nextObjective(save, branch);
+      )[nextId] ?? nextId;
+    button(
+      quests,
+      `branch-${branch.id}`,
+      710,
+      y + 8,
+      285,
+      48,
+      done
+        ? pendingStory(save, content, branch.objectives.at(-1)!, "after")
+          ? "Read conclusion"
+          : "Replay lead"
+        : "Pursue lead",
+      "open",
+      destination,
+      !save.story.caseAccepted,
+    );
     const chapters = chaptersForBranch(content, branch.id),
       current = chapters.find((c) => !questComplete(save, c)) ?? chapters[0];
-    if (current)
-      button(
-        quests,
-        `chapters-${branch.id}`,
-        x,
-        224,
-        310,
-        44,
-        "Chapter quests",
-        "graph-select",
-        current.id,
-      );
+    button(
+      quests,
+      `chapters-${branch.id}`,
+      28,
+      386,
+      310,
+      44,
+      "Open lead graph",
+      "graph-select",
+      current?.id ?? branch.objectives[0],
+    );
     button(
       quests,
       `intro-start-${branch.id}`,
-      x,
+      28,
       278,
       310,
       44,
@@ -511,7 +527,7 @@ export function createOfficeUi(input: OfficeUiInput): SurfaceModel[] {
     button(
       quests,
       `boss-start-${branch.id}`,
-      x,
+      28,
       278,
       310,
       44,
@@ -527,24 +543,8 @@ export function createOfficeUi(input: OfficeUiInput): SurfaceModel[] {
     );
     button(
       quests,
-      `branch-${branch.id}`,
-      x,
-      278,
-      310,
-      44,
-      done
-        ? pendingStory(save, content, branch.objectives.at(-1)!, "after")
-          ? "Read conclusion"
-          : "Replay activity"
-        : "Pursue lead",
-      "open",
-      destination,
-      !save.story.caseAccepted,
-    );
-    button(
-      quests,
       `material-${branch.id}`,
-      x,
+      28,
       332,
       310,
       44,
@@ -555,7 +555,7 @@ export function createOfficeUi(input: OfficeUiInput): SurfaceModel[] {
     button(
       quests,
       `claim-${branch.id}`,
-      x,
+      28,
       386,
       310,
       44,
@@ -614,24 +614,42 @@ export function createOfficeUi(input: OfficeUiInput): SurfaceModel[] {
     );
   }
   for (const activity of content.entities) {
-    if (activity.type !== "activity" || activity.template !== "puzzle")
-      continue;
-    button(
-      quests,
-      `evidence-${activity.id}`,
-      28,
-      278,
-      310,
-      44,
-      save.completed.includes(activity.id)
-        ? "Practice evidence case"
-        : "Recover evidence",
-      "open",
-      activity.id,
-      !save.completed.includes(activity.id) &&
-        !activityUnlocked(save, activity.id, content),
-    );
+    if (activity.type !== "activity") continue;
+    if (activity.template === "puzzle")
+      button(
+        quests,
+        `evidence-${activity.id}`,
+        28,
+        278,
+        310,
+        44,
+        save.completed.includes(activity.id)
+          ? "Practice evidence case"
+          : "Recover evidence",
+        "open",
+        activity.id,
+        !save.completed.includes(activity.id) &&
+          !activityUnlocked(save, activity.id, content),
+      );
   }
+  for (const branch of branches)
+    for (const id of branch.objectives.slice(1, -1)) {
+      const activity = content.entities.find((e) => e.id === id);
+      if (activity?.type !== "activity" || activity.template === "puzzle")
+        continue;
+      button(
+        quests,
+        `activity-${id}`,
+        28,
+        278,
+        310,
+        44,
+        save.completed.includes(id) ? "Replay encounter" : "Enter encounter",
+        "open",
+        id,
+        !save.completed.includes(id) && !activityUnlocked(save, id, content),
+      );
+    }
   button(
     quests,
     "claim-case",
@@ -653,7 +671,9 @@ export function createOfficeUi(input: OfficeUiInput): SurfaceModel[] {
     449,
     360,
     45,
-    closed ? "Replay ECHO-7" : `Confront ECHO-7 (${completed}/3)`,
+    closed
+      ? "Replay ECHO-7"
+      : `Confront ECHO-7 (${completed}/${branches.length})`,
     "open",
     "echo",
     !closed && !finaleAvailable(save, content),

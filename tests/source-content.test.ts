@@ -173,7 +173,7 @@ it("scores select-all questions as exact sets, independent of selection order", 
   ])
     expect(isCorrect(q, wrong)).toBe(false);
 });
-it("connects all 31 chapter encounters and three bosses to parallel clue branches", () => {
+it("connects all 31 chapter encounters and five bosses to parallel clue branches", () => {
   let save = initialSave();
   save.story.caseAccepted = true;
   const branches = content.entities.filter(
@@ -210,7 +210,9 @@ it("connects all 31 chapter encounters and three bosses to parallel clue branche
       }
       save = completeActivity(save, id);
     }
-    expect(branch.objectives.at(-1)).toMatch(/warden|keeper|mimic/);
+    expect(branch.objectives.at(-1)).toMatch(
+      /warden|keeper|mimic|quartermaster/,
+    );
   }
   expect(finaleAvailable(save, content)).toBe(true);
 });
@@ -218,6 +220,8 @@ it("restores previous completed cases without fabricating new chapter completion
   const save = initialSave();
   const legacy: Record<string, unknown> = {
     ...save,
+    version: 4,
+    story: { ...save.story, caseAccepted: true },
     completed: [
       "maze-chamber",
       "guardian-battle",
@@ -227,9 +231,9 @@ it("restores previous completed cases without fabricating new chapter completion
   };
   delete legacy.curriculumVersion;
   expect(parseSave(legacy, content).completed).toHaveLength(4);
-  expect(() => parseSave({ ...legacy, curriculumVersion: 2 }, content)).toThrow(
-    /all clue branches/,
-  );
+  expect(() =>
+    parseSave({ ...legacy, version: 5, curriculumVersion: 2 }, content),
+  ).toThrow(/all clue branches/);
   expect(() =>
     parseSave({ ...save, notes: { missing: "invalid" } }, content),
   ).toThrow(/unknown lesson/);
