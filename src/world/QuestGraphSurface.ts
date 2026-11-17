@@ -213,8 +213,6 @@ export function drawQuestGraph(
   text(n.title, 710, 100, 26, 275);
   c.fillStyle = "#36555d";
   c.fillRect(710, 151, 274, 1);
-  c.fillStyle = "#8ea7a9";
-  c.fillRect(710, 172, 4, 15);
   text(n.status, 710, 175, 20, 275, "#83d5c1");
   text(n.description, 710, 210, 20, 275);
   n.actions
