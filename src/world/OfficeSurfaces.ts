@@ -1046,7 +1046,7 @@ export function attachOfficeSurfaces(
         ? "pointer"
         : graphPoint && insideGraph(graphPoint.x, graphPoint.y)
           ? "grab"
-          : "";
+          : "default";
     }
     if (
       info.type === PointerEventTypes.POINTERUP &&
