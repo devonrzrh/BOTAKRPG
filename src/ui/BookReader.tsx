@@ -5,6 +5,7 @@ import {
   useMemo,
   useRef,
   useState,
+  type CSSProperties,
 } from "react";
 import { renderLessonMarkdown } from "../game/markdown";
 import DOMPurify from "dompurify";
@@ -94,6 +95,7 @@ export function BookReader(p: {
     columns: number;
     front: number;
     back: number;
+    pages: number;
   } | null>(null);
   const turning = useRef(false);
   const startAtBeginning = useRef<string | null>(null);
@@ -399,6 +401,7 @@ export function BookReader(p: {
         columns: layout.columns,
         front: frame.scrollLeft + (direction === "next" ? half : 0),
         back: target * layout.step + (direction === "previous" ? half : 0),
+        pages: 1,
       });
       turning.current = true;
       setTurn(direction);
@@ -412,12 +415,48 @@ export function BookReader(p: {
   };
   const pageStart = spread * layout.columns + 1;
   const pageEnd = Math.min(layout.pages, pageStart + layout.columns - 1);
-  const continueChapter = () => {
-    if (!nextChapter || closing || turning.current) return;
+  const selectChapter = (id: string) => {
+    if (closing || turning.current || id === p.lesson.id) return;
     savePosition();
     sound("page");
-    startAtBeginning.current = nextChapter.id;
-    p.onSelect(nextChapter.id);
+    startAtBeginning.current = id;
+    setDiagram(null);
+    setDrawer(null);
+    if (reducedMotion || mode !== "book") {
+      p.onSelect(id);
+      return;
+    }
+    const frame = viewport.current,
+      page = article.current;
+    if (!frame || !page) {
+      p.onSelect(id);
+      return;
+    }
+    const clone = page.cloneNode(true) as HTMLElement;
+    clone
+      .querySelectorAll("[id]")
+      .forEach((element) => element.removeAttribute("id"));
+    setSheet({
+      html: clone.innerHTML,
+      width: frame.clientWidth,
+      height: frame.clientHeight,
+      gap: getComputedStyle(page).columnGap,
+      columns: layout.columns,
+      front: frame.scrollLeft + (layout.columns > 1 ? frame.clientWidth / 2 : 0),
+      back: 0,
+      pages: 5,
+    });
+    turning.current = true;
+    setTurn("next");
+    turnTimer.current = setTimeout(() => {
+      turning.current = false;
+      setTurn(null);
+      setSheet(null);
+      p.onSelect(id);
+    }, 760);
+  };
+  const continueChapter = () => {
+    if (nextChapter) selectChapter(nextChapter.id);
   };
   const topics = useMemo(
     () =>
@@ -601,8 +640,7 @@ export function BookReader(p: {
                     e.preventDefault();
                     const id = link.hash.slice(8);
                     if (p.lessons.some((l) => l.id === id)) {
-                      savePosition();
-                      p.onSelect(id);
+                      selectChapter(id);
                     }
                   } else if (link?.hash) {
                     const id = decodeURIComponent(link.hash.slice(1));
@@ -656,30 +694,44 @@ export function BookReader(p: {
             </div>
             {sheet && !reducedMotion && (
               <div
-                className={`reader-turn-layer ${sheet.columns === 1 ? "single-page" : ""}`}
+                className={`reader-turn-layer ${sheet.columns === 1 ? "single-page" : ""} ${sheet.pages > 1 ? "chapter-turn" : ""}`}
                 aria-hidden="true"
                 inert
               >
-                <div className="reader-turn-sheet">
-                  {(["front", "back"] as const).map((face) => (
-                    <div
-                      key={face}
-                      className={`reader-turn-face reader-turn-${face}`}
-                    >
-                      <article
-                        className="markdown reader-content"
-                        style={{
-                          width: sheet.width,
-                          height: sheet.height,
-                          columnCount: sheet.columns,
-                          columnGap: sheet.gap,
-                          transform: `translateX(-${sheet[face]}px)`,
-                        }}
-                        dangerouslySetInnerHTML={{ __html: sheet.html }}
-                      />
-                    </div>
-                  ))}
-                </div>
+                {Array.from({ length: sheet.pages }, (_, index) => (
+                  <div
+                    key={index}
+                    className="reader-turn-sheet"
+                    style={sheet.pages > 1 ? {
+                      zIndex: sheet.pages - index,
+                      right: `${index * 2}px`,
+                      top: `${index}px`,
+                      bottom: `-${index}px`,
+                      animationDelay: `${index * 36}ms`,
+                    } as CSSProperties : undefined}
+                  >
+                    {(["front", "back"] as const).map((face) => (
+                      <div
+                        key={face}
+                        className={`reader-turn-face reader-turn-${face}`}
+                      >
+                        {(sheet.pages === 1 || index === 0) && (
+                          <article
+                            className="markdown reader-content"
+                            style={{
+                              width: sheet.width,
+                              height: sheet.height,
+                              columnCount: sheet.columns,
+                              columnGap: sheet.gap,
+                              transform: `translateX(-${sheet[face]}px)`,
+                            }}
+                            dangerouslySetInnerHTML={{ __html: sheet.html }}
+                          />
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                ))}
               </div>
             )}
           </div>
@@ -822,9 +874,7 @@ export function BookReader(p: {
                                           : undefined
                                       }
                                       onClick={() => {
-                                        savePosition();
-                                        sound("page");
-                                        p.onSelect(l.id);
+                                        selectChapter(l.id);
                                         setDrawer(null);
                                       }}
                                     >
@@ -877,9 +927,7 @@ export function BookReader(p: {
                         <button
                           key={id}
                           onClick={() => {
-                            savePosition();
-                            sound("page");
-                            p.onSelect(id);
+                            selectChapter(id);
                           }}
                         >
                           {p.lessons.find((l) => l.id === id)?.title}

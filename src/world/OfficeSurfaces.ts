@@ -78,6 +78,8 @@ export function attachOfficeSurfaces(
     zones: Zone[];
     width: number;
     height: number;
+    textureWidth: number;
+    textureHeight: number;
     aspect?: number;
     key: string;
     model: SurfaceModel | null;
@@ -196,6 +198,8 @@ export function attachOfficeSurfaces(
     pinIt = true,
     logicalWidth = 600,
     logicalHeight = 800,
+    textureWidth = 1024,
+    textureHeight = 1024,
   ) => {
     const root = new TransformNode(name, scene);
     root.parent = anchors.get(wall)!;
@@ -209,7 +213,7 @@ export function attachOfficeSurfaces(
     body.parent = root;
     body.material = paperMat;
     body.isPickable = false;
-    const t = texture(name),
+    const t = texture(name, textureWidth, textureHeight),
       p = face(name + " face", root, w, h, t);
     p.position.z = -0.013;
     const widget = {
@@ -221,6 +225,8 @@ export function attachOfficeSurfaces(
       zones: [] as Zone[],
       width: logicalWidth,
       height: logicalHeight,
+      textureWidth,
+      textureHeight,
       aspect: w / h / (logicalWidth / logicalHeight),
       key: "",
       model: null as SurfaceModel | null,
@@ -457,6 +463,8 @@ export function attachOfficeSurfaces(
     false,
     1024,
     576,
+    2048,
+    1152,
   );
   for (const mesh of display.getChildMeshes()) {
     const mat = mesh.material as StandardMaterial;
@@ -526,6 +534,8 @@ export function attachOfficeSurfaces(
       zones: [] as Zone[],
       width: 600,
       height: 800,
+      textureWidth: 1024,
+      textureHeight: 1024,
       aspect: 0.89 / 1.06 / (600 / 800),
       key: "",
       model: null as SurfaceModel | null,
@@ -576,13 +586,16 @@ export function attachOfficeSurfaces(
   const locker = sheet(
     "supply locker label",
     "desk",
-    2.2,
-    1.43,
-    4.46,
-    1.6,
-    0.86,
+    -0.2,
+    1.58,
+    4.85,
+    1.3,
+    0.82,
     0,
     (c, m) => {
+      c.save();
+      c.translate(600, 0);
+      c.scale(-1, 1);
       c.fillStyle = "#273b3d";
       c.fillRect(0, 0, 600, 260);
       c.strokeStyle = "#b39862";
@@ -590,20 +603,21 @@ export function attachOfficeSurfaces(
       c.strokeRect(18, 18, 564, 224);
       ink(c, "SUPPLY", 105, 43, 94, 485, "#ead6a4");
       ink(c, "LOCKER", 105, 141, 94, 485, "#ead6a4");
+      c.restore();
       return zone(m, "supply-locker", 0, 0, 600, 260);
     },
     false,
     600,
     260,
   );
-  locker.rotation.x = Math.PI / 2;
+  widgets.at(-1)!.face.rotation.y = Math.PI;
   const lockerBody = MeshBuilder.CreateBox(
     "steel supply locker",
-    { width: 1.68, height: 0.93, depth: 0.32 },
+    { width: 1.3, height: 0.82, depth: 0.4 },
     scene,
   );
   lockerBody.parent = locker;
-  lockerBody.position.z = 0.16;
+  lockerBody.position.z = 0.2;
   lockerBody.material = material("locker steel", "#34494a");
   lockerBody.isPickable = false;
 
@@ -918,7 +932,14 @@ export function attachOfficeSurfaces(
       w.model = m;
       w.selection = selected;
       const c = w.texture.getContext() as unknown as Ctx;
-      c.setTransform(1024 / w.width, 0, 0, 1024 / w.height, 0, 0);
+      c.setTransform(
+        w.textureWidth / w.width,
+        0,
+        0,
+        w.textureHeight / w.height,
+        0,
+        0,
+      );
       textAspect = w.aspect ?? 1;
       w.zones = w.draw(c, m);
       if (selected && w.zones.some((z) => z.control.id === selected)) {

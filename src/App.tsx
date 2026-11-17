@@ -1415,6 +1415,7 @@ export default function App() {
         battleResolved:
           battleView &&
           (battle.phase === "won" || battle.phase === "lost"),
+        battleLost: battleView && battle.phase === "lost",
         dialogue: Boolean(dialogueId || cutsceneId || chapterId),
       }),
     [

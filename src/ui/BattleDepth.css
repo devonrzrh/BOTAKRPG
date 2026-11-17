@@ -69,17 +69,65 @@
   position: fixed;
   inset: var(--top-height) 0 0;
   z-index: 12;
+  isolation: isolate;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 18px;
   padding: 28px;
-  background: radial-gradient(ellipse at center, #211019 0%, #07070c 65%);
+  background: transparent;
   color: #f5eeee;
   pointer-events: auto;
   text-align: center;
   font: 400 20px/1.5 var(--typewriter);
+}
+.battle-death::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  background: radial-gradient(ellipse at center, #211019 0%, #07070c 65%);
+  animation: death-darken 2s ease-out both;
+}
+.battle-death > * {
+  position: relative;
+  z-index: 1;
+  opacity: 0;
+  animation: death-reveal 850ms ease-out 2s both;
+}
+.battle-death .death-signal {
+  animation-delay: 2s;
+}
+.battle-death .death-kicker {
+  animation-delay: 2.15s;
+}
+.battle-death h1 {
+  animation-delay: 2.3s;
+}
+.battle-death > p:not(.death-kicker) {
+  animation-delay: 2.6s;
+}
+.battle-death .death-actions {
+  animation-delay: 2.85s;
+}
+@keyframes death-darken {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes death-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 .battle-death h1 {
   margin: 0;
@@ -118,10 +166,22 @@
   font-size: 18px;
 }
 @media (prefers-reduced-motion: reduce) {
+  .battle-death::before,
+  .battle-death > * {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
   .app:has(.battle-screen.impact-damage) .world-canvas,
   .app:has(.battle-screen.impact-defeat) .world-canvas {
     animation: none !important;
   }
+}
+.reduced-motion .battle-death::before,
+.reduced-motion .battle-death > * {
+  animation: none;
+  opacity: 1;
+  transform: none;
 }
 .battle-stance span,
 .battle-stance strong {

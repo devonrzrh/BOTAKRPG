@@ -59,6 +59,20 @@ describe("music direction", () => {
     ).toBe("boss");
   });
 
+  it("fades in the death score quietly after a lost battle", () => {
+    expect(
+      chooseMusic({
+        ...calm,
+        panel: "battle",
+        battleResolved: true,
+        battleLost: true,
+      }).track,
+    ).toBe("death");
+    expect(MUSIC_TRACKS.death.gain).toBe(0.12);
+    expect(trackLevel("death", 1)).toBeLessThan(trackLevel("menu", 1));
+    expect(fadeDuration("death", "battle")).toBe(2600);
+  });
+
   it("keeps the menu score for reading, only quieter", () => {
     expect(chooseMusic({ ...calm, reading: true })).toEqual({
       track: "menu",

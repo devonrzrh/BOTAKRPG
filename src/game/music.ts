@@ -1,9 +1,10 @@
 import battleSource from "../../sounds/ost_battle.mp3?url";
 import bossSource from "../../sounds/ost_bossbattle.mp3?url";
+import deathSource from "../../sounds/ost_death.mp3?url";
 import menuSource from "../../sounds/ost_menu.mp3?url";
 import puzzleSource from "../../sounds/ost_puzzle.mp3?url";
 
-export type MusicTrack = "menu" | "puzzle" | "battle" | "boss";
+export type MusicTrack = "menu" | "puzzle" | "battle" | "boss" | "death";
 
 /** Relative loudness per setting. Ambient sits low; battles lead. */
 export const MUSIC_TRACKS: Record<
@@ -14,6 +15,7 @@ export const MUSIC_TRACKS: Record<
   puzzle: { source: puzzleSource, gain: 0.44 },
   battle: { source: battleSource, gain: 0.62 },
   boss: { source: bossSource, gain: 0.72 },
+  death: { source: deathSource, gain: 0.12 },
 };
 
 /** Dialogue and cutscenes duck the score instead of stopping it. */
@@ -22,7 +24,7 @@ export const DUCKED_GAIN = 0.38;
 export const READING_GAIN = 0.55;
 
 /** Battles restart from the top; every other track resumes where it paused. */
-export const RESTART_TRACKS: MusicTrack[] = ["battle", "boss"];
+export const RESTART_TRACKS: MusicTrack[] = ["battle", "boss", "death"];
 
 export interface MusicSituation {
   intake: boolean;
@@ -30,6 +32,7 @@ export interface MusicSituation {
   reading: boolean;
   boss: boolean;
   battleResolved?: boolean;
+  battleLost?: boolean;
   dialogue: boolean;
 }
 
@@ -45,12 +48,15 @@ export function chooseMusic({
   reading,
   boss,
   battleResolved = false,
+  battleLost = false,
   dialogue,
 }: MusicSituation): MusicChoice {
   if (intake) return { track: null, gain: 0 };
   const quiet = reading || panel === "library";
   const track: MusicTrack =
-    panel === "battle" && !battleResolved
+    panel === "battle" && battleLost
+      ? "death"
+      : panel === "battle" && !battleResolved
       ? boss
         ? "boss"
         : "battle"
@@ -70,7 +76,7 @@ export function trackLevel(track: MusicTrack, volume: number, gain = 1) {
   return clamp(volume) * MUSIC_TRACKS[track].gain * clamp(gain);
 }
 
-/** Fade length for a transition. Battles cut in; ambient drifts. */
+/** Fade length for a transition. Battles cut in; death and ambient drift. */
 export function fadeDuration(
   next: MusicTrack | null,
   previous: MusicTrack | null,
@@ -78,6 +84,7 @@ export function fadeDuration(
   const battle = (track: MusicTrack | null) =>
     track === "battle" || track === "boss";
   if (battle(next)) return 420;
+  if (next === "death") return 2600;
   if (battle(previous)) return 1500;
   return 1100;
 }

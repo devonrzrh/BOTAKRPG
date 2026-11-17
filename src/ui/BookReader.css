@@ -154,6 +154,21 @@
     #eee2c6 100%
   );
 }
+.reader-book .reader-paper::after {
+  content: "";
+  position: absolute;
+  z-index: 3;
+  inset: var(--paper-top) var(--paper-side) var(--paper-bottom);
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    transparent 48.5%,
+    #4a392a26 49.5%,
+    #513f2755 50%,
+    #f5ecd84d 50.5%,
+    transparent 51.5%
+  );
+}
 .reader-viewport {
   position: relative;
   height: 100%;
