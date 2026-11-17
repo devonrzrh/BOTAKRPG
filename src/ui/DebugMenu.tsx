@@ -2,13 +2,111 @@ import { useEffect, useId, useRef, useState } from "react";
 import { Terminal, X } from "lucide-react";
 import type { Content, Question } from "../content/schema";
 import type { Battle } from "../game/combat";
+import { createCombatAudio } from "../game/combatAudio";
+import type { BattleCue } from "../game/combatPresentation";
 import { applyDebugSaveAction, type DebugSaveAction } from "../game/debug";
+import type { SfxName } from "../game/sfx";
 import type { Save } from "../game/state";
+import { useGameSound } from "./GameSound";
 import "./DebugMenu.css";
 
-const tabs = ["Travel", "Player", "Progress", "Inspect", "Encounter"] as const;
+const tabs = [
+  "Travel",
+  "Player",
+  "Progress",
+  "Inspect",
+  "Audio",
+  "Encounter",
+] as const;
 type Tab = (typeof tabs)[number];
 type Option = { id: string; title: string };
+
+const soundPreviews: { label: string; cue: SfxName }[] = [
+  { label: "Menu click", cue: "click" },
+  { label: "Open", cue: "open" },
+  { label: "Close", cue: "close" },
+  { label: "Page turn", cue: "page" },
+  { label: "Book open", cue: "bookOpen" },
+  { label: "Book close", cue: "bookClose" },
+  { label: "Movement", cue: "move" },
+  { label: "Blocked movement", cue: "blocked" },
+  { label: "Puzzle action", cue: "puzzleAction" },
+  { label: "Success", cue: "success" },
+  { label: "Error", cue: "error" },
+  { label: "Clue", cue: "clue" },
+  { label: "Level up", cue: "levelUp" },
+  { label: "Dialogue", cue: "dialogue" },
+  { label: "Human speech", cue: "speechHuman" },
+  { label: "Robot speech", cue: "speechRobot" },
+  { label: "ECHO speech", cue: "speechEcho" },
+  { label: "Soft speech", cue: "speechSoft" },
+  { label: "Connect", cue: "connect" },
+  { label: "Pursuit", cue: "pursuit" },
+  { label: "Train", cue: "train" },
+  { label: "Scan", cue: "scan" },
+  { label: "Hazard warning", cue: "hazard" },
+  { label: "Dodge", cue: "dodge" },
+  { label: "Impact", cue: "hit" },
+];
+
+const previewCueBase = {
+  skill: null,
+  amount: 1,
+  heavy: false,
+  blocked: false,
+  defeated: false,
+} as const;
+const battleSoundPreviews: {
+  label: string;
+  cue: Omit<BattleCue, "sequence">;
+}[] = [
+  {
+    label: "Player hit",
+    cue: { ...previewCueBase, kind: "player", skill: "strike" },
+  },
+  {
+    label: "Insight hit",
+    cue: { ...previewCueBase, kind: "player", skill: "insight" },
+  },
+  {
+    label: "Ward hit",
+    cue: { ...previewCueBase, kind: "player", skill: "ward" },
+  },
+  {
+    label: "Trace hit",
+    cue: { ...previewCueBase, kind: "player", skill: "trace" },
+  },
+  {
+    label: "Poison hit",
+    cue: { ...previewCueBase, kind: "poison" },
+  },
+  { label: "Enemy hit", cue: { ...previewCueBase, kind: "enemy" } },
+  {
+    label: "Heavy enemy hit",
+    cue: { ...previewCueBase, kind: "enemy", heavy: true },
+  },
+  {
+    label: "Blocked hit",
+    cue: { ...previewCueBase, kind: "enemy", blocked: true },
+  },
+  { label: "Miss", cue: { ...previewCueBase, kind: "miss" } },
+  {
+    label: "Weakness hit",
+    cue: { ...previewCueBase, kind: "player", special: "weakness" },
+  },
+  {
+    label: "Stance break",
+    cue: { ...previewCueBase, kind: "player", special: "break" },
+  },
+  {
+    label: "Finisher",
+    cue: { ...previewCueBase, kind: "player", special: "finisher" },
+  },
+  {
+    label: "Victory / pacify",
+    cue: { ...previewCueBase, kind: "player", defeated: true },
+  },
+];
 
 const locations: Option[] = [
   { id: "desk", title: "Detective's desk" },
@@ -88,6 +186,9 @@ export function DebugMenu({
   onMaze,
 }: DebugMenuProps) {
   const root = useRef<HTMLDialogElement>(null);
+  const combatAudio = useRef<ReturnType<typeof createCombatAudio> | null>(null);
+  const previewSequence = useRef(0);
+  const sound = useGameSound();
   const titleId = useId();
   const [tab, setTab] = useState<Tab>("Travel");
   const [search, setSearch] = useState("");
@@ -110,6 +211,27 @@ export function DebugMenu({
     dialog.showModal();
     return () => dialog.close();
   }, []);
+  useEffect(() => {
+    const audio = createCombatAudio();
+    combatAudio.current = audio;
+    return () => {
+      audio.dispose();
+      combatAudio.current = null;
+    };
+  }, []);
+  useEffect(() => {
+    combatAudio.current?.setVolume(save.settings.sfxVolume);
+  }, [save.settings.sfxVolume]);
+
+  function previewBattleSound(cue: Omit<BattleCue, "sequence">) {
+    const audio = combatAudio.current;
+    if (!audio) return;
+    audio.unlock();
+    audio.play(
+      { ...cue, sequence: ++previewSequence.current },
+      save.settings.reducedMotion,
+    );
+  }
 
   const { entities } = content;
   const chapters = entities.filter(
@@ -565,6 +687,40 @@ export function DebugMenu({
                   </div>
                 </>
               )}
+            </section>
+          </>
+        )}
+        {tab === "Audio" && (
+          <>
+            <section>
+              <h3>Bundled sound effects</h3>
+              <div className="debug-actions">
+                {soundPreviews.map(({ label, cue }) => (
+                  <button
+                    key={cue}
+                    type="button"
+                    data-sfx-silent
+                    onClick={() => sound(cue)}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            </section>
+            <section>
+              <h3>Procedural battle cues</h3>
+              <div className="debug-actions">
+                {battleSoundPreviews.map(({ label, cue }) => (
+                  <button
+                    key={label}
+                    type="button"
+                    data-sfx-silent
+                    onClick={() => previewBattleSound(cue)}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
             </section>
           </>
         )}
