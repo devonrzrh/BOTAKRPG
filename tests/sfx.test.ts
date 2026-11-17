@@ -87,6 +87,7 @@ describe("bundled interface SFX", () => {
       "hazard",
       "dodge",
       "hit",
+      "cameraMove",
     ];
     const sfx = createSfx();
     sfx.play("bookOpen");
@@ -95,13 +96,19 @@ describe("bundled interface SFX", () => {
     sfx.unlock();
     for (const name of names) sfx.play(name);
     expect(clips).toHaveLength(names.length);
-    expect(clips.every((clip) => clip.src.endsWith(".ogg"))).toBe(true);
+    expect(clips.every((clip) => /\.(ogg|mp3)$/.test(clip.src))).toBe(true);
     expect(
       clips.find((clip) => clip.src.includes("bookOpen.ogg"))?.play,
     ).toHaveBeenCalledOnce();
+    const cameraSwoosh = clips.find((clip) => clip.src.includes("swoosh.mp3"));
+    expect(cameraSwoosh?.play).toHaveBeenCalledOnce();
+    expect(cameraSwoosh?.volume).toBeCloseTo(0.65 * 0.12);
 
     sfx.setVolume(0.25);
-    expect(clips.slice(-12).every((clip) => clip.volume === 0.25)).toBe(true);
+    for (const clip of clips.slice(-12))
+      expect(clip.volume).toBeCloseTo(
+        0.25 * (clip.src.includes("swoosh.mp3") ? 0.12 : 1),
+      );
     sfx.setVolume(0);
     expect(
       clips.slice(-12).every((clip) => clip.pause.mock.calls.length > 0),

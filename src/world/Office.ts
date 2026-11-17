@@ -30,6 +30,7 @@ export function buildOffice(
     locked: boolean;
     reading?: boolean;
   },
+  onCameraTurn?: () => void,
 ) {
   scene.clearColor = new Color4(0.025, 0.035, 0.045, 1);
   const camera = new UniversalCamera(
@@ -293,6 +294,7 @@ export function buildOffice(
     if (s.wall !== previousWall) {
       previousWall = s.wall;
       turning = true;
+      onCameraTurn?.();
     }
     const steady =
       s.reducedMotion ||

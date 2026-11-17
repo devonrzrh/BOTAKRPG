@@ -261,6 +261,7 @@ function WorldCanvas(props: Props) {
           reading: latest.current.officeUi?.find((m) => m.id === "bookshelf")
             ?.bookOpen,
         }),
+        () => sound("cameraMove"),
       );
       const disposeUi = attachOfficeSurfaces(
         scene,

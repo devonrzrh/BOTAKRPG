@@ -47,6 +47,7 @@ const soundPreviews: { label: string; cue: SfxName }[] = [
   { label: "Hazard warning", cue: "hazard" },
   { label: "Dodge", cue: "dodge" },
   { label: "Impact", cue: "hit" },
+  { label: "Camera turn swoosh", cue: "cameraMove" },
 ];
 
 const previewCueBase = {

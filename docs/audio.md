@@ -8,7 +8,8 @@ the master effects preference. Both volumes survive journal export/import.
 
 | Action                                | Cue                                                                                                     |
 | ------------------------------------- | ------------------------------------------------------------------------------------------------------- |
-| Menu selection / room turn            | Soft click / short digital sweep                                                                        |
+| Menu selection                        | Soft click / short digital sweep                                                                        |
+| Office camera turn                    | Quiet swoosh                                                                                            |
 | Book opening / closing                | Paper rustle and low cover movement                                                                     |
 | Page turn                             | Short paper flick                                                                                       |
 | Maze / network movement               | Quiet synthetic footstep; blocked movement has a low tap                                                |
@@ -25,11 +26,12 @@ the master effects preference. Both volumes survive journal export/import.
 | Combat                                | Skill hits, shields, heavy strikes, breaks, finishers and victory                                       |
 
 Interface, activity, movement, and book effects use bundled Kenney OGG clips
-from `sounds/sfx`; battle cues keep their procedural Web Audio timing. The clips
-are included in the app build and their CC0 licenses stay beside each source
-pack. Playback unlocks on an explicit pointer or keyboard gesture. Unsupported
-audio fails silently. Short cooldowns and voice limits prevent input spam, and
-zero volume or disposal cancels live effects.
+from `sounds/sfx`; the office camera turn uses its bundled swoosh MP3. Battle
+cues keep their procedural Web Audio timing. Kenney clips are included in the
+app build and their CC0 licenses stay beside each source pack. Playback unlocks
+on an explicit pointer or keyboard gesture. Unsupported audio fails silently.
+Short cooldowns and voice limits prevent input spam, and zero volume or disposal
+cancels live effects.
 Loading a save or restoring puzzle commands does not replay success cues.
 Speech blips follow the typewriter, pause on whitespace and punctuation, and
 stop when a line is revealed, skipped, closed, or shown instantly with reduced

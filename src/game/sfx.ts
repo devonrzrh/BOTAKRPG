@@ -19,6 +19,7 @@ import digitalPhaseJump from "../../sounds/sfx/kenney_digital-audio_2/Audio/phas
 import digitalZap from "../../sounds/sfx/kenney_digital-audio_2/Audio/zapThreeToneUp.ogg?url";
 import digitalPhaser from "../../sounds/sfx/kenney_digital-audio_2/Audio/phaserUp1.ogg?url";
 import impactPunch from "../../sounds/sfx/kenney_impact-sounds/Audio/impactPunch_medium_001.ogg?url";
+import cameraSwoosh from "../../sounds/sfx/swoosh.mp3?url";
 import type { EvadeState } from "./evade";
 
 export type SfxName =
@@ -46,9 +47,10 @@ export type SfxName =
   | "scan"
   | "hazard"
   | "dodge"
-  | "hit";
+  | "hit"
+  | "cameraMove";
 
-type Voice = HTMLAudioElement;
+type Voice = { audio: HTMLAudioElement; gain: number };
 
 /** Use crossings rather than elapsed-time windows so each lane sounds once. */
 export function evadeSoundCues(
@@ -96,6 +98,7 @@ const COOLDOWNS: Record<SfxName, number> = {
   hazard: 180,
   dodge: 180,
   hit: 180,
+  cameraMove: 800,
 };
 
 const SOURCES: Record<SfxName, string> = {
@@ -124,6 +127,7 @@ const SOURCES: Record<SfxName, string> = {
   hazard: digitalHighDown,
   dodge: digitalPhaseJump,
   hit: impactPunch,
+  cameraMove: cameraSwoosh,
 };
 
 /** Bundled clips unlock on a user gesture and share one effects volume. */
@@ -136,9 +140,9 @@ export function createSfx() {
 
   const stop = (voice: Voice) => {
     if (!voices.delete(voice)) return;
-    voice.pause();
-    voice.removeAttribute("src");
-    voice.load();
+    voice.audio.pause();
+    voice.audio.removeAttribute("src");
+    voice.audio.load();
   };
   const cancelAll = () => {
     for (const voice of [...voices]) stop(voice);
@@ -157,15 +161,18 @@ export function createSfx() {
     if (voices.size >= MAX_VOICES) stop(voices.values().next().value!);
 
     try {
-      const voice = new Audio(SOURCES[name]);
-      voice.preload = "auto";
-      voice.volume = volume;
+      const voice = {
+        audio: new Audio(SOURCES[name]),
+        gain: name === "cameraMove" ? 0.12 : 1,
+      };
+      voice.audio.preload = "auto";
+      voice.audio.volume = volume * voice.gain;
       voices.add(voice);
       const release = () => stop(voice);
-      voice.addEventListener("ended", release, { once: true });
-      voice.addEventListener("error", release, { once: true });
+      voice.audio.addEventListener("ended", release, { once: true });
+      voice.audio.addEventListener("error", release, { once: true });
       try {
-        void voice.play().catch(release);
+        void voice.audio.play().catch(release);
       } catch {
         release();
       }
@@ -176,7 +183,7 @@ export function createSfx() {
   const setVolume = (next: number) => {
     volume = Number.isFinite(next) ? Math.max(0, Math.min(1, next)) : 0;
     voices.forEach((voice) => {
-      voice.volume = volume;
+      voice.audio.volume = volume * voice.gain;
     });
     if (volume === 0) cancelAll();
   };
