@@ -6,6 +6,7 @@ export function WorldUiControls({
   blocked,
   focused,
   onAction,
+  silentNavigation,
   onFocus,
   noteEditing,
   noteDraft,
@@ -18,6 +19,7 @@ export function WorldUiControls({
   blocked: boolean;
   focused: string | null;
   onAction: (a: OfficeAction) => void;
+  silentNavigation: (id: string) => boolean;
   onFocus: (id: string | null) => void;
   noteEditing: boolean;
   noteDraft: string;
@@ -111,6 +113,11 @@ export function WorldUiControls({
         <button
           key={b.id}
           disabled={b.disabled}
+          data-sfx-silent={
+            (b.action.kind === "open" && silentNavigation(b.action.id)) ||
+            (b.action.kind === "lesson" && model.id !== "bookshelf") ||
+            undefined
+          }
           aria-pressed={
             b.id.startsWith("node-")
               ? b.id === `node-${model.graph?.selected}`

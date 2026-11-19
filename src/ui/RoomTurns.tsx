@@ -80,7 +80,7 @@ export function RoomTurns({
     return () => window.removeEventListener("keydown", key);
   }, []);
   return (
-    <nav className="room-turns" aria-label="Turn around the room">
+    <nav className="room-turns" aria-label="Turn around the room" data-sfx-silent>
       {([-1, 1] as const).map((direction) => {
         const target = adjacentWall(wall, direction),
           Icon = direction === -1 ? ChevronLeft : ChevronRight;

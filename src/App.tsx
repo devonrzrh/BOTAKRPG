@@ -243,6 +243,14 @@ type Panel =
   | "settings"
   | "manual"
   | null;
+const officeDestinations = new Map<string, HomeWall>([
+  ["desk", "investigation"],
+  ["library", "bookshelf"],
+  ["quest", "quests"],
+  ["journal", "quests"],
+  ["inventory", "desk"],
+  ["supplies", "desk"],
+]);
 const destinations = [
   {
     id: "library" as const,
@@ -407,11 +415,6 @@ export default function App() {
     [configureSfxVolume, save.settings.sfxVolume],
   );
   const previousLevel = useRef<number | null>(null);
-  const previousWall = useRef(homeWall);
-  useEffect(() => {
-    if (previousWall.current !== homeWall && realm === "desk") sound("open");
-    previousWall.current = homeWall;
-  }, [homeWall, realm, sound]);
   useEffect(() => {
     if (!booted) return;
     const gainedLevel =
@@ -612,6 +615,19 @@ export default function App() {
     updateMaze(createMaze(seed));
     setOutput([]);
   };
+  const suppressNavigationSfx = useCallback(
+    (id: string) => {
+      if (id === "inventory") return true;
+      if (officeFallback || realm !== "desk") return false;
+      const { caseAccepted, networkIntroSeen } = saveRef.current.story;
+      const wall =
+        id === "network" && caseAccepted && networkIntroSeen
+          ? "quests"
+          : officeDestinations.get(id);
+      return wall !== undefined && wall !== homeWall;
+    },
+    [homeWall, officeFallback, realm],
+  );
   const open = useCallback(
     (id: string, debugTravel = false, confirmedExit = false) => {
       const activeBattle =
@@ -629,7 +645,7 @@ export default function App() {
       setReturnPuzzleId(null);
       if (tutorialRef.current) closeTutorial();
       if (id === "exit") return;
-      sound(id === "inventory" ? "clue" : "open");
+      if (!suppressNavigationSfx(id)) sound("open");
       if (id === "library" && !officeFallback) {
         setHomeWall("bookshelf");
         setRealm("desk");
@@ -799,15 +815,8 @@ export default function App() {
         trialRef.current = false;
         return;
       }
-      if (["desk", "library", "quest", "journal", "inventory", "supplies"].includes(id)) {
-        const wall: HomeWall =
-          id === "library"
-            ? "bookshelf"
-            : id === "quest" || id === "journal"
-              ? "quests"
-              : id === "inventory" || id === "supplies"
-                ? "desk"
-                : "investigation";
+      const wall = officeDestinations.get(id);
+      if (wall) {
         if (id === "supplies") setBookOpen(false);
         setHomeWall(wall);
         setRealm("desk");
@@ -881,7 +890,7 @@ export default function App() {
         trialRef.current = false;
       }
     },
-    [realm, officeFallback, sound, panel, settingsFromBattle],
+    [realm, officeFallback, sound, panel, settingsFromBattle, suppressNavigationSfx],
   );
   const close = useCallback((confirmedExit = false) => {
     if (settingsFromBattle && !confirmedExit) {
@@ -1569,6 +1578,7 @@ export default function App() {
         <a
           className="brand"
           href="#"
+          data-sfx-silent={suppressNavigationSfx("desk") || undefined}
           onClick={(event) => {
             event.preventDefault();
             open("desk");
@@ -1579,7 +1589,7 @@ export default function App() {
           </span>
           <span>NULL / TRACE</span>
         </a>
-        <MenuBar onSelect={open} />
+        <MenuBar onSelect={open} silentSelection={suppressNavigationSfx} />
         <XpMeter
           key={booted ? "ready" : "loading"}
           compact
@@ -3151,6 +3161,7 @@ export default function App() {
               }
               focused={officeFocused}
               onAction={handleOfficeAction}
+              silentNavigation={suppressNavigationSfx}
               onFocus={setOfficeFocused}
               noteEditing={Boolean(noteEditing)}
               noteDraft={noteDraft}
