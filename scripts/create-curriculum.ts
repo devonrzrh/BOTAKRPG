@@ -1,6 +1,7 @@
 import { readFile, writeFile } from "node:fs/promises";
 import { stringify } from "yaml";
 import { parseMarkdown } from "./compile-content";
+import { enemyThreatName } from "../src/game/enemyIdentity";
 // Authored checkpoints complement the imported bank, including topics absent from it.
 const checks = [
   [
@@ -405,12 +406,7 @@ for (const spec of specs) {
       lesson: chapter.id,
       enemy: {
         id: `guard-${chapter.id}`,
-        title:
-          spec.topic === "algorithms"
-            ? "Route interceptor"
-            : spec.topic === "structures"
-              ? "Archive drone"
-              : "Signal decoy",
+        title: enemyThreatName(`guard-${chapter.id}`),
         hp: 30,
         attack: 7,
         mixedQuestions: false,

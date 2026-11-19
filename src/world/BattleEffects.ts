@@ -13,6 +13,7 @@ type EffectRig = {
   rightArm: TransformNode;
   materials: StandardMaterial[];
   animateIdle?: (seconds: number) => void;
+  animateAttack?: (progress: number, heavy: boolean, blocked: boolean) => void;
   resetIdle?: () => void;
 };
 type CueState = { cue: BattleCue | null; reducedMotion: boolean };
@@ -261,7 +262,10 @@ export function attachBattleEffects(
       return;
     }
     const strike = cue.kind === "player" || cue.kind === "poison";
-    if (cue.kind === "enemy") {
+    if (cue.kind === "enemy" && rig.animateAttack) {
+      restore();
+      rig.animateAttack(t, cue.heavy, cue.blocked);
+    } else if (cue.kind === "enemy") {
       const wind = t < 0.32 ? t / 0.32 : t < 0.55 ? 1 : 1 - (t - 0.55) / 0.45;
       rig.leftArm.rotation.x =
         original.left.x - wind * (cue.heavy ? 1.1 : 0.68);
@@ -338,7 +342,7 @@ export function attachBattleEffects(
       );
       projectile.mesh.scaling.setAll(0.5);
     }
-    if (cue.kind === "enemy" && !cue.blocked && t > 0.62) {
+    if (cue.kind === "enemy" && !rig.animateAttack && !cue.blocked && t > 0.62) {
       const hit =
         Math.sin(Math.min(1, (t - 0.62) / 0.18) * Math.PI) *
         (cue.heavy ? 0.34 : 0.2);

@@ -562,7 +562,7 @@ template: battle
 lesson: source-alg-00
 enemy:
   id: guard-source-alg-00
-  title: Route interceptor
+  title: Packet Sniffer
   hp: 30
   attack: 7
   mixedQuestions: false
@@ -596,7 +596,7 @@ template: battle
 lesson: source-alg-01
 enemy:
   id: guard-source-alg-01
-  title: Route interceptor
+  title: Packet Sniffer
   hp: 30
   attack: 7
   mixedQuestions: false
@@ -631,7 +631,7 @@ template: battle
 lesson: source-alg-02
 enemy:
   id: guard-source-alg-02
-  title: Route interceptor
+  title: Relay Mantis
   hp: 30
   attack: 7
   mixedQuestions: false
@@ -665,7 +665,7 @@ template: battle
 lesson: source-alg-03
 enemy:
   id: guard-source-alg-03
-  title: Route interceptor
+  title: Packet Sniffer
   hp: 30
   attack: 7
   mixedQuestions: false
@@ -700,7 +700,7 @@ template: battle
 lesson: source-alg-04
 enemy:
   id: guard-source-alg-04
-  title: Route interceptor
+  title: Relay Mantis
   hp: 30
   attack: 7
   mixedQuestions: false
@@ -734,7 +734,7 @@ template: battle
 lesson: source-alg-05
 enemy:
   id: guard-source-alg-05
-  title: Route interceptor
+  title: Packet Sniffer
   hp: 30
   attack: 7
   mixedQuestions: false
@@ -768,7 +768,7 @@ template: battle
 lesson: source-alg-06
 enemy:
   id: guard-source-alg-06
-  title: Route interceptor
+  title: Relay Mantis
   hp: 30
   attack: 7
   mixedQuestions: false
@@ -803,7 +803,7 @@ template: battle
 lesson: source-alg-07
 enemy:
   id: guard-source-alg-07
-  title: Route interceptor
+  title: Packet Sniffer
   hp: 30
   attack: 7
   mixedQuestions: false
@@ -837,7 +837,7 @@ template: battle
 lesson: source-alg-08
 enemy:
   id: guard-source-alg-08
-  title: Route interceptor
+  title: Relay Mantis
   hp: 30
   attack: 7
   mixedQuestions: false
@@ -872,7 +872,7 @@ template: battle
 lesson: source-alg-09
 enemy:
   id: guard-source-alg-09
-  title: Route interceptor
+  title: Packet Sniffer
   hp: 30
   attack: 7
   mixedQuestions: false
@@ -906,7 +906,7 @@ template: battle
 lesson: source-alg-10
 enemy:
   id: guard-source-alg-10
-  title: Route interceptor
+  title: Relay Mantis
   hp: 30
   attack: 7
   mixedQuestions: false
@@ -988,7 +988,7 @@ template: battle
 lesson: source-ds-01
 enemy:
   id: guard-source-ds-01
-  title: Archive drone
+  title: Tracking Cookie
   hp: 30
   attack: 7
   mixedQuestions: false
@@ -1022,7 +1022,7 @@ template: battle
 lesson: source-ds-02
 enemy:
   id: guard-source-ds-02
-  title: Archive drone
+  title: Buffer Ram
   hp: 30
   attack: 7
   mixedQuestions: false
@@ -1057,7 +1057,7 @@ template: battle
 lesson: source-ds-03
 enemy:
   id: guard-source-ds-03
-  title: Archive drone
+  title: Buffer Ram
   hp: 30
   attack: 7
   mixedQuestions: false
@@ -1091,7 +1091,7 @@ template: battle
 lesson: source-ds-04
 enemy:
   id: guard-source-ds-04
-  title: Archive drone
+  title: Buffer Ram
   hp: 30
   attack: 7
   mixedQuestions: false
@@ -1126,7 +1126,7 @@ template: battle
 lesson: source-ds-05
 enemy:
   id: guard-source-ds-05
-  title: Archive drone
+  title: Tracking Cookie
   hp: 30
   attack: 7
   mixedQuestions: false
@@ -1160,7 +1160,7 @@ template: battle
 lesson: source-ds-06
 enemy:
   id: guard-source-ds-06
-  title: Archive drone
+  title: Buffer Ram
   hp: 30
   attack: 7
   mixedQuestions: false
@@ -1194,7 +1194,7 @@ template: battle
 lesson: source-ds-07
 enemy:
   id: guard-source-ds-07
-  title: Archive drone
+  title: Graph Weaver
   hp: 30
   attack: 7
   mixedQuestions: false
@@ -1229,7 +1229,7 @@ template: battle
 lesson: source-ds-08
 enemy:
   id: guard-source-ds-08
-  title: Archive drone
+  title: Graph Weaver
   hp: 30
   attack: 7
   mixedQuestions: false
@@ -1263,7 +1263,7 @@ template: battle
 lesson: source-ds-09
 enemy:
   id: guard-source-ds-09
-  title: Archive drone
+  title: Graph Weaver
   hp: 30
   attack: 7
   mixedQuestions: false
@@ -1298,7 +1298,7 @@ template: battle
 lesson: source-ds-10
 enemy:
   id: guard-source-ds-10
-  title: Archive drone
+  title: Graph Weaver
   hp: 30
   attack: 7
   mixedQuestions: false
@@ -1380,7 +1380,7 @@ template: battle
 lesson: source-ai-01
 enemy:
   id: guard-source-ai-01
-  title: Signal decoy
+  title: Spam Decoy
   hp: 30
   attack: 7
   mixedQuestions: false
@@ -1414,7 +1414,7 @@ template: battle
 lesson: source-ai-02
 enemy:
   id: guard-source-ai-02
-  title: Signal decoy
+  title: Inference Array
   hp: 30
   attack: 7
   mixedQuestions: false
@@ -1449,7 +1449,7 @@ template: battle
 lesson: source-ai-03
 enemy:
   id: guard-source-ai-03
-  title: Signal decoy
+  title: Spam Decoy
   hp: 30
   attack: 7
   mixedQuestions: false
@@ -1483,7 +1483,7 @@ template: battle
 lesson: source-ai-04
 enemy:
   id: guard-source-ai-04
-  title: Signal decoy
+  title: Inference Array
   hp: 30
   attack: 7
   mixedQuestions: false
@@ -1518,7 +1518,7 @@ template: battle
 lesson: source-ai-05
 enemy:
   id: guard-source-ai-05
-  title: Signal decoy
+  title: Spam Decoy
   hp: 30
   attack: 7
   mixedQuestions: false
@@ -1552,7 +1552,7 @@ template: battle
 lesson: source-ai-06
 enemy:
   id: guard-source-ai-06
-  title: Signal decoy
+  title: Inference Array
   hp: 30
   attack: 7
   mixedQuestions: false
@@ -1586,7 +1586,7 @@ template: battle
 lesson: source-ai-07
 enemy:
   id: guard-source-ai-07
-  title: Signal decoy
+  title: Spam Decoy
   hp: 30
   attack: 7
   mixedQuestions: false
@@ -1621,7 +1621,7 @@ template: battle
 lesson: source-ai-08
 enemy:
   id: guard-source-ai-08
-  title: Signal decoy
+  title: Inference Array
   hp: 30
   attack: 7
   mixedQuestions: false
@@ -1655,7 +1655,7 @@ template: battle
 lesson: source-ai-09
 enemy:
   id: guard-source-ai-09
-  title: Signal decoy
+  title: Inference Array
   hp: 30
   attack: 7
   mixedQuestions: false
@@ -1690,7 +1690,7 @@ template: battle
 lesson: source-ai-10
 enemy:
   id: guard-source-ai-10
-  title: Signal decoy
+  title: Spam Decoy
   hp: 30
   attack: 7
   mixedQuestions: false

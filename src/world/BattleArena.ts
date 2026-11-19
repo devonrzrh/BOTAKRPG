@@ -12,9 +12,10 @@ export function battleArenaKind(enemyId: string) {
   const kind = enemyArchetype(enemyId);
   if (kind === "echo") return "abandoned-subnet";
   if (kind === "warden") return "firewall";
-  if (kind === "keeper" || kind === "drone") return "cache-vault";
-  if (kind === "mimic" || kind === "decoy") return "browser-net";
-  if (kind === "interceptor") return "packet-highway";
+  if (kind === "keeper" || kind === "drone" || kind === "ram" || kind === "weaver")
+    return "cache-vault";
+  if (kind === "mimic" || kind === "decoy" || kind === "array") return "browser-net";
+  if (kind === "interceptor" || kind === "mantis") return "packet-highway";
   return "gateway";
 }
 

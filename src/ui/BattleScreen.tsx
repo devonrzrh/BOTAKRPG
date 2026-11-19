@@ -18,7 +18,7 @@ import { XpMeter } from "./XpMeter";
 import { SupplyIcon } from "./SupplyIcon";
 import { RpgIcon } from "./RpgIcon";
 import { useGameSound } from "./GameSound";
-import { enemyThreatName } from "../game/enemyIdentity";
+import { enemyArchetype, enemyThreatName } from "../game/enemyIdentity";
 import { EnemySpeech } from "./EnemySpeech";
 import { useSceneTransitioning } from "./SceneTransition";
 import { useGameParticles } from "./GameParticles";
@@ -63,17 +63,7 @@ interface Props {
   onRecover: () => void;
   onRetry?: () => void;
 }
-function enemyKind(id: string) {
-  if (id.startsWith("echo")) return "echo";
-  if (id.includes("warden")) return "warden";
-  if (id.includes("keeper")) return "keeper";
-  if (id.includes("mimic")) return "mimic";
-  if (id.startsWith("guard-source-alg")) return "interceptor";
-  if (id.startsWith("guard-source-ds")) return "drone";
-  if (id.startsWith("guard-source-ai")) return "decoy";
-  return "sentinel";
-}
-function enemySigil(id: string) {
+function enemySigil(kind: ReturnType<typeof enemyArchetype>) {
   return {
     echo: "✦",
     warden: "▲",
@@ -82,8 +72,12 @@ function enemySigil(id: string) {
     interceptor: "➤",
     drone: "◇",
     decoy: "◌",
+    mantis: "➤",
+    ram: "▣",
+    weaver: "◇",
+    array: "◉",
     sentinel: "◆",
-  }[enemyKind(id)];
+  }[kind];
 }
 export function BattleScreen(p: Props) {
   const sceneTransitioning = useSceneTransitioning();
@@ -101,6 +95,8 @@ export function BattleScreen(p: Props) {
   const victoryBurstSent = useRef(false);
   const { battle: b, save, question: q } = p,
     limits = stats(save, p.content);
+  const kind = enemyArchetype(b.enemyId);
+  const threat = enemyThreatName(b.enemyId);
   const reducedMotion = save.settings.reducedMotion || osReduced;
   const changes = useBattleFeedback(b, save, p.content);
   const changed = (target: string) =>
@@ -480,13 +476,13 @@ export function BattleScreen(p: Props) {
       }}
     >
       <div className="battle-enemy-hud">
-        <h2 className={`enemy-name enemy-${enemyKind(b.enemyId)}`}>
+        <h2 className={`enemy-name enemy-${kind}`}>
           <span className="enemy-sigil" aria-hidden="true">
-            {enemySigil(b.enemyId)}
+            {enemySigil(kind)}
           </span>
           {b.enemyName}
         </h2>
-        <p className="enemy-threat">{enemyThreatName(b.enemyId)}</p>
+        {threat !== b.enemyName && <p className="enemy-threat">{threat}</p>}
         {meter("Enemy HP", b.hp, b.maxHp, "enemy")}
         <div className="battle-status-effects">
           {b.effects

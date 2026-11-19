@@ -41,6 +41,10 @@ it.each([
   "guard-source-alg-01",
   "guard-source-ds-01",
   "guard-source-ai-01",
+  "guard-source-alg-02",
+  "guard-source-ds-02",
+  "guard-source-ds-07",
+  "guard-source-ai-02",
   "archive-keeper",
   "routing-warden",
   "signal-mimic",
@@ -74,6 +78,48 @@ it.each([
     }
   },
 );
+
+it.each([
+  ["guard-source-alg-02", "left shoulder pivot"],
+  ["guard-source-ds-02", "ram hydraulic piston"],
+  ["guard-source-ds-07", "weaver spindle"],
+  ["guard-source-ai-02", "array upper receiver"],
+  ["archive-keeper", "keeper drawer slide"],
+  ["signal-mimic", "mimic left mask hinge"],
+])("animates %s's %s through wind-up and impact and resets it", (id, joint) => {
+  const { rig, state, frame, dispose } = setup(id);
+  const pivot = rig.root
+    .getChildTransformNodes()
+    .find((node) => node.name === joint)!;
+  const pose = () => [...pivot.position.asArray(), ...pivot.rotation.asArray()];
+  try {
+    const rest = pose();
+    state.cue = {
+      sequence: 1,
+      kind: "enemy",
+      skill: null,
+      amount: 7,
+      heavy: true,
+      blocked: false,
+      defeated: false,
+    };
+    frame(0);
+    const duration = combatCueDuration(false);
+    frame(duration * 0.42);
+    const wind = pose();
+    expect(wind).not.toEqual(rest);
+    frame(duration * 0.62);
+    const impact = pose();
+    expect(impact).not.toEqual(wind);
+    frame(duration * 0.62);
+    expect(pose()).toEqual(impact);
+    state.reducedMotion = true;
+    frame(duration * 0.72);
+    expect(pose()).toEqual(rest);
+  } finally {
+    dispose();
+  }
+});
 
 it("hands idle parts to attacks and holds defeat rather than reviving the enemy", () => {
   const { rig, state, frame, dispose } = setup("guard-source-ds-01");
