@@ -1523,7 +1523,11 @@ export default function App() {
       setSearchEditing(false);
       openLesson(id);
     }
-    if (action.kind === "page") setOfficePage(Math.max(0, Number(id)));
+    if (action.kind === "page") {
+      const page = Math.max(0, Number(id));
+      if (homeWall === "desk" && page !== officePage) sound("page");
+      setOfficePage(page);
+    }
     if (action.kind === "topic") setTopic(id);
     if (action.kind === "search") setSearchEditing(true);
     if (action.kind === "note") {
@@ -1589,7 +1593,7 @@ export default function App() {
           </span>
           <span>NULL / TRACE</span>
         </a>
-        <MenuBar onSelect={open} silentSelection={suppressNavigationSfx} />
+        <MenuBar onSelect={open} />
         <XpMeter
           key={booted ? "ready" : "loading"}
           compact
@@ -1610,6 +1614,7 @@ export default function App() {
           <button
             className="icon-button"
             aria-label="Open field manual"
+            data-sfx-silent
             title="How to play"
             onClick={() => open("manual")}
           >
@@ -1618,6 +1623,7 @@ export default function App() {
           <button
             className="icon-button"
             aria-label="Open settings"
+            data-sfx-silent
             onClick={() => open("settings")}
           >
             <Settings size={19} />
@@ -1625,6 +1631,7 @@ export default function App() {
           <button
             className="avatar"
             aria-label="Open character"
+            data-sfx-silent
             onClick={() => open("character")}
           >
             {playerInitials(save.character.name)}

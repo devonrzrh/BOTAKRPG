@@ -50,13 +50,14 @@ export const SFX_CUES = {
   cameraMove: {
     label: "Camera turn swoosh",
     source: cameraSwoosh,
-    cooldown: 1300,
+    cooldown: 420,
   },
 } as const;
 export type SfxName = keyof typeof SFX_CUES;
 export const SFX_GAINS: Partial<Record<SfxName, number>> = {
   click: 0.55,
   hover: 0.12,
+  page: 0.5,
   clue: 0.7,
   levelUp: 0.7,
   dialogue: 0.22,
@@ -64,7 +65,7 @@ export const SFX_GAINS: Partial<Record<SfxName, number>> = {
   speechRobot: 0.12,
   speechEcho: 0.12,
   speechSoft: 0.12,
-  cameraMove: 0.05,
+  cameraMove: 0.2,
 };
 
 type Voice = { audio: HTMLAudioElement; gain: number };

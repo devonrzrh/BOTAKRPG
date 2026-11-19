@@ -83,7 +83,7 @@ describe("bundled interface SFX", () => {
     ).toHaveBeenCalledOnce();
     const cameraSwoosh = clips.find((clip) => clip.src.includes("swoosh.mp3"));
     expect(cameraSwoosh?.play).toHaveBeenCalledOnce();
-    expect(cameraSwoosh?.volume).toBeCloseTo(0.65 * 0.05);
+    expect(cameraSwoosh?.volume).toBeCloseTo(0.65 * 0.2);
     expect(SFX_CUES.clue.source).not.toBe(SFX_CUES.levelUp.source);
     expect(SFX_GAINS.hover).toBeLessThan(SFX_GAINS.click!);
 

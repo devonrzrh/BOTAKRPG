@@ -116,6 +116,7 @@ export function WorldUiControls({
           data-sfx-silent={
             (b.action.kind === "open" && silentNavigation(b.action.id)) ||
             (b.action.kind === "lesson" && model.id !== "bookshelf") ||
+            (b.action.kind === "page" && model.id === "desk") ||
             undefined
           }
           aria-pressed={

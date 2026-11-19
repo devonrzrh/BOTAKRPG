@@ -35,13 +35,7 @@ const menus = {
 } as const;
 const menuIcons = { Home: HomeIcon, Case: FileText, Game: Gamepad2 };
 const menuNames = Object.keys(menus);
-export function MenuBar({
-  onSelect,
-  silentSelection,
-}: {
-  onSelect: (id: string) => void;
-  silentSelection: (id: string) => boolean;
-}) {
+export function MenuBar({ onSelect }: { onSelect: (id: string) => void }) {
   const [active, setActive] = useState<string | null>(null);
   const root = useRef<HTMLElement>(null);
   const focusTrigger = (name: string) =>
@@ -156,13 +150,13 @@ export function MenuBar({
               className="menu-popup"
               role="menu"
               aria-label={`${name} menu`}
+              data-sfx-silent
             >
               {entries.map(([label, id, Icon]) => (
                 <button
                   key={id}
                   type="button"
                   role="menuitem"
-                  data-sfx-silent={silentSelection(id) || undefined}
                   onClick={() => {
                     focusTrigger(name);
                     setActive(null);
