@@ -644,13 +644,36 @@
   font-size: 16px;
   color: #bdcdc6;
 }
+.app.gameplay-battle .battle-layout-console .analysis-panel details {
+  border-top: 1px solid #60706a;
+}
+.app.gameplay-battle .battle-layout-console .analysis-panel summary {
+  padding: 8px 4px;
+  color: #efd49c;
+  font-size: 18px;
+  cursor: pointer;
+}
+.app.gameplay-battle .battle-layout-console .analysis-panel summary:focus-visible {
+  outline: 2px solid #efd49c;
+  outline-offset: -2px;
+}
+.app .analysis-panel .inspect-talk {
+  min-height: 44px;
+  margin: 4px 0 8px;
+  font-size: 18px;
+}
+.app .analysis-replies button {
+  min-height: 44px;
+  font-size: 18px;
+  text-align: left;
+}
 .app .battle-defense-options button {
   min-height: 44px;
   font-size: 18px;
 }
 @media (min-width: 701px) and (max-width: 1000px) {
   .app.gameplay-battle .battle-layout-console .battle-player-hud {
-    grid-template-columns: 132px 108px 162px;
+    grid-template-columns: 132px 126px 150px;
     gap: 4px 10px;
   }
 }

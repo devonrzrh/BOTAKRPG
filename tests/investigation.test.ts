@@ -104,7 +104,7 @@ it("uses all material topics in the final boss and can complete the case", () =>
   expect(battle.maxHp).toBe(105);
   const studied = new Set<string>();
   while (battle.phase !== "won" && battle.phase !== "lost") {
-    battle = selectSkill(battle, save, probe, questions);
+    battle = selectSkill(battle, save, probe, questions, content);
     const q = questions.find((q) => q.id === battle.question)!;
     studied.add(q.lesson);
     const result = answerBattle(battle, save, content, q.answer);

@@ -2,6 +2,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import type { Content, Item, Question, Skill } from "../content/schema";
 import {
   canSpare,
+  battleAnswerOrder,
   battleQuizDuration,
   previewDamage,
   enemyIntent,
@@ -105,7 +106,7 @@ export function BattleScreen(p: Props) {
     ["momentum", "effect", "stance"].includes(change.target),
   );
   const [menu, setMenu] = useState<
-    "skills" | "analyze" | "defend" | "items" | null
+    "skills" | "analyze" | "talk" | "defend" | "items" | null
   >("skills");
   const [evading, setEvading] = useState(false);
   const skillList = useRef<HTMLDivElement>(null);
@@ -347,7 +348,14 @@ export function BattleScreen(p: Props) {
     );
   };
   const activeCard = b.phase !== "lost" && !evading && !motion;
+  const inspecting = menu === "analyze" || menu === "talk";
   const boss = bossReadout(b);
+  const weakness =
+    b.weaknessKnown && b.tactics
+      ? (p.content.entities.find(
+          (e) => e.type === "skill" && e.id === b.tactics?.weakness,
+        )?.title ?? b.tactics.weakness)
+      : null;
   const upcomingIntent = enemyIntent(b, save, p.content);
   const intent =
     motion === "enemy" && p.cue
@@ -359,15 +367,12 @@ export function BattleScreen(p: Props) {
       : motion === "recover"
         ? { kind: "recover", label: "Opening", damage: 0 }
         : upcomingIntent;
-  const displayOptions =
-    q?.options
-      .map((text, index) => ({ text, index }))
-      .sort((a, c) =>
-        q.format === "ordering"
-          ? ((a.index + 2) % q.options.length) -
-            ((c.index + 2) % q.options.length)
-          : a.index - c.index,
-      ) ?? [];
+  const displayOptions = q
+    ? battleAnswerOrder(q, b.turn, b.questionOffset).map((index) => ({
+        text: q.options[index],
+        index,
+      }))
+    : [];
   const selectAnswer = (index: number) => {
     if (!q || b.phase !== "question") return;
     sound("click");
@@ -438,7 +443,7 @@ export function BattleScreen(p: Props) {
         if (e.key === "Escape" && menu !== null && menu !== "skills") {
           e.preventDefault();
           e.stopPropagation();
-          setMenu("skills");
+          setMenu(menu === "talk" ? "analyze" : "skills");
         }
         if (motion) return;
         if (/^[1-9]$/.test(e.key)) {
@@ -663,11 +668,11 @@ export function BattleScreen(p: Props) {
             )}
             {b.tactics &&
               b.phase === "choose" &&
-              (b.staggered || b.weaknessKnown) && (
+              (b.staggered || !!b.resolve) && (
                 <span>
                   {b.staggered
                     ? "Armor broken · next hit ×1.5"
-                    : `Weak to ${p.content.entities.find((s) => s.type === "skill" && s.id === b.tactics!.weakness)?.title ?? b.tactics.weakness} · break ${b.resolve ?? 0}/${b.tactics.resolve}`}
+                    : `Break ${b.resolve}/${b.tactics.resolve}`}
                 </span>
               )}
           </div>
@@ -727,20 +732,27 @@ export function BattleScreen(p: Props) {
         {activeCard && (
           <section
             key={`${b.turn}:${b.phase}:${menu}`}
-            className={`battle-decision ${b.phase === "choose" ? "command-panel" : "quiz-panel"} ${menu === "analyze" ? "analysis-panel" : ""} ${b.phase === "feedback" ? "feedback-panel" : ""} ${correctFeedback ? "answer-correct" : ""}`}
+            className={`battle-decision ${b.phase === "choose" ? "command-panel" : "quiz-panel"} ${inspecting ? "analysis-panel" : ""} ${b.phase === "feedback" ? "feedback-panel" : ""} ${correctFeedback ? "answer-correct" : ""}`}
             aria-label={
               b.phase === "question" ? "Battle question" : "Battle decision"
             }
           >
             {b.phase === "choose" && (
               <>
-                {menu === "analyze" && (
+                {inspecting && (
                   <header>
                     <h2 ref={title} tabIndex={-1}>
-                      Analyze
+                      {menu === "talk" ? "Talk" : "Inspect"}
                     </h2>
-                    <button onClick={() => setMenu("skills")}>
-                      Back to actions
+                    {menu === "talk" && (
+                      <span className="analysis-note">
+                        Uses a turn. A good reply reveals a weakness and adds 20 Momentum.
+                      </span>
+                    )}
+                    <button
+                      onClick={() => setMenu(menu === "talk" ? "analyze" : "skills")}
+                    >
+                      Back
                     </button>
                   </header>
                 )}
@@ -867,108 +879,67 @@ export function BattleScreen(p: Props) {
                 )}
                 {menu === "analyze" && (
                   <>
-                    <p>
-                      {enemyThreatName(b.enemyId)} · Attack {b.attack} · Your
-                      defense {limits.defense}
-                    </p>
-                    {b.weaknessKnown && b.tactics && (
+                    {boss && (
                       <p>
-                        Weakness:{" "}
-                        {skills.find(
-                          (skill) => skill.id === b.tactics!.weakness,
-                        )?.title ?? b.tactics.weakness}
+                        <strong>{boss.title}</strong> · {boss.description}
                       </p>
                     )}
-                    {b.tactics && (
+                    {weakness && <p>Weak to {weakness}</p>}
+                    {!boss && !weakness && !b.tactics && (
+                      <p>
+                        Next move · {upcomingIntent.label}
+                        {upcomingIntent.damage ? ` · ${upcomingIntent.damage} damage` : ""}
+                      </p>
+                    )}
+                    {b.tactics && !b.analyzed && (
+                      <button className="inspect-talk" onClick={() => setMenu("talk")}>
+                        Talk
+                      </button>
+                    )}
+                    {b.analyzed && b.tactics?.spare && (
                       <div className="battle-act-options">
-                        <p>
-                          {b.analyzed
-                            ? b.tactics.act.explanation
-                            : b.tactics.act.prompt}
-                        </p>
-                        {!b.analyzed && (
-                          <>
-                            <p className="analysis-note">
-                              Reply spends a turn · +20 Momentum and weakness
-                              revealed on success.
-                            </p>
-                            <div className="analysis-replies">
-                              {b.tactics.act.options.map((option, index) => (
-                                <button
-                                  key={index}
-                                  onClick={() => p.onAct(index)}
-                                >
-                                  {option}
-                                </button>
-                              ))}
-                            </div>
-                          </>
-                        )}
-                        {b.analyzed && b.tactics.spare && (
-                          <>
-                            <button
-                              className="primary"
-                              disabled={!canSpare(b)}
-                              onClick={p.onSpare}
-                            >
-                              Stand down
-                            </button>
-                            {!canSpare(b) && (
-                              <p>
-                                Requires {b.tactics.boss ? 3 : 1} correct
-                                attacks and at most {b.tactics.boss ? 35 : 65}%
-                                enemy HP. ({b.correctAnswers ?? 0} correct)
-                              </p>
-                            )}
-                          </>
+                        <button
+                          className="primary"
+                          disabled={!canSpare(b)}
+                          onClick={p.onSpare}
+                        >
+                          Stand down
+                        </button>
+                        {!canSpare(b) && (
+                          <p className="analysis-note">
+                            Correct attacks {Math.min(b.correctAnswers ?? 0, b.tactics.boss ? 3 : 1)}/{b.tactics.boss ? 3 : 1}
+                            {" · "}Enemy HP must reach {b.tactics.boss ? 35 : 65}% or less.
+                          </p>
                         )}
                       </div>
                     )}
-                    {boss && (
-                      <details>
-                        <summary>{boss.title}</summary>
-                        <p>{boss.description}</p>
-                      </details>
-                    )}
                     <details>
-                      <summary>Skill effects</summary>
-                      {skills.map((skill) => (
-                        <p key={skill.id}>
-                          <strong>{skill.title}</strong> · {skill.description}
+                      <summary>Turn history</summary>
+                      {lastAnswer.current && (
+                        <p>
+                          <strong>
+                            Last answer · {lastAnswer.current.correct ? "Correct" : "Incorrect"}
+                          </strong>
+                          <br />
+                          {lastAnswer.current.question.explanation}
                         </p>
-                      ))}
-                    </details>
-                    <details>
-                      <summary>Combat rules</summary>
-                      <p>
-                        Correct attacks earn 25 Momentum, plus 10 for a
-                        weakness. Spend 25, 50 or 75 for the same percentage of
-                        extra damage; 100 unlocks a triple-power finisher. A
-                        wrong answer still spends focus and committed Momentum.
-                      </p>
-                      <p>
-                        Defend restores focus and softens a hit. Heavy attacks
-                        offer a dodge instead. Weakness hits break stance, skip
-                        one response, and strengthen the next correct attack.
-                        Poison resolves before the enemy acts.
-                      </p>
-                    </details>
-                    {lastAnswer.current && (
-                      <details>
-                        <summary>
-                          Last answer:{" "}
-                          {lastAnswer.current.correct ? "Correct" : "Review"}
-                        </summary>
-                        <p>{lastAnswer.current.question.prompt}</p>
-                        <p>{lastAnswer.current.question.explanation}</p>
-                      </details>
-                    )}
-                    <details>
-                      <summary>Recent turns</summary>
+                      )}
                       {b.log.slice(-3).map((line, i) => (
                         <p key={i}>{line}</p>
                       ))}
                     </details>
+                  </>
+                )}
+                {menu === "talk" && b.tactics && !b.analyzed && (
+                  <>
+                    <p>{b.tactics.act.prompt}</p>
+                    <div className="analysis-replies">
+                      {b.tactics.act.options.map((option, index) => (
+                        <button key={index} onClick={() => p.onAct(index)}>
+                          {option}
+                        </button>
+                      ))}
+                    </div>
                   </>
                 )}
               </>
@@ -995,7 +966,7 @@ export function BattleScreen(p: Props) {
                 </h2>
                 {q.format === "ordering" && (
                   <p>
-                    Select the steps in order. Select a step again to remove it.
+                    Select steps in order. Select again to undo.
                   </p>
                 )}
                 {q.format === "multiple" && <p>Select all that apply.</p>}
@@ -1227,7 +1198,7 @@ export function BattleScreen(p: Props) {
                 <span>Items</span>
               </button>
               <button
-                aria-pressed={menu === "analyze"}
+                aria-pressed={inspecting}
                 disabled={b.phase !== "choose" || !!motion || evading}
                 onClick={() => setMenu("analyze")}
               >

@@ -108,7 +108,7 @@ export const tutorials: Tutorial[] = [
       },
       {
         title: "Read the machine",
-        body: "Analyze shows enemy details and dialogue choices. A successful read reveals the weakness, adds 20 Momentum, and can open a peaceful stand-down. Retreat keeps your evidence.",
+        body: "Open Talk in Inspect to question the enemy. A good reply reveals a weakness, adds 20 Momentum, and can open a peaceful stand-down. Retreat keeps your evidence.",
       },
       {
         title: "Use your skills",
@@ -186,7 +186,7 @@ export const manualSections: ManualSection[] = [
     lines: [
       "Pick a skill and answer an untimed question. Probe deals direct damage; Firewall adds a two-turn shield; Trace injection poisons for three turns.",
       "Defend restores focus, reduces the next hit, and adds 15 Momentum. Heavy attacks offer an optional Dodge with amber strikes and teal openings.",
-      "Analyze shows enemy details and dialogue choices. A successful read reveals the weakness and may enable stand-down. Retreat keeps your evidence.",
+      "Inspect shows enemy tells. Open Talk to learn weaknesses and work toward a stand-down. Retreat keeps your evidence.",
       "Momentum caps at 100: correct answers +25, weaknesses +10, successful ACT +20, damage taken +10. Spend 25/50/75 for +25/50/75% damage, or all 100 for a free triple-power Probe. Wrong answers still spend committed Momentum.",
     ],
   },

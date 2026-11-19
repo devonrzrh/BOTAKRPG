@@ -576,14 +576,13 @@ enemy:
       - recover
     resolve: 1
     act:
-      prompt: The courier's route is forged. Which record proves the next hop?
+      prompt: The loop must visit slots 0, 1, and 2. Set its stop value.
       options:
-        - Present the signed record
-        - Threaten the system
-        - Guess and proceed
+        - Set stop to 3
+        - Set stop to 2
+        - Set stop to 4
       answer: 0
-      explanation: Verified route evidence satisfies the protocol and avoids harming
-        the protected system.
+      explanation: Python excludes the stop value.
     spare: true
     boss: false
 ```
@@ -611,14 +610,14 @@ enemy:
       - recover
     resolve: 1
     act:
-      prompt: PATCH is trapped behind a route check. What earns safe passage?
+      prompt: PATCH needs the same route check in two languages. What should travel
+        with the code?
       options:
-        - Threaten the system
-        - Guess and proceed
-        - Present the signed record
+        - A copy of one sample result
+        - A screenshot of the original program
+        - The step-by-step procedure
       answer: 2
-      explanation: Verified route evidence satisfies the protocol and avoids harming
-        the protected system.
+      explanation: The procedure can be implemented in either language.
     spare: true
     boss: false
 ```
@@ -645,14 +644,14 @@ enemy:
       - heavy
     resolve: 1
     act:
-      prompt: The relay flags a cycle. What evidence should you present?
+      prompt: A dispatch list is nearly sorted with one arrival out of place. How
+        should PATCH repair it?
       options:
-        - Guess and proceed
-        - Present the signed record
-        - Threaten the system
+        - Search for the arrival and leave it in place
+        - Insert the arrival into the sorted prefix
+        - Reverse the whole dispatch list
       answer: 1
-      explanation: Verified route evidence satisfies the protocol and avoids harming
-        the protected system.
+      explanation: Insertion restores order by shifting the larger entries.
     spare: true
     boss: false
 ```
@@ -680,14 +679,14 @@ enemy:
       - heavy
     resolve: 1
     act:
-      prompt: The courier's route is forged. Which record proves the next hop?
+      prompt: The relay demands a binary lookup. Which directory can PATCH trust for
+        it?
       options:
-        - Present the signed record
-        - Threaten the system
-        - Guess and proceed
+        - A directory sorted by the lookup key
+        - A directory sorted by arrival time
+        - A directory with its duplicates removed
       answer: 0
-      explanation: Verified route evidence satisfies the protocol and avoids harming
-        the protected system.
+      explanation: Binary search needs the same ordering as the lookup key.
     spare: true
     boss: false
 ```
@@ -714,14 +713,14 @@ enemy:
       - recover
     resolve: 1
     act:
-      prompt: PATCH is trapped behind a route check. What earns safe passage?
+      prompt: The relay keeps retrying even after it reaches the end. What should
+        PATCH add?
       options:
-        - Threaten the system
-        - Guess and proceed
-        - Present the signed record
+        - Retry the same address once more
+        - Return only after another retry succeeds
+        - Return as soon as the end is reached
       answer: 2
-      explanation: Verified route evidence satisfies the protocol and avoids harming
-        the protected system.
+      explanation: A reachable stopping condition ends the recursion.
     spare: true
     boss: false
 ```
@@ -748,14 +747,14 @@ enemy:
       - recover
     resolve: 1
     act:
-      prompt: The relay flags a cycle. What evidence should you present?
+      prompt: Every manifest entry is being compared with every receipt. What evidence
+        exposes the cost?
       options:
-        - Guess and proceed
-        - Present the signed record
-        - Threaten the system
+        - Only the number of matching pairs
+        - Counts for both input lists
+        - Only the size of the larger list
       answer: 1
-      explanation: Verified route evidence satisfies the protocol and avoids harming
-        the protected system.
+      explanation: The nested scan checks the product of both input sizes.
     spare: true
     boss: false
 ```
@@ -783,14 +782,14 @@ enemy:
       - recover
     resolve: 1
     act:
-      prompt: The courier's route is forged. Which record proves the next hop?
+      prompt: PATCH wants the fewest hops across equal-cost links. Which route log can
+        certify that?
       options:
-        - Present the signed record
-        - Threaten the system
-        - Guess and proceed
+        - A search log that expands by hop count
+        - A log that follows one branch to its end
+        - A log ordered by relay name
       answer: 0
-      explanation: Verified route evidence satisfies the protocol and avoids harming
-        the protected system.
+      explanation: Expanding by hop count reaches the target in the fewest links.
     spare: true
     boss: false
 ```
@@ -817,14 +816,14 @@ enemy:
       - heavy
     resolve: 1
     act:
-      prompt: PATCH is trapped behind a route check. What earns safe passage?
+      prompt: The greedy route won its first leg and lost overall. What proves it can
+        fail?
       options:
-        - Threaten the system
-        - Guess and proceed
-        - Present the signed record
+        - A cheaper first hop with no known finish
+        - A route using the same relays in the same order
+        - A cheaper complete route
       answer: 2
-      explanation: Verified route evidence satisfies the protocol and avoids harming
-        the protected system.
+      explanation: A complete counterexample compares the full costs.
     spare: true
     boss: false
 ```
@@ -852,14 +851,13 @@ enemy:
       - heavy
     resolve: 1
     act:
-      prompt: The relay flags a cycle. What evidence should you present?
+      prompt: Several routes reach the same relay state. What can PATCH reuse?
       options:
-        - Guess and proceed
-        - Present the signed record
-        - Threaten the system
+        - The location of the first relay only
+        - The solved cost from that state
+        - The cost of the most recent first hop
       answer: 1
-      explanation: Verified route evidence satisfies the protocol and avoids harming
-        the protected system.
+      explanation: Reuse the result of the matching subproblem.
     spare: true
     boss: false
 ```
@@ -886,14 +884,14 @@ enemy:
       - recover
     resolve: 1
     act:
-      prompt: The courier's route is forged. Which record proves the next hop?
+      prompt: One route rarely fails but is costly when it does. What should PATCH
+        compare?
       options:
-        - Present the signed record
-        - Threaten the system
-        - Guess and proceed
+        - Each outcome weighted by its chance
+        - The normal-day cost alone
+        - The worst outcome alone
       answer: 0
-      explanation: Verified route evidence satisfies the protocol and avoids harming
-        the protected system.
+      explanation: Expected cost accounts for both losses and their probabilities.
     spare: true
     boss: false
 ```
@@ -920,14 +918,13 @@ enemy:
       - recover
     resolve: 1
     act:
-      prompt: PATCH is trapped behind a route check. What earns safe passage?
+      prompt: A cheap dispatch closes a future route. What belongs in the decision?
       options:
-        - Threaten the system
-        - Guess and proceed
-        - Present the signed record
+        - Only the cost of the next hop
+        - Only the total number of relays
+        - The price now and the options it leaves later
       answer: 2
-      explanation: Verified route evidence satisfies the protocol and avoids harming
-        the protected system.
+      explanation: Today's dispatch changes what can happen tomorrow.
     spare: true
     boss: false
 ```
@@ -965,14 +962,13 @@ enemy:
       - recover
     resolve: 2
     act:
-      prompt: The courier's route is forged. Which record proves the next hop?
+      prompt: What proves ECHO crossed relay R-17?
       options:
-        - Present the signed record
-        - Threaten the system
-        - Guess and proceed
+        - PATCH's signed delivery receipt
+        - A list of possible relays
+        - A timing chart with no sender
       answer: 0
-      explanation: Verified route evidence satisfies the protocol and avoids harming
-        the protected system.
+      explanation: The receipt binds the recorded crossing to its relay.
     spare: true
     boss: true
 clue:
@@ -1002,14 +998,13 @@ enemy:
       - recover
     resolve: 1
     act:
-      prompt: FOLIO's identity was erased. Which record can restore the audit trail?
+      prompt: FOLIO has a badge ID and needs a single record. Choose the first check.
       options:
-        - Present the signed record
-        - Threaten the system
-        - Guess and proceed
+        - Look up the badge ID in the index
+        - Sort records by owner name
+        - Read the newest record first
       answer: 0
-      explanation: Verified archive evidence satisfies the protocol and avoids harming
-        the protected system.
+      explanation: The badge ID is the lookup key for the record.
     spare: true
     boss: false
 ```
@@ -1037,14 +1032,14 @@ enemy:
       - recover
     resolve: 1
     act:
-      prompt: The archive blocks access. Which credential follows its protocol?
+      prompt: FOLIO needs the entry after A even when the records are stored apart.
+        What should it follow?
       options:
-        - Threaten the system
-        - Guess and proceed
-        - Present the signed record
+        - The adjacent memory address
+        - The next record by creation date
+        - A's next link
       answer: 2
-      explanation: Verified archive evidence satisfies the protocol and avoids harming
-        the protected system.
+      explanation: The link gives the logical successor.
     spare: true
     boss: false
 ```
@@ -1071,14 +1066,14 @@ enemy:
       - heavy
     resolve: 1
     act:
-      prompt: A revision was altered. What evidence verifies its history?
+      prompt: FOLIO inserts a new entry at the start of a packed array. What happens
+        to the old first entry?
       options:
-        - Guess and proceed
-        - Present the signed record
-        - Threaten the system
+        - Swap it with the final entry
+        - Move it one slot right
+        - Leave it at index zero
       answer: 1
-      explanation: Verified archive evidence satisfies the protocol and avoids harming
-        the protected system.
+      explanation: Insertion shifts existing entries without changing their order.
     spare: true
     boss: false
 ```
@@ -1106,14 +1101,13 @@ enemy:
       - heavy
     resolve: 1
     act:
-      prompt: FOLIO's identity was erased. Which record can restore the audit trail?
+      prompt: FOLIO is replacing A→B with A→X→B. Which edit keeps B reachable?
       options:
-        - Present the signed record
-        - Threaten the system
-        - Guess and proceed
+        - Set X's next to B before changing A
+        - Point A at X and clear X's next
+        - Point B at X and keep A unchanged
       answer: 0
-      explanation: Verified archive evidence satisfies the protocol and avoids harming
-        the protected system.
+      explanation: Link X to the remainder before reconnecting A.
     spare: true
     boss: false
 ```
@@ -1140,14 +1134,14 @@ enemy:
       - recover
     resolve: 1
     act:
-      prompt: The archive blocks access. Which credential follows its protocol?
+      prompt: FOLIO needs to reverse the last edit first. Which record should it
+        remove?
       options:
-        - Threaten the system
-        - Guess and proceed
-        - Present the signed record
+        - The earliest edit in the archive
+        - The edit with the lowest record ID
+        - The top of the undo stack
       answer: 2
-      explanation: Verified archive evidence satisfies the protocol and avoids harming
-        the protected system.
+      explanation: Undo uses the reverse of the edit order.
     spare: true
     boss: false
 ```
@@ -1174,14 +1168,14 @@ enemy:
       - recover
     resolve: 1
     act:
-      prompt: A revision was altered. What evidence verifies its history?
+      prompt: The archive is serving tickets 17, 20, and 14 in arrival order. Which
+        ticket goes first?
       options:
-        - Guess and proceed
-        - Present the signed record
-        - Threaten the system
+        - Ticket 20
+        - Ticket 17
+        - Ticket 14
       answer: 1
-      explanation: Verified archive evidence satisfies the protocol and avoids harming
-        the protected system.
+      explanation: FIFO serves the earliest arrival.
     spare: true
     boss: false
 ```
@@ -1209,14 +1203,14 @@ enemy:
       - recover
     resolve: 1
     act:
-      prompt: FOLIO's identity was erased. Which record can restore the audit trail?
+      prompt: Branches have lost their parent labels. Which record would rebuild the
+        hierarchy?
       options:
-        - Present the signed record
-        - Threaten the system
-        - Guess and proceed
+        - A child-to-parent table
+        - A count of files per folder
+        - A list sorted by folder name
       answer: 0
-      explanation: Verified archive evidence satisfies the protocol and avoids harming
-        the protected system.
+      explanation: The hierarchy depends on each child's own parent link.
     spare: true
     boss: false
 ```
@@ -1243,14 +1237,14 @@ enemy:
       - heavy
     resolve: 1
     act:
-      prompt: The archive blocks access. Which credential follows its protocol?
+      prompt: FOLIO wants the stored keys in sorted order. Which route through the
+        tree should it follow?
       options:
-        - Threaten the system
-        - Guess and proceed
-        - Present the signed record
+        - Node, left subtree, right subtree
+        - Left subtree, right subtree, node
+        - Left subtree, node, right subtree
       answer: 2
-      explanation: Verified archive evidence satisfies the protocol and avoids harming
-        the protected system.
+      explanation: Inorder traversal respects the search tree's ordering.
     spare: true
     boss: false
 ```
@@ -1278,14 +1272,14 @@ enemy:
       - heavy
     resolve: 1
     act:
-      prompt: A revision was altered. What evidence verifies its history?
+      prompt: The route from A to D is missing. Which record belongs in A's adjacency
+        list?
       options:
-        - Guess and proceed
-        - Present the signed record
-        - Threaten the system
+        - A duplicate of A's own ID
+        - D, if A links directly to D
+        - Every stop reachable after D
       answer: 1
-      explanation: Verified archive evidence satisfies the protocol and avoids harming
-        the protected system.
+      explanation: An adjacency list stores direct neighbors.
     spare: true
     boss: false
 ```
@@ -1312,14 +1306,14 @@ enemy:
       - recover
     resolve: 1
     act:
-      prompt: FOLIO's identity was erased. Which record can restore the audit trail?
+      prompt: A revision looks authentic, but FOLIO suspects altered bytes. What
+        should it compare?
       options:
-        - Present the signed record
-        - Threaten the system
-        - Guess and proceed
+        - A fresh checksum against the trusted checksum
+        - The filename against the parent name
+        - The edit date against today's date
       answer: 0
-      explanation: Verified archive evidence satisfies the protocol and avoids harming
-        the protected system.
+      explanation: A fresh checksum can detect content changes.
     spare: true
     boss: false
 ```
@@ -1357,14 +1351,14 @@ enemy:
       - recover
     resolve: 2
     act:
-      prompt: The archive blocks access. Which credential follows its protocol?
+      prompt: FOLIO must both identify the missing gateway entry and check its
+        integrity. What should it use?
       options:
-        - Threaten the system
-        - Guess and proceed
-        - Present the signed record
+        - An unsigned copy with the same title
+        - A queue of unrelated archive requests
+        - The signed audit with the matching revision checksum
       answer: 2
-      explanation: Verified archive evidence satisfies the protocol and avoids harming
-        the protected system.
+      explanation: The audit identifies the entry and the checksum checks its contents.
     spare: true
     boss: true
 clue:
@@ -1394,14 +1388,14 @@ enemy:
       - recover
     resolve: 1
     act:
-      prompt: LUMA detects a forged signal. What test best verifies its source?
+      prompt: LUMA needs the model to learn from a wrong label prediction. What should
+        change?
       options:
-        - Present the signed record
-        - Threaten the system
-        - Guess and proceed
+        - The weights, based on the prediction error
+        - The label so it matches the prediction
+        - The number of test examples only
       answer: 0
-      explanation: Verified signal evidence satisfies the protocol and avoids harming
-        the protected system.
+      explanation: Training changes the model in response to the error.
     spare: true
     boss: false
 ```
@@ -1429,14 +1423,14 @@ enemy:
       - recover
     resolve: 1
     act:
-      prompt: The handshake is untrusted. Which evidence establishes its origin?
+      prompt: A copied neuron gives a different output for the same inputs. What
+        record would let LUMA reproduce it?
       options:
-        - Threaten the system
-        - Guess and proceed
-        - Present the signed record
+        - Its layer number and input count
+        - Its latest accuracy score
+        - Its weights, bias, and activation
       answer: 2
-      explanation: Verified signal evidence satisfies the protocol and avoids harming
-        the protected system.
+      explanation: All three determine the neuron's computation.
     spare: true
     boss: false
 ```
@@ -1463,14 +1457,14 @@ enemy:
       - heavy
     resolve: 1
     act:
-      prompt: The model flags a drift. What should be checked before adapting?
+      prompt: The classifier works in daylight and fails at night. What evidence shows
+        the size of the gap?
       options:
-        - Guess and proceed
-        - Present the signed record
-        - Threaten the system
+        - More copies of the same night image
+        - Separate scores on held-out day and night examples
+        - A single score on daytime training data
       answer: 1
-      explanation: Verified signal evidence satisfies the protocol and avoids harming
-        the protected system.
+      explanation: Separate unseen samples show how performance changes with conditions.
     spare: true
     boss: false
 ```
@@ -1498,14 +1492,13 @@ enemy:
       - heavy
     resolve: 1
     act:
-      prompt: LUMA detects a forged signal. What test best verifies its source?
+      prompt: A ReLU unit stays at zero across a batch. What should LUMA inspect first?
       options:
-        - Present the signed record
-        - Threaten the system
-        - Guess and proceed
+        - The signs of the unit's inputs before ReLU
+        - Only the model's final predicted classes
+        - The order of the training labels
       answer: 0
-      explanation: Verified signal evidence satisfies the protocol and avoids harming
-        the protected system.
+      explanation: ReLU zeroes nonpositive preactivations.
     spare: true
     boss: false
 ```
@@ -1532,14 +1525,14 @@ enemy:
       - recover
     resolve: 1
     act:
-      prompt: The handshake is untrusted. Which evidence establishes its origin?
+      prompt: LUMA is checking a forecast for next week. Where should the test cases
+        come from?
       options:
-        - Threaten the system
-        - Guess and proceed
-        - Present the signed record
+        - A random subset of the training records
+        - The oldest block used for tuning
+        - A time block after the training period
       answer: 2
-      explanation: Verified signal evidence satisfies the protocol and avoids harming
-        the protected system.
+      explanation: A later holdout matches real forecasting.
     spare: true
     boss: false
 ```
@@ -1566,14 +1559,14 @@ enemy:
       - recover
     resolve: 1
     act:
-      prompt: The model flags a drift. What should be checked before adapting?
+      prompt: LUMA sees a drop after the sensors are replaced. What helps identify
+        drift?
       options:
-        - Guess and proceed
-        - Present the signed record
-        - Threaten the system
+        - Compare the number of input fields only
+        - Compare recent sensor readings with training readings
+        - Increase the interface refresh rate
       answer: 1
-      explanation: Verified signal evidence satisfies the protocol and avoids harming
-        the protected system.
+      explanation: Distribution comparisons can expose changed inputs.
     spare: true
     boss: false
 ```
@@ -1601,14 +1594,14 @@ enemy:
       - recover
     resolve: 1
     act:
-      prompt: LUMA detects a forged signal. What test best verifies its source?
+      prompt: New labeled events arrive in a stream. When should LUMA score each
+        prediction?
       options:
-        - Present the signed record
-        - Threaten the system
-        - Guess and proceed
+        - Before updating the model with that event
+        - After training on that same event
+        - Only after replaying the entire stream
       answer: 0
-      explanation: Verified signal evidence satisfies the protocol and avoids harming
-        the protected system.
+      explanation: Scoring first measures an unseen example.
     spare: true
     boss: false
 ```
@@ -1635,14 +1628,13 @@ enemy:
       - heavy
     resolve: 1
     act:
-      prompt: The handshake is untrusted. Which evidence establishes its origin?
+      prompt: A new item has no clicks. What should LUMA use to rank it initially?
       options:
-        - Threaten the system
-        - Guess and proceed
-        - Present the signed record
+        - A click rate inferred from no observations
+        - Its position in the import file
+        - Its content and known user preferences
       answer: 2
-      explanation: Verified signal evidence satisfies the protocol and avoids harming
-        the protected system.
+      explanation: Available content can bridge the cold start.
     spare: true
     boss: false
 ```
@@ -1670,14 +1662,14 @@ enemy:
       - heavy
     resolve: 1
     act:
-      prompt: The model flags a drift. What should be checked before adapting?
+      prompt: The agent always picks its first rewarded action. What change helps test
+        alternatives?
       options:
-        - Guess and proceed
-        - Present the signed record
-        - Threaten the system
+        - Remove all actions with unknown values
+        - Occasionally sample another action
+        - Increase the first action's recorded reward
       answer: 1
-      explanation: Verified signal evidence satisfies the protocol and avoids harming
-        the protected system.
+      explanation: Exploration collects evidence about other actions.
     spare: true
     boss: false
 ```
@@ -1704,14 +1696,14 @@ enemy:
       - recover
     resolve: 1
     act:
-      prompt: LUMA detects a forged signal. What test best verifies its source?
+      prompt: Training loss falls and validation loss rises. What is the most useful
+        checkpoint?
       options:
-        - Present the signed record
-        - Threaten the system
-        - Guess and proceed
+        - The checkpoint with the best validation score
+        - The final checkpoint with the lowest training loss
+        - The checkpoint tuned on the final test set
       answer: 0
-      explanation: Verified signal evidence satisfies the protocol and avoids harming
-        the protected system.
+      explanation: Validation helps select a model before training overfits.
     spare: true
     boss: false
 ```
@@ -1748,14 +1740,14 @@ enemy:
       - recover
     resolve: 2
     act:
-      prompt: LUMA detects a forged signal. What test best verifies its source?
+      prompt: An impostor repeats LUMA's display name. What can authenticate the
+        source?
       options:
-        - Present the signed record
-        - Threaten the system
-        - Guess and proceed
+        - A verified handshake from the expected peer
+        - A matching avatar
+        - A prediction with high confidence
       answer: 0
-      explanation: Verified signal evidence satisfies the protocol and avoids harming
-        the protected system.
+      explanation: The handshake establishes the peer's identity.
     spare: true
     boss: true
 clue:

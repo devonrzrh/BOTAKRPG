@@ -304,8 +304,16 @@ const records: object[] = checks.map(
     };
   },
 );
+const curriculum = parseMarkdown(
+  await readFile("content/08-curriculum.md", "utf8"),
+);
+const authoredActs = new Map(curriculum.flatMap((record) =>
+  record.type === "activity" && record.enemy?.tactics
+    ? [[record.id, record.enemy.tactics.act] as const]
+    : [],
+));
 const tacticsFor = (
-  topic: string,
+  id: string,
   index: number,
   boss = false,
   mechanic?: "routing" | "archive" | "mimic",
@@ -318,48 +326,14 @@ const tacticsFor = (
     ["strike", "strike", "recover"],
   ];
   const weaknesses = ["insight", "ward"];
-  const subject =
-    topic === "algorithms"
-      ? "route"
-      : topic === "structures"
-        ? "archive"
-        : "signal";
-  const acts =
-    topic === "algorithms"
-      ? [
-          "The courier's route is forged. Which record proves the next hop?",
-          "PATCH is trapped behind a route check. What earns safe passage?",
-          "The relay flags a cycle. What evidence should you present?",
-        ]
-      : topic === "structures"
-        ? [
-            "FOLIO's identity was erased. Which record can restore the audit trail?",
-            "The archive blocks access. Which credential follows its protocol?",
-            "A revision was altered. What evidence verifies its history?",
-          ]
-        : [
-            "LUMA detects a forged signal. What test best verifies its source?",
-            "The handshake is untrusted. Which evidence establishes its origin?",
-            "The model flags a drift. What should be checked before adapting?",
-          ];
-  const options = [
-    "Present the signed record",
-    "Threaten the system",
-    "Guess and proceed",
-  ];
-  const rotation = index % options.length;
-  const rotated = [...options.slice(rotation), ...options.slice(0, rotation)];
+  const act = authoredActs.get(id);
+  if (!act) throw new Error(`Missing authored battle dialogue for ${id}`);
   return {
     ...(mechanic ? { mechanic } : {}),
     weakness: weaknesses[index % weaknesses.length],
     pattern: patterns[index % patterns.length],
     resolve: boss ? 2 : 1,
-    act: {
-      prompt: acts[index % acts.length],
-      options: rotated,
-      answer: (options.length - rotation) % options.length,
-      explanation: `Verified ${subject} evidence satisfies the protocol and avoids harming the protected system.`,
-    },
+    act,
     spare: true,
     boss,
   };
@@ -411,7 +385,7 @@ for (const spec of specs) {
         attack: 7,
         mixedQuestions: false,
         lessons: [chapter.id],
-        tactics: tacticsFor(spec.topic, index),
+        tactics: tacticsFor(`encounter-${chapter.id}`, index),
       },
     });
   records.push({
@@ -428,7 +402,7 @@ for (const spec of specs) {
       mixedQuestions: false,
       lessons: chapters.map((c: { id: string }) => c.id),
       tactics: tacticsFor(
-        spec.topic,
+        spec.boss,
         spec.topic === "structures" ? 1 : 0,
         true,
         spec.topic === "algorithms"

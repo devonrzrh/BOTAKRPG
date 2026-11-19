@@ -163,12 +163,14 @@ const createMaze = activityTemplates.maze.create;
 const mazeCommand = activityTemplates.maze.command;
 const createBattle = (
   enemy?: Parameters<typeof activityTemplates.battle.create>[0],
+  attempt = 0,
 ) => {
   const guardian = content.entities.find(
     (e) => e.type === "activity" && e.id === "guardian-battle",
   );
   return activityTemplates.battle.create(
     enemy ?? (guardian?.type === "activity" ? guardian.enemy : undefined),
+    attempt,
   );
 };
 const initialSeed = content.entities.find(
@@ -363,6 +365,16 @@ export default function App() {
   const [debugOpen, setDebugOpen] = useState(false);
   const debugCheckpoint = useRef<Save | null>(null);
   const [debugBattleRun, setDebugBattleRun] = useState(0);
+  const battleAttempts = useRef(new Map<string, number>());
+  const startBattle = useCallback(
+    (enemy?: Parameters<typeof createBattle>[0]) => {
+      const id = enemy?.id ?? "sentinel";
+      const attempt = battleAttempts.current.get(id) ?? 0;
+      battleAttempts.current.set(id, attempt + 1);
+      return createBattle(enemy, attempt);
+    },
+    [],
+  );
   const [debugPuzzleRun, setDebugPuzzleRun] = useState(0);
   const [blocksExpanded, setBlocksExpanded] = useState(true);
   const [maze, setMaze] = useState<Maze>(() => createMaze(defaultSave().seed)),
@@ -749,7 +761,7 @@ export default function App() {
         updateSave(recoverResources);
         const enemy = encounter.enemy;
         setBattle(
-          createBattle(
+          startBattle(
             enemy
               ? {
                   ...enemy,
@@ -851,7 +863,7 @@ export default function App() {
         setScene("hub");
         setPanel("battle");
         setBattle(
-          createBattle(
+          startBattle(
             echoActivity.type === "activity" ? echoActivity.enemy : undefined,
           ),
         );
@@ -869,7 +881,7 @@ export default function App() {
         setPanel(id as Panel);
         if (id === "battle") {
           updateSave(recoverResources);
-          const enemy = createBattle();
+          const enemy = startBattle();
           const activity = content.entities.find(
             (e) => e.type === "activity" && e.id === "guardian-battle",
           );
@@ -890,7 +902,7 @@ export default function App() {
         trialRef.current = false;
       }
     },
-    [realm, officeFallback, sound, panel, settingsFromBattle, suppressNavigationSfx],
+    [realm, officeFallback, sound, panel, settingsFromBattle, suppressNavigationSfx, startBattle],
   );
   const close = useCallback((confirmedExit = false) => {
     if (settingsFromBattle && !confirmedExit) {
@@ -2266,7 +2278,7 @@ export default function App() {
               )}
               {panel === "battle" && (
                 <BattleScreen
-                  key={`${battle.enemyId}:${debugBattleRun}`}
+                  key={`${battle.enemyId}:${battle.questionOffset}:${debugBattleRun}`}
                   paused={debugOpen}
                   previewVictory={
                     battle.enemyId === echoActivity.enemy?.id &&

@@ -9,6 +9,7 @@ import type {
 export type { CombatTactics } from "../content/schema";
 import { stats, type Save } from "./state";
 import { useConsumable } from "./gacha";
+import { random } from "./maze";
 export interface ActiveEffect {
   id: "shield" | "poison";
   remaining: number;
@@ -43,6 +44,7 @@ export interface Battle {
   finisher?: boolean;
   evasion?: number;
   asked?: string[];
+  questionOffset?: number;
   mechanicSkill?: string;
   archiveOpen?: boolean;
   phaseShiftTurn?: number;
@@ -63,6 +65,7 @@ export function createBattle(
     attack: 10,
     mixedQuestions: false,
   },
+  questionOffset = 0,
 ): Battle {
   return {
     enemyId: enemy.id,
@@ -82,6 +85,7 @@ export function createBattle(
     momentum: 0,
     momentumSpend: 0,
     asked: [],
+    questionOffset,
     ...(enemy.tactics
       ? {
           tactics: enemy.tactics,
@@ -148,7 +152,7 @@ export function bossReadout(
         phase: "Firewall",
         title: "Route Firewall",
         description:
-          "Unpowered hits are halved. Momentum, Finisher, or Broken stance bypass armor.",
+          "Hits deal half damage. Spend Momentum or break its stance to bypass the firewall.",
       };
     case "archive":
       return battle.archiveOpen
@@ -156,21 +160,21 @@ export function bossReadout(
             phase: "Open",
             title: "Audit Window",
             description:
-              "The archive is exposed this turn; attacks deal full damage.",
+              "Attack now for full damage.",
           }
         : {
             phase: "Checksum",
             title: "Checksum Lock",
             description:
-              "Attacks are halved. Brace with Defend to expose it for your next turn.",
+              "Hits deal half damage. Brace to open the lock for your next turn.",
           };
     case "mimic":
       return {
         phase: "Adapting",
         title: "Signal Adaptation",
         description: battle.mechanicSkill
-          ? "Repeating your last skill is resisted. Switch skills or brace with Defend to clear adaptation."
-          : "Hits are full. Switch skills after a hit; bracing clears adaptation.",
+          ? "It resists your last skill. Switch skills or brace."
+          : "It learns each skill after a hit. Switch skills between attacks.",
       };
     case "echo": {
       const phaseTwo = battle.hp <= battle.maxHp / 2;
@@ -178,8 +182,8 @@ export function bossReadout(
         phase: phaseTwo ? "Phase 2" : "Phase 1",
         title: phaseTwo ? "Escalation" : "Containment Pattern",
         description: phaseTwo
-          ? "Strikes hit harder; Recover opens a safe turn to attack."
-          : "At half health ECHO shifts. Follow its telegraph; Recover opens a safe attack.",
+          ? "Strikes hit harder. Attack when ECHO pauses."
+          : "ECHO hits harder at half health. Attack when it pauses.",
       };
     }
     default:
@@ -245,6 +249,7 @@ export function selectSkill(
       : questions.filter((q) => q.lesson === skill.lesson);
   // A single lesson can hold only two or three questions. Widen the pool to
   // prerequisite lessons, keeping future chapters out of early encounters.
+  const openingPool = pool;
   if (content && pool.length < 6) {
     const lessonIds = new Set<string>();
     const addPrerequisites = (lessonId: string) => {
@@ -269,24 +274,43 @@ export function selectSkill(
     pool = [...pool, ...related];
   }
   if (!pool.length) throw new Error("No questions for this skill");
-  const asked = new Set(battle.asked ?? []);
+  let cycle = battle.asked ?? [];
+  const asked = new Set(cycle);
+  const previous = pool.find((q) => q.id === (battle.question ?? cycle.at(-1)));
   let candidates = pool.filter((q) => !asked.has(q.id));
   if (!candidates.length) {
-    // Every question in the subject has been asked this encounter. Restart the
-    // cycle but never repeat the prompt that is still on screen.
-    candidates = pool.filter(
-      (q) => q.id !== (battle.question ?? battle.asked?.at(-1)),
-    );
+    cycle = [];
+    candidates = pool.length === 1 ? pool : pool.filter((q) => q !== previous);
   }
-  if (!candidates.length) candidates = pool;
-  const chosen = candidates[Math.max(0, battle.turn - 1) % candidates.length];
+  if (!asked.size && !previous && openingPool.length) {
+    candidates = openingPool;
+  }
+  const attempt = battle.questionOffset ?? 0;
+  if (battle.mixedQuestions && !battle.lessons && content) {
+    const topics = ["algorithms", "structures", "ai"];
+    const topic = topics[(cycle.length + attempt) % topics.length];
+    const lessonIds = new Set(content.entities.flatMap((e) =>
+      e.type === "lesson" && e.topic === topic ? [e.id] : [],
+    ));
+    const matching = candidates.filter((q) => lessonIds.has(q.lesson));
+    if (matching.length) candidates = matching;
+  }
+  if (previous && (battle.lessons || content)) {
+    const otherFormats = candidates.filter((q) => q.format !== previous.format);
+    if (otherFormats.length) {
+      const currentLesson = otherFormats.filter((q) => openingPool.includes(q));
+      candidates = currentLesson.length ? currentLesson : otherFormats;
+    }
+  }
+  const index = attempt + Math.max(0, battle.turn - 1);
+  const chosen = candidates[index % candidates.length];
   return {
     ...battle,
     phase: "question",
     skill: skill.id,
     question: chosen.id,
     assisted: false,
-    asked: [...(battle.asked ?? []), chosen.id],
+    asked: [...cycle, chosen.id],
   };
 }
 export function isCorrect(question: Question, answer: number[]): boolean {
@@ -300,6 +324,20 @@ export function isCorrect(question: Question, answer: number[]): boolean {
     question.answer.length === answer.length &&
     question.answer.every((x, i) => x === answer[i])
   );
+}
+export function battleAnswerOrder(question: Question, turn: number, attempt = 0) {
+  let seed = turn + 31 * attempt;
+  for (const char of question.id) seed = Math.imul(seed, 31) + char.charCodeAt(0);
+  const roll = random(seed);
+  const order = question.options.map((_, index) => index);
+  for (let i = order.length - 1; i > 0; i--) {
+    const j = Math.floor(roll() * (i + 1));
+    [order[i], order[j]] = [order[j], order[i]];
+  }
+  if (question.format === "ordering" && question.answer.every((index, i) => order[i] === index)) {
+    [order[0], order[1]] = [order[1], order[0]];
+  }
+  return order;
 }
 export function battleQuizDuration(format: Question["format"]): number {
   return format === "choice" ? 30_000 : 45_000;
