@@ -1194,55 +1194,62 @@ export function BattleScreen(p: Props) {
             </div>
           </section>
         )}
-        <nav className="battle-command-menu" aria-label="Battle commands">
-          <button
-            ref={skillsButton}
-            aria-pressed={menu === "skills"}
-            disabled={b.phase !== "choose" || !!motion || evading}
-            onClick={() => setMenu("skills")}
-          >
-            <RpgIcon name="skills" />
-            <span>Skills</span>
-          </button>
-          <button
-            disabled={b.phase !== "choose" || !!motion || evading}
-            aria-pressed={menu === "defend"}
-            onClick={() => {
-              if (b.tactics && intent.kind === "heavy") setMenu("defend");
-              else p.onGuard();
-            }}
-          >
-            <RpgIcon name="brace" />
-            <span>
-              Defend<small>Brace or dodge</small>
-            </span>
-          </button>
-          <button
-            aria-pressed={menu === "items"}
-            disabled={b.phase !== "choose" || !!motion || evading}
-            onClick={() => setMenu("items")}
-          >
-            <RpgIcon name="items" />
-            <span>Items</span>
-          </button>
-          <button
-            aria-pressed={menu === "analyze"}
-            disabled={b.phase !== "choose" || !!motion || evading}
-            onClick={() => setMenu("analyze")}
-          >
-            <RpgIcon name="inspect" />
-            <span>Inspect</span>
-          </button>
-          <button
-            disabled={!!motion || evading || b.phase === "lost"}
-            onClick={p.onRetreat}
-          >
-            <RpgIcon name="retreat" />
-            <span>
-              Retreat<small>Keep evidence</small>
-            </span>
-          </button>
-        </nav>
+        <div
+          className="battle-command-slot"
+          inert={b.phase !== "choose" || !activeCard}
+        >
+          <div>
+            <nav className="battle-command-menu" aria-label="Battle commands">
+              <button
+                ref={skillsButton}
+                aria-pressed={menu === "skills"}
+                disabled={b.phase !== "choose" || !!motion || evading}
+                onClick={() => setMenu("skills")}
+              >
+                <RpgIcon name="skills" />
+                <span>Skills</span>
+              </button>
+              <button
+                disabled={b.phase !== "choose" || !!motion || evading}
+                aria-pressed={menu === "defend"}
+                onClick={() => {
+                  if (b.tactics && intent.kind === "heavy") setMenu("defend");
+                  else p.onGuard();
+                }}
+              >
+                <RpgIcon name="brace" />
+                <span>
+                  Defend<small>Brace or dodge</small>
+                </span>
+              </button>
+              <button
+                aria-pressed={menu === "items"}
+                disabled={b.phase !== "choose" || !!motion || evading}
+                onClick={() => setMenu("items")}
+              >
+                <RpgIcon name="items" />
+                <span>Items</span>
+              </button>
+              <button
+                aria-pressed={menu === "analyze"}
+                disabled={b.phase !== "choose" || !!motion || evading}
+                onClick={() => setMenu("analyze")}
+              >
+                <RpgIcon name="inspect" />
+                <span>Inspect</span>
+              </button>
+              <button
+                disabled={!!motion || evading || b.phase === "lost"}
+                onClick={p.onRetreat}
+              >
+                <RpgIcon name="retreat" />
+                <span>
+                  Retreat<small>Keep evidence</small>
+                </span>
+              </button>
+            </nav>
+          </div>
+        </div>
       </div>
     </div>
   );
