@@ -214,11 +214,6 @@ body {
   inset: 0;
   border: 0;
 }
-.gameplay-battle .world-canvas.boss-world {
-  top: 40px;
-  height: 49%;
-  width: 100%;
-}
 .gameplay-battle .combat-actions {
   min-height: 250px;
   max-height: 56%;

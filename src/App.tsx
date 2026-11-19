@@ -1556,7 +1556,7 @@ export default function App() {
   ).length;
   return (
     <div
-      className={`app gameplay-${panel ?? "explore"} maze-${mode} ${blocksExpanded ? "blocks-expanded" : "blocks-docked"} ${useWorldUi ? "world-ui-view" : ""} ${realm === "desk" ? "home-view" : "network-view"} ${homeMoving && realm === "desk" ? "home-panning" : ""} ${settingsFromBattle ? "battle-in-settings" : ""} ${save.settings.reducedMotion ? "reduced-motion" : ""}`}
+      className={`app gameplay-${panel ?? "explore"} maze-${mode} ${blocksExpanded ? "blocks-expanded" : "blocks-docked"} ${useWorldUi ? "world-ui-view" : ""} ${realm === "desk" ? "home-view" : "network-view"} ${homeMoving && realm === "desk" ? "home-panning" : ""} ${save.settings.reducedMotion ? "reduced-motion" : ""}`}
     >
       {intakeOpen && (
         <Onboarding

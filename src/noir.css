@@ -673,11 +673,6 @@ textarea::placeholder {
   font-size: 12px;
   color: #8aabb8;
 }
-/* Combat is a stage behind the UI, with all choices anchored below it. */
-.world-canvas.boss-world {
-  top: 40px;
-  height: 46%;
-}
 .battle-panel {
   background: transparent;
   border-color: #344b5780;
@@ -1344,9 +1339,5 @@ textarea::placeholder {
   }
   .case-summary .section-eyebrow {
     font-size: 6px;
-  }
-  .world-canvas.boss-world {
-    height: 42%;
-    top: 55px;
   }
 }

@@ -300,11 +300,14 @@ function WorldCanvas(props: Props) {
       camera.target.set(5, 2.3, 4);
     }
     const view = props.encounter ? 3.1 : props.scene === "maze" ? 9 : 12;
+    // Frame the enemy in the upper half while rendering the arena behind the HUD.
+    const framingHeight = props.encounter ? 0.5 : 1;
     const resize = () => {
-      const aspect = engine.getRenderWidth() / engine.getRenderHeight();
+      const aspect =
+        engine.getRenderWidth() / (engine.getRenderHeight() * framingHeight);
       const vertical = view / Math.min(1, aspect);
       camera.orthoTop = vertical;
-      camera.orthoBottom = -vertical;
+      camera.orthoBottom = vertical - (2 * vertical) / framingHeight;
       camera.orthoLeft = -vertical * aspect;
       camera.orthoRight = vertical * aspect;
     };

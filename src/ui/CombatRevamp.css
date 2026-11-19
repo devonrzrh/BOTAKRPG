@@ -47,10 +47,6 @@
   grid-template-columns: repeat(4, 1fr);
   gap: 6px;
 }
-.app.battle-in-settings .world-canvas.boss-world {
-  top: 0;
-  height: calc(100% - 220px);
-}
 .app .battle-command-menu > span {
   font-size: 16px;
 }
@@ -148,10 +144,6 @@
   top: 43%;
   max-height: calc(100% - 300px);
 }
-.app .battle-screen.phase-question .battle-command-menu,
-.app .battle-screen.phase-feedback .battle-command-menu {
-  display: none;
-}
 .app .battle-decision.command-panel {
   bottom: 108px;
   width: min(530px, calc(100% - 48px));
@@ -231,12 +223,6 @@
   .app .battle-skill-tray button {
     padding: 10px 12px;
   }
-}
-.app.gameplay-battle .world-canvas.boss-world,
-.app.battle-in-settings .world-canvas.boss-world,
-.app.gameplay-battle:has(.quiz-panel) .world-canvas.boss-world {
-  top: 0;
-  height: calc(100% - 220px);
 }
 .app.gameplay-battle .world-canvas,
 .app .motion-enemy .battle-player-hud {

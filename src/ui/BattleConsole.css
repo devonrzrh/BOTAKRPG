@@ -1,22 +1,5 @@
 .app.gameplay-battle {
-  --battle-console-height: min(320px, 54%);
-  --battle-stage-height: calc(100% - var(--battle-console-height) - 28px);
-}
-.app.gameplay-battle:has(.battle-screen.phase-question),
-.app.gameplay-battle:has(.battle-screen.phase-feedback) {
-  --battle-console-height: min(400px, 62%);
-}
-.app.gameplay-battle:has(.battle-screen.battle-layout-console)
-  .world-canvas.boss-world {
-  top: 0;
-  height: var(--battle-stage-height);
-}
-@media (max-width: 700px) and (min-height: 600px) {
-  .app.gameplay-battle:has(.battle-screen.battle-layout-console)
-    .world-canvas.boss-world {
-    top: 50px;
-    height: calc(var(--battle-stage-height) - 104px);
-  }
+  --battle-console-height: min(360px, 52%);
 }
 .app.gameplay-battle .battle-layout-console .battle-enemy-hud {
   top: 6px;
@@ -78,7 +61,7 @@
   flex-direction: column;
   min-height: 0;
   border: 2px solid #d3b273;
-  background: #080f15f5;
+  background: #080f15ed;
   box-shadow:
     0 12px 45px #000a,
     inset 0 0 0 3px #17252b;
@@ -351,7 +334,7 @@
 }
 @media (max-width: 700px) {
   .app.gameplay-battle {
-    --battle-console-height: min(370px, 60%);
+    --battle-console-height: min(400px, 54%);
   }
   .app.gameplay-battle .battle-layout-console .battle-console {
     inset-inline: 8px;
@@ -377,7 +360,7 @@
 .app.gameplay-battle
   .battle-layout-console:has(> .evade)
   .battle-command-menu {
-  visibility: hidden;
+  display: none;
 }
 .app.gameplay-battle .battle-layout-console .skill-description,
 .app.gameplay-battle .battle-layout-console .battle-command-menu small {
@@ -679,6 +662,6 @@
 
 @media (max-height: 550px) {
   .app.gameplay-battle {
-    --battle-console-height: min(320px, 72%);
+    --battle-console-height: min(320px, 62%);
   }
 }

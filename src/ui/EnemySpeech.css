@@ -24,11 +24,11 @@
 @media (min-width: 701px) and (min-height: 551px) {
   [data-enemy-speech-anchor] .enemy-speech {
     --speech-left: calc(var(--enemy-speech-x) + 14px);
-    --speech-anchor-y: calc(var(--enemy-speech-y) * var(--battle-stage-height));
+    --speech-anchor-y: calc(var(--enemy-speech-y) * 100%);
     --speech-top: clamp(
       82px,
       calc(var(--speech-anchor-y) - 20px),
-      max(82px, calc(var(--battle-stage-height) - 104px))
+      max(82px, calc(100% - var(--battle-console-height) - 104px))
     );
     top: var(--speech-top);
     bottom: auto;

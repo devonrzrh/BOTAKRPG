@@ -3,19 +3,10 @@
   pointer-events: none;
   box-shadow: none;
 }
-.app.gameplay-battle .world-canvas.boss-world {
-  top: 76px;
-  height: calc(100% - 230px);
-  width: 100%;
-}
 .battle-screen {
   position: absolute;
   inset: 0;
   pointer-events: none;
-}
-.app.gameplay-battle:has(.quiz-panel) .world-canvas.boss-world {
-  top: 0;
-  height: calc(100% - 230px);
 }
 .battle-screen button,
 .battle-screen .battle-decision {

@@ -386,6 +386,10 @@ label > select {
 .world-canvas.maze-world {
   width: calc(100% - min(530px, 49%));
 }
+.world-canvas.boss-world {
+  inset: 0;
+  width: 100%;
+}
 .world-shell:before {
   content: "";
   pointer-events: none;
