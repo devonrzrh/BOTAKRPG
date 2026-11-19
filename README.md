@@ -7,7 +7,7 @@ A local-first learning RPG built with TypeScript, React, Babylon.js, Blockly, an
 ### Requirements
 
 - **Node.js 22 or newer** (includes npm). Check with `node --version` and `npm --version`.
-- A modern browser with **WebGPU** or **WebGL2**. The app tries WebGPU first and falls back to WebGL2.
+- A modern desktop browser with **WebGPU** or **WebGL2**. The app tries WebGPU first and falls back to WebGL2. Phones and tablets are unsupported.
 - No Python installation is required for normal play: Python runs in the browser through Pyodide.
 - Optional: **Poppler** (`pdftotext` on `PATH`) only if you want to re-import the untracked `Source/` material with `npm run source:import`.
 

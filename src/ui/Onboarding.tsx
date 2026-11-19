@@ -1,4 +1,4 @@
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 import { ArrowLeft, ArrowRight, Check, Fingerprint } from "lucide-react";
 import { PLAYER_NAME_LIMIT, playerInitials } from "../game/player";
 
@@ -25,10 +25,12 @@ export function Onboarding({
   initialName,
   lessonCount,
   onComplete,
+  children,
 }: {
   initialName: string;
   lessonCount: number;
   onComplete: (name: string) => void;
+  children?: ReactNode;
 }) {
   const [step, setStep] = useState(0),
     [name, setName] = useState(initialName === "Vale" ? "" : initialName),
@@ -66,6 +68,7 @@ export function Onboarding({
           CASE 007 · INTAKE · {step + 1} / 2
         </span>
       </header>
+      {children}
       {step === 0 ? (
         <div className="onboarding-body">
           <article className="intake-report">

@@ -1576,7 +1576,9 @@ export default function App() {
           initialName={save.character.name}
           lessonCount={lessons.length}
           onComplete={(name) => updateSave((s) => finishIntake(s, name))}
-        />
+        >
+          <ViewportWarning mobileOnly />
+        </Onboarding>
       )}
       <header className="topbar" inert={intakeOpen}>
         <a
