@@ -17,6 +17,13 @@ export interface BattleCue {
 export const combatCueDuration = (reducedMotion: boolean) =>
   reducedMotion ? 200 : 650;
 
+export const isVictoryCue = (cue: BattleCue) =>
+  cue.defeated || (cue.kind === "recover" && cue.special === "pacify");
+
+/** Give the outcome time to settle while keeping the existing hit timing. */
+export const combatPresentationDuration = (cue: BattleCue, reducedMotion: boolean) =>
+  !reducedMotion && isVictoryCue(cue) ? 980 : combatCueDuration(reducedMotion);
+
 /** Visual events are derived from resolved actions, before XP can heal a level-up. */
 export function battleCue(
   before: Battle,

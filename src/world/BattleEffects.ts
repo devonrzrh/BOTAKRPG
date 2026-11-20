@@ -5,7 +5,12 @@ import type { Mesh } from "@babylonjs/core/Meshes/mesh";
 import type { InstancedMesh } from "@babylonjs/core/Meshes/instancedMesh";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
-import { combatCueDuration, type BattleCue } from "../game/combatPresentation";
+import {
+  combatCueDuration,
+  combatPresentationDuration,
+  isVictoryCue,
+  type BattleCue,
+} from "../game/combatPresentation";
 
 type EffectRig = {
   root: TransformNode;
@@ -124,6 +129,7 @@ export function attachBattleEffects(
   let activeSequence = -1;
   let started = startTime;
   let activeCue: BattleCue | null = null;
+  let settled = false;
   let reduced = false;
   const hide = () =>
     pooled.forEach(({ mesh }) => {
@@ -153,6 +159,7 @@ export function attachBattleEffects(
       activeSequence = state.cue?.sequence ?? -1;
       activeCue = state.cue;
       reduced = state.reducedMotion;
+      settled = false;
       started = performance.now();
       hide();
       hideParticles();
@@ -164,22 +171,23 @@ export function attachBattleEffects(
       if (!reduced) rig.animateIdle?.((performance.now() - startTime) / 1000);
       return;
     }
-    const duration = combatCueDuration(reduced);
-    const t = Math.min(1, (performance.now() - started) / duration);
-    animate(activeCue, t);
-    if (t >= 1) hide();
-    if (
-      t >= 1 &&
-      !(
-        activeCue.defeated &&
-        !reduced &&
-        (activeCue.kind === "player" || activeCue.kind === "poison")
-      )
-    ) {
-      activeCue = null;
+    if (settled) return;
+    const elapsed = performance.now() - started;
+    const actionDuration = combatCueDuration(reduced);
+    const duration = combatPresentationDuration(activeCue, reduced);
+    const t = Math.min(1, elapsed / actionDuration);
+    const resolve = duration > actionDuration
+      ? Math.max(0, Math.min(1, (elapsed - 340) / (duration - 340)))
+      : 0;
+    animate(activeCue, t, resolve, elapsed);
+    if (elapsed >= duration) {
       hide();
       hideParticles();
-      restore();
+      if (isVictoryCue(activeCue)) settled = true;
+      else {
+        activeCue = null;
+        restore();
+      }
     }
   });
 
@@ -218,8 +226,10 @@ export function attachBattleEffects(
     if ((cue.kind === "player" || cue.kind === "poison") && cue.amount > 0) {
       ring.material.emissiveColor.copyFrom(color);
       particleMaterial.emissiveColor.copyFrom(
-        cue.defeated ? colors.green : color,
+        cue.defeated ? colors.amber : color,
       );
+    } else if (cue.special === "pacify") {
+      ring.material.emissiveColor.copyFrom(colors.cyan);
     } else if (cue.kind === "enemy" && cue.blocked) {
       particleMaterial.emissiveColor.copyFrom(colors.cyan);
     } else if (cue.special === "break" || cue.special === "finisher") {
@@ -240,7 +250,7 @@ export function attachBattleEffects(
       const radius =
         progress *
         speed *
-        (style === "block" ? 0.48 : style === "defeat" ? 1.05 : 0.78);
+        (style === "block" ? 0.48 : style === "defeat" ? 2.4 : 0.78);
       mesh.position.set(
         5 + Math.cos(angle) * radius,
         impactHeight + Math.sin(angle) * radius + progress * lift,
@@ -254,9 +264,15 @@ export function attachBattleEffects(
       mesh.rotation.set(progress * (i % 3), progress * 3 + angle, progress * 2);
     });
   }
-  function animate(cue: BattleCue, t: number): void {
+  function animate(cue: BattleCue, t: number, resolve: number, elapsed: number): void {
     const pulse = Math.sin(Math.PI * t);
     if (reduced) {
+      if (isVictoryCue(cue)) {
+        rig.materials.forEach((m, i) =>
+          m.emissiveColor.copyFrom(original.emissives[i]).scaleInPlace(1 - t * 0.8),
+        );
+        return;
+      }
       if (cue.kind === "miss" || cue.kind === "recover") return;
       rig.materials.forEach((m, i) =>
         m.emissiveColor
@@ -327,7 +343,7 @@ export function attachBattleEffects(
                 : cue.special === "break" || cue.special === "finisher"
                   ? "shard"
                   : "hit",
-            ((t - contact) * combatCueDuration(false)) / 1000,
+            (elapsed - contact * combatCueDuration(false)) / 1000,
           );
       }
       // Contact launches a sharp, damped rattle rather than a single soft sway.
@@ -346,11 +362,6 @@ export function attachBattleEffects(
       rig.root.position.z = original.rootPosition.z + recoil * 0.25 * strength;
       rig.leftArm.rotation.z = original.left.z - rattle * 0.11;
       rig.rightArm.rotation.z = original.right.z + rattle * 0.11;
-      if (cue.defeated && t > 0.55) {
-        const fall = Math.min(1, (t - 0.55) / 0.45);
-        rig.root.rotation.x = original.rootRotation.x + fall * 0.95;
-        rig.root.position.y = original.rootPosition.y - fall * 0.55;
-      }
     }
     if (cue.kind === "miss") {
       projectile.mesh.position.set(
@@ -384,6 +395,24 @@ export function attachBattleEffects(
           ).scale(flash),
         ),
     );
+    if (cue.defeated) {
+      const fall = Math.min(1, resolve * 1.2) ** 2;
+      rig.root.rotation.x = original.rootRotation.x + fall * 1.3;
+      rig.root.position.y = original.rootPosition.y - fall * 0.66 * original.rootScaling.y;
+      rig.leftArm.rotation.x = original.left.x - fall * 0.46;
+      rig.rightArm.rotation.x = original.right.x - fall * 0.7;
+      rig.materials.forEach((m) => m.emissiveColor.scaleInPlace(1 - resolve * 0.92));
+    } else if (cue.special === "pacify") {
+      const standDown = 1 - (1 - resolve) ** 2;
+      rig.root.rotation.x = original.rootRotation.x + standDown * 0.14;
+      rig.leftArm.rotation.z = original.left.z - standDown * 0.14;
+      rig.rightArm.rotation.z = original.right.z + standDown * 0.14;
+      ring.mesh.position.set(5, impactHeight, 3.5);
+      ring.mesh.scaling.setAll(1 + standDown * 3.2);
+      ring.material.alpha = Math.sin(Math.PI * resolve) * 0.65;
+      ring.mesh.isVisible = resolve > 0 && resolve < 1;
+      rig.materials.forEach((m) => m.emissiveColor.scaleInPlace(1 - standDown * 0.55));
+    }
   }
 
   return () => {

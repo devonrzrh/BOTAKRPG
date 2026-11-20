@@ -654,7 +654,8 @@ export default function App() {
       }
       if (id === "settings" && panel === "battle") setSettingsFromBattle(true);
       else if (id !== "settings") setSettingsFromBattle(false);
-      setCombatEvent(null);
+      if (id !== "settings" || battleRef.current.phase !== "won")
+        setCombatEvent(null);
       setReturnPuzzleId(null);
       if (tutorialRef.current) closeTutorial();
       if (id === "exit") return;
@@ -1428,6 +1429,7 @@ export default function App() {
   const bossBattle = FINAL_BOSS_IDS.includes(battle.enemyId),
     battleView = panel === "battle" || settingsFromBattle;
   const battleRank = encounterRank(battle.enemyId, battle.tactics?.boss ?? bossBattle);
+  const showBattleScreen = panel === "battle" || (settingsFromBattle && battle.phase === "won");
   const musicMix = useMemo(
     () =>
       chooseMusic({
@@ -1769,7 +1771,7 @@ export default function App() {
               Boolean(cutsceneId)
             }
             encounter={battleView}
-            combatCue={panel === "battle" ? combatEvent : null}
+            combatCue={showBattleScreen ? combatEvent : null}
             encounterRank={battleRank}
             enemyId={battle.enemyId}
             maze={maze}
@@ -2277,10 +2279,11 @@ export default function App() {
                   </details>
                 </div>
               )}
-              {panel === "battle" && (
+              {showBattleScreen && (
                 <BattleScreen
                   key={`${battle.enemyId}:${battle.questionOffset}:${debugBattleRun}`}
-                  paused={debugOpen}
+                  covered={settingsFromBattle}
+                  paused={debugOpen || settingsFromBattle}
                   previewVictory={
                     battle.enemyId === echoActivity.enemy?.id &&
                     !save.completed.includes("echo-battle") &&

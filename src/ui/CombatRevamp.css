@@ -140,10 +140,6 @@
   font-weight: 400;
   font-size: 25px;
 }
-.app .battle-decision.quiz-panel:has(.battle-xp-reward) {
-  top: 43%;
-  max-height: calc(100% - 300px);
-}
 .app .battle-decision.command-panel {
   bottom: 108px;
   width: min(530px, calc(100% - 48px));

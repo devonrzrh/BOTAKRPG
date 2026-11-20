@@ -65,18 +65,113 @@
     translate: 0 0;
   }
 }
+/* The outcome takes over the controls while the arena stays in view. */
+.battle-victory {
+  --result-accent: #edc98b;
+  position: absolute;
+  z-index: 10;
+  inset: auto 0 clamp(12px, 4vh, 32px);
+  width: min(700px, calc(100% - 32px));
+  max-height: min(57%, calc(100% - 102px));
+  margin-inline: auto;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: 12px;
+  padding: clamp(14px, 3vw, 26px);
+  border: 1px solid #64747b;
+  border-top-color: var(--result-accent);
+  background: linear-gradient(150deg, #1d2528, #0b141c 62%);
+  box-shadow: 0 18px 45px #050a10c9;
+  color: #f1eee5;
+  pointer-events: auto;
+  font: 400 18px/1.45 var(--typewriter);
+  animation: battle-victory-open 460ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.battle-victory[data-pacified] {
+  --result-accent: #99ddd5;
+}
+.battle-screen .battle-victory h2 {
+  margin: 0;
+  font: 400 clamp(24px, 4vw, 40px)/1.15 var(--typewriter);
+  color: var(--result-accent);
+  text-wrap: balance;
+}
+.battle-victory-details {
+  overflow: auto;
+  scrollbar-gutter: stable;
+}
+.battle-victory-details:focus-visible,
+.battle-victory summary:focus-visible {
+  outline: 2px solid var(--result-accent);
+  outline-offset: -2px;
+}
+.battle-victory .battle-xp-reward {
+  padding-block: 12px;
+  border-block: 1px solid #415258;
+}
+.battle-victory .battle-xp-reward > strong {
+  display: block;
+  font-weight: 400;
+  color: #e5d4ba;
+}
+.battle-victory .battle-xp-reward[data-earned] > strong {
+  margin-bottom: 8px;
+  color: var(--result-accent);
+  font-size: clamp(28px, 5vw, 44px);
+  line-height: 1.1;
+}
+.battle-victory .battle-xp-reward h3 {
+  margin: 12px 0 0;
+  color: var(--result-accent);
+  font-size: 20px;
+  font-weight: 400;
+}
+.battle-victory p {
+  margin: 6px 0 0;
+}
+.battle-victory details {
+  margin-top: 12px;
+}
+.battle-victory summary {
+  cursor: pointer;
+}
+.battle-victory footer,
+.death-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.app .battle-victory button,
+.app .death-actions button {
+  min-height: 44px;
+  padding: 8px 16px;
+  font-size: 18px;
+}
+@keyframes battle-victory-open {
+  from {
+    clip-path: inset(0 0 12% 0);
+    opacity: 0.55;
+    translate: 0 10px;
+  }
+  to {
+    clip-path: inset(0);
+    opacity: 1;
+    translate: none;
+  }
+}
 .battle-death {
-  position: fixed;
-  inset: var(--top-height) 0 0;
+  position: absolute;
+  inset: 0;
   z-index: 12;
   isolation: isolate;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 18px;
-  padding: 28px;
-  background: transparent;
+  justify-content: safe center;
+  gap: 12px;
+  padding: 20px;
+  overflow: auto;
+  background: linear-gradient(#09090e50, #130a10d9 62%, #08070bf7);
   color: #f5eeee;
   pointer-events: auto;
   text-align: center;
@@ -85,103 +180,51 @@
 .battle-death::before {
   content: "";
   position: absolute;
-  z-index: 0;
+  z-index: -1;
   inset: 0;
-  background: radial-gradient(ellipse at center, #211019 0%, #07070c 65%);
-  animation: death-darken 2s ease-out both;
+  pointer-events: none;
+  background: linear-gradient(transparent, #220d18aa 46%, #831f2866 50%, #220d18aa 54%, transparent);
+  animation: battle-signal-drop 620ms cubic-bezier(0.16, 1, 0.3, 1) both;
 }
-.battle-death > * {
-  position: relative;
-  z-index: 1;
-  opacity: 0;
-  animation: death-reveal 850ms ease-out 2s both;
-}
-.battle-death .death-signal {
-  animation-delay: 2s;
-}
-.battle-death .death-kicker {
-  animation-delay: 2.15s;
-}
-.battle-death h1 {
-  animation-delay: 2.3s;
-}
-.battle-death > p:not(.death-kicker) {
-  animation-delay: 2.6s;
-}
-.battle-death .death-actions {
-  animation-delay: 2.85s;
-}
-@keyframes death-darken {
+@keyframes battle-signal-drop {
   from {
-    opacity: 0;
+    clip-path: inset(48% 0);
+    opacity: 0.95;
   }
   to {
-    opacity: 1;
-  }
-}
-@keyframes death-reveal {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+    clip-path: inset(0);
+    opacity: 0.65;
   }
 }
 .battle-death h1 {
   margin: 0;
-  font: 400 clamp(56px, 10vw, 112px)/1.1 var(--typewriter);
-  letter-spacing: 0.08em;
-  color: #ff897d;
-  text-shadow: 0 0 35px #d9403540;
+  font: 400 clamp(42px, 8vw, 88px)/1 var(--typewriter);
+  color: #ff9d8c;
+  text-shadow: 0 5px 16px #20070a;
 }
 .battle-death h1:focus {
   outline: none;
 }
 .battle-death p {
-  max-width: 42ch;
   margin: 0;
 }
-.battle-death .death-kicker {
-  color: #c77b78;
-  font-size: 16px;
-  letter-spacing: 0.18em;
-}
-.death-signal {
-  font-size: 64px;
-  line-height: 1;
-  color: #e56e65;
-}
 .death-actions {
-  display: flex;
-  flex-wrap: wrap;
   justify-content: center;
-  gap: 14px;
   margin-top: 16px;
 }
-.app .death-actions button {
-  min-height: 52px;
-  padding: 12px 22px;
-  font-size: 18px;
-}
 @media (prefers-reduced-motion: reduce) {
-  .battle-death::before,
-  .battle-death > * {
+  .battle-victory,
+  .battle-death::before {
     animation: none;
-    opacity: 1;
-    transform: none;
   }
   .app:has(.battle-screen.impact-damage) .world-canvas,
   .app:has(.battle-screen.impact-defeat) .world-canvas {
     animation: none !important;
   }
 }
-.reduced-motion .battle-death::before,
-.reduced-motion .battle-death > * {
+.reduced-motion .battle-victory,
+.reduced-motion .battle-death::before {
   animation: none;
-  opacity: 1;
-  transform: none;
 }
 .battle-stance span,
 .battle-stance strong {

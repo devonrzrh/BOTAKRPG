@@ -7,6 +7,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { attachBattleEffects } from "../src/world/BattleEffects";
 import {
   combatCueDuration,
+  combatPresentationDuration,
   type BattleCue,
 } from "../src/game/combatPresentation";
 
@@ -35,7 +36,7 @@ describe("battle effects", () => {
     now = undefined;
   });
 
-  function setup(initial: BattleCue | null = null, reducedMotion = false, boss = false) {
+  function setup(initial: BattleCue | null = null, reducedMotion = false, boss = false, glow = 0) {
     engine = new NullEngine();
     scene = new Scene(engine);
     let time = 0;
@@ -48,6 +49,7 @@ describe("battle effects", () => {
     const rightArm = new TransformNode("right arm", scene);
     rightArm.rotation.set(-0.4, -0.5, -0.6);
     const material = new StandardMaterial("rig material", scene);
+    material.emissiveColor.r = glow;
     let state = { cue: initial, reducedMotion };
     const baseObserverCount = scene.onBeforeRenderObservable.observers.length;
     const dispose = attachBattleEffects(
@@ -118,6 +120,26 @@ describe("battle effects", () => {
     expect(wave.isVisible).toBe(false);
     dispose();
     expect(scene!.getMeshByName("boss shockwave")).toBeNull();
+  });
+
+  it.each([
+    ["knockout", cue({ defeated: true }), 1.3, 0.08],
+    ["stand-down", cue({ kind: "recover", special: "pacify", amount: 0 }), 0.14, 0.45],
+  ] as const)("settles and holds the %s pose until the cue clears", (_, ending, pitch, glow) => {
+    const { frame, root, material, setState } = setup(ending, false, false, 1);
+    frame();
+    frame(combatCueDuration(false));
+    expect(root.rotation.x).toBeGreaterThan(0.1);
+    expect(root.rotation.x).toBeLessThan(0.1 + pitch);
+    frame(combatPresentationDuration(ending, false) - combatCueDuration(false));
+    expect(root.rotation.x).toBeCloseTo(0.1 + pitch);
+    expect(material.emissiveColor.r).toBeCloseTo(glow);
+    frame(900);
+    expect(root.rotation.x).toBeCloseTo(0.1 + pitch);
+    expect(scene!.getMeshByName("impact ring")!.isVisible).toBe(false);
+    setState({ cue: null, reducedMotion: false });
+    frame();
+    expect(root.rotation.x).toBeCloseTo(0.1);
   });
 
   it("rattles the enemy across multiple axes after contact and damps back to rest", () => {

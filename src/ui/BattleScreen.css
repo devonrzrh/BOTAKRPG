@@ -160,27 +160,6 @@
   grid-template-columns: 1fr 1fr;
   gap: 8px;
 }
-.battle-xp-reward {
-  margin-top: 18px;
-}
-.battle-decision.quiz-panel:has(.battle-xp-reward) {
-  top: 40%;
-  max-height: calc(100% - 260px);
-}
-.battle-xp-reward > strong {
-  display: block;
-  font:
-    26px Consolas,
-    monospace;
-  color: #f0d09b;
-  margin-bottom: 14px;
-}
-.battle-xp-reward h3 {
-  font-size: 22px;
-  color: #f0d09b;
-  margin: 16px 0 8px;
-}
-
 .battle-command-menu > span {
   grid-column: 1/-1;
   font:

@@ -5,6 +5,7 @@ import { buildEnemyModel } from "../src/world/EnemyModel";
 import { attachBattleEffects } from "../src/world/BattleEffects";
 import {
   combatCueDuration,
+  combatPresentationDuration,
   type BattleCue,
 } from "../src/game/combatPresentation";
 
@@ -141,7 +142,7 @@ it("hands idle parts to attacks and holds defeat rather than reviving the enemy"
     };
     frame(1100);
     expect(gyro.rotation.equals(restRotation)).toBe(true);
-    frame(1100 + combatCueDuration(false));
+    frame(1100 + combatPresentationDuration(state.cue, false));
     const fallen = rig.root.position.clone();
     frame(9000);
     expect(rig.root.position.equals(fallen)).toBe(true);

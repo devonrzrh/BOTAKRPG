@@ -82,6 +82,9 @@
   pointer-events: auto;
   font: 400 18px/1.4 var(--typewriter);
 }
+.app.gameplay-battle .battle-layout-console .battle-console[hidden] {
+  display: none;
+}
 .app.gameplay-battle .battle-layout-console .battle-console-status {
   position: relative;
   display: grid;
@@ -336,9 +339,6 @@
 .app.gameplay-battle .battle-layout-console .battle-damage-number.number-enemy {
   bottom: calc(var(--battle-console-height) + 22px);
   left: 150px;
-}
-.app.gameplay-battle .battle-layout-console .battle-xp-reward {
-  margin-top: 12px;
 }
 @media (max-width: 1050px) {
   .app.gameplay-battle .battle-layout-console .battle-console-status {

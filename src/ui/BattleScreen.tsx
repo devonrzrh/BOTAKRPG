@@ -14,7 +14,11 @@ import { evadeSeed } from "../game/evade";
 import "./BattleDepth.css";
 import "./BattleConsole.css";
 import { stats, type Save } from "../game/state";
-import { combatCueDuration, type BattleCue } from "../game/combatPresentation";
+import {
+  combatCueDuration,
+  combatPresentationDuration,
+  type BattleCue,
+} from "../game/combatPresentation";
 import { XpMeter } from "./XpMeter";
 import { SupplyIcon } from "./SupplyIcon";
 import { RpgIcon } from "./RpgIcon";
@@ -22,7 +26,6 @@ import { useGameSound } from "./GameSound";
 import { enemyArchetype, enemyThreatName } from "../game/enemyIdentity";
 import { EnemySpeech } from "./EnemySpeech";
 import { useSceneTransitioning } from "./SceneTransition";
-import { useGameParticles } from "./GameParticles";
 import { createCombatAudio } from "../game/combatAudio";
 import { createCombatHaptics } from "../game/combatHaptics";
 import { useBattleFeedback } from "./useBattleFeedback";
@@ -35,6 +38,7 @@ import {
 
 interface Props {
   paused?: boolean;
+  covered?: boolean;
   previewVictory?: boolean;
   battle: Battle;
   cue: BattleCue | null;
@@ -92,10 +96,9 @@ export function BattleScreen(p: Props) {
     query.addEventListener("change", change);
     return () => query.removeEventListener("change", change);
   }, []);
-  const particles = useGameParticles();
-  const victoryBurstSent = useRef(false);
   const { battle: b, save, question: q } = p,
     limits = stats(save, p.content);
+  const battleEnded = b.phase === "won" || b.phase === "lost";
   const kind = enemyArchetype(b.enemyId);
   const threat = enemyThreatName(b.enemyId);
   const reducedMotion = save.settings.reducedMotion || osReduced;
@@ -267,7 +270,7 @@ export function BattleScreen(p: Props) {
     if (b.phase !== "choose") setMenu(null);
     const timer = setTimeout(
       () => setMotion(null),
-      combatCueDuration(reducedMotion),
+      combatPresentationDuration(cue, reducedMotion),
     );
     return () => {
       clearTimeout(timer);
@@ -277,7 +280,8 @@ export function BattleScreen(p: Props) {
   }, [p.cue, reducedMotion]);
   useEffect(() => {
     if (motion || evading || p.paused || sceneTransitioning) return;
-    if (menu === "skills")
+    if (battleEnded) title.current?.focus();
+    else if (menu === "skills")
       skillList.current
         ?.querySelector<HTMLButtonElement>("button:not(:disabled)")
         ?.focus();
@@ -285,7 +289,7 @@ export function BattleScreen(p: Props) {
       defenseList.current?.querySelector<HTMLButtonElement>("button")?.focus();
     else if (menu || b.phase !== "choose") title.current?.focus();
     else skillsButton.current?.focus();
-  }, [b.phase, b.turn, evading, menu, motion, p.paused, sceneTransitioning]);
+  }, [b.phase, b.turn, battleEnded, evading, menu, motion, p.paused, sceneTransitioning]);
   const skills = p.content.entities.filter(
     (e): e is Skill =>
       e.type === "skill" && save.character.skills.includes(e.id),
@@ -347,7 +351,7 @@ export function BattleScreen(p: Props) {
       </div>
     );
   };
-  const activeCard = b.phase !== "lost" && !evading && !motion;
+  const activeCard = !battleEnded && !evading && !motion;
   const inspecting = menu === "analyze" || menu === "talk";
   const boss = bossReadout(b);
   const weakness =
@@ -404,17 +408,6 @@ export function BattleScreen(p: Props) {
     0,
     save.supply.tokens - startingSave.current.supply.tokens,
   );
-  useEffect(() => {
-    if (
-      b.phase === "won" &&
-      !motion &&
-      gainedXp > 0 &&
-      !victoryBurstSent.current
-    ) {
-      victoryBurstSent.current = true;
-      particles("clue");
-    }
-  }, [b.phase, motion, gainedXp, particles]);
   const oldStats = stats(startingSave.current, p.content);
   const levelGain = save.character.level - startingSave.current.character.level;
   const newSkills = p.content.entities.filter(
@@ -427,6 +420,7 @@ export function BattleScreen(p: Props) {
   return (
     <div
       className={`battle-screen battle-layout-console phase-${b.phase} ${motion ? `motion-${motion}` : ""} ${impactLanded && motion && p.cue?.amount && motion === "enemy" ? "impact-damage" : impactLanded && motion && p.cue?.defeated ? "impact-defeat" : ""}`}
+      hidden={p.covered}
       data-sfx-silent
       onClickCapture={(event) => {
         if (
@@ -480,7 +474,7 @@ export function BattleScreen(p: Props) {
         }
       }}
     >
-      <div className="battle-enemy-hud">
+      <div className="battle-enemy-hud" hidden={battleEnded && !motion}>
         <h2 className={`enemy-name enemy-${kind}`}>
           <span className="enemy-sigil" aria-hidden="true">
             {enemySigil(kind)}
@@ -510,7 +504,7 @@ export function BattleScreen(p: Props) {
         key={b.enemyId}
         battle={b}
         cue={p.cue}
-        hidden={evading || b.phase === "question"}
+        hidden={evading || b.phase === "question" || battleEnded}
         reducedMotion={reducedMotion}
       />
       {evading && (
@@ -561,7 +555,7 @@ export function BattleScreen(p: Props) {
           )}
         </>
       )}
-      <div className="battle-console" aria-label="Battle console">
+      <div className="battle-console" aria-label="Battle console" hidden={battleEnded}>
         <header className="battle-console-status">
           <div className="battle-player-hud">
             <strong>{save.character.name}</strong>
@@ -1054,111 +1048,6 @@ export function BattleScreen(p: Props) {
                 </footer>
               </>
             )}
-            {b.phase === "won" && (
-              <>
-                <h2 ref={title} tabIndex={-1}>
-                  {b.resolution === "pacified"
-                    ? `${b.enemyName} stood down`
-                    : b.enemyId === "echo-7"
-                      ? "ECHO-7 contained"
-                      : `${b.enemyName} defeated`}
-                </h2>
-                <div className="battle-xp-reward">
-                  <strong role="status">
-                    {gainedXp
-                      ? `+${gainedXp} XP`
-                      : p.previewVictory
-                        ? "Debug victory · no reward"
-                        : "Practice victory · XP already earned"}
-                  </strong>
-                  <XpMeter
-                    xp={save.character.xp}
-                    initialXp={startingSave.current.character.xp}
-                    reducedMotion={reducedMotion}
-                    label="Victory experience"
-                  />
-                  {gainedTokens > 0 && <p>+{gainedTokens} Supply Token</p>}
-                  {levelGain > 0 && (
-                    <>
-                      <h3>
-                        Level up! {startingSave.current.character.level} →{" "}
-                        {save.character.level}
-                      </h3>
-                      <p>
-                        HP +{limits.maxHp - oldStats.maxHp} · Focus +
-                        {limits.maxFocus - oldStats.maxFocus} · Attack +
-                        {limits.attack - oldStats.attack} · Defense +
-                        {limits.defense - oldStats.defense}
-                      </p>
-                      {newSkills.length > 0 && (
-                        <p>
-                          Available skills:{" "}
-                          {newSkills.map((s) => s.title).join(", ")}. Learn them
-                          in the character menu.
-                        </p>
-                      )}
-                    </>
-                  )}
-                </div>
-                {q?.explanation && (
-                  <details>
-                    <summary>Answer explanation</summary>
-                    <p>{q.explanation}</p>
-                  </details>
-                )}
-                <footer>
-                  <button className="primary" onClick={p.onJournal}>
-                    {p.victoryActionLabel ?? "Quest map"}
-                  </button>
-                  <button onClick={p.onRetreat}>Return to network</button>
-                </footer>
-              </>
-            )}
-          </section>
-        )}
-        {b.phase === "lost" && !motion && (
-          <section
-            className="battle-death"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="battle-death-title"
-            onKeyDown={(event) => {
-              if (event.key !== "Tab") return;
-              const buttons = [
-                ...event.currentTarget.querySelectorAll<HTMLButtonElement>(
-                  "button",
-                ),
-              ];
-              const index = buttons.indexOf(
-                document.activeElement as HTMLButtonElement,
-              );
-              event.preventDefault();
-              buttons[
-                index < 0
-                  ? event.shiftKey
-                    ? buttons.length - 1
-                    : 0
-                  : (index + (event.shiftKey ? -1 : 1) + buttons.length) %
-                    buttons.length
-              ]?.focus();
-            }}
-          >
-            <div className="death-signal" aria-hidden="true">
-              ◇
-            </div>
-            <p className="death-kicker">SIGNAL TERMINATED</p>
-            <h1 id="battle-death-title" ref={title} tabIndex={-1}>
-              YOU DIED
-            </h1>
-            <p>Your evidence is safe. The investigation isn’t over.</p>
-            <div className="death-actions">
-              {p.onRetry && (
-                <button className="primary" onClick={p.onRetry}>
-                  Recover & retry
-                </button>
-              )}
-              <button onClick={p.onRecover}>Return to the office</button>
-            </div>
           </section>
         )}
         <div
@@ -1218,6 +1107,115 @@ export function BattleScreen(p: Props) {
           </div>
         </div>
       </div>
+      {b.phase === "won" && !motion && (
+        <section
+          className="battle-victory"
+          data-pacified={b.resolution === "pacified" || undefined}
+          aria-labelledby="battle-victory-title"
+        >
+          <h2 id="battle-victory-title" ref={title} tabIndex={-1}>
+            {b.resolution === "pacified"
+              ? `${b.enemyName} stood down`
+              : b.enemyId === "echo-7"
+                ? "ECHO-7 contained"
+                : `${b.enemyName} defeated`}
+          </h2>
+          <div className="battle-victory-details" role="region" aria-label="Victory details" tabIndex={0}>
+            <div className="battle-xp-reward" data-earned={gainedXp > 0 || undefined}>
+              <strong role="status">
+                {gainedXp
+                  ? `+${gainedXp} XP`
+                  : p.previewVictory
+                    ? "Debug victory · no reward"
+                    : "Practice victory · XP already earned"}
+              </strong>
+              {gainedXp > 0 && (
+                <XpMeter
+                  xp={save.character.xp}
+                  initialXp={startingSave.current.character.xp}
+                  reducedMotion={reducedMotion}
+                  label="Victory experience"
+                />
+              )}
+              {gainedTokens > 0 && <p>+{gainedTokens} Supply Token</p>}
+              {levelGain > 0 && (
+                <>
+                  <h3>
+                    Level up! {startingSave.current.character.level} →{" "}
+                    {save.character.level}
+                  </h3>
+                  <p>
+                    HP +{limits.maxHp - oldStats.maxHp} · Focus +
+                    {limits.maxFocus - oldStats.maxFocus} · Attack +
+                    {limits.attack - oldStats.attack} · Defense +
+                    {limits.defense - oldStats.defense}
+                  </p>
+                  {newSkills.length > 0 && (
+                    <p>
+                      Available skills:{" "}
+                      {newSkills.map((s) => s.title).join(", ")}. Learn them
+                      in the character menu.
+                    </p>
+                  )}
+                </>
+              )}
+            </div>
+            {q?.explanation && (
+              <details>
+                <summary>Answer explanation</summary>
+                <p>{q.explanation}</p>
+              </details>
+            )}
+          </div>
+          <footer>
+            <button className="primary" onClick={p.onJournal}>
+              {p.victoryActionLabel ?? "Quest map"}
+            </button>
+            <button onClick={p.onRetreat}>Return to network</button>
+          </footer>
+        </section>
+      )}
+      {b.phase === "lost" && !motion && (
+        <section
+          className="battle-death"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="battle-death-title"
+          onKeyDown={(event) => {
+            if (event.key !== "Tab") return;
+            const buttons = [
+              ...event.currentTarget.querySelectorAll<HTMLButtonElement>(
+                "button",
+              ),
+            ];
+            const index = buttons.indexOf(
+              document.activeElement as HTMLButtonElement,
+            );
+            event.preventDefault();
+            buttons[
+              index < 0
+                ? event.shiftKey
+                  ? buttons.length - 1
+                  : 0
+                : (index + (event.shiftKey ? -1 : 1) + buttons.length) %
+                  buttons.length
+            ]?.focus();
+          }}
+        >
+          <h1 id="battle-death-title" ref={title} tabIndex={-1}>
+            Signal lost
+          </h1>
+          <p>Your recovered evidence is safe.</p>
+          <div className="death-actions">
+            {p.onRetry && (
+              <button className="primary" onClick={p.onRetry}>
+                Recover & retry
+              </button>
+            )}
+            <button onClick={p.onRecover}>Return to the office</button>
+          </div>
+        </section>
+      )}
     </div>
   );
 }
