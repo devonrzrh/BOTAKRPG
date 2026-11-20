@@ -1,10 +1,28 @@
 import battleSource from "../../sounds/ost_battle.mp3?url";
+import battle2Source from "../../sounds/ost_battle2.mp3?url";
+import battle3Source from "../../sounds/ost_battle3.mp3?url";
+import battle4Source from "../../sounds/ost_battle4.mp3?url";
+import battle5Source from "../../sounds/ost_battle5.mp3?url";
 import bossSource from "../../sounds/ost_bossbattle.mp3?url";
 import deathSource from "../../sounds/ost_death.mp3?url";
 import menuSource from "../../sounds/ost_menu.mp3?url";
 import puzzleSource from "../../sounds/ost_puzzle.mp3?url";
+import winSource from "../../sounds/ost_win.mp3?url";
 
-export type MusicTrack = "menu" | "puzzle" | "battle" | "boss" | "death";
+const BATTLE_TRACKS = [
+  "battle", "battle2", "battle3", "battle4", "battle5",
+] as const;
+const BATTLE_GAIN = 0.62;
+export type MusicTrack =
+  | "menu"
+  | "puzzle"
+  | "boss"
+  | "death"
+  | "win"
+  | (typeof BATTLE_TRACKS)[number];
+
+const isBattleVariation = (track: MusicTrack | null) =>
+  BATTLE_TRACKS.some((variation) => variation === track);
 
 /** Relative loudness per setting. Ambient sits low; battles lead. */
 export const MUSIC_TRACKS: Record<
@@ -13,9 +31,14 @@ export const MUSIC_TRACKS: Record<
 > = {
   menu: { source: menuSource, gain: 0.5 },
   puzzle: { source: puzzleSource, gain: 0.44 },
-  battle: { source: battleSource, gain: 0.62 },
+  battle: { source: battleSource, gain: BATTLE_GAIN },
+  battle2: { source: battle2Source, gain: BATTLE_GAIN },
+  battle3: { source: battle3Source, gain: BATTLE_GAIN },
+  battle4: { source: battle4Source, gain: BATTLE_GAIN },
+  battle5: { source: battle5Source, gain: BATTLE_GAIN },
   boss: { source: bossSource, gain: 0.72 },
   death: { source: deathSource, gain: 0.12 },
+  win: { source: winSource, gain: 0.5 },
 };
 
 /** Dialogue and cutscenes duck the score instead of stopping it. */
@@ -23,15 +46,17 @@ export const DUCKED_GAIN = 0.38;
 /** Reading uses the menu score, just further back. Library music is retired. */
 export const READING_GAIN = 0.55;
 
-/** Battles restart from the top; every other track resumes where it paused. */
-export const RESTART_TRACKS: MusicTrack[] = ["battle", "boss", "death"];
+/** Encounter scores restart from the top. Ambient resumes where it paused. */
+export const RESTART_TRACKS: MusicTrack[] = [
+  ...BATTLE_TRACKS, "boss", "death", "win",
+];
 
 export interface MusicSituation {
   intake: boolean;
   panel: string | null;
   reading: boolean;
   boss: boolean;
-  battleResolved?: boolean;
+  battleWon?: boolean;
   battleLost?: boolean;
   dialogue: boolean;
 }
@@ -47,22 +72,18 @@ export function chooseMusic({
   panel,
   reading,
   boss,
-  battleResolved = false,
+  battleWon = false,
   battleLost = false,
   dialogue,
 }: MusicSituation): MusicChoice {
   if (intake) return { track: null, gain: 0 };
   const quiet = reading || panel === "library";
-  const track: MusicTrack =
-    panel === "battle" && battleLost
-      ? "death"
-      : panel === "battle" && !battleResolved
-      ? boss
-        ? "boss"
-        : "battle"
-      : panel === "puzzles" || panel === "maze" || panel === "garden"
-        ? "puzzle"
-        : "menu";
+  let track: MusicTrack = "menu";
+  if (panel === "battle") {
+    track = battleLost ? "death" : battleWon ? "win" : boss ? "boss" : "battle";
+  } else if (panel === "puzzles" || panel === "maze" || panel === "garden") {
+    track = "puzzle";
+  }
   return {
     track,
     gain: dialogue ? DUCKED_GAIN : quiet ? READING_GAIN : 1,
@@ -82,8 +103,8 @@ export function fadeDuration(
   previous: MusicTrack | null,
 ) {
   const battle = (track: MusicTrack | null) =>
-    track === "battle" || track === "boss";
-  if (battle(next)) return 420;
+    isBattleVariation(track) || track === "boss";
+  if (battle(next) || next === "win") return 420;
   if (next === "death") return 2600;
   if (battle(previous)) return 1500;
   return 1100;
@@ -266,9 +287,10 @@ export function createMusic() {
   function warmRemaining() {
     if (warmed || disposed) return;
     warmed = true;
-    (Object.keys(MUSIC_TRACKS) as MusicTrack[]).forEach((track) =>
-      ensure(track),
-    );
+    // Fetch battle variants on demand to avoid downloading five songs at startup.
+    for (const track of ["menu", "puzzle", "boss", "death", "win"] as const) {
+      ensure(track);
+    }
   }
 
   const onVisibility = () => {
@@ -285,6 +307,11 @@ export function createMusic() {
     setTrack(track: MusicTrack | null, gain = 1) {
       if (disposed) return;
       const previous = choice.track;
+      if (track === "battle") {
+        track = previous && isBattleVariation(previous)
+          ? previous
+          : BATTLE_TRACKS[Math.floor(Math.random() * BATTLE_TRACKS.length)];
+      }
       choice = { track, gain: clamp(gain) };
       fadeMs = reducedMotion ? 0 : fadeDuration(track, previous);
       if (track) {

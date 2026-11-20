@@ -1433,9 +1433,7 @@ export default function App() {
         panel: battleView ? "battle" : panel,
         reading: bookOpen && homeWall === "bookshelf",
         boss: bossBattle,
-        battleResolved:
-          battleView &&
-          (battle.phase === "won" || battle.phase === "lost"),
+        battleWon: battleView && battle.phase === "won",
         battleLost: battleView && battle.phase === "lost",
         dialogue: Boolean(dialogueId || cutsceneId || chapterId),
       }),

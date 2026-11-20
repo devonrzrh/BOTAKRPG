@@ -37,26 +37,19 @@ describe("music direction", () => {
     expect(chooseMusic(calm).track).toBe("menu");
   });
 
-  it("settles resolved fights to ambient and restarts the battle score for a retry", () => {
+  it("plays the victory score after regular and boss battles", () => {
     expect(
       chooseMusic({
         ...calm,
         panel: "battle",
         boss: true,
-        battleResolved: true,
+        battleWon: true,
       }).track,
-    ).toBe("menu");
+    ).toBe("win");
     expect(
-      chooseMusic({ ...calm, panel: "battle", battleResolved: true }).track,
-    ).toBe("menu");
-    expect(
-      chooseMusic({
-        ...calm,
-        panel: "battle",
-        boss: true,
-        battleResolved: false,
-      }).track,
-    ).toBe("boss");
+      chooseMusic({ ...calm, panel: "battle", battleWon: true }).track,
+    ).toBe("win");
+    expect(chooseMusic({ ...calm, battleWon: true }).track).toBe("menu");
   });
 
   it("fades in the death score quietly after a lost battle", () => {
@@ -64,7 +57,6 @@ describe("music direction", () => {
       chooseMusic({
         ...calm,
         panel: "battle",
-        battleResolved: true,
         battleLost: true,
       }).track,
     ).toBe("death");
@@ -111,6 +103,7 @@ describe("music director", () => {
   const restore: Array<[string, unknown]> = [];
   afterEach(() => {
     vi.useRealTimers();
+    vi.restoreAllMocks();
     while (restore.length) {
       const [key, value] = restore.pop()!;
       if (value === undefined) Reflect.deleteProperty(globalThis, key);
@@ -236,22 +229,34 @@ describe("music director", () => {
     music.dispose();
   });
 
-  it("restarts battle music instead of resuming it", () => {
+  it("picks a track per battle and restarts it when drawn again", () => {
     vi.useFakeTimers();
+    const random = vi.spyOn(Math, "random").mockReturnValue(0.9);
     const { instances } = installDom();
     const music = createMusic();
     music.setTrack("menu");
     vi.advanceTimersByTime(2000);
     music.setTrack("battle");
     vi.advanceTimersByTime(2000);
-    const battle = instances.find((audio) => audio.src.includes("ost_battle"))!;
+    const battle = instances.find((audio) => audio.src.includes("ost_battle5.mp3"))!;
     battle.currentTime = 42;
-    music.setTrack("menu");
+    music.setTrack("battle", DUCKED_GAIN);
+    expect(random).toHaveBeenCalledTimes(1);
+    expect(battle.currentTime).toBe(42);
+    music.setTrack("win");
     vi.advanceTimersByTime(2000);
+    const win = instances.find((audio) => audio.src.includes("ost_win.mp3"))!;
+    expect(win.paused).toBe(false);
     expect(battle.paused).toBe(true);
     expect(battle.currentTime).toBe(42);
     music.setTrack("battle");
+    expect(random).toHaveBeenCalledTimes(2);
     expect(battle.currentTime).toBe(0);
+    music.setTrack("menu");
+    random.mockReturnValue(0);
+    music.setTrack("battle");
+    expect(instances.find((audio) => audio.src.includes("ost_battle.mp3"))?.play)
+      .toHaveBeenCalled();
     music.dispose();
   });
 
