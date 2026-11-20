@@ -35,6 +35,14 @@ export function enemyArchetype(id: string) {
   return "sentinel";
 }
 
+export type EncounterRank = "regular" | "miniboss" | "boss" | "final";
+
+export function encounterRank(enemyId: string, boss: boolean): EncounterRank {
+  if (enemyId === "echo-7") return "final";
+  if (boss) return "boss";
+  return enemyId === "checkpoint-echo" ? "miniboss" : "regular";
+}
+
 export const enemyThreatName = (id: string) =>
   ({
     echo: "Reconstructed Chassis",

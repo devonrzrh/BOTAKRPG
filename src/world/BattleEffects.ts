@@ -30,6 +30,7 @@ export function attachBattleEffects(
   scene: Scene,
   rig: EffectRig,
   read: () => CueState,
+  impactColor?: Color3,
 ): () => void {
   const colors = {
     cyan: new Color3(0.12, 0.88, 1),
@@ -80,6 +81,7 @@ export function attachBattleEffects(
   const ring = makeFlash("impact ring", colors.white, "ring");
   ring.mesh.scaling.setAll(1.15);
   ring.mesh.rotation.x = Math.PI / 2;
+  const arenaWave = impactColor && makeFlash("boss shockwave", impactColor, "ring");
   // One shared low-poly geometry/material, with fixed instances reused by every cue.
   const particleMaterial = new StandardMaterial(
     "battle particle material",
@@ -108,6 +110,7 @@ export function attachBattleEffects(
     };
   });
   const pooled = [projectile, beam, shield, ring];
+  if (arenaWave) pooled.push(arenaWave);
   const original = {
     rootPosition: rig.root.position.clone(),
     rootRotation: rig.root.rotation.clone(),
@@ -116,6 +119,7 @@ export function attachBattleEffects(
     right: rig.rightArm.rotation.clone(),
     emissives: rig.materials.map((m) => m.emissiveColor.clone()),
   };
+  const impactHeight = 1.6 * original.rootScaling.y;
   const startTime = performance.now();
   let activeSequence = -1;
   let started = startTime;
@@ -239,7 +243,7 @@ export function attachBattleEffects(
         (style === "block" ? 0.48 : style === "defeat" ? 1.05 : 0.78);
       mesh.position.set(
         5 + Math.cos(angle) * radius,
-        1.6 + Math.sin(angle) * radius + progress * lift,
+        impactHeight + Math.sin(angle) * radius + progress * lift,
         3.5 + Math.sin(angle * 2) * radius * 0.25,
       );
       mesh.scaling.set(
@@ -261,6 +265,20 @@ export function attachBattleEffects(
       );
       return;
     }
+    if (arenaWave) {
+      const phase = cue.phaseShift;
+      const heavy = cue.kind === "enemy" && cue.heavy && !cue.blocked && cue.amount > 0;
+      const onset = phase ? 0.32 : cue.defeated ? 0.5 : 0.62;
+      const age = (t - onset) / (1 - onset);
+      arenaWave.mesh.isVisible = Boolean((phase || cue.defeated || heavy) && age >= 0 && age < 1);
+      if (arenaWave.mesh.isVisible) {
+        const spread = 1 - (1 - age) ** 2;
+        arenaWave.mesh.position.set(5, phase ? impactHeight : 0.22, 4);
+        arenaWave.mesh.rotation.x = phase ? Math.PI / 2 : 0;
+        arenaWave.mesh.scaling.setAll(1.5 + spread * 7.5);
+        arenaWave.material.alpha = 0.85 * (1 - age);
+      }
+    }
     const strike = cue.kind === "player" || cue.kind === "poison";
     if (cue.kind === "enemy" && rig.animateAttack) {
       restore();
@@ -277,7 +295,7 @@ export function attachBattleEffects(
       if (t <= contact) {
         const flight = t / contact;
         projectile.mesh.isVisible = true;
-        projectile.mesh.position.set(5, 0.8 + flight * 0.8, -3 + flight * 6.5);
+        projectile.mesh.position.set(5, 0.8 + flight * (impactHeight - 0.8), -3 + flight * 6.5);
         projectile.mesh.scaling.setAll(
           (0.8 + flight * 0.55) * (cue.special === "finisher" ? 2 : 1),
         );
@@ -295,7 +313,7 @@ export function attachBattleEffects(
           : 0;
       if (cue.amount > 0) {
         ring.mesh.isVisible = impact > 0;
-        ring.mesh.position.set(5, 1.6, 3.5);
+        ring.mesh.position.set(5, impactHeight, 3.5);
         ring.mesh.scaling.setAll(
           (0.55 + (t - contact) * 2.5) * (cue.special === "finisher" ? 1.8 : 1),
         );

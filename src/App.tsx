@@ -85,6 +85,7 @@ import { ViewportWarning } from "./ui/ViewportWarning";
 import { DebugMenu } from "./ui/DebugMenu";
 import { solvePuzzleForDebug } from "./game/debugPuzzle";
 import { chooseMusic, createMusic } from "./game/music";
+import { encounterRank } from "./game/enemyIdentity";
 import { HomeBoard } from "./ui/HomeBoard";
 import { WorldUiControls } from "./ui/WorldUiControls";
 import { RoomTurns } from "./ui/RoomTurns";
@@ -1426,6 +1427,7 @@ export default function App() {
   const useWorldUi = realm === "desk" && !officeFallback;
   const bossBattle = FINAL_BOSS_IDS.includes(battle.enemyId),
     battleView = panel === "battle" || settingsFromBattle;
+  const battleRank = encounterRank(battle.enemyId, battle.tactics?.boss ?? bossBattle);
   const musicMix = useMemo(
     () =>
       chooseMusic({
@@ -1723,6 +1725,7 @@ export default function App() {
         }
         reducedMotion={save.settings.reducedMotion}
         className="world-shell"
+        data-encounter-rank={battleView ? battleRank : undefined}
         inert={intakeOpen}
         onPointerMove={(e) => {
           const r = e.currentTarget.getBoundingClientRect();
@@ -1767,7 +1770,7 @@ export default function App() {
             }
             encounter={battleView}
             combatCue={panel === "battle" ? combatEvent : null}
-            finalBoss={FINAL_BOSS_IDS.includes(battle.enemyId)}
+            encounterRank={battleRank}
             enemyId={battle.enemyId}
             maze={maze}
             renderer={save.settings.renderer}

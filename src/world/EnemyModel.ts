@@ -13,7 +13,7 @@ import sentinelMesh from "./sentinelMesh.json";
 export { enemyArchetype, enemyThreatName } from "../game/enemyIdentity";
 
 /** Each enemy has its own silhouette, not a reskinned humanoid. Scene owns the rig. */
-export function buildEnemyModel(scene: Scene, id: string) {
+export function buildEnemyModel(scene: Scene, id: string, scale = 1) {
   const kind = enemyArchetype(id);
   const palettes = {
     echo: ["#3c5666", "#64848f", "#8adce7"],
@@ -43,6 +43,7 @@ export function buildEnemyModel(scene: Scene, id: string) {
   const [shell, alloy, signal] = materials;
   const root = new TransformNode("enemy combat rig", scene);
   root.position.set(5, 0, 4);
+  root.scaling.setAll(scale);
   root.metadata = { archetype: kind };
   const leftArm = new TransformNode("left shoulder pivot", scene);
   const rightArm = new TransformNode("right shoulder pivot", scene);

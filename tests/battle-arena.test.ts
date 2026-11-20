@@ -95,4 +95,27 @@ describe("battle arenas", () => {
       engine.dispose();
     }
   });
+
+  it("frames the same arena differently for regular, miniboss and final fights", () => {
+    const engine = new NullEngine();
+    const scene = new Scene(engine);
+    try {
+      const layouts = (["regular", "miniboss", "final"] as const).map((rank) => {
+        const arena = buildBattleArena(scene, "echo-7", rank);
+        const result = {
+          halos: arena.meshes.filter((mesh) => mesh.name.endsWith("command halo")),
+          rim: arena.lights[1].intensity,
+        };
+        arena.dispose();
+        return result;
+      });
+      expect(layouts.map(({ halos }) => halos.length)).toEqual([0, 1, 2]);
+      expect(layouts[2].rim).toBeGreaterThan(layouts[1].rim);
+      expect(layouts[1].rim).toBeGreaterThan(layouts[0].rim);
+      expect(scene.meshes).toHaveLength(0);
+    } finally {
+      scene.dispose();
+      engine.dispose();
+    }
+  });
 });

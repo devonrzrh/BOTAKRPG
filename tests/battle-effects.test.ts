@@ -1,4 +1,5 @@
 import { NullEngine } from "@babylonjs/core/Engines/nullEngine";
+import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { Scene } from "@babylonjs/core/scene";
@@ -34,7 +35,7 @@ describe("battle effects", () => {
     now = undefined;
   });
 
-  function setup(initial: BattleCue | null = null, reducedMotion = false) {
+  function setup(initial: BattleCue | null = null, reducedMotion = false, boss = false) {
     engine = new NullEngine();
     scene = new Scene(engine);
     let time = 0;
@@ -53,6 +54,7 @@ describe("battle effects", () => {
       scene,
       { root, leftArm, rightArm, materials: [material] },
       () => state,
+      boss ? Color3.Red() : undefined,
     );
     const frame = (elapsed = 0) => {
       time += elapsed;
@@ -97,6 +99,25 @@ describe("battle effects", () => {
     frame(288);
     expect(root.position.z).toBeLessThan(4);
     expect(leftArm.rotation.x).toBeLessThan(0.4);
+  });
+
+  it("expands a boss shockwave at heavy impact and clears it in reduced motion", () => {
+    const heavy = cue({ kind: "enemy", heavy: true });
+    const { frame, setState, dispose } = setup(heavy, false, true);
+    const wave = scene!.getMeshByName("boss shockwave")!;
+    const duration = combatCueDuration(false);
+    frame();
+    frame(duration * 0.6);
+    expect(wave.isVisible).toBe(false);
+    frame(duration * 0.2);
+    expect(wave.isVisible).toBe(true);
+    expect(wave.scaling.x).toBeGreaterThan(5);
+    setState({ cue: heavy, reducedMotion: true });
+    frame();
+    frame(combatCueDuration(true) * 0.8);
+    expect(wave.isVisible).toBe(false);
+    dispose();
+    expect(scene!.getMeshByName("boss shockwave")).toBeNull();
   });
 
   it("rattles the enemy across multiple axes after contact and damps back to rest", () => {

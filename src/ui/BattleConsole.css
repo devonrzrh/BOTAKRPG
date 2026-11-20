@@ -18,6 +18,19 @@
   align-items: center;
   gap: 8px;
 }
+.app.gameplay-battle [data-encounter-rank="miniboss"] .battle-layout-console .battle-enemy-hud,
+.app.gameplay-battle [data-encounter-rank="boss"] .battle-layout-console .battle-enemy-hud,
+.app.gameplay-battle [data-encounter-rank="final"] .battle-layout-console .battle-enemy-hud {
+  width: min(540px, 86%);
+  text-shadow: 0 2px 7px #060a10;
+}
+.app.gameplay-battle [data-encounter-rank="final"] .battle-layout-console .battle-enemy-hud h2 {
+  font-size: clamp(25px, 4vw, 34px);
+}
+.app.gameplay-battle [data-encounter-rank="final"] .battle-meter.enemy [role="progressbar"] {
+  height: 14px;
+  border-color: #b6505d;
+}
 .app.gameplay-battle
   .battle-layout-console
   .battle-enemy-hud

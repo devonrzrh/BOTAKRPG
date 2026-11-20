@@ -22,6 +22,7 @@ import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { attachBattleEffects } from "./BattleEffects";
 import { createBattleSpeechAnchor } from "./BattleSpeechAnchor";
 import { buildEnemyModel } from "./EnemyModel";
+import type { EncounterRank } from "../game/enemyIdentity";
 import { buildBattleArena } from "./BattleArena";
 import { attachWorldParticles } from "./WorldParticles";
 import type { BattleCue } from "../game/combatPresentation";
@@ -62,7 +63,7 @@ interface Props {
   scene: SceneId;
   encounter?: boolean;
   combatCue?: BattleCue | null;
-  finalBoss?: boolean;
+  encounterRank?: EncounterRank;
   enemyId?: string;
   homeWall?: HomeWall;
   homeLookLocked?: boolean;
@@ -293,11 +294,14 @@ function WorldCanvas(props: Props) {
       scene,
     );
     camera.mode = ArcRotateCamera.ORTHOGRAPHIC_CAMERA;
+    const rank = props.encounterRank ?? "regular";
+    const enemyScale = { regular: 1, miniboss: 1.28, boss: 1.42, final: 1.62 }[rank];
+    const majorEncounter = props.encounter && rank !== "regular";
     if (props.encounter) {
       camera.alpha = -Math.PI / 2;
-      camera.beta = 1.18;
+      camera.beta = majorEncounter ? 1.41 : 1.18;
       // Leave the upper strip for the enemy's name and HP, above its silhouette.
-      camera.target.set(5, 2.3, 4);
+      camera.target.set(5, 2.3 + (enemyScale - 1) * 2.65, 4);
     }
     const view = props.encounter ? 3.1 : props.scene === "maze" ? 9 : 12;
     // Frame the enemy in the upper half while rendering the arena behind the HUD.
@@ -305,7 +309,12 @@ function WorldCanvas(props: Props) {
     const resize = () => {
       const aspect =
         engine.getRenderWidth() / (engine.getRenderHeight() * framingHeight);
-      const vertical = view / Math.min(1, aspect);
+      const compactRoom = majorEncounter
+        ? Math.max(0, Math.min(1, (740 - canvas.current!.clientHeight) / 185))
+        : 0;
+      if (majorEncounter)
+        camera.target.y = 2.42 + (enemyScale - 1) * 2.65 + compactRoom * 0.35;
+      const vertical = (view * (1 + compactRoom * 0.46)) / Math.min(1, aspect);
       camera.orthoTop = vertical;
       camera.orthoBottom = vertical - (2 * vertical) / framingHeight;
       camera.orthoLeft = -vertical * aspect;
@@ -316,14 +325,14 @@ function WorldCanvas(props: Props) {
     if (!props.encounter) camera.attachControl(canvas.current!, true);
     camera.inputs.removeByType("ArcRotateCameraKeyboardMoveInput");
     camera.lowerBetaLimit = 0.4;
-    camera.upperBetaLimit = 1.15;
+    camera.upperBetaLimit = majorEncounter ? 1.41 : 1.15;
     camera.lowerRadiusLimit = 18;
     camera.upperRadiusLimit = 32;
     camera.panningSensibility = 0;
     new HemisphericLight("sky", new Vector3(0.3, 1, 0.2), scene).intensity =
       0.58;
     const sun = new DirectionalLight("sun", new Vector3(-0.5, -1, 0.5), scene);
-    sun.intensity = 0.72;
+    sun.intensity = majorEncounter ? 0.42 : 0.72;
     sun.diffuse = new Color3(1, 0.93, 0.79);
     const mat = (name: string, color: string, emissive = false) => {
       const m = new StandardMaterial(name, scene);
@@ -508,13 +517,18 @@ function WorldCanvas(props: Props) {
       ])
         tree(x, z, 0.85);
     } else if (props.encounter) {
-      const arena = buildBattleArena(scene, enemyId);
+      const arena = buildBattleArena(scene, enemyId, rank);
       disposeBattleArena = arena.dispose;
-      const enemyRig = buildEnemyModel(scene, enemyId);
-      disposeBattleEffects = attachBattleEffects(scene, enemyRig, () => ({
-        cue: latest.current.combatCue ?? null,
-        reducedMotion: latest.current.reducedMotion || motionQuery.matches,
-      }));
+      const enemyRig = buildEnemyModel(scene, enemyId, enemyScale);
+      disposeBattleEffects = attachBattleEffects(
+        scene,
+        enemyRig,
+        () => ({
+          cue: latest.current.combatCue ?? null,
+          reducedMotion: latest.current.reducedMotion || motionQuery.matches,
+        }),
+        arena.impactColor,
+      );
       const projectSpeech = createBattleSpeechAnchor(enemyRig.meshes);
       const stage = canvas.current!.parentElement!;
       let previousX = NaN;
@@ -848,7 +862,7 @@ function WorldCanvas(props: Props) {
     props.maze.seed,
     props.renderer,
     props.encounter,
-    props.finalBoss,
+    props.encounterRank,
     props.enemyId,
   ]);
   return (

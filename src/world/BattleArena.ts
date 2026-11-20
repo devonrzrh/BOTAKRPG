@@ -6,7 +6,7 @@ import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { PointLight } from "@babylonjs/core/Lights/pointLight";
 import type { Scene } from "@babylonjs/core/scene";
-import { enemyArchetype } from "../game/enemyIdentity";
+import { enemyArchetype, type EncounterRank } from "../game/enemyIdentity";
 
 export function battleArenaKind(enemyId: string) {
   const kind = enemyArchetype(enemyId);
@@ -20,7 +20,11 @@ export function battleArenaKind(enemyId: string) {
 }
 
 /** Static encounter sets keep the enemy's x=5,z=4 sightline clear. */
-export function buildBattleArena(scene: Scene, enemyId: string) {
+export function buildBattleArena(
+  scene: Scene,
+  enemyId: string,
+  rank: EncounterRank = "regular",
+) {
   const kind = battleArenaKind(enemyId);
   const themes = {
     "packet-highway": ["#101c2b", "#294352", "#68c5ed", "#101b2b"],
@@ -31,6 +35,8 @@ export function buildBattleArena(scene: Scene, enemyId: string) {
     gateway: ["#15202b", "#3e5666", "#73b8c3", "#101b27"],
   };
   const [floorColor, shellColor, accentColor, backgroundColor] = themes[kind];
+  const major = rank !== "regular";
+  const final = rank === "final";
   const previousBackground = scene.clearColor;
   const background = Color4.FromHexString(backgroundColor + "ff");
   scene.clearColor = background;
@@ -469,17 +475,45 @@ export function buildBattleArena(scene: Scene, enemyId: string) {
     for (let i = 0; i < 5; i++)
       box("gateway socket", (i - 2) * 1.2, 1.65, 4.2, 0.6, 2.5, 0.25);
   }
-  const key = new PointLight(`${kind} enemy key`, new Vector3(5, 3, 1), scene);
+  if (major) {
+    const span = final ? 6.8 : rank === "miniboss" ? 4.9 : 5.8;
+    const crown = final ? 3.35 : 2.85;
+    for (const mesh of meshes) {
+      if (mesh.metadata.region === "backdrop") mesh.position.z += 2.8;
+    }
+    const halo = ring("command halo", 0, crown, 2.95, span);
+    halo.rotation.x = Math.PI / 2;
+    if (final) ring("outer command halo", 0, crown, 3.35, span + 0.65)
+      .rotation.x = Math.PI / 2;
+    for (const side of [-1, 1]) {
+      const x = side * (span / 2 + 0.63);
+      const y = crown - 0.07;
+      box("command buttress", x, y, 3.25, 0.8, crown * 2, 0.68)
+        .rotation.z = side * 0.2;
+      box("buttress light", x, y, 2.88, 0.09, crown * 1.9, 0.04, "backdrop", accent)
+        .rotation.z = side * 0.2;
+    }
+    for (let i = 0; i < 16; i++) {
+      const angle = (i / 16) * Math.PI * 2;
+      const radius = span / 2 + 0.16;
+      box("halo contact", Math.cos(angle) * radius, crown + Math.sin(angle) * radius,
+        2.95, i % 4 === 0 ? 0.36 : 0.18, 0.065, 0.075, "backdrop", accent)
+        .rotation.z = angle;
+    }
+    ring("command dais circuit", 0, 0.16, 0, span + 0.45, "floor");
+    if (final) ring("outer dais circuit", 0, 0.13, 0, span + 1.15, "floor", shell);
+  }
+  const key = new PointLight(`${kind} enemy key`, new Vector3(5, major ? 4.4 : 3, 1), scene);
   key.diffuse = new Color3(0.63, 0.78, 0.86);
-  key.intensity = 1.1;
+  key.intensity = major ? 1.45 : 1.1;
   key.range = 10;
   const rim = new PointLight(
     `${kind} backdrop glow`,
-    new Vector3(5, 3.8, 7),
+    new Vector3(5, major ? 5.1 : 3.8, 7),
     scene,
   );
   rim.diffuse = Color3.FromHexString(accentColor);
-  rim.intensity = 0.45;
+  rim.intensity = final ? 1.65 : major ? 1.2 : 0.45;
   rim.range = 7;
   const lights = [key, rim];
   let disposed = false;
@@ -489,6 +523,7 @@ export function buildBattleArena(scene: Scene, enemyId: string) {
     meshes,
     materials,
     lights,
+    impactColor: major ? rim.diffuse : undefined,
     dispose: () => {
       if (disposed) return;
       disposed = true;
