@@ -85,6 +85,51 @@
 .app.gameplay-battle .battle-layout-console .battle-console[hidden] {
   display: none;
 }
+.quiz-cast-layer {
+  position: absolute;
+  z-index: 8;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  --cast-color: #d0f1ff;
+}
+[data-cast-skill="insight"] .quiz-cast-layer { --cast-color: #51e9ff; }
+[data-cast-skill="ward"] .quiz-cast-layer { --cast-color: #7eafff; }
+[data-cast-skill="trace"] .quiz-cast-layer { --cast-color: #74ff9f; }
+[data-cast-skill="finisher"] .quiz-cast-layer { --cast-color: #ffc572; }
+.app.gameplay-battle .quiz-casting > .battle-console {
+  visibility: hidden;
+}
+.app.gameplay-battle .battle-layout-console .quiz-cast-snapshot {
+  inset: auto;
+  overflow: hidden;
+  border-color: var(--cast-color);
+  box-shadow: inset 0 0 26px color-mix(in srgb, var(--cast-color) 32%, transparent);
+  pointer-events: none;
+  animation: quiz-condense 180ms cubic-bezier(0.64, 0, 0.48, 1) both;
+}
+.app.gameplay-battle .quiz-cast-snapshot .battle-answer-options .selected {
+  border-color: var(--cast-color);
+  background: color-mix(in srgb, var(--cast-color) 22%, #091820);
+}
+.quiz-cast-bolt {
+  position: absolute;
+  width: 12px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  opacity: 0;
+  background: var(--cast-color);
+  box-shadow: 0 1px 13px var(--cast-color);
+}
+@keyframes quiz-condense {
+  0% { scale: 1; opacity: 1; }
+  44% { scale: 0.78 0.62; opacity: 1; }
+  86% { scale: 0.03 0.13; opacity: 1; background: var(--cast-color); }
+  100% { scale: 0.009 0.044; opacity: 0.7; background: var(--cast-color); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .quiz-cast-layer { display: none; }
+}
 .app.gameplay-battle .battle-layout-console .battle-console-status {
   position: relative;
   display: grid;

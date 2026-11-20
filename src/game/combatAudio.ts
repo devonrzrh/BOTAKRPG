@@ -1,4 +1,4 @@
-import { combatCueDuration, isVictoryCue, type BattleCue } from "./combatPresentation";
+import { combatContactMs, isVictoryCue, type BattleCue } from "./combatPresentation";
 import { createSoundManager, type SfxName } from "./soundManager";
 
 const previewCueBase = {
@@ -114,9 +114,7 @@ export function createCombatAudio() {
       )
         return;
       lastSequence = cue.sequence;
-      const delay =
-        combatCueDuration(reducedMotion) *
-        (cue.kind === "enemy" ? 0.62 : 0.32);
+      const delay = combatContactMs(cue, reducedMotion);
       const timer = setTimeout(() => {
         timers.delete(timer);
         sounds.play(battleSound(cue));

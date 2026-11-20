@@ -68,7 +68,7 @@ import {
   type Dialogue as DialogueContent,
 } from "./content/schema";
 import { BattleScreen } from "./ui/BattleScreen";
-import { battleCue, type BattleCue } from "./game/combatPresentation";
+import { battleCue, type BattleCue, type QuizOrigin } from "./game/combatPresentation";
 import { XpMeter } from "./ui/XpMeter";
 import { GameNotice } from "./ui/GameNotice";
 import { LearningQuest } from "./ui/LearningQuest";
@@ -1142,6 +1142,7 @@ export default function App() {
     nextSave: Save,
     cause?: "guard" | "item" | "act" | "evade",
     beforeResponse: Save = saveRef.current,
+    quizOrigin?: QuizOrigin,
   ) => {
     const cue = battleCue(
       battleRef.current,
@@ -1152,7 +1153,7 @@ export default function App() {
       ++combatSequence.current,
       cause,
     );
-    if (cue) setCombatEvent(cue);
+    if (cue) setCombatEvent(cue.kind === "player" && quizOrigin ? { ...cue, quizOrigin } : cue);
     if (
       nextBattle.phase === "won" &&
       (nextBattle.enemyId !== echoActivity.enemy?.id || finaleAvailable(nextSave, content))
@@ -1176,7 +1177,7 @@ export default function App() {
     setBattle(nextBattle);
     updateSave(() => nextSave);
   };
-  const submitAnswer = (chosenAnswer?: number[], elapsedMs = 0) => {
+  const submitAnswer = (chosenAnswer?: number[], elapsedMs = 0, quizOrigin?: QuizOrigin) => {
     if (battleRef.current !== battle || battle.phase !== "question") return;
     try {
       const result = answerBattle(
@@ -1194,7 +1195,7 @@ export default function App() {
         result.correct,
         battle.assisted,
       );
-      applyBattle(result.battle, next);
+      applyBattle(result.battle, next, undefined, undefined, quizOrigin);
       setBattleNotice(
         !result.correct ? "Incorrect · turn spent"
           : result.battle.hp === battle.hp ? "Correct · time expired, no damage"

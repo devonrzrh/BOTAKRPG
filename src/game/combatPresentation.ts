@@ -3,6 +3,8 @@ import { enemyIntent } from "./combat";
 import type { Save } from "./state";
 import type { Content } from "../content/schema";
 
+export type QuizOrigin = { x: number; y: number };
+
 export interface BattleCue {
   sequence: number;
   kind: "player" | "enemy" | "miss" | "recover" | "poison";
@@ -13,9 +15,17 @@ export interface BattleCue {
   defeated: boolean;
   special?: "weakness" | "break" | "momentum" | "finisher" | "pacify" | "evade";
   phaseShift?: boolean;
+  quizOrigin?: QuizOrigin;
 }
 export const combatCueDuration = (reducedMotion: boolean) =>
   reducedMotion ? 200 : 650;
+
+export const QUIZ_CAST_MS = 180;
+
+export const combatContactMs = (cue: BattleCue, reducedMotion: boolean) =>
+  cue.quizOrigin && !reducedMotion
+    ? 390
+    : combatCueDuration(reducedMotion) * (cue.kind === "enemy" ? 0.62 : 0.32);
 
 export const isVictoryCue = (cue: BattleCue) =>
   cue.defeated || (cue.kind === "recover" && cue.special === "pacify");

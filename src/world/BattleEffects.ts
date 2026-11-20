@@ -1,4 +1,5 @@
 import { Color3 } from "@babylonjs/core/Maths/math.color";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import type { Scene } from "@babylonjs/core/scene";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import type { Mesh } from "@babylonjs/core/Meshes/mesh";
@@ -7,8 +8,10 @@ import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import {
   combatCueDuration,
+  combatContactMs,
   combatPresentationDuration,
   isVictoryCue,
+  QUIZ_CAST_MS,
   type BattleCue,
 } from "../game/combatPresentation";
 
@@ -125,6 +128,8 @@ export function attachBattleEffects(
     emissives: rig.materials.map((m) => m.emissiveColor.clone()),
   };
   const impactHeight = 1.6 * original.rootScaling.y;
+  const launchPoint = new Vector3(5, 0.8, -3);
+  const impactPoint = new Vector3(5, impactHeight, 3.5);
   const startTime = performance.now();
   let activeSequence = -1;
   let started = startTime;
@@ -176,10 +181,12 @@ export function attachBattleEffects(
     const actionDuration = combatCueDuration(reduced);
     const duration = combatPresentationDuration(activeCue, reduced);
     const t = Math.min(1, elapsed / actionDuration);
+    const contact = combatContactMs(activeCue, reduced);
+    const settleStart = Math.max(340, contact + 125);
     const resolve = duration > actionDuration
-      ? Math.max(0, Math.min(1, (elapsed - 340) / (duration - 340)))
+      ? Math.max(0, Math.min(1, (elapsed - settleStart) / (duration - settleStart)))
       : 0;
-    animate(activeCue, t, resolve, elapsed);
+    animate(activeCue, t, resolve, elapsed, contact);
     if (elapsed >= duration) {
       hide();
       hideParticles();
@@ -193,6 +200,9 @@ export function attachBattleEffects(
 
   function begin(cue: BattleCue): void {
     if (reduced) return;
+    // The projected cast crosses below the stage floor before it reaches the rig.
+    projectile.mesh.renderingGroupId = cue.quizOrigin ? 1 : 0;
+    beam.mesh.renderingGroupId = projectile.mesh.renderingGroupId;
     const color =
       cue.special === "finisher"
         ? colors.amber
@@ -209,12 +219,27 @@ export function attachBattleEffects(
                   : colors.white;
     if (cue.kind === "player" || cue.kind === "poison") {
       projectile.material.emissiveColor.copyFrom(color);
-      projectile.mesh.isVisible = true;
-      projectile.mesh.position.set(5, 0.8, -3);
-      if (cue.skill === "insight") {
+      launchPoint.set(5, 0.8, -3);
+      if (cue.quizOrigin && scene.activeCamera) {
+        // Keep the old launch depth while matching the quiz's screen position.
+        const transform = scene.getTransformMatrix();
+        const depth = Vector3.TransformCoordinates(launchPoint, transform).z;
+        Vector3.TransformCoordinatesFromFloatsToRef(
+          cue.quizOrigin.x * 2 - 1,
+          1 - cue.quizOrigin.y * 2,
+          depth,
+          transform.clone().invert(),
+          launchPoint,
+        );
+      }
+      projectile.mesh.isVisible = !cue.quizOrigin;
+      projectile.mesh.position.copyFrom(launchPoint);
+      if (cue.skill === "insight" || cue.quizOrigin) {
         beam.material.emissiveColor.copyFrom(color);
-        beam.mesh.isVisible = true;
+        beam.material.alpha = 0.9;
+        beam.mesh.isVisible = !cue.quizOrigin;
         beam.mesh.position.set(5, 1.2, 0.2);
+        beam.mesh.rotation.setAll(0);
       }
     } else if (cue.kind === "enemy" && cue.blocked) {
       shield.mesh.isVisible = true;
@@ -264,7 +289,7 @@ export function attachBattleEffects(
       mesh.rotation.set(progress * (i % 3), progress * 3 + angle, progress * 2);
     });
   }
-  function animate(cue: BattleCue, t: number, resolve: number, elapsed: number): void {
+  function animate(cue: BattleCue, t: number, resolve: number, elapsed: number, contactMs: number): void {
     const pulse = Math.sin(Math.PI * t);
     if (reduced) {
       if (isVictoryCue(cue)) {
@@ -281,10 +306,11 @@ export function attachBattleEffects(
       );
       return;
     }
+    const contact = contactMs / combatCueDuration(false);
     if (arenaWave) {
       const phase = cue.phaseShift;
       const heavy = cue.kind === "enemy" && cue.heavy && !cue.blocked && cue.amount > 0;
-      const onset = phase ? 0.32 : cue.defeated ? 0.5 : 0.62;
+      const onset = phase ? contact : cue.defeated ? Math.max(contact, 0.5) : 0.62;
       const age = (t - onset) / (1 - onset);
       arenaWave.mesh.isVisible = Boolean((phase || cue.defeated || heavy) && age >= 0 && age < 1);
       if (arenaWave.mesh.isVisible) {
@@ -307,16 +333,26 @@ export function attachBattleEffects(
         original.rootPosition.z - wind * (cue.heavy ? 0.48 : 0.25);
       rig.root.rotation.x = original.rootRotation.x + wind * 0.12;
     } else if (strike) {
-      const contact = 0.32;
-      if (t <= contact) {
-        const flight = t / contact;
-        projectile.mesh.isVisible = true;
-        projectile.mesh.position.set(5, 0.8 + flight * (impactHeight - 0.8), -3 + flight * 6.5);
+      const launch = cue.quizOrigin ? QUIZ_CAST_MS : 0;
+      projectile.mesh.isVisible = elapsed >= launch && elapsed < contactMs;
+      if (projectile.mesh.isVisible) {
+        const flight = (elapsed - launch) / (contactMs - launch);
+        const progress = cue.quizOrigin ? flight * (0.64 + 0.36 * flight) : flight;
+        Vector3.LerpToRef(launchPoint, impactPoint, progress, projectile.mesh.position);
+        if (cue.quizOrigin) projectile.mesh.position.y += Math.sin(Math.PI * flight) * 0.35;
         projectile.mesh.scaling.setAll(
-          (0.8 + flight * 0.55) * (cue.special === "finisher" ? 2 : 1),
+          (0.8 + flight * 0.55) * (cue.special === "finisher" ? 2 : cue.quizOrigin ? 1.65 : 1),
         );
-      } else projectile.mesh.isVisible = false;
-      if (cue.skill === "insight") {
+      }
+      if (cue.quizOrigin) {
+        beam.mesh.isVisible = projectile.mesh.isVisible && elapsed > launch;
+        if (beam.mesh.isVisible) {
+          Vector3.LerpToRef(launchPoint, projectile.mesh.position, 0.88, beam.mesh.position);
+          beam.mesh.lookAt(projectile.mesh.position);
+          beam.mesh.scaling.set(0.9, 0.9, Vector3.Distance(beam.mesh.position, projectile.mesh.position) * 2);
+          beam.material.alpha = 0.58;
+        }
+      } else if (cue.skill === "insight") {
         beam.mesh.isVisible = t <= contact;
         beam.mesh.position.set(5, 1.2, 0.25);
         beam.mesh.scaling.z = 1 + Math.min(1, t / contact) * 5.5;
@@ -343,7 +379,7 @@ export function attachBattleEffects(
                 : cue.special === "break" || cue.special === "finisher"
                   ? "shard"
                   : "hit",
-            (elapsed - contact * combatCueDuration(false)) / 1000,
+            (elapsed - contactMs) / 1000,
           );
       }
       // Contact launches a sharp, damped rattle rather than a single soft sway.
@@ -381,8 +417,9 @@ export function attachBattleEffects(
       shield.mesh.scaling.set(1.1 + pulse * 0.35, 1.1 + pulse * 0.35, 0.12);
     if (cue.kind === "enemy" && cue.blocked && t >= 0.62 && cue.amount > 0)
       emitParticles("block", ((t - 0.62) * combatCueDuration(false)) / 1000);
-    const flash =
-      cue.kind === "miss" || cue.kind === "recover" ? 0 : pulse * 0.2;
+    const flash = cue.quizOrigin
+      ? Math.sin(Math.PI * Math.max(0, (t - contact) / (1 - contact))) * 0.32
+      : cue.kind === "miss" || cue.kind === "recover" ? 0 : pulse * 0.2;
     rig.materials.forEach((m, i) =>
       m.emissiveColor
         .copyFrom(original.emissives[i])

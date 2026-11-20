@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { BATTLE_CUE_PREVIEWS, createCombatAudio } from "../src/game/combatAudio";
-import type { BattleCue } from "../src/game/combatPresentation";
+import { combatContactMs, type BattleCue } from "../src/game/combatPresentation";
 
 const strike = { ...BATTLE_CUE_PREVIEWS[0].cue, sequence: 1 };
 
@@ -88,6 +88,18 @@ describe("combat audio", () => {
     vi.advanceTimersByTime(208);
     expect(clips).toHaveLength(2);
     expect(clips.every(({ src }) => src.endsWith("/powerUp1.ogg"))).toBe(true);
+    audio.dispose();
+  });
+
+  it.each([false, true])("plays at quiz projectile contact with reduced motion %s", (reducedMotion) => {
+    const audio = createCombatAudio();
+    audio.unlock();
+    const attack = { ...strike, quizOrigin: { x: 0.5, y: 0.7 } };
+    audio.play(attack, reducedMotion);
+    vi.advanceTimersByTime(combatContactMs(attack, reducedMotion) - 1);
+    expect(clips).toHaveLength(0);
+    vi.advanceTimersByTime(1);
+    expect(clips).toHaveLength(1);
     audio.dispose();
   });
 

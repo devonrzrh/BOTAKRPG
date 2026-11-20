@@ -7,11 +7,13 @@ import "./EnemySpeech.css";
 export function EnemySpeech({
   battle,
   cue,
+  awaitingImpact,
   hidden,
   reducedMotion,
 }: {
   battle: Battle;
   cue: BattleCue | null;
+  awaitingImpact: boolean;
   hidden: boolean;
   reducedMotion: boolean;
 }) {
@@ -25,7 +27,7 @@ export function EnemySpeech({
   const idleSpoken = useRef(false);
   useEffect(() => {
     const terminal = battle.phase === "won" || battle.phase === "lost";
-    if (terminalSpoken.current) return;
+    if (awaitingImpact || terminalSpoken.current) return;
     const freshCue = cue && handledCue.current !== cue.sequence;
     if (!terminal && !freshCue) return;
     if (cue) handledCue.current = cue.sequence;
@@ -41,7 +43,7 @@ export function EnemySpeech({
       text: enemyDialogue(battle.enemyId, event, battle.turn),
       serial: previous.serial + 1,
     }));
-  }, [battle, cue]);
+  }, [awaitingImpact, battle, cue]);
   useEffect(() => {
     if (!speech.text) return;
     const timer = window.setTimeout(
@@ -69,7 +71,7 @@ export function EnemySpeech({
       aria-live="polite"
       aria-atomic="true"
     >
-      {!hidden && speech.text && (
+      {!hidden && !awaitingImpact && speech.text && (
         <p key={speech.serial} className="enemy-speech-bubble">
           <span className="enemy-speech-speaker">
             {battle.enemyName} says:{" "}

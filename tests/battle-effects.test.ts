@@ -1,13 +1,17 @@
 import { NullEngine } from "@babylonjs/core/Engines/nullEngine";
+import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
+import { Matrix, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { Scene } from "@babylonjs/core/scene";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { attachBattleEffects } from "../src/world/BattleEffects";
 import {
+  combatContactMs,
   combatCueDuration,
   combatPresentationDuration,
+  QUIZ_CAST_MS,
   type BattleCue,
 } from "../src/game/combatPresentation";
 
@@ -91,6 +95,33 @@ describe("battle effects", () => {
     frame(duration * 0.03);
     expect(root.rotation.y).not.toBeCloseTo(0.2);
     expect(root.position.x).not.toBeCloseTo(2);
+  });
+
+  it("launches from the collapsed quiz and lands at the shared contact time", () => {
+    const attack = cue({ quizOrigin: { x: 0.4, y: 0.75 } });
+    const { frame, material, root } = setup(attack);
+    scene!.activeCamera = new FreeCamera("test camera", Vector3.Zero(), scene!);
+    scene!.setTransformMatrix(Matrix.Identity(), Matrix.Identity());
+    const shot = scene!.getMeshByName("battle projectile")!;
+    const trail = scene!.getMeshByName("insight beam")!;
+    frame();
+    frame(QUIZ_CAST_MS - 1);
+    expect(shot.isVisible).toBe(false);
+    frame(1);
+    expect(shot.isVisible).toBe(true);
+    expect(shot.renderingGroupId).toBeGreaterThan(0);
+    expect(shot.position.x).toBeCloseTo(-0.2);
+    expect(shot.position.y).toBeCloseTo(-0.5);
+    frame(combatContactMs(attack, false) - QUIZ_CAST_MS - 5);
+    expect(trail.isVisible).toBe(true);
+    expect(shot.position.z).toBeGreaterThan(3);
+    expect(root.rotation.y).toBeCloseTo(0.2);
+    expect(material.emissiveColor.b).toBe(0);
+    frame(14);
+    expect(shot.isVisible).toBe(false);
+    expect(trail.isVisible).toBe(false);
+    expect(root.rotation.y).not.toBeCloseTo(0.2);
+    expect(material.emissiveColor.b).toBeGreaterThan(0);
   });
 
   it("moves the root and arm during a heavy enemy cue", () => {

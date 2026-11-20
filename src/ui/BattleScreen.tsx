@@ -15,9 +15,12 @@ import "./BattleDepth.css";
 import "./BattleConsole.css";
 import { stats, type Save } from "../game/state";
 import {
+  combatContactMs,
   combatCueDuration,
   combatPresentationDuration,
+  QUIZ_CAST_MS,
   type BattleCue,
+  type QuizOrigin,
 } from "../game/combatPresentation";
 import { XpMeter } from "./XpMeter";
 import { SupplyIcon } from "./SupplyIcon";
@@ -56,7 +59,7 @@ interface Props {
   onAct: (choice: number) => void;
   onSpare: () => void;
   onEvade: (collisions: number) => void;
-  onSubmit: (answer?: number[], elapsedMs?: number) => void;
+  onSubmit: (answer?: number[], elapsedMs?: number, quizOrigin?: QuizOrigin) => void;
   onToggleSound: () => void;
   onToggleAutoAdvance: () => void;
   onHint: () => void;
@@ -119,7 +122,8 @@ export function BattleScreen(p: Props) {
   const [reviewing, setReviewing] = useState(false);
   const [impact, setImpact] = useState("");
   const [motion, setMotion] = useState<BattleCue["kind"] | null>(null);
-  const [impactLanded, setImpactLanded] = useState(false);
+  const [landedSequence, setLandedSequence] = useState<number | null>(null);
+  const impactLanded = p.cue?.sequence === landedSequence;
   useEffect(() => {
     if ((b.phase !== "choose" || motion) && momentumMenu.current)
       momentumMenu.current.open = false;
@@ -164,6 +168,16 @@ export function BattleScreen(p: Props) {
   };
   const quizDuration = b.phase === "question" && q ? battleQuizDuration(q.format) : 0;
   const quizClock = useRef({ elapsed: 0, started: null as number | null });
+  const quizCard = useRef<HTMLElement>(null);
+  const castLayer = useRef<HTMLDivElement>(null);
+  const pendingCast = useRef<{
+    card: HTMLElement;
+    left: number;
+    top: number;
+    width: number;
+    height: number;
+    scroll: number;
+  } | null>(null);
   const [quizElapsed, setQuizElapsed] = useState(0);
   useLayoutEffect(() => {
     quizClock.current = { elapsed: 0, started: null };
@@ -189,7 +203,29 @@ export function BattleScreen(p: Props) {
     const clock = quizClock.current;
     if (!quizDuration || p.paused) return;
     const running = clock.started === null ? 0 : performance.now() - clock.started;
-    p.onSubmit(answer, clock.elapsed + running);
+    let origin: QuizOrigin | undefined;
+    pendingCast.current = null;
+    if (!reducedMotion && quizCard.current && castLayer.current) {
+      const live = quizCard.current;
+      const stage = castLayer.current.getBoundingClientRect();
+      const { left, top, width, height } = live.getBoundingClientRect();
+      if (width && height && stage.width && stage.height) {
+        const selected = answer ?? p.answer;
+        const card = live.cloneNode(true) as HTMLElement;
+        card.removeAttribute("aria-label");
+        card.querySelectorAll("[id]").forEach((node) => node.removeAttribute("id"));
+        card.querySelectorAll(".battle-answer-options button").forEach((button, position) => {
+          const chosen = selected.includes(displayOptions[position].index);
+          button.classList.toggle("selected", chosen);
+          button.setAttribute("aria-pressed", String(chosen));
+        });
+        const x = left - stage.left;
+        const y = top - stage.top;
+        pendingCast.current = { card, left: x, top: y, width, height, scroll: live.scrollTop };
+        origin = { x: (x + width / 2) / stage.width, y: (y + height / 2) / stage.height };
+      }
+    }
+    p.onSubmit(answer, clock.elapsed + running, origin);
   };
   const remaining = Math.max(0, quizDuration - quizElapsed);
   const correctFeedback = b.phase === "feedback" && p.notice === "Correct";
@@ -231,14 +267,52 @@ export function BattleScreen(p: Props) {
       return;
     }
     setMotion(cue.kind);
-    setImpactLanded(false);
+    setLandedSequence(null);
+    const cast = pendingCast.current;
+    pendingCast.current = null;
+    const layer = castLayer.current;
+    let castTimer: ReturnType<typeof setTimeout> | undefined;
+    if (cue.quizOrigin && cast && layer && !reducedMotion) {
+      const snapshot = document.createElement("div");
+      snapshot.className = "battle-console quiz-cast-snapshot";
+      Object.assign(snapshot.style, {
+        left: `${cast.left}px`, top: `${cast.top}px`,
+        width: `${cast.width}px`, height: `${cast.height}px`,
+        animationDuration: `${QUIZ_CAST_MS}ms`,
+      });
+      snapshot.append(cast.card);
+      layer.append(snapshot);
+      cast.card.scrollTop = cast.scroll;
+      castTimer = setTimeout(() => snapshot.remove(), QUIZ_CAST_MS);
+      if (!layer.closest("[data-enemy-speech-anchor]")) {
+        const bolt = document.createElement("span");
+        bolt.className = "quiz-cast-bolt";
+        bolt.style.left = `${cue.quizOrigin.x * 100}%`;
+        bolt.style.top = `${cue.quizOrigin.y * 100}%`;
+        layer.append(bolt);
+        const dx = (0.5 - cue.quizOrigin.x) * layer.clientWidth;
+        const dy = (0.22 - cue.quizOrigin.y) * layer.clientHeight;
+        bolt.animate(
+          [
+            { transform: "translate(-50%, -50%)", opacity: 1 },
+            { transform: `translate(-50%, -50%) translate(${dx}px, ${dy}px)`, opacity: 0.7 },
+          ],
+          {
+            duration: combatContactMs(cue, false) - QUIZ_CAST_MS,
+            delay: QUIZ_CAST_MS,
+            easing: "ease-in",
+            fill: "forwards",
+          },
+        ).onfinish = () => bolt.remove();
+      }
+    }
     audio.current?.play(cue, reducedMotion);
     const contactTimer = setTimeout(
       () => {
-        setImpactLanded(true);
+        setLandedSequence(cue.sequence);
         haptics.current?.impact(cue, reducedMotion);
       },
-      combatCueDuration(reducedMotion) * (cue.kind === "enemy" ? 0.62 : 0.32),
+      combatContactMs(cue, reducedMotion),
     );
     setImpact(
       cue.phaseShift
@@ -275,6 +349,8 @@ export function BattleScreen(p: Props) {
     return () => {
       clearTimeout(timer);
       clearTimeout(contactTimer);
+      clearTimeout(castTimer);
+      layer?.replaceChildren();
       haptics.current?.cancel();
     };
   }, [p.cue, reducedMotion]);
@@ -352,6 +428,7 @@ export function BattleScreen(p: Props) {
     );
   };
   const activeCard = !battleEnded && !evading && !motion;
+  const quizCasting = motion === "player" && Boolean(p.cue?.quizOrigin) && !reducedMotion;
   const inspecting = menu === "analyze" || menu === "talk";
   const boss = bossReadout(b);
   const weakness =
@@ -419,7 +496,8 @@ export function BattleScreen(p: Props) {
   );
   return (
     <div
-      className={`battle-screen battle-layout-console phase-${b.phase} ${motion ? `motion-${motion}` : ""} ${impactLanded && motion && p.cue?.amount && motion === "enemy" ? "impact-damage" : impactLanded && motion && p.cue?.defeated ? "impact-defeat" : ""}`}
+      className={`battle-screen battle-layout-console phase-${b.phase} ${quizCasting ? "quiz-casting" : ""} ${motion ? `motion-${motion}` : ""} ${impactLanded && motion && p.cue?.amount && motion === "enemy" ? "impact-damage" : impactLanded && motion && p.cue?.defeated ? "impact-defeat" : ""}`}
+      data-cast-skill={quizCasting ? (p.cue?.special === "finisher" ? "finisher" : p.cue?.skill) : undefined}
       hidden={p.covered}
       data-sfx-silent
       onClickCapture={(event) => {
@@ -500,10 +578,12 @@ export function BattleScreen(p: Props) {
             ))}
         </div>
       </div>
+      <div className="quiz-cast-layer" ref={castLayer} aria-hidden="true" inert />
       <EnemySpeech
         key={b.enemyId}
         battle={b}
         cue={p.cue}
+        awaitingImpact={Boolean(p.cue?.quizOrigin) && !impactLanded}
         hidden={evading || b.phase === "question" || battleEnded}
         reducedMotion={reducedMotion}
       />
@@ -726,6 +806,7 @@ export function BattleScreen(p: Props) {
         {activeCard && (
           <section
             key={`${b.turn}:${b.phase}:${menu}`}
+            ref={b.phase === "question" ? quizCard : undefined}
             className={`battle-decision ${b.phase === "choose" ? "command-panel" : "quiz-panel"} ${inspecting ? "analysis-panel" : ""} ${b.phase === "feedback" ? "feedback-panel" : ""} ${correctFeedback ? "answer-correct" : ""}`}
             aria-label={
               b.phase === "question" ? "Battle question" : "Battle decision"
