@@ -37,7 +37,8 @@ const locations: Option[] = [
   { id: "supplies", title: "Supply locker" },
   { id: "settings", title: "Settings" },
 ];
-const soundCueNames = Object.keys(SFX_CUES) as (keyof typeof SFX_CUES)[];
+const soundCueNames = (Object.keys(SFX_CUES) as (keyof typeof SFX_CUES)[])
+  .filter((cue) => !cue.startsWith("battle"));
 
 function Picker({
   label,
@@ -622,7 +623,7 @@ export function DebugMenu({
               </div>
             </section>
             <section>
-              <h3>Procedural battle cues</h3>
+              <h3>Battle sound effects</h3>
               <div className="debug-actions">
                 {BATTLE_CUE_PREVIEWS.map(({ label, cue }) => (
                   <button

@@ -17,7 +17,17 @@ import digitalTwoTone from "../../sounds/sfx/kenney_digital-audio_2/Audio/twoTon
 import digitalPhaseJump from "../../sounds/sfx/kenney_digital-audio_2/Audio/phaseJump1.ogg?url";
 import digitalZap from "../../sounds/sfx/kenney_digital-audio_2/Audio/zapThreeToneUp.ogg?url";
 import digitalPhaser from "../../sounds/sfx/kenney_digital-audio_2/Audio/phaserUp1.ogg?url";
+import digitalPhaserDown from "../../sounds/sfx/kenney_digital-audio_2/Audio/phaserDown1.ogg?url";
+import digitalPowerUp from "../../sounds/sfx/kenney_digital-audio_2/Audio/powerUp1.ogg?url";
+import impactGlass from "../../sounds/sfx/kenney_impact-sounds/Audio/impactGlass_medium_000.ogg?url";
+import impactGlassHeavy from "../../sounds/sfx/kenney_impact-sounds/Audio/impactGlass_heavy_000.ogg?url";
+import impactMetal from "../../sounds/sfx/kenney_impact-sounds/Audio/impactMetal_medium_000.ogg?url";
 import impactPunch from "../../sounds/sfx/kenney_impact-sounds/Audio/impactPunch_medium_001.ogg?url";
+import impactPunchHeavy from "../../sounds/sfx/kenney_impact-sounds/Audio/impactPunch_heavy_000.ogg?url";
+import explosion from "../../sounds/sfx/kenney_sci-fi-sounds/Audio/explosionCrunch_000.ogg?url";
+import forceField from "../../sounds/sfx/kenney_sci-fi-sounds/Audio/forceField_000.ogg?url";
+import laserRetro from "../../sounds/sfx/kenney_sci-fi-sounds/Audio/laserRetro_000.ogg?url";
+import laserSmall from "../../sounds/sfx/kenney_sci-fi-sounds/Audio/laserSmall_000.ogg?url";
 import cameraSwoosh from "../../sounds/sfx/swoosh.mp3?url";
 
 export const SFX_CUES = {
@@ -47,6 +57,19 @@ export const SFX_CUES = {
   hazard: { label: "Hazard warning", source: digitalHighDown, cooldown: 180 },
   dodge: { label: "Dodge", source: digitalPhaseJump, cooldown: 180 },
   hit: { label: "Impact", source: impactPunch, cooldown: 180 },
+  battleStrike: { label: "Strike", source: impactMetal, cooldown: 0 },
+  battleInsight: { label: "Insight", source: laserSmall, cooldown: 0 },
+  battleWard: { label: "Ward", source: forceField, cooldown: 0 },
+  battleTrace: { label: "Trace", source: laserRetro, cooldown: 0 },
+  battlePoison: { label: "Poison", source: digitalLowDown, cooldown: 0 },
+  battleEnemy: { label: "Enemy hit", source: impactPunch, cooldown: 0 },
+  battleHeavy: { label: "Heavy enemy hit", source: impactPunchHeavy, cooldown: 0 },
+  battleBlock: { label: "Blocked hit", source: rpgMetalClick, cooldown: 0 },
+  battleMiss: { label: "Miss", source: digitalPhaserDown, cooldown: 0 },
+  battleWeakness: { label: "Weakness hit", source: impactGlass, cooldown: 0 },
+  battleBreak: { label: "Stance break", source: impactGlassHeavy, cooldown: 0 },
+  battleFinisher: { label: "Finisher", source: explosion, cooldown: 0 },
+  battleVictory: { label: "Victory / pacify", source: digitalPowerUp, cooldown: 0 },
   cameraMove: {
     label: "Camera turn swoosh",
     source: cameraSwoosh,
@@ -65,6 +88,19 @@ export const SFX_GAINS: Partial<Record<SfxName, number>> = {
   speechRobot: 0.12,
   speechEcho: 0.12,
   speechSoft: 0.12,
+  battleStrike: 0.65,
+  battleInsight: 0.55,
+  battleWard: 0.55,
+  battleTrace: 0.55,
+  battlePoison: 0.45,
+  battleEnemy: 0.75,
+  battleHeavy: 0.95,
+  battleBlock: 0.6,
+  battleMiss: 0.4,
+  battleWeakness: 0.7,
+  battleBreak: 0.75,
+  battleFinisher: 0.85,
+  battleVictory: 0.55,
   cameraMove: 0.2,
 };
 
