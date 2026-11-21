@@ -265,7 +265,7 @@ export function stats(save: Save, content?: Content) {
   return {
     maxHp: 60 + (save.character.level - 1) * 10,
     maxFocus: 12 + (save.character.level - 1) * 2,
-    attack: 6 + (save.character.level - 1) * 2 + bonus("weapon"),
+    attack: 6 + (save.character.level - 1) * 3 + bonus("weapon"),
     defense: 2 + save.character.level - 1 + bonus("armor"),
   };
 }

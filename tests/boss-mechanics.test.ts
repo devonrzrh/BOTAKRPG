@@ -51,9 +51,9 @@ const battle = (mechanic: CombatTactics["mechanic"], hp = 100) =>
 
 describe("level-gated combat skills", () => {
   it.each([
-    ["packet-relay", 300],
-    ["window-exploit", 600],
-    ["containment-burst", 900],
+    ["packet-relay", 200],
+    ["window-exploit", 400],
+    ["containment-burst", 600],
   ] as const)("unlocks %s at %i XP and preserves it on import", (id, xp) => {
     const entry = skill(id);
     const before = addXp(initialSave(), xp - 1);
@@ -69,7 +69,7 @@ describe("level-gated combat skills", () => {
 
   it("builds extra Momentum only when Packet Relay hits", () => {
     const entry = skill("packet-relay");
-    const save = unlockSkill(addXp(initialSave(), 300), entry);
+    const save = unlockSkill(addXp(initialSave(), 200), entry);
     const selected = selectSkill(battle("mimic"), save, entry, questions);
     const q = questions.find((q) => q.id === selected.question)!;
     const hit = answerBattle(selected, save, content, q.answer);
@@ -84,7 +84,7 @@ describe("level-gated combat skills", () => {
 
   it("previews and applies Window Exploit's bonus on recovery turns", () => {
     const entry = skill("window-exploit");
-    const save = unlockSkill(addXp(initialSave(), 600), entry);
+    const save = unlockSkill(addXp(initialSave(), 400), entry);
     const strike = battle("mimic");
     const opening = { ...strike, turn: 3 };
     const damage = previewDamage(opening, save, entry, content);
@@ -101,7 +101,7 @@ describe("level-gated combat skills", () => {
 
   it("applies Containment Burst's damage and shield for eight Focus", () => {
     const entry = skill("containment-burst");
-    const save = unlockSkill(addXp(initialSave(), 900), entry);
+    const save = unlockSkill(addXp(initialSave(), 600), entry);
     const base = battle("mimic");
     const selected = selectSkill(base, save, entry, questions);
     const q = questions.find((q) => q.id === selected.question)!;

@@ -83,7 +83,7 @@ it("plays the complete routing story from the maze to the Warden and files its r
       let battle = createBattle({
         ...activity.enemy,
         title: scene.enemyName ?? activity.enemy.title,
-      });
+      }, 0, save.character.level);
       while (battle.phase !== "won" && battle.phase !== "lost" && turns < 100) {
         battle = selectSkill(battle, save, probe, questions);
         const question = questions.find((q) => q.id === battle.question)!;

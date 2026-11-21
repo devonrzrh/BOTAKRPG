@@ -31,7 +31,7 @@ it("uses a consumable before the enemy responds and spends exactly one turn", ()
 
   const result = itemTurn(battle, save, content, patch)!;
   expect(result.used.character.hp).toBe(48);
-  expect(result.save.character.hp).toBe(40);
+  expect(result.save.character.hp).toBe(37);
   expect(result.save.supply.items[patch.id]).toBeUndefined();
   expect(result.battle.turn).toBe(battle.turn + 1);
   expect(itemTurn(result.battle, result.save, content, patch)).toBeNull();

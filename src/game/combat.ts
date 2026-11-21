@@ -66,15 +66,18 @@ export function createBattle(
     mixedQuestions: false,
   },
   questionOffset = 0,
+  playerLevel = 1,
 ): Battle {
+  const levelsGained = playerLevel - 1;
+  const hp = Math.round(enemy.hp * (1 + levelsGained * 0.1));
   return {
     enemyId: enemy.id,
     enemyName: enemy.title,
-    attack: enemy.attack,
+    attack: enemy.attack + 3 + levelsGained * 2,
     mixedQuestions: enemy.mixedQuestions,
     lessons: enemy.lessons,
-    hp: enemy.hp,
-    maxHp: enemy.hp,
+    hp,
+    maxHp: hp,
     turn: 1,
     phase: "choose",
     skill: null,

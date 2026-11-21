@@ -123,7 +123,7 @@ describe("Combat rules", () => {
     expect(result.battle.hp).toBe(76);
     expect(result.battle.phase).toBe("feedback");
     const reply = enemyTurn(result.battle, result.save, content);
-    expect(reply.save.character.hp).toBe(52);
+    expect(reply.save.character.hp).toBe(49);
     expect(enemyTurn(reply.battle, reply.save, content)).toEqual(reply);
   });
   it("expires shield after exactly two attacks", () => {
@@ -131,14 +131,14 @@ describe("Combat rules", () => {
       q = questions.find((q) => q.id === battle.question)!;
     let result = answerBattle(battle, initialSave(), content, q.answer);
     let reply = enemyTurn(result.battle, result.save, content);
-    expect(reply.save.character.hp).toBe(57);
+    expect(reply.save.character.hp).toBe(54);
     expect(reply.battle.effects[0].remaining).toBe(1);
     reply = enemyTurn(
       { ...reply.battle, phase: "feedback" },
       reply.save,
       content,
     );
-    expect(reply.save.character.hp).toBe(47);
+    expect(reply.save.character.hp).toBe(38);
     expect(reply.battle.effects).toEqual([]);
   });
   it("poison can win before an enemy attacks; shield reduces damage", () => {
@@ -161,7 +161,7 @@ describe("Combat rules", () => {
       save,
       content,
     );
-    expect(shielded.save.character.hp).toBe(55);
+    expect(shielded.save.character.hp).toBe(52);
   });
   it("defeat is explicit and unaffordable skills cannot be selected", () => {
     const save = initialSave();
@@ -291,7 +291,7 @@ describe("Progression and saves", () => {
   });
   it("equipment-free stats and leveling restore resources", () => {
     let save = addXp(initialSave(), 120);
-    expect(stats(save, content).attack).toBe(8);
+    expect(stats(save, content).attack).toBe(9);
     expect(save.character.hp).toBe(70);
   });
 });

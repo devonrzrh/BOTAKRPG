@@ -19,6 +19,8 @@ Each authored enemy has a skill weakness. A correct matching attack reveals it a
 
 ## Skills and defense
 
+Enemy attack starts 3 points above its authored value. Each player level above 1 adds another 2 attack and 10% of the enemy's starting HP. Each level gives the player 3 attack, 1 defense, 10 HP, and 2 Focus. Packet Relay becomes available at level 3, Window Exploit at level 5, and Containment Burst at level 7.
+
 Probe is a free direct attack. Firewall costs focus, deals damage, and grants a shield for two enemy turns. Trace injection deals damage and applies poison for three enemy turns. Firewall replaces the former Throttle skill: version 3 journals merge any acquired Throttle into Firewall and deduplicate the skill list. Other progress, rewards, code, notes, and settings survive both local load and JSON import.
 
 Defend restores up to 4 focus, reduces the next hit by about 70%, and adds 15 Momentum. It preserves active skill shields and provides boss-counter openings. Heavy intent also offers Dodge within Defend.

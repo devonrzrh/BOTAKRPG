@@ -5,7 +5,7 @@ import {
   enemyTurn,
   guardTurn,
 } from "../src/game/combat";
-import { initialSave, stats, type Save } from "../src/game/state";
+import { addXp, initialSave, stats, type Save } from "../src/game/state";
 import { validateContent } from "../src/content/schema";
 import raw from "../src/generated/content.json";
 
@@ -25,11 +25,23 @@ describe("combat tactics", () => {
       effects: [{ id: "shield" as const, remaining: 2, magnitude: 3 }],
     };
     expect(enemyIntent(battle, save, content).damage).toBe(
-      Math.max(1, 10 - stats(save, content).defense - 3),
+      8,
     );
     expect(enemyIntent({ ...battle, turn: 2 }, save, content).damage).toBe(
-      Math.max(1, Math.ceil(10 * 1.7) - stats(save, content).defense - 3),
+      18,
     );
+  });
+
+  it("scales encounter health and both strikes with the starting level", () => {
+    const save = addXp(initialSave(), 200);
+    const battle = createBattle(undefined, 2, save.character.level);
+    expect(battle).toMatchObject({ hp: 91, maxHp: 91, attack: 17, questionOffset: 2 });
+    expect(enemyIntent(battle, save, content).damage).toBe(13);
+    const heavy = { ...battle, turn: 2, phase: "feedback" as const };
+    const damage = enemyIntent(heavy, save, content).damage;
+    expect(damage).toBe(25);
+    expect(enemyTurn(heavy, save, content).save.character.hp).toBe(55);
+    expect(guardTurn({ ...heavy, phase: "choose" }, save, content).save.character.hp).toBe(73);
   });
 
   it("guards without a quiz, restoring focus and resolving exactly one turn", () => {

@@ -19,6 +19,7 @@ import {
 } from "../src/game/investigation";
 import {
   createBattle,
+  selectMomentum,
   selectSkill,
   answerBattle,
   enemyTurn,
@@ -39,6 +40,9 @@ const echo = content.entities.find(
 const questions = content.entities.filter(
   (e): e is Question => e.type === "question",
 );
+const firewall = content.entities.find(
+  (e): e is Skill => e.type === "skill" && e.id === "ward",
+)!;
 const probe = content.entities.find(
   (e): e is Skill => e.type === "skill" && e.id === "insight",
 )!;
@@ -99,12 +103,18 @@ it("uses all material topics in the final boss and can complete the case", () =>
   for (const q of branches)
     for (const id of q.objectives) save = completeActivity(save, id);
   save = claimQuest(save, root, content);
-  let battle = createBattle(echo.type === "activity" ? echo.enemy : undefined);
+  let battle = createBattle(
+    echo.type === "activity" ? echo.enemy : undefined,
+    0,
+    save.character.level,
+  );
   expect(battle.enemyId).toBe("echo-7");
-  expect(battle.maxHp).toBe(105);
+  expect(battle.maxHp).toBe(116);
   const studied = new Set<string>();
   while (battle.phase !== "won" && battle.phase !== "lost") {
-    battle = selectSkill(battle, save, probe, questions, content);
+    if (battle.momentum >= 25) battle = selectMomentum(battle, 25);
+    const skill = save.character.focus >= firewall.cost ? firewall : probe;
+    battle = selectSkill(battle, save, skill, questions, content);
     const q = questions.find((q) => q.id === battle.question)!;
     studied.add(q.lesson);
     const result = answerBattle(battle, save, content, q.answer);

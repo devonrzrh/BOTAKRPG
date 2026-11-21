@@ -121,7 +121,7 @@ title: Packet Relay
 description: Trade damage for 20 extra Momentum on a hit.
 cost: 2
 power: 2
-level: 4
+level: 3
 parent: insight
 bonusMomentum: 20
 lesson: graph-search
@@ -134,7 +134,7 @@ title: Window Exploit
 description: Deals 12 bonus base damage during an enemy Opening.
 cost: 4
 power: 3
-level: 7
+level: 5
 parent: insight
 openingPower: 12
 lesson: stacks-queues
@@ -147,7 +147,7 @@ title: Containment Burst
 description: Hit hard and gain a two-turn shield.
 cost: 8
 power: 13
-level: 10
+level: 7
 parent: ward
 effect: shield
 lesson: perceptron-basics

@@ -165,6 +165,7 @@ const mazeCommand = activityTemplates.maze.command;
 const createBattle = (
   enemy?: Parameters<typeof activityTemplates.battle.create>[0],
   attempt = 0,
+  playerLevel = 1,
 ) => {
   const guardian = content.entities.find(
     (e) => e.type === "activity" && e.id === "guardian-battle",
@@ -172,6 +173,7 @@ const createBattle = (
   return activityTemplates.battle.create(
     enemy ?? (guardian?.type === "activity" ? guardian.enemy : undefined),
     attempt,
+    playerLevel,
   );
 };
 const initialSeed = content.entities.find(
@@ -372,7 +374,7 @@ export default function App() {
       const id = enemy?.id ?? "sentinel";
       const attempt = battleAttempts.current.get(id) ?? 0;
       battleAttempts.current.set(id, attempt + 1);
-      return createBattle(enemy, attempt);
+      return createBattle(enemy, attempt, saveRef.current.character.level);
     },
     [],
   );
@@ -1587,6 +1589,7 @@ export default function App() {
       if (skill) updateSave((s) => unlockSkill(s, skill));
     }
   };
+  const nextSkill = skills.find((skill) => skill.level > save.character.level);
   const characterStats = stats(save, content),
     currentLesson = lessons.find((l) => l.id === lessonId)!,
     currentQuestion = questions.find((q) => q.id === battle.question);
@@ -2753,6 +2756,9 @@ export default function App() {
                         {save.character.xp} total XP ·{" "}
                         {100 - (save.character.xp % 100)} XP to next level
                       </p>
+                      {nextSkill && (
+                        <p>Level {nextSkill.level} unlocks {nextSkill.title}</p>
+                      )}
                       {!renaming ? (
                         <button
                           className="text-button"

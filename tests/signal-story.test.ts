@@ -92,7 +92,7 @@ function winEncounter(save: ReturnType<typeof initialSave>, id: string) {
   const activity = content.entities.find((e) => e.id === id);
   if (activity?.type !== "activity" || !activity.enemy)
     throw new Error(`Missing encounter ${id}`);
-  let battle = createBattle(activity.enemy),
+  let battle = createBattle(activity.enemy, 0, save.character.level),
     turns = 0;
   while (battle.phase !== "won" && battle.phase !== "lost" && turns < 100) {
     battle = selectSkill(battle, save, insight, questions);
