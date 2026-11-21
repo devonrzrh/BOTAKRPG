@@ -51,6 +51,7 @@ export function Garden({
     [message, setMessage] = useState(""),
     [x, setX] = useState(-0.5),
     [y, setY] = useState(-0.5);
+  const latestSamples = useRef(samples);
   const persist = useRef(onExperiment);
   persist.current = onExperiment;
   useEffect(() => {
@@ -67,7 +68,12 @@ export function Garden({
   }, [samples, network, label, rate, epochs, tested]);
   const add = (px: number, py: number) => {
     try {
-      setSamples((previous) => addSample(previous, { x: px, y: py, label }));
+      latestSamples.current = addSample(latestSamples.current, {
+        x: px,
+        y: py,
+        label,
+      });
+      setSamples(latestSamples.current);
       setTested(false);
       setMessage("Example added.");
       sound("puzzleAction");
@@ -323,7 +329,8 @@ export function Garden({
         <button
           className="text-button"
           onClick={() => {
-            setSamples([]);
+            latestSamples.current = [];
+            setSamples(latestSamples.current);
             setNetwork(initialNetwork());
             setTested(false);
             setMessage("Exhibit reset.");
