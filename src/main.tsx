@@ -22,6 +22,9 @@ import "./ui/Blocks.css";
 import "./ui/Feedback.css";
 
 console.log("Hey.. no peeking ;)");
+console.log("Created for the Computer Science and AI class at Beijing Institute of Technology");
+console.log("Created with love by team B.O.T.A.K");
+console.log("Development lead by Devon");
 
 createRoot(document.getElementById("root")!).render(
   <GameSoundProvider>
