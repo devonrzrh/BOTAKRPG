@@ -20,6 +20,9 @@ import "./ui/BattlePolish.css";
 import "./onboarding.css";
 import "./ui/Blocks.css";
 import "./ui/Feedback.css";
+
+console.log("Hey.. no peeking ;)");
+
 createRoot(document.getElementById("root")!).render(
   <GameSoundProvider>
     <GameParticlesProvider>
