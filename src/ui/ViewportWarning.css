@@ -54,6 +54,6 @@
   outline: 2px solid #f1cd8e;
   outline-offset: 2px;
 }
-.app:has(.dialogue-backdrop, .cutscene-finale) .viewport-warning {
+.app:has(.dialogue-backdrop, .prologue) .viewport-warning {
   display: none;
 }

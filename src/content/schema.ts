@@ -126,6 +126,8 @@ export const storySchema = z.object({
     .array(
       z.object({
         time: z.string(),
+        shot: id,
+        alt: z.string().min(1),
         heading: z.string(),
         body: z.string(),
         steps: z.number().int().min(1).max(20).default(1),

@@ -1,8 +1,14 @@
 import { useEffect, useRef, useState } from "react";
-import { ArrowRight, LockKeyhole, Radio, SkipForward } from "lucide-react";
+import { preload } from "react-dom";
+import { ArrowRight, SkipForward } from "lucide-react";
 import type { Story } from "../content/schema";
 import { personalizeText } from "../game/player";
 import { useGameSound } from "./GameSound";
+import "./Cutscene.css";
+
+const shotUrl = (shot: string) =>
+  `${import.meta.env.BASE_URL}cutscenes/${shot}.webp`;
+
 export function Cutscene({
   story,
   savedName = "",
@@ -13,185 +19,98 @@ export function Cutscene({
   onFinish: () => void;
 }) {
   const sound = useGameSound();
-  const [frame, setFrame] = useState(0),
-    [steps, setSteps] = useState(0);
-  const dialog = useRef<HTMLElement>(null);
+  const [{ frame, step }, setPosition] = useState({ frame: 0, step: 0 });
+  const nextButton = useRef<HTMLButtonElement>(null);
   useEffect(() => {
     const previous = document.activeElement as HTMLElement | null;
-    dialog.current?.querySelector<HTMLButtonElement>(".primary")?.focus();
-    return () => previous?.focus();
-  }, []);
-  const advance = () => {
-    sound(
-      story.visual !== "chase"
-        ? "connect"
-        : steps + 1 >= story.frames[frame].steps && frame + 1 === 2
-          ? "connect"
-          : frame < 2 && story.frames[frame].steps > 1
-            ? "pursuit"
-            : "dialogue",
-    );
-    if (steps + 1 < story.frames[frame].steps) setSteps((n) => n + 1);
-    else if (frame + 1 < story.frames.length) {
-      setFrame((n) => n + 1);
-      setSteps(0);
-    } else onFinish();
-  };
-  useEffect(() => {
-    const key = (event: KeyboardEvent) => {
-      if (event.key === "Tab") {
-        const buttons = [
-          ...(dialog.current?.querySelectorAll<HTMLButtonElement>("button") ??
-            []),
-        ];
-        const index = buttons.indexOf(
-          document.activeElement as HTMLButtonElement,
-        );
-        event.preventDefault();
-        buttons[
-          (index + (event.shiftKey ? -1 : 1) + buttons.length) % buttons.length
-        ]?.focus();
-        return;
-      }
-      if (
-        event.target instanceof HTMLButtonElement &&
-        event.key !== "ArrowRight"
-      )
-        return;
-      if (["ArrowRight", " ", "Enter"].includes(event.key)) {
-        event.preventDefault();
-        advance();
-      }
+    nextButton.current?.focus();
+    return () => {
+      if (previous?.isConnected) previous.focus();
     };
-    window.addEventListener("keydown", key);
-    return () => window.removeEventListener("keydown", key);
-  }, [frame, steps]);
+  }, []);
+
   const current = story.frames[frame];
-  const finale = story.visual === "finale";
+  const next = story.frames[frame + 1];
+  const chasing = current.steps > 1;
+  if (next) preload(shotUrl(next.shot), { as: "image" });
+
+  const advance = () => {
+    if (step + 1 < current.steps) {
+      sound("pursuit");
+      setPosition({ frame, step: step + 1 });
+    } else if (next) {
+      sound(story.visual === "chase" && !chasing ? "pursuit" : "connect");
+      setPosition({ frame: frame + 1, step: 0 });
+    } else {
+      sound("dialogue");
+      onFinish();
+    }
+  };
+
   return (
     <section
-      ref={dialog}
-      className={`prologue cutscene-${story.visual}`}
+      className="prologue"
       role="dialog"
       aria-modal="true"
       aria-label={story.title}
+      onKeyDown={(event) => {
+        if (event.key === "Tab") {
+          const buttons = [...event.currentTarget.querySelectorAll("button")];
+          const index = buttons.indexOf(
+            document.activeElement as HTMLButtonElement,
+          );
+          event.preventDefault();
+          buttons[
+            (index + (event.shiftKey ? -1 : 1) + buttons.length) %
+              buttons.length
+          ]?.focus();
+        } else if (event.key === "ArrowRight") {
+          event.preventDefault();
+          if (!event.repeat) advance();
+        }
+      }}
     >
-      <header>
-        <span className="case-wordmark">NULL / TRACE</span>
-        <button onClick={onFinish}>
-          <SkipForward size={14} />
+      <div className="cutscene-picture">
+        <img
+          key={current.shot}
+          src={shotUrl(current.shot)}
+          alt={current.alt}
+          style={{
+            translate: `${step * -1}% 0`,
+            scale: 1 + step * 0.035,
+          }}
+        />
+        <button className="cutscene-skip" onClick={onFinish}>
+          <SkipForward size={16} aria-hidden="true" />
           Skip scene
         </button>
-      </header>
-      {finale ? (
-        <div className="finale-scene" data-closed={frame > 0 || undefined}>
-          <div className="finale-signal" aria-hidden="true">
-            <span />
-            {frame === 0 ? <Radio size={44} /> : <LockKeyhole size={44} />}
-            <span />
-          </div>
-          <p role="status">{current.time}</p>
-        </div>
-      ) : story.visual === "network" ? (
-        <div
-          className="network-cutscene"
-          aria-label="A terminal connecting to the network"
-        >
-          <div className="connection-grid" />
-          <div className="connection-node">
-            {frame === 0 ? "CONNECTING" : "GATEWAY 01"}
-          </div>
-          <span>{current.time}</span>
-        </div>
-      ) : (
-        <div
-          className={`chase-scene chase-frame-${frame}`}
-          aria-label={
-            frame === 2
-              ? "An empty robot chassis beside a network terminal"
-              : "A detective pursuing a robot across a rain-soaked city"
-          }
-        >
-          <div className="city-moon" />
-          <div className="city-skyline">
-            {Array.from({ length: 14 }, (_, i) => (
-              <span
-                key={i}
-                style={{
-                  height: `${80 + ((i * 47) % 150)}px`,
-                  width: `${35 + ((i * 13) % 35)}px`,
-                }}
-              />
-            ))}
-          </div>
-          <div className="rain-lines" />
-          <div className="chase-ground" />
-          <div className="street-sign">
-            LOWER CITY <b>SECTOR 07</b>
-          </div>
-          <div
-            className="chase-person detective"
-            style={{ left: `${22 + steps * 4}%` }}
-          >
-            <i />
-            <span />
-            <b />
-          </div>
-          <div
-            className="chase-person fugitive"
-            style={{ left: frame === 2 ? "74%" : `${57 + steps * 4}%` }}
-          >
-            <i />
-            <span />
-            <b />
-          </div>
-          {frame === 2 && (
-            <div className="empty-signal">
-              CONNECTION TRANSFERRED
-              <br />
-              <strong>DESTINATION UNKNOWN</strong>
-            </div>
-          )}
-          <span className="chase-time">{current.time}</span>
-          <span className="chase-caption">
-            {frame === 1
-              ? `PURSUIT ${steps + 1}/6 · PRESS → OR CONTINUE`
-              : frame === 2
-                ? "TRANSFER COMPLETE"
-                : "PROLOGUE"}
-          </span>
-        </div>
-      )}
+      </div>
       <div className="prologue-copy">
-        <div>
-          {!finale && (
-            <span className="section-eyebrow">
-              CASE 007 · {frame + 1} / {story.frames.length}
-            </span>
-          )}
+        <div className="cutscene-caption" aria-live="polite" aria-atomic="true">
+          <p className="cutscene-time">{current.time}</p>
           <h1>{personalizeText(current.heading, savedName)}</h1>
           <p>{personalizeText(current.body, savedName)}</p>
         </div>
-        <button className="primary" onClick={advance}>
-          {frame + 1 === story.frames.length
-            ? story.visual === "network"
-              ? "Enter network"
-              : finale
-                ? "Return to office"
-                : "Return home"
-            : current.steps > 1
-              ? "Continue pursuit"
-              : "Continue"}
-          <ArrowRight size={17} />
-        </button>
+        <div className="cutscene-action">
+          <button ref={nextButton} className="primary" onClick={advance}>
+            {next
+              ? chasing
+                ? "Give chase"
+                : "Continue"
+              : story.visual === "network"
+                ? "Enter network"
+                : "Return to office"}
+            <ArrowRight size={18} aria-hidden="true" />
+          </button>
+          {chasing && (
+            <progress
+              value={step + 1}
+              max={current.steps}
+              aria-label="Pursuit progress"
+            />
+          )}
+        </div>
       </div>
-      <footer>
-        <span>
-          {story.frames.map((_, i) => (
-            <i key={i} className={i === frame ? "active" : ""} />
-          ))}
-        </span>
-      </footer>
     </section>
   );
 }

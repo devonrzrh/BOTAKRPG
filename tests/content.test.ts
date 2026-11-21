@@ -70,17 +70,35 @@ it("supports reusable cutscenes with different frame counts and pursuit steps", 
   expect(intro?.type === "story" && intro.frames[1].steps).toBe(6);
   expect(connection?.type === "story" && connection.frames.length).toBe(2);
 });
-it.each(["pacified", "defeated"])("compiles the %s ECHO-7 epilogue", (outcome) => {
-  const finale = validateContent(raw).entities.find(
-    (entry) => entry.type === "story" && entry.id === `echo-epilogue-${outcome}`,
+it.each(["pacified", "defeated"])(
+  "compiles the %s ECHO-7 epilogue",
+  (outcome) => {
+    const finale = validateContent(raw).entities.find(
+      (entry) =>
+        entry.type === "story" && entry.id === `echo-epilogue-${outcome}`,
+    );
+    expect(finale).toMatchObject({
+      visual: "finale",
+      frames: [
+        { steps: 1 },
+        { time: "Detective’s office / First light", steps: 1 },
+      ],
+    });
+  },
+);
+it("ships accessible artwork for every cutscene frame", async () => {
+  const stories = validateContent(raw).entities.filter(
+    (entry) => entry.type === "story",
   );
-  expect(finale).toMatchObject({
-    visual: "finale",
-    frames: [
-      { steps: 1 },
-      { time: "CASE 007 CLOSED", steps: 1 },
-    ],
-  });
+  await Promise.all(
+    stories.flatMap((story) =>
+      story.frames.map(async ({ shot, alt }) => {
+        expect(alt.trim()).not.toBe("");
+        const image = await readFile(`public/cutscenes/${shot}.webp`);
+        expect(image.toString("ascii", 8, 12)).toBe("WEBP");
+      }),
+    ),
+  );
 });
 it("compiles active curriculum types and the field supply catalog", () => {
   const c = validateContent(raw);

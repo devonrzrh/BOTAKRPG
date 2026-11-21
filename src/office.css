@@ -427,131 +427,6 @@ button.pinned-paper:hover:not(:disabled) {
     filter: blur(0);
   }
 }
-.prologue {
-  inset: var(--top-height) 0 0;
-  z-index: 40;
-}
-.prologue > header {
-  height: 40px;
-  padding: 0 25px;
-  justify-content: flex-end;
-}
-.prologue .case-wordmark {
-  display: none;
-}
-.prologue-copy {
-  padding: 25px max(30px, 8vw);
-}
-.prologue-copy h1 {
-  font-size: 36px;
-  margin: 10px 0;
-}
-.prologue-copy p {
-  font-size: 13px;
-  line-height: 1.6;
-}
-.prologue > footer {
-  padding: 15px 30px;
-}
-.network-cutscene {
-  position: relative;
-  overflow: hidden;
-  min-height: 200px;
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: radial-gradient(ellipse, #193a49, #07121c);
-}
-.connection-grid {
-  position: absolute;
-  inset: -60%;
-  background:
-    repeating-linear-gradient(0deg, transparent 0 70px, #4b7c8b40 71px 72px),
-    repeating-linear-gradient(90deg, transparent 0 70px, #4b7c8b40 71px 72px);
-  transform: perspective(700px) rotateX(60deg);
-  animation: network-travel 3s linear infinite;
-}
-@keyframes network-travel {
-  to {
-    translate: 0 144px;
-  }
-}
-.connection-node {
-  z-index: 1;
-  border: 1px solid #52889b;
-  background: #0c2231d9;
-  box-shadow: 0 0 60px #51879922;
-  padding: 30px 50px;
-  font: 18px monospace;
-  letter-spacing: 3px;
-  color: #b3c9ce;
-}
-.network-cutscene > span {
-  position: absolute;
-  bottom: 25px;
-  left: 30px;
-  color: #5c8a9f;
-  font: 11px monospace;
-}
-.finale-scene {
-  --signal: #92d7cb;
-  flex: 1;
-  min-height: 180px;
-  display: grid;
-  align-content: center;
-  justify-items: center;
-  gap: 22px;
-  color: var(--signal);
-  background: radial-gradient(ellipse at center, #1b3946, #0a1722 70%);
-}
-.finale-scene[data-closed] {
-  --signal: #e4ca95;
-  background: radial-gradient(ellipse at bottom, #594534, #14222e 70%);
-}
-.finale-signal {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  width: min(72%, 440px);
-}
-.finale-signal span {
-  flex: 1;
-  height: 1px;
-  background: currentColor;
-  position: relative;
-}
-.finale-signal span::after {
-  content: "";
-  position: absolute;
-  inset: -3px 0 auto auto;
-  width: 7px;
-  height: 7px;
-  background: currentColor;
-}
-.finale-signal span:last-child::after {
-  inset-inline: 0 auto;
-}
-.finale-scene p {
-  margin: 0;
-  font: 400 16px/1.4 Consolas, monospace;
-  text-align: center;
-  letter-spacing: 0.08em;
-}
-.cutscene-finale .prologue-copy p {
-  color: #cedcde;
-  font-size: 18px;
-}
-.cutscene-finale > header button,
-.cutscene-finale .prologue-copy button {
-  color: #e1dac8;
-  font-size: 16px;
-}
-.cutscene-finale > header button:focus-visible,
-.cutscene-finale .prologue-copy button:focus-visible {
-  outline: 2px solid #e4ca95;
-  outline-offset: 3px;
-}
 .dialogue-backdrop {
   position: fixed;
   inset: var(--top-height) 0 0;
@@ -646,8 +521,7 @@ button.pinned-paper:hover:not(:disabled) {
 }
 .reduced-motion .world-canvas,
 .reduced-motion .investigation-board,
-.reduced-motion .home-panel,
-.reduced-motion .connection-grid {
+.reduced-motion .home-panel {
   animation: none;
   transform: none;
 }
@@ -802,11 +676,5 @@ button.pinned-paper:hover:not(:disabled) {
   }
   .home-panel {
     width: 94vw;
-  }
-  .prologue-copy {
-    padding: 20px;
-  }
-  .prologue-copy h1 {
-    font-size: 27px;
   }
 }
