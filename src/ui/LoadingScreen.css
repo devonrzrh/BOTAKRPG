@@ -1,0 +1,73 @@
+.loading-screen {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: radial-gradient(ellipse at center, #17282f, #0b151d 72%);
+  color: var(--ink);
+  pointer-events: none;
+}
+
+.loading-screen-journal {
+  position: fixed;
+  inset: var(--top-height) 0 0;
+  z-index: 70;
+  pointer-events: auto;
+}
+
+.app:has(.dialogue-backdrop) .loading-screen:not(.loading-screen-journal) {
+  align-items: start;
+  padding-block-start: clamp(24px, 10vh, 80px);
+}
+
+.loading-screen-content {
+  display: grid;
+  justify-items: center;
+  gap: 16px;
+  inline-size: min(100%, 216px);
+  font-size: 18px;
+  text-align: center;
+}
+
+.loading-screen-content svg {
+  color: var(--gold);
+}
+
+.loading-screen-track {
+  inline-size: 100%;
+  block-size: 3px;
+  overflow: hidden;
+  background: #385058;
+}
+
+.loading-screen-track::before {
+  content: "";
+  display: block;
+  width: 34%;
+  height: 100%;
+  background: var(--gold);
+  animation: loading-scan 1.25s ease-in-out infinite alternate;
+}
+
+@keyframes loading-scan {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(194%);
+  }
+}
+
+.reduced-motion .loading-screen-track::before {
+  animation: none;
+  margin-inline: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .loading-screen-track::before {
+    animation: none;
+    margin-inline: auto;
+  }
+}

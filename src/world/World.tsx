@@ -7,6 +7,7 @@ import {
   type RefObject,
 } from "react";
 import { useGameSound } from "../ui/GameSound";
+import { LoadingScreen } from "../ui/LoadingScreen";
 import { Engine } from "@babylonjs/core/Engines/engine";
 import { WebGPUEngine } from "@babylonjs/core/Engines/webgpuEngine";
 import { Scene } from "@babylonjs/core/scene";
@@ -129,7 +130,8 @@ function WorldCanvas(props: Props) {
     actorRef = useRef<Mesh | null>(null);
   const [ready, setReady] = useState(0),
     [error, setError] = useState(""),
-    [notice, setNotice] = useState("Establishing the scene…");
+    [notice, setNotice] = useState(""),
+    [hasRendered, setHasRendered] = useState(false);
   const hubPosition = useRef(new Vector3(0, 0.5, 1));
   useEffect(() => {
     let disposed = false;
@@ -170,10 +172,10 @@ function WorldCanvas(props: Props) {
           return;
         }
         engineRef.current = engine;
-        latest.current.onRendererReady?.();
         setReady((n) => n + 1);
         let ticks: number[] = [],
           lastReport = performance.now();
+        let hasRendered = false;
         engine.runRenderLoop(() => {
           const scene = sceneRef.current;
           if (!scene) return;
@@ -194,7 +196,19 @@ function WorldCanvas(props: Props) {
               p.reducedMotion ? 1 : Math.min(1, engine!.getDeltaTime() / 85),
             );
           }
-          scene.render();
+          try {
+            scene.render();
+            if (!hasRendered && scene.isReady()) {
+              hasRendered = true;
+              setHasRendered(true);
+              latest.current.onRendererReady?.();
+            }
+          } catch (e) {
+            engine?.stopRenderLoop();
+            latest.current.onRenderFailure?.();
+            setError(String(e));
+            return;
+          }
           const delta = engine!.getDeltaTime();
           if (delta > 0 && delta < 1000) ticks.push(delta);
           if (performance.now() - lastReport > 1200) {
@@ -876,16 +890,19 @@ function WorldCanvas(props: Props) {
             : "Interactive network world. WASD to move, E to interact. Use destination buttons for keyboard navigation."
         }
         tabIndex={0}
+        inert={!hasRendered || Boolean(error)}
       />
       {error ? (
         <div className="world-error">
-          <h2>The 3D world couldn’t start</h2>
+          <h2>The 3D world couldn’t render</h2>
           <p>{error}</p>
           <p>You can still use the destination controls and 2D maze below.</p>
         </div>
-      ) : (
-        notice && <div className="world-notice">{notice}</div>
-      )}
+      ) : !hasRendered ? (
+        <LoadingScreen />
+      ) : notice ? (
+        <div className="world-notice">{notice}</div>
+      ) : null}
     </>
   );
 }

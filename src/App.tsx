@@ -45,6 +45,7 @@ import { renderLessonMarkdown } from "./game/markdown";
 import { ClueLedger } from "./ui/ClueLedger";
 import { BookReader } from "./ui/BookReader";
 import { SceneTransition } from "./ui/SceneTransition";
+import { LoadingScreen } from "./ui/LoadingScreen";
 import { useGameSound, useGameSoundVolume } from "./ui/GameSound";
 import {
   useGameParticles,
@@ -300,7 +301,7 @@ export default function App() {
     saveRef = useRef(save),
     [booted, setBooted] = useState(false),
     [storageReady, setStorageReady] = useState(true),
-    [saveStatus, setSaveStatus] = useState("Loading journal…");
+    [saveStatus, setSaveStatus] = useState("");
   const [realm, setRealm] = useState<"desk" | "hub">("desk");
   const [prologueReplay, setPrologueReplay] = useState(false);
   const [officeFallback, setOfficeFallback] = useState(false);
@@ -1620,12 +1621,14 @@ export default function App() {
           CASE 007 <span className="top-divider">/</span> ECHO-7
         </div>
         <div className="top-actions">
-          <span className="save-status">
-            <span />
-            {saveStatus === "All progress saved locally"
-              ? "Journal saved"
-              : saveStatus}
-          </span>
+          {booted && (
+            <span className="save-status">
+              <span />
+              {saveStatus === "All progress saved locally"
+                ? "Journal saved"
+                : saveStatus}
+            </span>
+          )}
           <button
             className="icon-button"
             aria-label="Open field manual"
@@ -1654,11 +1657,7 @@ export default function App() {
         </div>
       </header>
       {booted && !intakeOpen && <ViewportWarning />}
-      {!booted && (
-        <div className="boot-screen" role="status">
-          Loading journal…
-        </div>
-      )}
+      {!booted && <LoadingScreen journal />}
       <aside
         className="rail"
         aria-label="Investigation navigation"
@@ -1727,7 +1726,7 @@ export default function App() {
         reducedMotion={save.settings.reducedMotion}
         className="world-shell"
         data-encounter-rank={battleView ? battleRank : undefined}
-        inert={intakeOpen}
+        inert={!booted || intakeOpen}
         onPointerMove={(e) => {
           const r = e.currentTarget.getBoundingClientRect();
           const factor = save.settings.reducedMotion || homeMoving ? 0 : 1;
@@ -1745,9 +1744,7 @@ export default function App() {
           e.currentTarget.style.setProperty("--look-y", "0");
         }}
       >
-        <Suspense
-          fallback={<div className="world-notice">Establishing the scene…</div>}
-        >
+        <Suspense fallback={<LoadingScreen />}>
           <World
             scene={scene}
             officeUi={officeUi}

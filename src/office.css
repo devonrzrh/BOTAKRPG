@@ -492,16 +492,6 @@ button.pinned-paper:hover:not(:disabled) {
 .dialogue-choices button {
   font-size: 12px;
 }
-.boot-screen {
-  position: fixed;
-  inset: var(--top-height) 0 0;
-  z-index: 70;
-  display: grid;
-  place-items: center;
-  background: #101b23;
-  color: #a2b4bd;
-  font: 13px monospace;
-}
 .recovered-clues {
   margin: 25px 0;
 }
