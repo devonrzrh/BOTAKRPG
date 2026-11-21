@@ -33,16 +33,29 @@ export interface QuestGraph {
   selected: string;
   view: GraphView;
 }
-export const GRAPH_AREA = { x: 18, y: 80, w: 650, h: 445 };
+export const GRAPH_AREA = { x: 18, y: 80, w: 650, h: 472 };
+export const GRAPH_NODE = { halfWidth: 100, halfHeight: 44 };
 export const centerGraph = (node: QuestNode, zoom = 1): GraphView => ({
-  x: 325 - node.x * zoom,
-  y: 222 - node.y * zoom,
+  x: GRAPH_AREA.w / 2 - node.x * zoom,
+  y: GRAPH_AREA.h / 2 - node.y * zoom,
   zoom,
 });
+export const graphShowsNode = (node: QuestNode, view: GraphView) => {
+  const x = node.x * view.zoom + view.x;
+  const y = node.y * view.zoom + view.y;
+  const halfWidth = GRAPH_NODE.halfWidth * view.zoom;
+  const halfHeight = GRAPH_NODE.halfHeight * view.zoom;
+  return (
+    x - halfWidth >= 0 &&
+    x + halfWidth <= GRAPH_AREA.w &&
+    y - halfHeight >= 0 &&
+    y + halfHeight <= GRAPH_AREA.h
+  );
+};
 export function zoomGraph(
   view: GraphView,
   factor: number,
-  point = { x: 325, y: 222 },
+  point = { x: GRAPH_AREA.w / 2, y: GRAPH_AREA.h / 2 },
 ): GraphView {
   const zoom = Math.max(1, Math.min(2.2, view.zoom * factor)),
     ratio = zoom / view.zoom;
@@ -208,22 +221,24 @@ export function createQuestGraph(
       const row = Math.floor(i / 3),
         col = row % 2 ? 2 - (i % 3) : i % 3;
       n.x = 100 + 220 * col;
-      n.y = 80 + 150 * row;
+      n.y = 60 + 124 * row;
     });
     const selection = nodes.some((n) => n.id === selected)
       ? selected!
       : nodes[0].id;
+    const target = nodes.find((n) => n.id === selection)!;
+    const start = { x: 5, y: 0, zoom: 1 };
     return {
       branch: detail.id,
       title: detail.title,
       nodes,
       edges: nodes.slice(1).map((n, i) => [nodes[i].id, n.id]),
       selected: selection,
-      view: view ?? centerGraph(nodes.find((n) => n.id === selection)!),
+      view: view ?? (graphShowsNode(target, start) ? start : centerGraph(target)),
     };
   }
   const accepted = save.story.caseAccepted;
-  const branchGap = branches.length > 3 ? 88 : 140;
+  const branchGap = branches.length > 3 ? 92 : 140;
   const branchStart = (GRAPH_AREA.h - (branches.length - 1) * branchGap) / 2;
   const mid = GRAPH_AREA.h / 2;
   const nodes: QuestNode[] = [
@@ -298,7 +313,7 @@ export function createQuestGraph(
           branches[0]?.id ??
           "case")
         : "case",
-    view: view ?? { x: 0, y: 0, zoom: 1 },
+    view: view ?? { x: 5, y: 0, zoom: 1 },
   };
 }
 export function graphButtons(graph: QuestGraph): SurfaceButton[] {
@@ -313,10 +328,10 @@ export function graphButtons(graph: QuestGraph): SurfaceButton[] {
       action: { kind: "graph-select" as const, id: node.id },
     })),
     ...[
-      ["overview", "Overview", 250, 130],
-      ["zoom-out", "−", 390, 50],
-      ["zoom-in", "+", 450, 50],
-      ["center", "Center", 510, 140],
+      ["overview", "Overview", 610, 130],
+      ["zoom-out", "−", 750, 50],
+      ["zoom-in", "+", 810, 50],
+      ["center", "Center", 870, 136],
     ].map(([id, label, x, w]) => ({
       id: `graph-${id}`,
       x: Number(x),

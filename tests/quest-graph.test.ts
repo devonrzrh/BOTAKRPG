@@ -2,6 +2,8 @@ import { expect, it } from "vitest";
 import {
   createQuestGraph,
   centerGraph,
+  GRAPH_AREA,
+  graphShowsNode,
   zoomGraph,
   panGraph,
 } from "../src/game/questGraph";
@@ -25,7 +27,7 @@ it("keeps the overview compact and hides locked clues without unlocking the boss
   expect(graph.nodes.some((n) => n.kind === "clue")).toBe(false);
   expect(graph.nodes).toHaveLength(7);
   expect(graph.nodes.every((n) => n.x >= 100 && n.x <= 540)).toBe(true);
-  expect(graph.nodes.every((n) => n.y >= 44 && n.y <= 401)).toBe(true);
+  expect(graph.nodes.every((n) => graphShowsNode(n, graph.view))).toBe(true);
   expect(graph.nodes.find((n) => n.id === "finale")?.title).toBe("Hidden host");
   for (const [from, to] of graph.edges) {
     expect(graph.nodes.some((n) => n.id === from)).toBe(true);
@@ -122,5 +124,13 @@ it("keeps the point under the cursor fixed while zooming and bounds navigation",
   const node = createQuestGraph(initialSave(), content).nodes[0],
     center = centerGraph(node, 1.4);
   expect(node.x * center.zoom + center.x).toBe(325);
-  expect(node.y * center.zoom + center.y).toBe(222);
+  expect(node.y * center.zoom + center.y).toBe(GRAPH_AREA.h / 2);
+  expect(graphShowsNode(node, center)).toBe(true);
+  expect(graphShowsNode(node, { ...center, x: center.x - 200 })).toBe(false);
+});
+
+it("opens the Supply graph with every node visible when the handoff is selected", () => {
+  const graph = createQuestGraph(initialSave(), content, "depot-search");
+  expect(graph.branch).toBe("supply-district");
+  expect(graph.nodes.every((node) => graphShowsNode(node, graph.view))).toBe(true);
 });

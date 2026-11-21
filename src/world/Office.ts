@@ -262,10 +262,10 @@ export function buildOffice(
         box("bottle cap", x, 1.63, 4.3, 0.16, 0.1, 0.16, "#b5aa8c", wall);
       }
       // A working evidence tray makes the desk read as a detective's clue station.
-      box("evidence tray", -2.7, 1.2, 2.6, 1.05, 0.16, 0.82, "#443b32", wall);
-      box("case folder", -2.7, 1.3, 2.6, 0.82, 0.08, 0.62, "#b29b6c", wall);
-      box("evidence sheet", -2.7, 1.35, 2.6, 0.68, 0.025, 0.47, "#d8c7a1", wall);
-      box("redacted evidence mark", -2.7, 1.368, 2.57, 0.31, 0.008, 0.045, "#964d39", wall);
+      box("evidence tray", -2.75, 1.2, 3.25, 0.68, 0.16, 0.82, "#443b32", wall);
+      box("case folder", -2.75, 1.3, 3.25, 0.54, 0.08, 0.62, "#b29b6c", wall);
+      box("evidence sheet", -2.75, 1.35, 3.25, 0.44, 0.025, 0.47, "#d8c7a1", wall);
+      box("redacted evidence mark", -2.75, 1.368, 3.22, 0.24, 0.008, 0.045, "#964d39", wall);
       box("lamp stem", -3, 1.9, 4.4, 0.05, 1.6, 0.05, "#b09566", wall);
       box("lamp shade", -3, 2.65, 4.4, 0.8, 0.25, 0.5, "#957953", wall);
     }

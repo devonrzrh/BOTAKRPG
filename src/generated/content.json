@@ -6747,7 +6747,7 @@
         ],
         "kind": "search"
       },
-      "brief": "Search the cold depot. The dispatch order, charging-bay sheet, relay reader, handoff ledger, door counter, thermal memo and technician note are filed by time in HHMM format. Find the relay handoff recorded at 02:14.",
+      "brief": "Search the cold depot's time-sorted records for the relay handoff at 02:14. The records use HHMM format.",
       "hint": "The ledger is sorted by time. Probe the middle record first and narrow the range.",
       "solution": "Probe 02:16 first, then 02:12, then 02:14.",
       "lesson": "source-alg-09",

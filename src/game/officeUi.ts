@@ -59,6 +59,11 @@ export interface SurfaceText {
 }
 export interface SurfaceModel {
   graph?: QuestGraph;
+  ledger?: {
+    count: number;
+    pageLabel: string;
+    clues: ReturnType<typeof recoveredClues>;
+  };
   books?: { id: string; title: string; topic: string }[];
   bookOpen?: boolean;
   selectedLesson?: string;
@@ -708,7 +713,12 @@ export function createOfficeUi(input: OfficeUiInput): SurfaceModel[] {
   });
   const clues = recoveredClues(save, content);
   const cluePages = Math.max(1, Math.ceil(clues.length / 2));
-  const cluePage = Math.min(input.page, cluePages - 1);
+  const cluePage = Math.max(0, Math.min(input.page, cluePages - 1));
+  inventory.ledger = {
+    count: clues.length,
+    pageLabel: `${cluePage + 1} / ${cluePages}`,
+    clues: clues.slice(cluePage * 2, cluePage * 2 + 2),
+  };
   text(inventory, 30, 85, String(clues.length) + " recovered clues", 26);
   if (!clues.length)
     text(
@@ -719,12 +729,10 @@ export function createOfficeUi(input: OfficeUiInput): SurfaceModel[] {
       26,
       900,
     );
-  clues.slice(cluePage * 2, cluePage * 2 + 2).forEach((clue, index) => {
+  inventory.ledger.clues.forEach((clue, index) => {
     const x = index === 0 ? 30 : 550;
     text(inventory, x, 140, clue.title, 30, 430);
-    wrapLines(clue.text, 23).forEach((line, i) =>
-      text(inventory, x, 245 + i * 38, line, 30, 430),
-    );
+    text(inventory, x, 245, clue.text, 30, 430);
     button(
       inventory,
       "clue-reference-" + clue.id,
@@ -737,7 +745,7 @@ export function createOfficeUi(input: OfficeUiInput): SurfaceModel[] {
       clue.lesson,
     );
   });
-  text(inventory, 415, 525, String(cluePage + 1) + " / " + cluePages, 25, 180);
+  text(inventory, 415, 525, inventory.ledger.pageLabel, 25, 180);
   button(
     inventory,
     "clues-prev",

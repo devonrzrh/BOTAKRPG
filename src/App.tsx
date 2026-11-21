@@ -92,9 +92,8 @@ import { RoomTurns } from "./ui/RoomTurns";
 import { createOfficeUi, type OfficeAction } from "./game/officeUi";
 import {
   centerGraph,
-  createQuestGraph,
   zoomGraph,
-  GRAPH_AREA,
+  graphShowsNode,
   type GraphView,
 } from "./game/questGraph";
 import { QuestBranches, FinaleCard } from "./ui/QuestBranches";
@@ -312,11 +311,7 @@ export default function App() {
     if (!bookOpen) setBookClosing(false);
   }, [bookOpen]);
   const [questSelection, setQuestSelection] = useState<string>();
-  const [questView, setQuestView] = useState<GraphView>({
-    x: 0,
-    y: 0,
-    zoom: 1,
-  });
+  const [questView, setQuestView] = useState<GraphView>();
   const [officeFocused, setOfficeFocused] = useState<string | null>(null);
   const [noteEditing, setNoteEditing] = useState<string | null>(null);
   const [noteDraft, setNoteDraft] = useState("");
@@ -1506,38 +1501,27 @@ export default function App() {
       const graph = officeUi.find((m) => m.id === "quests")!.graph!;
       const node = graph.nodes.find((n) => n.id === id);
       if (!node) {
-        const next = createQuestGraph(save, content, id);
-        const target = next.nodes.find((n) => n.id === id);
-        if (target)
-          setQuestView(
-            target.y <= GRAPH_AREA.h - 44
-              ? { x: 0, y: 0, zoom: 1 }
-              : centerGraph(target),
-          );
+        setQuestView(undefined);
+      } else if (!graphShowsNode(node, graph.view)) {
+        setQuestView(centerGraph(node, graph.view.zoom));
+      } else {
+        setQuestView(graph.view);
       }
-      if (
-        node &&
-        (node.x * questView.zoom + questView.x < 100 ||
-          node.x * questView.zoom + questView.x > GRAPH_AREA.w - 100 ||
-          node.y * questView.zoom + questView.y < 44 ||
-          node.y * questView.zoom + questView.y > GRAPH_AREA.h - 44)
-      )
-        setQuestView(centerGraph(node, questView.zoom));
     }
     if (action.kind === "graph-view") {
       const graph = officeUi.find((m) => m.id === "quests")!.graph!;
       if (action.view) setQuestView(action.view);
       else if (id === "overview") {
         if (graph.branch) setQuestSelection(graph.branch);
-        setQuestView({ x: 0, y: 0, zoom: 1 });
+        setQuestView(undefined);
       } else if (id === "center")
         setQuestView(
           centerGraph(
             graph.nodes.find((n) => n.id === graph.selected)!,
-            questView.zoom,
+            graph.view.zoom,
           ),
         );
-      else setQuestView(zoomGraph(questView, id === "zoom-in" ? 1.2 : 1 / 1.2));
+      else setQuestView(zoomGraph(graph.view, id === "zoom-in" ? 1.2 : 1 / 1.2));
     }
     if (action.kind === "close-book") {
       setBookOpen(false);

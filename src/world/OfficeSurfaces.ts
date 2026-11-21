@@ -9,13 +9,7 @@ import { DynamicTexture } from "@babylonjs/core/Materials/Textures/dynamicTextur
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { PointerEventTypes } from "@babylonjs/core/Events/pointerEvents";
-import {
-  hitControl,
-  wrapLines,
-  type SurfaceModel,
-  type SurfaceButton,
-  type OfficeAction,
-} from "../game/officeUi";
+import type { SurfaceModel, SurfaceButton, OfficeAction } from "../game/officeUi";
 import {
   BOOK_OPEN_MS,
   BOOK_CLOSE_MS,
@@ -24,6 +18,8 @@ import {
   bookReadingScale,
 } from "../game/bookAnimation";
 import { drawQuestGraph } from "./QuestGraphSurface";
+import { drawLedgerSurface } from "./LedgerSurface";
+import { hitSurfaceZone, measureSurfaceText, type SurfaceZone as Zone } from "./SurfaceLayout";
 import {
   GRAPH_AREA,
   panGraph,
@@ -37,13 +33,6 @@ export interface OfficeSurfaceState {
   locked: boolean;
   focused: string | null;
   reducedMotion?: boolean;
-}
-interface Zone {
-  x: number;
-  y: number;
-  w: number;
-  h: number;
-  control: SurfaceButton;
 }
 type Ctx = CanvasRenderingContext2D;
 
@@ -139,16 +128,7 @@ export function attachOfficeSurfaces(
     width = 530,
     color = "#34332d",
   ) => {
-    c.fillStyle = color;
-    c.font = `${size}px Consolas, monospace`;
-    c.textBaseline = "top";
-    c.save();
-    c.translate(x, y);
-    c.scale(1, textAspect);
-    wrapLines(value, Math.max(8, Math.floor(width / (size * 0.61)))).forEach(
-      (line, i) => c.fillText(line, 0, i * size * 1.3),
-    );
-    c.restore();
+    measureSurfaceText(c, value, width, size, 1.3, textAspect).draw(x, y, color);
   };
   const texture = (name: string, w = 1024, h = 1024) => {
     const t = new DynamicTexture(name, { width: w, height: h }, scene, false);
@@ -682,6 +662,7 @@ export function attachOfficeSurfaces(
     const source = document.createElement("canvas");
     source.width = 2048;
     source.height = 1152;
+    let zones: Zone[] = [];
     let key = "",
       lastModel: SurfaceModel | null = null;
     const draw = (model: SurfaceModel, selected: string | null) => {
@@ -723,107 +704,9 @@ export function attachOfficeSurfaces(
         c.moveTo(512, 70);
         c.lineTo(512, 330);
         c.stroke();
-        pages.forEach((page, index) => {
-          const t = (page.material as StandardMaterial)
-            .diffuseTexture as DynamicTexture;
-          const pc = t.getContext() as unknown as Ctx;
-          pc.setTransform(1, 0, 0, 1, 0, 0);
-          pc.drawImage(source, index * 1024, 0, 1024, 1152, 0, 0, 1024, 1152);
-          t.update();
-        });
-        return;
+      } else {
+        zones = drawLedgerSurface(c, model, selected);
       }
-      const shade = c.createLinearGradient(472, 0, 552, 0);
-      shade.addColorStop(0, "#c8b58b00");
-      shade.addColorStop(0.5, "#8f795d77");
-      shade.addColorStop(1, "#c8b58b00");
-      c.fillStyle = shade;
-      c.fillRect(472, 0, 80, 576);
-      c.strokeStyle = "#b7a78644";
-      c.lineWidth = 0.6;
-      for (let y = 106; y < 470; y += 23) {
-        c.beginPath();
-        c.moveTo(28, y);
-        c.lineTo(482, y);
-        c.moveTo(544, y);
-        c.lineTo(996, y);
-        c.stroke();
-      }
-      if (wall === "desk") {
-        c.fillStyle = "#30464a";
-        c.fillRect(20, 14, 463, 48);
-        c.fillRect(535, 14, 469, 48);
-      }
-      ink(
-        c,
-        wall === "desk" ? "CLUE LEDGER" : model.title,
-        35,
-        25,
-        wall === "desk" ? 32 : 22,
-        440,
-        wall === "desk" ? "#eee2c6" : "#453d30",
-      );
-      if (wall === "desk")
-        ink(c, "EVIDENCE FILES", 550, 25, 32, 430, "#eee2c6");
-      for (const t of model.texts) {
-        const width = Math.min(
-          t.maxWidth ?? 440,
-          t.x < 512 ? 482 - t.x : 1000 - t.x,
-        );
-        ink(
-          c,
-          t.text,
-          t.x,
-          t.y,
-          wall === "desk" ? Math.max(30, t.size ?? 18) : (t.size ?? 18),
-          width,
-        );
-      }
-      for (const b of model.buttons) {
-        if (b.prop) continue;
-        c.globalAlpha = 1;
-        if (wall === "desk" && b.x > 512) {
-          c.fillStyle = selected === b.id ? "#b0b8a855" : "#f6efdf66";
-          c.fillRect(b.x, b.y - 4, b.w, b.h + 8);
-          c.strokeStyle = b.disabled ? "#9f957b" : "#667c72";
-          c.lineWidth = b.disabled ? 1 : 2;
-          c.strokeRect(b.x, b.y - 4, b.w, b.h + 8);
-          c.fillStyle = b.disabled ? "#9f957b" : "#667c72";
-          c.fillRect(b.x, b.y - 4, 3, b.h + 8);
-        }
-        c.globalAlpha = b.disabled ? 0.72 : 1;
-        const size = wall === "desk" ? 30 : 20,
-          lines = wrapLines(
-            b.label,
-            Math.max(7, Math.floor((b.w - 10) / (size * 0.61))),
-          );
-        ink(
-          c,
-          lines.slice(0, 2).join("\n"),
-          b.x + 5,
-          b.y + 6,
-          size,
-          b.w - 10,
-          selected === b.id ? "#9a4f31" : "#66503b",
-        );
-        if (!b.disabled) {
-          c.strokeStyle = selected === b.id ? "#a35738" : "#9b8052";
-          c.lineWidth = selected === b.id ? 2 : 1;
-          c.beginPath();
-          c.moveTo(b.x + 5, b.y + b.h - 3);
-          c.lineTo(
-            b.x + Math.min(b.w - 5, b.label.length * 9.8),
-            b.y + b.h - 3,
-          );
-          c.stroke();
-          if (selected === b.id) {
-            c.strokeStyle = "#9a4f25";
-            c.lineWidth = 2.5;
-            c.strokeRect(b.x, b.y, b.w, b.h);
-          }
-        }
-      }
-      c.globalAlpha = 1;
       pages.forEach((page, index) => {
         const t = (page.material as StandardMaterial)
           .diffuseTexture as DynamicTexture;
@@ -833,7 +716,7 @@ export function attachOfficeSurfaces(
         t.update();
       });
     };
-    return { root, hinge, pages, draw };
+    return { root, hinge, pages, draw, get zones() { return zones; } };
   };
   const reading = makeBook("selected reference book", "bookshelf"),
     ledger = makeBook("clue ledger", "desk");
@@ -844,17 +727,10 @@ export function attachOfficeSurfaces(
   let progress = 0,
     activeBook = "",
     lastReadingModel: SurfaceModel | null = null;
-  const bookPageTargets = new Map<
-    AbstractMesh,
-    { book: typeof reading; side: number; wall: HomeWall }
-  >();
-  reading.pages.forEach((p, side) => {
-    p.metadata = { bookPage: true };
-    bookPageTargets.set(p, { book: reading, side, wall: "bookshelf" });
-  });
+  const ledgerPages = new Map<AbstractMesh, number>();
+  for (const page of reading.pages) page.isPickable = false;
   ledger.pages.forEach((p, side) => {
-    p.metadata = { bookPage: true };
-    bookPageTargets.set(p, { book: ledger, side, wall: "desk" });
+    ledgerPages.set(p, side);
   });
   const render = scene.onBeforeRenderObservable.add(() => {
     const s = state(),
@@ -1038,25 +914,14 @@ export function attachOfficeSurfaces(
       if (w && w.wall === s.wall) {
         const x = uv.x * w.width,
           y = (1 - uv.y) * w.height;
-        selected = w.zones.find(
-          (z) =>
-            !z.control.disabled &&
-            x >= z.x &&
-            x <= z.x + z.w &&
-            y >= z.y &&
-            y <= z.y + z.h,
-        )?.control;
+        selected = hitSurfaceZone(w.zones, x, y);
         nextWidget = w;
       }
-      const page = bookPageTargets.get(pick.pickedMesh);
-      if (
-        page &&
-        page.wall === s.wall &&
-        (page.wall === "desk" || libraryIsReady())
-      )
-        selected = hitControl(
-          modelFor(page.wall).buttons.filter((button) => !button.prop),
-          (uv.x + page.side) * 512,
+      const side = ledgerPages.get(pick.pickedMesh);
+      if (side !== undefined && s.wall === "desk")
+        selected = hitSurfaceZone(
+          ledger.zones,
+          (uv.x + side) * 512,
           (1 - uv.y) * 576,
         );
     }
@@ -1076,9 +941,6 @@ export function attachOfficeSurfaces(
     )
       action(selected.action);
   });
-  function libraryIsReady() {
-    return progress > 0.97 && Boolean(modelFor("bookshelf").bookOpen);
-  }
   const wheel = (event: WheelEvent) => {
     const s = state();
     if (s.locked || s.wall !== "quests") return;
