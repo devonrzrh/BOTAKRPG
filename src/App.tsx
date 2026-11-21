@@ -3071,6 +3071,14 @@ export default function App() {
                       : "required hosting headers are missing; Python execution is unavailable"}
                     . Block programs run through the same Python worker.
                   </p>
+                  <h3>Credits</h3>
+                  <p>
+                    Created for the Computer Science and AI class at Beijing Institute of Technology
+                    <br />
+                    Created with love by team B.O.T.A.K
+                    <br />
+                    Development lead by Devon
+                  </p>
                 </div>
               )}
               {panel === "manual" && (
