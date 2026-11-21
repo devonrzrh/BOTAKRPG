@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { ArrowRight, SkipForward } from "lucide-react";
+import { ArrowRight, LockKeyhole, Radio, SkipForward } from "lucide-react";
 import type { Story } from "../content/schema";
 import { personalizeText } from "../game/player";
 import { useGameSound } from "./GameSound";
@@ -23,7 +23,7 @@ export function Cutscene({
   }, []);
   const advance = () => {
     sound(
-      story.visual === "network"
+      story.visual !== "chase"
         ? "connect"
         : steps + 1 >= story.frames[frame].steps && frame + 1 === 2
           ? "connect"
@@ -67,6 +67,7 @@ export function Cutscene({
     return () => window.removeEventListener("keydown", key);
   }, [frame, steps]);
   const current = story.frames[frame];
+  const finale = story.visual === "finale";
   return (
     <section
       ref={dialog}
@@ -82,7 +83,16 @@ export function Cutscene({
           Skip scene
         </button>
       </header>
-      {story.visual === "network" ? (
+      {finale ? (
+        <div className="finale-scene" data-closed={frame > 0 || undefined}>
+          <div className="finale-signal" aria-hidden="true">
+            <span />
+            {frame === 0 ? <Radio size={44} /> : <LockKeyhole size={44} />}
+            <span />
+          </div>
+          <p role="status">{current.time}</p>
+        </div>
+      ) : story.visual === "network" ? (
         <div
           className="network-cutscene"
           aria-label="A terminal connecting to the network"
@@ -154,9 +164,11 @@ export function Cutscene({
       )}
       <div className="prologue-copy">
         <div>
-          <span className="section-eyebrow">
-            CASE 007 · {frame + 1} / {story.frames.length}
-          </span>
+          {!finale && (
+            <span className="section-eyebrow">
+              CASE 007 · {frame + 1} / {story.frames.length}
+            </span>
+          )}
           <h1>{personalizeText(current.heading, savedName)}</h1>
           <p>{personalizeText(current.body, savedName)}</p>
         </div>
@@ -164,7 +176,9 @@ export function Cutscene({
           {frame + 1 === story.frames.length
             ? story.visual === "network"
               ? "Enter network"
-              : "Return home"
+              : finale
+                ? "Return to office"
+                : "Return home"
             : current.steps > 1
               ? "Continue pursuit"
               : "Continue"}

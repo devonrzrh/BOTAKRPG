@@ -70,6 +70,18 @@ it("supports reusable cutscenes with different frame counts and pursuit steps", 
   expect(intro?.type === "story" && intro.frames[1].steps).toBe(6);
   expect(connection?.type === "story" && connection.frames.length).toBe(2);
 });
+it.each(["pacified", "defeated"])("compiles the %s ECHO-7 epilogue", (outcome) => {
+  const finale = validateContent(raw).entities.find(
+    (entry) => entry.type === "story" && entry.id === `echo-epilogue-${outcome}`,
+  );
+  expect(finale).toMatchObject({
+    visual: "finale",
+    frames: [
+      { steps: 1 },
+      { time: "CASE 007 CLOSED", steps: 1 },
+    ],
+  });
+});
 it("compiles active curriculum types and the field supply catalog", () => {
   const c = validateContent(raw);
   expect(new Set(c.entities.map((x) => x.type))).toEqual(

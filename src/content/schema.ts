@@ -121,7 +121,7 @@ export const questSchema = z.object({
 export const storySchema = z.object({
   ...base,
   type: z.literal("story"),
-  visual: z.enum(["chase", "network"]).default("chase"),
+  visual: z.enum(["chase", "network", "finale"]).default("chase"),
   frames: z
     .array(
       z.object({

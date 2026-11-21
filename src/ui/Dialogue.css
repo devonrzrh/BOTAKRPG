@@ -21,8 +21,10 @@
 }
 .app .dialogue-portrait {
   align-self: flex-start;
+  display: grid;
+  place-items: center;
   width: 136px;
-  height: 192px;
+  aspect-ratio: 6 / 7;
   flex-shrink: 0;
   color: #9fbabd;
   border: 1px solid #667e80;
@@ -31,13 +33,9 @@
   position: relative;
   overflow: hidden;
 }
-.app .dialogue-portrait.is-robot {
-  color: #d1bb83;
-  background: linear-gradient(155deg, #3a3e33, #101d22);
-}
 .app .dialogue-portrait svg {
-  width: 124px;
-  height: 150px;
+  display: block;
+  width: 100%;
   stroke: currentColor;
   stroke-width: 2;
 }
@@ -46,18 +44,11 @@
   stroke-width: 1;
 }
 .app .dialogue-portrait .portrait-fill {
-  fill: #071219aa;
+  fill: color-mix(in srgb, currentColor 16%, #0b1923);
 }
 .app .dialogue-portrait .portrait-frame {
   opacity: 0.6;
   stroke-width: 1;
-}
-.app .dialogue-portrait span {
-  font:
-    400 16px/1 Consolas,
-    monospace;
-  letter-spacing: 1px;
-  margin: 8px 0 0;
 }
 .app .dialogue-body {
   min-width: 0;
@@ -231,13 +222,30 @@
   }
   .app .dialogue-portrait {
     width: 104px;
-    height: 160px;
-  }
-  .app .dialogue-portrait svg {
-    width: 96px;
-    height: 120px;
   }
   .app .dialogue-speech p {
     font-size: 20px;
+  }
+}
+@media (max-width: 600px) {
+  .app .dialogue-backdrop {
+    padding: 12px;
+  }
+  .app .dialogue-box {
+    display: grid;
+    grid-template-columns: 62px minmax(0, 1fr);
+    column-gap: 12px;
+    row-gap: 0;
+    padding: 14px;
+  }
+  .app .dialogue-portrait {
+    width: 62px;
+  }
+  .app .dialogue-body {
+    display: contents;
+  }
+  .app .dialogue-speech,
+  .app .dialogue-response-area {
+    grid-column: 1 / -1;
   }
 }

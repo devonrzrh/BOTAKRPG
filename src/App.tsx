@@ -1137,6 +1137,17 @@ export default function App() {
   const narratedBattle = Boolean(
     activityStory(content, battleActivityId, "before"),
   );
+  const epilogueId =
+    battleActivityId === "echo-battle" &&
+    battle.phase === "won" &&
+    save.finaleOutcome
+      ? `echo-epilogue-${save.finaleOutcome}`
+      : null;
+  const activeStory = cutsceneId
+    ? content.entities.find(
+        (e): e is Story => e.type === "story" && e.id === cutsceneId,
+      )!
+    : story;
   const applyBattle = (
     nextBattle: Battle,
     nextSave: Save,
@@ -2448,6 +2459,9 @@ export default function App() {
                     notify("Chapter bookmarked for review.");
                   }}
                   onRetreat={() => close()}
+                  onEpilogue={
+                    epilogueId ? () => setCutsceneId(epilogueId) : undefined
+                  }
                   victoryActionLabel={
                     narratedBattle
                       ? activityStory(content, battleActivityId, "after")
@@ -3325,16 +3339,12 @@ export default function App() {
           <Cutscene
             key={cutsceneId ?? "intro"}
             savedName={save.character.name}
-            story={
-              cutsceneId
-                ? content.entities.find(
-                    (e): e is Story =>
-                      e.type === "story" && e.id === cutsceneId,
-                  )!
-                : story
-            }
+            story={activeStory}
             onFinish={() => {
-              if (cutsceneId) {
+              if (activeStory.visual === "finale") {
+                setCutsceneId(null);
+                open("journal");
+              } else if (cutsceneId) {
                 updateSave((s) => ({
                   ...s,
                   story: { ...s.story, networkIntroSeen: true },

@@ -68,6 +68,7 @@ interface Props {
   onRetreat: () => void;
   onJournal: () => void;
   victoryActionLabel?: string;
+  onEpilogue?: () => void;
   onRecover: () => void;
   onRetry?: () => void;
 }
@@ -1249,10 +1250,14 @@ export function BattleScreen(p: Props) {
             )}
           </div>
           <footer>
-            <button className="primary" onClick={p.onJournal}>
-              {p.victoryActionLabel ?? "Quest map"}
+            <button className="primary" onClick={p.onEpilogue ?? p.onJournal}>
+              {p.onEpilogue
+                ? "Continue to epilogue"
+                : (p.victoryActionLabel ?? "Quest map")}
             </button>
-            <button onClick={p.onRetreat}>Return to network</button>
+            {!p.onEpilogue && (
+              <button onClick={p.onRetreat}>Return to network</button>
+            )}
           </footer>
         </section>
       )}

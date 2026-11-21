@@ -494,6 +494,64 @@ button.pinned-paper:hover:not(:disabled) {
   color: #5c8a9f;
   font: 11px monospace;
 }
+.finale-scene {
+  --signal: #92d7cb;
+  flex: 1;
+  min-height: 180px;
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 22px;
+  color: var(--signal);
+  background: radial-gradient(ellipse at center, #1b3946, #0a1722 70%);
+}
+.finale-scene[data-closed] {
+  --signal: #e4ca95;
+  background: radial-gradient(ellipse at bottom, #594534, #14222e 70%);
+}
+.finale-signal {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  width: min(72%, 440px);
+}
+.finale-signal span {
+  flex: 1;
+  height: 1px;
+  background: currentColor;
+  position: relative;
+}
+.finale-signal span::after {
+  content: "";
+  position: absolute;
+  inset: -3px 0 auto auto;
+  width: 7px;
+  height: 7px;
+  background: currentColor;
+}
+.finale-signal span:last-child::after {
+  inset-inline: 0 auto;
+}
+.finale-scene p {
+  margin: 0;
+  font: 400 16px/1.4 Consolas, monospace;
+  text-align: center;
+  letter-spacing: 0.08em;
+}
+.cutscene-finale .prologue-copy p {
+  color: #cedcde;
+  font-size: 18px;
+}
+.cutscene-finale > header button,
+.cutscene-finale .prologue-copy button {
+  color: #e1dac8;
+  font-size: 16px;
+}
+.cutscene-finale > header button:focus-visible,
+.cutscene-finale .prologue-copy button:focus-visible {
+  outline: 2px solid #e4ca95;
+  outline-offset: 3px;
+}
 .dialogue-backdrop {
   position: fixed;
   inset: var(--top-height) 0 0;
