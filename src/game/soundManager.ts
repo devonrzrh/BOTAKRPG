@@ -18,7 +18,6 @@ import digitalPhaseJump from "../../sounds/sfx/kenney_digital-audio_2/Audio/phas
 import digitalZap from "../../sounds/sfx/kenney_digital-audio_2/Audio/zapThreeToneUp.ogg?url";
 import digitalPhaser from "../../sounds/sfx/kenney_digital-audio_2/Audio/phaserUp1.ogg?url";
 import digitalPhaserDown from "../../sounds/sfx/kenney_digital-audio_2/Audio/phaserDown1.ogg?url";
-import digitalPowerUp from "../../sounds/sfx/kenney_digital-audio_2/Audio/powerUp1.ogg?url";
 import impactGlass from "../../sounds/sfx/kenney_impact-sounds/Audio/impactGlass_medium_000.ogg?url";
 import impactGlassHeavy from "../../sounds/sfx/kenney_impact-sounds/Audio/impactGlass_heavy_000.ogg?url";
 import impactMetal from "../../sounds/sfx/kenney_impact-sounds/Audio/impactMetal_medium_000.ogg?url";
@@ -69,7 +68,6 @@ export const SFX_CUES = {
   battleWeakness: { label: "Weakness hit", source: impactGlass, cooldown: 0 },
   battleBreak: { label: "Stance break", source: impactGlassHeavy, cooldown: 0 },
   battleFinisher: { label: "Finisher", source: explosion, cooldown: 0 },
-  battleVictory: { label: "Victory / pacify", source: digitalPowerUp, cooldown: 0 },
   cameraMove: {
     label: "Camera turn swoosh",
     source: cameraSwoosh,
@@ -100,7 +98,6 @@ export const SFX_GAINS: Partial<Record<SfxName, number>> = {
   battleWeakness: 0.7,
   battleBreak: 0.75,
   battleFinisher: 0.85,
-  battleVictory: 0.55,
   cameraMove: 0.2,
 };
 

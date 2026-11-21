@@ -1,4 +1,4 @@
-import { combatContactMs, isVictoryCue, type BattleCue } from "./combatPresentation";
+import { combatContactMs, type BattleCue } from "./combatPresentation";
 import { createSoundManager, type SfxName } from "./soundManager";
 
 const previewCueBase = {
@@ -51,14 +51,10 @@ export const BATTLE_CUE_PREVIEWS: {
     label: "Finisher",
     cue: { ...previewCueBase, kind: "player", special: "finisher" },
   },
-  {
-    label: "Victory / pacify",
-    cue: { ...previewCueBase, kind: "player", defeated: true },
-  },
 ];
 
-function battleSound(cue: BattleCue): SfxName {
-  if (isVictoryCue(cue)) return "battleVictory";
+function battleSound(cue: BattleCue): SfxName | null {
+  if (cue.kind === "recover" && cue.special === "pacify") return null;
   if (cue.kind === "miss") return "battleMiss";
   if (cue.kind === "enemy")
     return cue.blocked
@@ -114,10 +110,12 @@ export function createCombatAudio() {
       )
         return;
       lastSequence = cue.sequence;
+      const sound = battleSound(cue);
+      if (!sound) return;
       const delay = combatContactMs(cue, reducedMotion);
       const timer = setTimeout(() => {
         timers.delete(timer);
-        sounds.play(battleSound(cue));
+        sounds.play(sound);
       }, delay);
       timers.add(timer);
     },

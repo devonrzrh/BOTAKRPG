@@ -24,7 +24,7 @@ const files = [
   "impactMetal_medium_000", "laserSmall_000", "forceField_000", "laserRetro_000",
   "lowDown", "impactPunch_medium_001", "impactPunch_heavy_000", "metalClick",
   "phaserDown1", "impactGlass_medium_000", "impactGlass_heavy_000",
-  "explosionCrunch_000", "powerUp1",
+  "explosionCrunch_000",
 ];
 
 describe("combat audio", () => {
@@ -79,15 +79,18 @@ describe("combat audio", () => {
     audio.dispose();
   });
 
-  it("routes pacification and lethal poison to the victory effect", () => {
+  it("keeps the final hit sound and plays no effect for pacification", () => {
     const audio = createCombatAudio();
     audio.unlock();
     const pacify: BattleCue = { ...strike, kind: "recover", special: "pacify" };
     audio.play(pacify);
     audio.play({ ...strike, sequence: 2, kind: "poison", defeated: true });
+    audio.play({ ...strike, sequence: 3, special: "finisher", defeated: true });
     vi.advanceTimersByTime(208);
-    expect(clips).toHaveLength(2);
-    expect(clips.every(({ src }) => src.endsWith("/powerUp1.ogg"))).toBe(true);
+    expect(clips.map(({ src }) => src.split("/").pop())).toEqual([
+      "lowDown.ogg",
+      "explosionCrunch_000.ogg",
+    ]);
     audio.dispose();
   });
 
