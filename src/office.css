@@ -1,5 +1,6 @@
 :root {
-  --top-height: 56px;
+  --top-height-reduction: 4px;
+  --top-height: calc(56px - var(--top-height-reduction));
 }
 .app {
   grid-template-rows: var(--top-height) minmax(0, 1fr);
@@ -596,7 +597,7 @@ button.pinned-paper:hover:not(:disabled) {
 }
 @media (max-width: 650px) {
   :root {
-    --top-height: 52px;
+    --top-height: calc(52px - var(--top-height-reduction));
   }
   .brand {
     font-size: 11px;

@@ -1,5 +1,13 @@
 .app.gameplay-battle {
-  --battle-console-height: min(360px, 52%);
+  --battle-console-max-height: 360px;
+  --battle-console-ratio: 0.52;
+  --battle-console-height: calc(
+    min(
+        var(--battle-console-max-height),
+        (100% - var(--top-height-reduction)) * var(--battle-console-ratio)
+      ) +
+      var(--top-height-reduction)
+  );
 }
 .app.gameplay-battle .battle-layout-console .battle-enemy-hud {
   top: 6px;
@@ -392,7 +400,8 @@
 }
 @media (max-width: 700px) {
   .app.gameplay-battle {
-    --battle-console-height: min(400px, 54%);
+    --battle-console-max-height: 400px;
+    --battle-console-ratio: 0.54;
   }
   .app.gameplay-battle .battle-layout-console .battle-console {
     inset-inline: 8px;
@@ -752,6 +761,7 @@
 
 @media (max-height: 550px) {
   .app.gameplay-battle {
-    --battle-console-height: min(320px, 62%);
+    --battle-console-max-height: 320px;
+    --battle-console-ratio: 0.62;
   }
 }
