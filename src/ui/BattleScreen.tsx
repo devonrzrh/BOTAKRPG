@@ -555,6 +555,37 @@ export function BattleScreen(p: Props) {
         </h2>
         {threat !== b.enemyName && <p className="enemy-threat">{threat}</p>}
         {meter("Enemy HP", b.hp, b.maxHp, "enemy")}
+        <div
+          className={`battle-intent intent-${intent.kind}${!motion && changed("intent") ? " intent-changed" : ""}`}
+          role="status"
+        >
+          <span>Turn {b.turn}</span>
+          {b.phase !== "won" && (
+            <strong
+              key={
+                !motion
+                  ? changed("intent")?.sequence
+                  : `cue-${p.cue?.sequence}`
+              }
+            >
+              {intent.label}
+              {intent.damage
+                ? ` · ${intent.damage} damage`
+                : intent.kind === "recover"
+                  ? " · focus recovery"
+                  : ""}
+            </strong>
+          )}
+          {b.tactics &&
+            b.phase === "choose" &&
+            (b.staggered || !!b.resolve) && (
+              <span>
+                {b.staggered
+                  ? "Armor broken · next hit ×1.5"
+                  : `Break ${b.resolve}/${b.tactics.resolve}`}
+              </span>
+            )}
+        </div>
         <div className="battle-status-effects">
           {b.effects
             .filter((e) => e.id !== "shield")
@@ -630,121 +661,6 @@ export function BattleScreen(p: Props) {
         </>
       )}
       <div className="battle-console" aria-label="Battle console" hidden={battleEnded}>
-        <header className="battle-console-status">
-          <div className="battle-player-hud">
-            <strong>{save.character.name}</strong>
-            {meter("HP", save.character.hp, limits.maxHp, "health")}
-            {meter("Focus", save.character.focus, limits.maxFocus, "focus")}
-            <details className="battle-momentum" ref={momentumMenu}>
-              <summary
-                aria-label={`Momentum ${b.momentum} of 100. ${b.momentumSpend} committed. Choose attack power`}
-                onClick={(event) => {
-                  if (b.phase !== "choose" || motion || evading)
-                    event.preventDefault();
-                }}
-              >
-                <span className="momentum-label">
-                  Momentum <strong>{b.momentum}/100 ▾</strong>
-                </span>
-                <span
-                  className="momentum-track"
-                  role="progressbar"
-                  aria-label="Momentum"
-                  aria-valuenow={b.momentum}
-                  aria-valuemin={0}
-                  aria-valuemax={100}
-                >
-                  <i style={{ width: `${b.momentum}%` }} />
-                </span>
-              </summary>
-              <div className="momentum-options">
-                <p>Power next attack</p>
-                {[0, 25, 50, 75]
-                  .filter((amount) => amount <= b.momentum)
-                  .map((amount) => (
-                    <button
-                      key={amount}
-                      aria-pressed={b.momentumSpend === amount}
-                      disabled={b.phase !== "choose" || !!motion || evading}
-                      onClick={() => {
-                        p.onMomentum(amount);
-                        if (momentumMenu.current)
-                          momentumMenu.current.open = false;
-                      }}
-                    >
-                      {amount
-                        ? `Spend ${amount} · +${amount}% damage`
-                        : "Save Momentum"}
-                    </button>
-                  ))}
-                {b.momentum === 100 && (
-                  <button
-                    className="finisher-ready"
-                    onClick={() => {
-                      if (momentumMenu.current)
-                        momentumMenu.current.open = false;
-                      setMenu(null);
-                      p.onFinisher();
-                    }}
-                  >
-                    Finisher · spend 100 · triple Probe
-                  </button>
-                )}
-              </div>
-            </details>
-            <div className="battle-status-effects">
-              {b.effects
-                .filter((e) => e.id === "shield")
-                .map((e) => (
-                  <span
-                    key={`${e.id}-${e.remaining}-${e.magnitude}`}
-                    className={
-                      changes.some((change) => change.id === `effect-${e.id}`)
-                        ? "effect-changed"
-                        : ""
-                    }
-                  >
-                    Shield · {e.remaining} turns
-                  </span>
-                ))}
-            </div>
-          </div>
-
-          <div
-            className={`battle-intent intent-${intent.kind}${!motion && changed("intent") ? " intent-changed" : ""}`}
-            role="status"
-          >
-            <span>
-              TURN {b.turn} ·{" "}
-              {b.phase === "won" ? "ENCOUNTER COMPLETE" : "INCOMING"}
-            </span>
-            {b.phase !== "won" && (
-              <strong
-                key={
-                  !motion
-                    ? changed("intent")?.sequence
-                    : `cue-${p.cue?.sequence}`
-                }
-              >
-                {intent.label}
-                {intent.damage
-                  ? ` · ${intent.damage} damage`
-                  : intent.kind === "recover"
-                    ? " · focus recovery"
-                    : ""}
-              </strong>
-            )}
-            {b.tactics &&
-              b.phase === "choose" &&
-              (b.staggered || !!b.resolve) && (
-                <span>
-                  {b.staggered
-                    ? "Armor broken · next hit ×1.5"
-                    : `Break ${b.resolve}/${b.tactics.resolve}`}
-                </span>
-              )}
-          </div>
-        </header>
         {resultChanges.length > 0 && (
           <div
             className="battle-change-feed"
@@ -1097,60 +1013,142 @@ export function BattleScreen(p: Props) {
             )}
           </section>
         )}
-        <div
-          className="battle-command-slot"
-          inert={b.phase !== "choose" || !activeCard}
-        >
-          <div>
-            <nav className="battle-command-menu" aria-label="Battle commands">
-              <button
-                ref={skillsButton}
-                aria-pressed={menu === "skills"}
-                disabled={b.phase !== "choose" || !!motion || evading}
-                onClick={() => setMenu("skills")}
-              >
-                <RpgIcon name="skills" />
-                <span>Skills</span>
-              </button>
-              <button
-                disabled={b.phase !== "choose" || !!motion || evading}
-                aria-pressed={menu === "defend"}
-                onClick={() => {
-                  if (b.tactics && intent.kind === "heavy") setMenu("defend");
-                  else p.onGuard();
+        <div className="battle-console-footer">
+          <div className="battle-player-hud">
+            {meter("HP", save.character.hp, limits.maxHp, "health")}
+            {meter("Focus", save.character.focus, limits.maxFocus, "focus")}
+            <details className="battle-momentum" ref={momentumMenu}>
+              <summary
+                aria-label={`Momentum ${b.momentum} of 100. ${b.momentumSpend} committed. Choose attack power`}
+                onClick={(event) => {
+                  if (b.phase !== "choose" || motion || evading)
+                    event.preventDefault();
                 }}
               >
-                <RpgIcon name="brace" />
-                <span>
-                  Defend<small>Brace or dodge</small>
+                <span className="momentum-label">
+                  Momentum <strong>{b.momentum}/100 ▾</strong>
                 </span>
-              </button>
-              <button
-                aria-pressed={menu === "items"}
-                disabled={b.phase !== "choose" || !!motion || evading}
-                onClick={() => setMenu("items")}
-              >
-                <RpgIcon name="items" />
-                <span>Items</span>
-              </button>
-              <button
-                aria-pressed={inspecting}
-                disabled={b.phase !== "choose" || !!motion || evading}
-                onClick={() => setMenu("analyze")}
-              >
-                <RpgIcon name="inspect" />
-                <span>Inspect</span>
-              </button>
-              <button
-                disabled={!!motion || evading || b.phase === "lost"}
-                onClick={p.onRetreat}
-              >
-                <RpgIcon name="retreat" />
-                <span>
-                  Retreat<small>Keep evidence</small>
+                <span
+                  className="momentum-track"
+                  role="progressbar"
+                  aria-label="Momentum"
+                  aria-valuenow={b.momentum}
+                  aria-valuemin={0}
+                  aria-valuemax={100}
+                >
+                  <i style={{ width: `${b.momentum}%` }} />
                 </span>
-              </button>
-            </nav>
+              </summary>
+              <div className="momentum-options">
+                <p>Power next attack</p>
+                {[0, 25, 50, 75]
+                  .filter((amount) => amount <= b.momentum)
+                  .map((amount) => (
+                    <button
+                      key={amount}
+                      aria-pressed={b.momentumSpend === amount}
+                      disabled={b.phase !== "choose" || !!motion || evading}
+                      onClick={() => {
+                        p.onMomentum(amount);
+                        if (momentumMenu.current)
+                          momentumMenu.current.open = false;
+                      }}
+                    >
+                      {amount
+                        ? `Spend ${amount} · +${amount}% damage`
+                        : "Save Momentum"}
+                    </button>
+                  ))}
+                {b.momentum === 100 && (
+                  <button
+                    className="finisher-ready"
+                    onClick={() => {
+                      if (momentumMenu.current)
+                        momentumMenu.current.open = false;
+                      setMenu(null);
+                      p.onFinisher();
+                    }}
+                  >
+                    Finisher · spend 100 · triple Probe
+                  </button>
+                )}
+              </div>
+            </details>
+            <div
+              className="battle-status-effects"
+              hidden={!b.effects.some((effect) => effect.id === "shield")}
+            >
+              {b.effects
+                .filter((e) => e.id === "shield")
+                .map((e) => (
+                  <span
+                    key={`${e.id}-${e.remaining}-${e.magnitude}`}
+                    className={
+                      changes.some((change) => change.id === `effect-${e.id}`)
+                        ? "effect-changed"
+                        : ""
+                    }
+                  >
+                    Shield · {e.remaining} turns
+                  </span>
+                ))}
+            </div>
+          </div>
+          <div
+            className="battle-command-slot"
+            inert={b.phase !== "choose" || !activeCard}
+          >
+            <div>
+              <nav className="battle-command-menu" aria-label="Battle commands">
+                <button
+                  ref={skillsButton}
+                  aria-pressed={menu === "skills"}
+                  disabled={b.phase !== "choose" || !!motion || evading}
+                  onClick={() => setMenu("skills")}
+                >
+                  <RpgIcon name="skills" />
+                  <span>Skills</span>
+                </button>
+                <button
+                  disabled={b.phase !== "choose" || !!motion || evading}
+                  aria-pressed={menu === "defend"}
+                  onClick={() => {
+                    if (b.tactics && intent.kind === "heavy") setMenu("defend");
+                    else p.onGuard();
+                  }}
+                >
+                  <RpgIcon name="brace" />
+                  <span>
+                    Defend<small>Brace or dodge</small>
+                  </span>
+                </button>
+                <button
+                  aria-pressed={menu === "items"}
+                  disabled={b.phase !== "choose" || !!motion || evading}
+                  onClick={() => setMenu("items")}
+                >
+                  <RpgIcon name="items" />
+                  <span>Items</span>
+                </button>
+                <button
+                  aria-pressed={inspecting}
+                  disabled={b.phase !== "choose" || !!motion || evading}
+                  onClick={() => setMenu("analyze")}
+                >
+                  <RpgIcon name="inspect" />
+                  <span>Inspect</span>
+                </button>
+                <button
+                  disabled={!!motion || evading || b.phase === "lost"}
+                  onClick={p.onRetreat}
+                >
+                  <RpgIcon name="retreat" />
+                  <span>
+                    Retreat<small>Keep evidence</small>
+                  </span>
+                </button>
+              </nav>
+            </div>
           </div>
         </div>
       </div>

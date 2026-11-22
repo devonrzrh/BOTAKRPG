@@ -36,14 +36,8 @@
 .app .meter-changed [role="progressbar"] {
   animation: battle-stat-pulse 650ms ease-out both;
 }
-.app.gameplay-battle
-  .battle-layout-console
-  .battle-player-hud
-  .battle-status-effects {
-  margin-top: 0;
-}
-.app.gameplay-battle .battle-layout-console .battle-enemy-hud .battle-meter {
-  margin-bottom: 22px;
+.app.gameplay-battle .battle-layout-console .battle-enemy-hud .battle-meter-delta {
+  position: static;
 }
 .app .battle-meter.health-critical [role="progressbar"] {
   border-color: #ff9284;
