@@ -21,10 +21,18 @@ import "./onboarding.css";
 import "./ui/Blocks.css";
 import "./ui/Feedback.css";
 
-console.log("Hey.. no peeking ;)");
-console.log("Created for the Computer Science and AI class at Beijing Institute of Technology");
-console.log("Created with love by team B.O.T.A.K");
-console.log("Development lead by Devon");
+const consoleHeading =
+  "font: bold 28px monospace; color: #ffd782; background: #211a12; padding: 6px 10px;";
+const consoleCredit =
+  "font: 18px monospace; color: #f5e6d1; background: #211a12; padding: 3px 10px;";
+
+console.log("%cHey.. no peeking ;)", consoleHeading);
+console.log(
+  "%cCreated for the Computer Science and AI class at Beijing Institute of Technology",
+  consoleCredit,
+);
+console.log("%cCreated with love by team B.O.T.A.K", consoleCredit);
+console.log("%cDevelopment lead by Devon", consoleCredit);
 
 createRoot(document.getElementById("root")!).render(
   <GameSoundProvider>
