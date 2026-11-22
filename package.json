@@ -15,7 +15,7 @@
     "check": "tsc -b"
   },
   "dependencies": {
-    "@babylonjs/core": "^8.0.0",
+    "@babylonjs/core": "^9.37.1",
     "@codemirror/commands": "^6.8.0",
     "@codemirror/lang-python": "^6.2.0",
     "@codemirror/state": "^6.5.0",
