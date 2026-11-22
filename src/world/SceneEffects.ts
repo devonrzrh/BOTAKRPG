@@ -4,16 +4,21 @@ import { Color4 } from "@babylonjs/core/Maths/math.color";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { ImageProcessingPostProcess } from "@babylonjs/core/PostProcesses/imageProcessingPostProcess";
 import type { Scene } from "@babylonjs/core/scene";
+import { attachFsrUpscaler, FSR_RENDER_SCALE } from "./FsrUpscaler";
 
 export function attachSceneEffects(
   scene: Scene,
   look: "office" | "network" | "battle",
   enabled: () => boolean,
+  upscaling: () => boolean = () => false,
 ) {
   let grade: ImageProcessingPostProcess | undefined;
   let glow: GlowLayer | undefined;
   let background: Color4 | undefined;
+  let disposeFsr: (() => void) | undefined;
   const clear = () => {
+    disposeFsr?.();
+    disposeFsr = undefined;
     grade?.dispose();
     glow?.dispose();
     grade = undefined;
@@ -24,13 +29,16 @@ export function attachSceneEffects(
     scene.imageProcessingConfiguration.contrast = 1;
   };
   scene.onBeforeRenderObservable.add(() => {
-    if (enabled() === Boolean(grade)) return;
-    if (grade) {
-      clear();
-      return;
-    }
+    const useGrade = enabled();
+    const useFsr = upscaling();
+    if (useGrade === Boolean(grade) && useFsr === Boolean(disposeFsr)) return;
     const camera = scene.activeCamera;
     if (!camera) return;
+    clear();
+    if (!useGrade) {
+      if (useFsr) disposeFsr = attachFsrUpscaler(camera, true);
+      return;
+    }
 
     // Keep the vignette away from the office's wall controls and printed text.
     const office = look === "office";
@@ -50,7 +58,7 @@ export function attachSceneEffects(
       : Constants.TEXTURETYPE_UNSIGNED_BYTE;
     grade = new ImageProcessingPostProcess(
       "scene grade",
-      1,
+      useFsr ? FSR_RENDER_SCALE : 1,
       camera,
       undefined,
       engine,
@@ -59,6 +67,10 @@ export function attachSceneEffects(
     );
     // With post-processing, geometry renders here instead of the antialiased canvas.
     grade.samples = 4;
+    if (useFsr) {
+      // EASU receives the color-graded frame at the same reduced resolution.
+      disposeFsr = attachFsrUpscaler(camera, false);
+    }
     if (!office) {
       glow = new GlowLayer("signal bloom", scene, {
         mainTextureRatio: 0.35,

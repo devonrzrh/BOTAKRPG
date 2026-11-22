@@ -77,6 +77,7 @@ interface Props {
   renderer: RendererPreference;
   shadows: boolean;
   postEffects: boolean;
+  fsr: boolean;
   onGraphicsCheck?: (result: "kept" | "reduced") => void;
   reducedMotion: boolean;
   locked: boolean;
@@ -359,8 +360,11 @@ function WorldCanvas(props: Props) {
       scene,
     );
     camera.mode = ArcRotateCamera.ORTHOGRAPHIC_CAMERA;
-    attachSceneEffects(scene, props.encounter ? "battle" : "network", () =>
-      latest.current.postEffects,
+    attachSceneEffects(
+      scene,
+      props.encounter ? "battle" : "network",
+      () => latest.current.postEffects,
+      () => latest.current.fsr,
     );
     const rank = props.encounterRank ?? "regular";
     const enemyScale = { regular: 1, miniboss: 1.28, boss: 1.42, final: 1.62 }[rank];

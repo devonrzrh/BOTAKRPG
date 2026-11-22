@@ -162,6 +162,7 @@ export const saveSchema = z
       renderer: z.enum(["auto", "webgpu", "webgl"]),
       shadows: z.boolean().default(true),
       postEffects: z.boolean().default(true),
+      fsr: z.boolean().default(false),
       graphicsCheck: z
         .enum(["pending", "kept", "reduced", "manual"])
         .default("pending"),
@@ -225,6 +226,7 @@ export function initialSave(): Save {
       renderer: "auto",
       shadows: true,
       postEffects: true,
+      fsr: false,
       graphicsCheck: "pending",
       reducedMotion: false,
       combatMuted: false,

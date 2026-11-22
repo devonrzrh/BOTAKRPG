@@ -1848,6 +1848,7 @@ export default function App() {
             renderer={save.settings.renderer}
             shadows={save.settings.shadows}
             postEffects={save.settings.postEffects}
+            fsr={save.settings.fsr}
             onGraphicsCheck={
               booted &&
               save.settings.graphicsCheck === "pending" &&
@@ -3054,6 +3055,19 @@ export default function App() {
                       }
                     />{" "}
                     Post-processing effects
+                  </label>
+                  <label className="checkbox-label">
+                    <input
+                      type="checkbox"
+                      checked={save.settings.fsr}
+                      onChange={(e) =>
+                        updateSave((s) => ({
+                          ...s,
+                          settings: { ...s.settings, fsr: e.target.checked },
+                        }))
+                      }
+                    />{" "}
+                    AMD FSR 1 upscaling in the network and battles
                   </label>
                   {save.settings.graphicsCheck === "reduced" && (
                     <p className="muted">
