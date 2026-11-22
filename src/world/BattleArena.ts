@@ -7,6 +7,7 @@ import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { PointLight } from "@babylonjs/core/Lights/pointLight";
 import type { Scene } from "@babylonjs/core/scene";
 import { enemyArchetype, type EncounterRank } from "../game/enemyIdentity";
+import { attachBattleAtmosphere } from "./BattleAtmosphere";
 
 export function battleArenaKind(enemyId: string) {
   const kind = enemyArchetype(enemyId);
@@ -19,11 +20,12 @@ export function battleArenaKind(enemyId: string) {
   return "gateway";
 }
 
-/** Static encounter sets keep the enemy's x=5,z=4 sightline clear. */
+/** Encounter sets keep the enemy's x=5,z=4 sightline clear. */
 export function buildBattleArena(
   scene: Scene,
   enemyId: string,
   rank: EncounterRank = "regular",
+  reducedMotion: () => boolean = () => false,
 ) {
   const kind = battleArenaKind(enemyId);
   const themes = {
@@ -516,6 +518,10 @@ export function buildBattleArena(
   rim.intensity = final ? 1.65 : major ? 1.2 : 0.45;
   rim.range = 7;
   const lights = [key, rim];
+  const disposeAtmosphere =
+    rank === "regular"
+      ? undefined
+      : attachBattleAtmosphere(root, enemyId, rank, rim.diffuse, reducedMotion);
   let disposed = false;
   return {
     kind,
@@ -527,6 +533,7 @@ export function buildBattleArena(
     dispose: () => {
       if (disposed) return;
       disposed = true;
+      disposeAtmosphere?.();
       root.dispose();
       lights.forEach((light) => light.dispose());
       materials.forEach((material) => material.dispose());

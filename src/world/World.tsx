@@ -531,7 +531,12 @@ function WorldCanvas(props: Props) {
       ])
         tree(x, z, 0.85);
     } else if (props.encounter) {
-      const arena = buildBattleArena(scene, enemyId, rank);
+      const arena = buildBattleArena(
+        scene,
+        enemyId,
+        rank,
+        () => latest.current.reducedMotion || motionQuery.matches,
+      );
       disposeBattleArena = arena.dispose;
       const enemyRig = buildEnemyModel(scene, enemyId, enemyScale);
       disposeBattleEffects = attachBattleEffects(

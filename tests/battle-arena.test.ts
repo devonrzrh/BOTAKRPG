@@ -1,5 +1,6 @@
 import { NullEngine } from "@babylonjs/core/Engines/nullEngine";
 import { Scene } from "@babylonjs/core/scene";
+import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { describe, expect, it } from "vitest";
@@ -113,6 +114,37 @@ describe("battle arenas", () => {
       expect(layouts[2].rim).toBeGreaterThan(layouts[1].rim);
       expect(layouts[1].rim).toBeGreaterThan(layouts[0].rim);
       expect(scene.meshes).toHaveLength(0);
+    } finally {
+      scene.dispose();
+      engine.dispose();
+    }
+  });
+
+  it("keeps major encounter particles behind the enemy and honors live reduced motion", () => {
+    const engine = new NullEngine();
+    const scene = new Scene(engine);
+    try {
+      let reducedMotion = true;
+      const arena = buildBattleArena(scene, "echo-7", "final", () => reducedMotion);
+      const flecks = scene.getMeshByName("arena background particles");
+      if (!(flecks instanceof Mesh)) throw new Error("Missing arena particles");
+      expect(flecks.parent).toBe(arena.root);
+      expect(flecks.isPickable).toBe(false);
+      expect(flecks.thinInstanceCount).toBe(104);
+      expect(flecks.thinInstanceGetWorldMatrices().every((matrix) =>
+        matrix.getTranslation().z > 3,
+      )).toBe(true);
+      expect(flecks.isEnabled()).toBe(false);
+      reducedMotion = false;
+      scene.onBeforeRenderObservable.notifyObservers(scene);
+      expect(flecks.isEnabled()).toBe(true);
+      reducedMotion = true;
+      scene.onBeforeRenderObservable.notifyObservers(scene);
+      expect(flecks.isEnabled()).toBe(false);
+      arena.dispose();
+      expect(flecks.isDisposed()).toBe(true);
+      expect(scene.materials).toHaveLength(0);
+      expect(scene.onBeforeRenderObservable.hasObservers()).toBe(false);
     } finally {
       scene.dispose();
       engine.dispose();
