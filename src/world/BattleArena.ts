@@ -505,18 +505,24 @@ export function buildBattleArena(
     ring("command dais circuit", 0, 0.16, 0, span + 0.45, "floor");
     if (final) ring("outer dais circuit", 0, 0.13, 0, span + 1.15, "floor", shell);
   }
-  const key = new PointLight(`${kind} enemy key`, new Vector3(5, major ? 4.4 : 3, 1), scene);
-  key.diffuse = new Color3(0.63, 0.78, 0.86);
-  key.intensity = major ? 1.45 : 1.1;
-  key.range = 10;
+  const key = new PointLight(
+    `${kind} enemy key`,
+    new Vector3(2.1, major ? 5.1 : 3.6, 0.8),
+    scene,
+  );
+  key.diffuse = Color3.FromHexString("#ffebd6");
+  key.specular = Color3.FromHexString("#d0dae0");
+  key.intensity = major ? 1.65 : 1.55;
+  key.range = 14;
   const rim = new PointLight(
     `${kind} backdrop glow`,
-    new Vector3(5, major ? 5.1 : 3.8, 7),
+    new Vector3(7.4, major ? 4.5 : 3.2, 6.4),
     scene,
   );
   rim.diffuse = Color3.FromHexString(accentColor);
-  rim.intensity = final ? 1.65 : major ? 1.2 : 0.45;
-  rim.range = 7;
+  rim.specular = rim.diffuse;
+  rim.intensity = final ? 2.2 : major ? 1.75 : 1.35;
+  rim.range = 9;
   const lights = [key, rim];
   const disposeAtmosphere =
     rank === "regular"

@@ -343,11 +343,24 @@ function WorldCanvas(props: Props) {
     camera.lowerRadiusLimit = 18;
     camera.upperRadiusLimit = 32;
     camera.panningSensibility = 0;
-    new HemisphericLight("sky", new Vector3(0.3, 1, 0.2), scene).intensity =
-      0.58;
-    const sun = new DirectionalLight("sun", new Vector3(-0.5, -1, 0.5), scene);
-    sun.intensity = majorEncounter ? 0.42 : 0.72;
-    sun.diffuse = new Color3(1, 0.93, 0.79);
+    const inMaze = props.scene === "maze";
+    const sky = new HemisphericLight(
+      "sky fill",
+      new Vector3(0.3, 1, -0.35),
+      scene,
+    );
+    sky.intensity = props.encounter ? 0.55 : inMaze ? 0.75 : 0.66;
+    sky.diffuse = Color3.FromHexString("#d3e5ff");
+    sky.groundColor = Color3.FromHexString("#8299b4");
+    if (!props.encounter) {
+      const sun = new DirectionalLight(
+        "network key",
+        new Vector3(0.7, -1, 0.45),
+        scene,
+      );
+      sun.intensity = inMaze ? 0.66 : 0.84;
+      sun.diffuse = Color3.FromHexString(inMaze ? "#eef5ff" : "#ffe0b6");
+    }
     const mat = (name: string, color: string, emissive = false) => {
       const m = new StandardMaterial(name, scene);
       m.diffuseColor = Color3.FromHexString(color);
@@ -484,6 +497,8 @@ function WorldCanvas(props: Props) {
     let disposeBattleArena: (() => void) | undefined;
     if (props.scene === "maze") {
       const m = props.maze;
+      const path = mat("maze path", "#2b424d");
+      const pathInset = mat("maze path inset", "#243944");
       box(
         "maze foundation",
         -0.5,
@@ -510,7 +525,7 @@ function WorldCanvas(props: Props) {
               0.92,
               0.12,
               0.92,
-              (x + y) % 3 ? edge : grass,
+              (x + y) % 3 ? path : pathInset,
             );
         }
       const [gx, gy] = m.goal;

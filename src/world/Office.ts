@@ -50,10 +50,18 @@ export function buildOffice(
     scene,
   );
   ambient.intensity = 0.45;
-  ambient.diffuse = Color3.FromHexString("#adbac4");
-  const light = new PointLight("ceiling light", new Vector3(0, 4.2, 0), scene);
-  light.intensity = 1.4;
-  light.diffuse = Color3.FromHexString("#edbe83");
+  ambient.diffuse = Color3.FromHexString("#c8d8e6");
+  ambient.groundColor = Color3.FromHexString("#717a86");
+
+  const ceilingLight = new PointLight(
+    "ceiling light",
+    new Vector3(0.9, 4.1, -0.7),
+    scene,
+  );
+  ceilingLight.intensity = 1.55;
+  ceilingLight.range = 15;
+  ceilingLight.diffuse = Color3.FromHexString("#ffe0b5");
+  ceilingLight.specular = Color3.FromHexString("#e8cbac");
   const materials = new Map<string, StandardMaterial>();
   const mat = (color: string) => {
     if (materials.has(color)) return materials.get(color)!;
@@ -84,6 +92,7 @@ export function buildOffice(
     if (parent) mesh.parent = parent;
     return mesh;
   };
+  mat("#d9ae70").emissiveColor = Color3.FromHexString("#a5642f");
   box("floor", 0, -0.12, 0, 11, 0.2, 11, "#332e2a");
   box("ceiling", 0, 4.7, 0, 11, 0.15, 11, "#17222a");
   for (let i = 0; i < 4; i++) {
@@ -94,7 +103,7 @@ export function buildOffice(
     box("wood rail", 0, 1.14, 4.92, 10.5, 0.08, 0.14, "#54473b", wall);
     for (let x = -5; x <= 5; x += 1.25)
       box("wall seam", x, 2.8, 5.04, 0.018, 3.3, 0.02, "#1e2a31", wall);
-    const sconce = box(
+    box(
       "sconce",
       -4,
       3.2,
@@ -105,7 +114,6 @@ export function buildOffice(
       "#d9ae70",
       wall,
     );
-    sconce.material = mat("#d9ae70");
     if (i === 0 || i === 2) {
       box(
         i === 0 ? "investigation board" : "quest board",
@@ -268,6 +276,25 @@ export function buildOffice(
       box("redacted evidence mark", -2.75, 1.368, 3.22, 0.24, 0.008, 0.045, "#964d39", wall);
       box("lamp stem", -3, 1.9, 4.4, 0.05, 1.6, 0.05, "#b09566", wall);
       box("lamp shade", -3, 2.65, 4.4, 0.8, 0.25, 0.5, "#957953", wall);
+      const deskLamp = new PointLight(
+        "desk lamp",
+        new Vector3(-3, 2.48, 4.18),
+        scene,
+      );
+      deskLamp.parent = wall;
+      deskLamp.diffuse = Color3.FromHexString("#ffc27c");
+      deskLamp.intensity = 1.25;
+      deskLamp.range = 5.5;
+
+      const windowLight = new PointLight(
+        "night window fill",
+        new Vector3(0, 3.55, 4.55),
+        scene,
+      );
+      windowLight.parent = wall;
+      windowLight.diffuse = Color3.FromHexString("#83b8ef");
+      windowLight.intensity = 1.05;
+      windowLight.range = 7;
     }
   }
   let px = 0,
