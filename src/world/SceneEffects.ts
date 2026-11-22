@@ -57,6 +57,8 @@ export function attachSceneEffects(
       false,
       textureType,
     );
+    // With post-processing, geometry renders here instead of the antialiased canvas.
+    grade.samples = 4;
     if (!office) {
       glow = new GlowLayer("signal bloom", scene, {
         mainTextureRatio: 0.35,
