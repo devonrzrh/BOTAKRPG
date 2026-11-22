@@ -308,8 +308,12 @@ export default function App() {
   const [officePage, setOfficePage] = useState(0);
   const [bookOpen, setBookOpen] = useState(false);
   const [bookClosing, setBookClosing] = useState(false);
+  const [bookReady, setBookReady] = useState(false);
   useEffect(() => {
-    if (!bookOpen) setBookClosing(false);
+    if (!bookOpen) {
+      setBookClosing(false);
+      setBookReady(false);
+    }
   }, [bookOpen]);
   const [questSelection, setQuestSelection] = useState<string>();
   const [questView, setQuestView] = useState<GraphView>();
@@ -543,17 +547,40 @@ export default function App() {
       active = false;
     };
   }, [updateMaze]);
+  const persistSave = useCallback(() => {
+    void storeSave(saveRef.current)
+      .then(() => setSaveStatus("All progress saved locally"))
+      .catch(() => {
+        setSaveStatus("Save failed. Export your progress to keep it.");
+      });
+  }, []);
+  const updateReading = (
+    edit: (reading: Save["reading"]) => Save["reading"],
+    persist = true,
+  ) => {
+    const previous = saveRef.current.reading;
+    const reading = edit(previous);
+    if (reading === previous) return;
+    updateSave((s) => ({ ...s, reading }));
+    if (persist && booted && storageReady) persistSave();
+  };
   useEffect(() => {
     if (!booted || !storageReady) return;
-    const timeout = setTimeout(() => {
-      void storeSave(save)
-        .then(() => setSaveStatus("All progress saved locally"))
-        .catch(() => {
-          setSaveStatus("Save failed. Export your progress to keep it.");
-        });
-    }, 450);
+    const timeout = setTimeout(persistSave, 450);
     return () => clearTimeout(timeout);
-  }, [save, booted, storageReady]);
+  }, [save, booted, storageReady, persistSave]);
+  useEffect(() => {
+    if (!booted || !storageReady) return;
+    const onVisibility = () => {
+      if (document.hidden) persistSave();
+    };
+    document.addEventListener("visibilitychange", onVisibility);
+    window.addEventListener("pagehide", persistSave);
+    return () => {
+      document.removeEventListener("visibilitychange", onVisibility);
+      window.removeEventListener("pagehide", persistSave);
+    };
+  }, [booted, storageReady, persistSave]);
   useEffect(() => {
     runner.current = new PythonRunner(
       async (command) => {
@@ -1097,9 +1124,22 @@ export default function App() {
       mode === "blocks" ? generated : saveRef.current.code,
     );
   };
+  const selectReadingLesson = (id: string) => {
+    setLessonId(id);
+    const lesson = lessons.find((item) => item.id === id);
+    if (!lesson) return;
+    updateReading((reading) => {
+      const lastChapterByTopic = reading.lastChapterByTopic;
+      if (lastChapterByTopic?.[lesson.topic] === id) return reading;
+      return {
+        ...reading,
+        lastChapterByTopic: { ...lastChapterByTopic, [lesson.topic]: id },
+      };
+    });
+  };
   const openLesson = (id: string) => {
     if (tutorialRef.current) closeTutorial();
-    setLessonId(id);
+    selectReadingLesson(id);
     setOfficePage(0);
     if (officeFallback) {
       open("library");
@@ -1413,7 +1453,8 @@ export default function App() {
         content,
         lessonId,
         page: officePage,
-        bookOpen: bookOpen && !bookClosing,
+        bookOpen:
+          bookOpen && !bookClosing && homeWall === "bookshelf" && !homeMoving,
         questSelection,
         questView,
         search,
@@ -1431,11 +1472,20 @@ export default function App() {
       noteDraft,
       bookOpen,
       bookClosing,
+      homeWall,
+      homeMoving,
       questSelection,
       questView,
     ],
   );
   const useWorldUi = realm === "desk" && !officeFallback;
+  const showBookReader =
+    bookOpen &&
+    homeWall === "bookshelf" &&
+    !homeMoving &&
+    (officeFallback
+      ? panel === "library"
+      : useWorldUi && (bookReady || bookClosing));
   const bossBattle = FINAL_BOSS_IDS.includes(battle.enemyId),
     battleView = panel === "battle" || settingsFromBattle;
   const battleRank = encounterRank(battle.enemyId, battle.tactics?.boss ?? bossBattle);
@@ -1750,6 +1800,7 @@ export default function App() {
             officeUi={officeUi}
             officeFocused={officeFocused}
             onOfficeAction={handleOfficeAction}
+            onBookReady={setBookReady}
             onRenderFailure={() => setOfficeFallback(true)}
             onRendererReady={() => setOfficeFallback(false)}
             homeWall={homeWall}
@@ -1829,6 +1880,7 @@ export default function App() {
             <section
               className={`activity-panel ${realm === "desk" ? `home-panel home-${homeWall}` : ""} ${panel === "maze" ? "maze-panel" : ""} ${panel === "battle" ? "battle-panel" : ""}`}
               aria-label={`${panel} activity`}
+              inert={panel === "library" && bookOpen}
             >
               {panel !== "battle" && (
                 <header className="panel-header">
@@ -1906,7 +1958,7 @@ export default function App() {
                         <button
                           key={lesson.id}
                           className={`lesson-link ${lessonId === lesson.id ? "selected" : ""}`}
-                          onClick={() => setLessonId(lesson.id)}
+                          onClick={() => openLesson(lesson.id)}
                         >
                           <span>
                             0{index + 1} · {topicNames[lesson.topic]}
@@ -1952,7 +2004,7 @@ export default function App() {
                       <p className="prerequisite">
                         Builds on{" "}
                         {currentLesson.prerequisites.map((id) => (
-                          <button key={id} onClick={() => setLessonId(id)}>
+                          <button key={id} onClick={() => openLesson(id)}>
                             {lessons.find((l) => l.id === id)?.title}
                           </button>
                         ))}
@@ -3109,7 +3161,7 @@ export default function App() {
               )}
             </section>
           )}
-        {realm === "desk" && officeFallback && (
+        {realm === "desk" && officeFallback && !bookOpen && (
           <nav className="room-nav" aria-label="Room walls">
             {[
               ["investigation", "Investigation wall", "desk"],
@@ -3127,7 +3179,7 @@ export default function App() {
             ))}
           </nav>
         )}
-        {useWorldUi && bookOpen && homeWall === "bookshelf" && !homeMoving && (
+        {showBookReader && (
           <BookReader
             lessons={lessons}
             lesson={currentLesson}
@@ -3136,29 +3188,26 @@ export default function App() {
             note={save.notes[lessonId] ?? ""}
             reading={save.reading}
             onPreferences={(mode, fontSize) =>
-              updateSave((s) => ({
-                ...s,
-                reading: { ...s.reading, mode, fontSize },
-              }))
+              updateReading((reading) => ({ ...reading, mode, fontSize }))
             }
             onPosition={(id, position) =>
-              updateSave((s) => {
-                const current = s.reading.positions[id];
-                if (
-                  current?.block === position.block &&
-                  current?.offset === position.offset
-                )
-                  return s;
-                return {
-                  ...s,
-                  reading: {
-                    ...s.reading,
-                    positions: { ...s.reading.positions, [id]: position },
-                  },
-                };
-              })
+              updateReading(
+                (reading) => {
+                  const current = reading.positions[id];
+                  if (
+                    current?.block === position.block &&
+                    current?.offset === position.offset
+                  )
+                    return reading;
+                  return {
+                    ...reading,
+                    positions: { ...reading.positions, [id]: position },
+                  };
+                },
+                saveRef.current.reading.mode === "book",
+              )
             }
-            onSelect={setLessonId}
+            onSelect={selectReadingLesson}
             onClosing={() => setBookClosing(true)}
             onClose={() => {
               setBookOpen(false);

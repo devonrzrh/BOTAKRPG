@@ -786,7 +786,10 @@ export function createOfficeUi(input: OfficeUiInput): SurfaceModel[] {
     );
     // Physical volumes remain subject indexes, including when search finds a chapter.
     lessons.slice(0, 3).forEach((volume, index) => {
-      const match = visible.find((l) => l.topic === volume.topic);
+      const lastChapter = input.save.reading.lastChapterByTopic?.[volume.topic];
+      const match =
+        visible.find((l) => l.id === lastChapter) ??
+        visible.find((l) => l.topic === volume.topic);
       if (match)
         button(
           library,

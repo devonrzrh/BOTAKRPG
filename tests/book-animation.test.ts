@@ -8,10 +8,12 @@ import {
 it("pulls the closed book clear before opening, then closes before returning", () => {
   expect(bookPose(0).travel).toBe(0);
   expect(bookPose(0).coverYaw).toBeCloseTo(-Math.PI);
-  expect(bookPose(0.4).opening).toBe(0);
-  expect(bookPose(0.42).opening).toBe(0);
-  expect(bookPose(0.55).travel).toBe(1);
+  expect(bookPose(0.2).pull).toBeGreaterThan(0);
+  expect(bookPose(0.2).travel).toBe(0);
+  expect(bookPose(0.33).pull).toBe(1);
+  expect(bookPose(0.33).opening).toBe(0);
   expect(bookPose(0.55).opening).toBeGreaterThan(0);
+  expect(bookPose(0.55).travel).toBeLessThan(1);
   expect(bookPose(1).travel).toBe(1);
   expect(bookPose(1).coverYaw).toBeCloseTo(0);
   expect(bookPose(0.8).lift).toBeGreaterThan(0);
@@ -38,6 +40,7 @@ it("swings the cover toward the reader instead of through the back pages", () =>
   for (let i = 0; i < 100; i++) {
     const previous = bookPose(i / 100),
       next = bookPose((i + 1) / 100);
+    expect(next.pull).toBeGreaterThanOrEqual(previous.pull);
     expect(next.travel).toBeGreaterThanOrEqual(previous.travel);
     expect(next.opening).toBeGreaterThanOrEqual(previous.opening);
     expect(next.coverYaw).toBeGreaterThanOrEqual(previous.coverYaw);

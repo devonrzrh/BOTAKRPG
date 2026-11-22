@@ -20,8 +20,15 @@ it("round trips reading preferences and per lesson positions", () => {
     mode: "fullscreen",
     fontSize: 24,
     positions: { "graph-search": { block: 7, offset: 0.625 } },
+    lastChapterByTopic: { algorithms: "graph-search" },
   };
   expect(parseSave(JSON.parse(JSON.stringify(save)), content)).toEqual(save);
+});
+
+it("rejects a saved volume chapter from a different subject", () => {
+  const save = initialSave();
+  save.reading.lastChapterByTopic = { ai: "graph-search" };
+  expect(() => parseSave(save, content)).toThrow(/invalid reading chapter/i);
 });
 
 it("rejects invalid reading preferences, positions, and lesson ids", () => {

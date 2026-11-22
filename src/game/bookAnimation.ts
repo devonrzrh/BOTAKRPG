@@ -10,20 +10,21 @@ export function bookPose(progress: number, readingScale = 0.46) {
     n = clamp(n);
     return n * n * n * (n * (n * 6 - 15) + 10);
   };
-  // Pull the closed volume clear of the shelf first. The cover only starts to
-  // turn once the book is away from the other spines, then settles open.
-  const travel = smooth(progress / 0.48),
-    opening = smooth((progress - 0.5) / 0.5);
+  const openingStart = 0.34;
+  const pull = smooth(progress / 0.31),
+    travel = smooth((progress - 0.23) / 0.67),
+    opening = smooth((progress - openingStart) / (1 - openingStart));
   return {
+    pull,
     travel,
     opening,
     // A small lift makes the book leave the shelf rather than slide through it.
-    lift: Math.sin(travel * Math.PI) * 0.14,
+    lift: Math.sin(travel * Math.PI) * 0.08,
     scale: BOOK_SHELF_SCALE + (readingScale - BOOK_SHELF_SCALE) * travel,
     coverYaw: -Math.PI * (1 - opening),
   };
 }
-export const BOOK_OPEN_MS = 900;
-export const BOOK_CLOSE_MS = 780;
-export const BOOK_READER_FADE_MS = 180;
+export const BOOK_OPEN_MS = 640;
+export const BOOK_CLOSE_MS = 540;
+export const BOOK_READER_FADE_MS = 140;
 export const BOOK_SHELF_SCALE = 1.1 / 3.34;

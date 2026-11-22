@@ -1,5 +1,10 @@
 import { z } from "zod";
-import type { Content, Quest, Skill } from "../content/schema";
+import {
+  lessonSchema,
+  type Content,
+  type Quest,
+  type Skill,
+} from "../content/schema";
 import { STARTER_CODE } from "./maze";
 import { finaleAvailable, questUnlocked } from "./investigation";
 import { DEFAULT_PLAYER_NAME, assertPlayerName } from "./player";
@@ -60,6 +65,9 @@ const readingSchema = z
         }),
       )
       .default({}),
+    lastChapterByTopic: z
+      .record(lessonSchema.shape.topic, z.string())
+      .optional(),
   })
   .default({ mode: "book", fontSize: 22, positions: {} });
 const signalSampleSchema = z.object({
@@ -427,6 +435,15 @@ export function parseSave(input: unknown, content: Content): Save {
   check(save.bookmarks, "lesson");
   check(Object.keys(save.notes), "lesson");
   check(Object.keys(save.reading.positions), "lesson");
+  for (const [topic, id] of Object.entries(
+    save.reading.lastChapterByTopic ?? {},
+  )) {
+    const lesson = content.entities.find((e) => e.id === id);
+    if (lesson?.type !== "lesson" || lesson.topic !== topic)
+      throw new Error(
+        `Save contains invalid reading chapter for ${topic}: ${id}`,
+      );
+  }
   for (const [id, run] of Object.entries(save.puzzleRuns)) {
     const activity = content.entities.find((e) => e.id === id);
     if (

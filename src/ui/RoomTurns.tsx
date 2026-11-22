@@ -91,12 +91,13 @@ export function RoomTurns({
             disabled={disabled}
             aria-label={`Turn ${direction === -1 ? "left" : "right"} to ${labels[target]}`}
             onClick={() => turn(direction)}
-            onPointerEnter={(e) => {
+            onPointerMove={(e) => {
               if (
                 e.pointerType === "touch" ||
                 !allowHover ||
                 disabled ||
-                consumed.current
+                consumed.current ||
+                timer.current
               )
                 return;
               cancel();

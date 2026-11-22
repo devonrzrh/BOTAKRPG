@@ -60,6 +60,7 @@ interface Props {
   officeUi?: SurfaceModel[];
   officeFocused?: string | null;
   onOfficeAction?: (action: OfficeAction) => void;
+  onBookReady?: (ready: boolean) => void;
   onRenderFailure?: () => void;
   onRendererReady?: () => void;
   scene: SceneId;
@@ -292,6 +293,7 @@ function WorldCanvas(props: Props) {
           reducedMotion: latest.current.reducedMotion || motionQuery.matches,
         }),
         (action) => latest.current.onOfficeAction?.(action),
+        (ready) => latest.current.onBookReady?.(ready),
       );
       return () => {
         disposeUi();

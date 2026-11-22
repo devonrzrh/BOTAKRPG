@@ -171,3 +171,15 @@ it("selects physical volumes before exposing the open book controls", () => {
     expect(b.y + b.h).toBeLessThanOrEqual(SURFACE_HEIGHT);
   }
 });
+
+it("reopens a volume at its last chapter when it matches the library search", () => {
+  const data = { ...input(), bookOpen: false };
+  data.save.reading.lastChapterByTopic = { algorithms: "source-alg-09" };
+  const volumeAction = () =>
+    createOfficeUi(data)
+      .find((model) => model.id === "bookshelf")!
+      .buttons.find((button) => button.id === "lesson-graph-search")?.action;
+  expect(volumeAction()?.id).toBe("source-alg-09");
+  data.search = "Finding a way through";
+  expect(volumeAction()?.id).toBe("graph-search");
+});

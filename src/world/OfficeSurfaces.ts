@@ -13,7 +13,6 @@ import type { SurfaceModel, SurfaceButton, OfficeAction } from "../game/officeUi
 import {
   BOOK_OPEN_MS,
   BOOK_CLOSE_MS,
-  BOOK_SHELF_SCALE,
   bookPose,
   bookReadingScale,
 } from "../game/bookAnimation";
@@ -42,6 +41,7 @@ export function attachOfficeSurfaces(
   surface: HTMLElement,
   state: () => OfficeSurfaceState,
   action: (a: OfficeAction) => void,
+  onBookReady: (ready: boolean) => void,
 ) {
   const anchors = new Map<HomeWall, TransformNode>();
   for (const id of Object.keys(wallYaw) as HomeWall[]) {
@@ -525,7 +525,7 @@ export function attachOfficeSurfaces(
     };
     p.metadata = { propPage: widget };
     widgets.push(widget);
-    return { id: book.id, root, index };
+    return { id: book.id, root, index, cover: p.material };
   });
   // Small library index card; the shelf itself remains completely visible.
   sheet(
@@ -674,37 +674,26 @@ export function attachOfficeSurfaces(
       c.setTransform(2, 0, 0, 2, 0, 0);
       c.fillStyle = "#e2d4b4";
       c.fillRect(0, 0, 1024, 576);
-      const coverTexture = (outside.material as StandardMaterial)
-        .diffuseTexture as DynamicTexture;
-      const coverContext = coverTexture.getContext() as unknown as Ctx;
-      coverContext.fillStyle = wall === "desk" ? "#45352e" : "#4b5351";
-      coverContext.fillRect(0, 0, 1024, 1024);
-      coverContext.strokeStyle = "#ba9d65";
-      coverContext.lineWidth = 8;
-      coverContext.strokeRect(70, 65, 884, 894);
-      ink(coverContext, model.title, 110, 280, 55, 810, "#d8bd83");
-      coverTexture.update();
-      // The 3D prop is a transition, not a second reading surface. Blank pages
-      // avoid duplicate controls and warped lesson text during the opening.
       if (wall === "bookshelf") {
-        // Quiet paper texture bridges the prop and the reader without loading copy.
-        c.strokeStyle = "#b7a78644";
-        c.lineWidth = 1;
-        for (let row = 0; row < 15; row++) {
-          for (const x of [75, 590]) {
-            c.beginPath();
-            c.moveTo(x, 120 + row * 22);
-            c.lineTo(x + (row % 4 === 3 ? 240 : 345), 120 + row * 22);
-            c.stroke();
-          }
-        }
-        c.strokeStyle = "#b7a786";
-        c.lineWidth = 1;
-        c.beginPath();
-        c.moveTo(512, 70);
-        c.lineTo(512, 330);
-        c.stroke();
+        const gutter = c.createLinearGradient(0, 0, 1024, 0);
+        gutter.addColorStop(0, "#e9ddc2");
+        gutter.addColorStop(0.47, "#f2e8d0");
+        gutter.addColorStop(0.5, "#b7a582");
+        gutter.addColorStop(0.53, "#f2e8d0");
+        gutter.addColorStop(1, "#e9ddc2");
+        c.fillStyle = gutter;
+        c.fillRect(0, 0, 1024, 576);
       } else {
+        const coverTexture = (outside.material as StandardMaterial)
+          .diffuseTexture as DynamicTexture;
+        const coverContext = coverTexture.getContext() as unknown as Ctx;
+        coverContext.fillStyle = "#45352e";
+        coverContext.fillRect(0, 0, 1024, 1024);
+        coverContext.strokeStyle = "#ba9d65";
+        coverContext.lineWidth = 8;
+        coverContext.strokeRect(70, 65, 884, 894);
+        ink(coverContext, model.title, 110, 280, 55, 810, "#d8bd83");
+        coverTexture.update();
         zones = drawLedgerSurface(c, model, selected);
       }
       pages.forEach((page, index) => {
@@ -716,7 +705,7 @@ export function attachOfficeSurfaces(
         t.update();
       });
     };
-    return { root, hinge, pages, draw, get zones() { return zones; } };
+    return { root, hinge, pages, outside, draw, get zones() { return zones; } };
   };
   const reading = makeBook("selected reference book", "bookshelf"),
     ledger = makeBook("clue ledger", "desk");
@@ -726,7 +715,9 @@ export function attachOfficeSurfaces(
   ledger.hinge.rotation.y = 0;
   let progress = 0,
     activeBook = "",
-    lastReadingModel: SurfaceModel | null = null;
+    activeTopic = "",
+    bookReady = false,
+    paperDrawn = false;
   const ledgerPages = new Map<AbstractMesh, number>();
   for (const page of reading.pages) page.isPickable = false;
   ledger.pages.forEach((p, side) => {
@@ -736,8 +727,9 @@ export function attachOfficeSurfaces(
     const s = state(),
       library = modelFor("bookshelf");
     if (!library) return;
-    if (progress === 0 && library.selectedLesson !== activeBook) {
+    if (progress === 0) {
       activeBook = library.selectedLesson ?? books[0]?.id ?? "";
+      activeTopic = library.selectedTopic ?? "";
     }
     const target = library.bookOpen ? 1 : 0,
       dt = Math.min(0.05, scene.getEngine().getDeltaTime() / 1000);
@@ -756,31 +748,37 @@ export function attachOfficeSurfaces(
     const aspect =
       scene.getEngine().getRenderWidth() /
       Math.max(1, scene.getEngine().getRenderHeight());
+    const readingDistance = 2.84;
     const pose = bookPose(
         progress,
-        bookReadingScale(aspect, camera?.fov ?? 1.03, 3.46) * 0.87,
+        bookReadingScale(aspect, camera?.fov ?? 1.03, readingDistance) * 0.95,
       ),
       volume =
         volumes.find((v) => v.id === activeBook) ??
-        volumes.find((v) => books[v.index].topic === library.selectedTopic) ??
+        volumes.find((v) => books[v.index].topic === activeTopic) ??
         volumes[0],
       x = volume ? -2.2 + volume.index * 2.2 : 0;
-    reading.root.setEnabled(progress > 0.001);
-    reading.root.position = Vector3.Lerp(
-      new Vector3(x - 1.45 * BOOK_SHELF_SCALE, 2.12, 4.38),
-      new Vector3(0, 2.2 + pose.lift, 3.46),
-      pose.travel,
+    reading.root.setEnabled(progress > 0);
+    reading.root.position.set(
+      x * (1 - pose.travel) - 1.45 * pose.scale * (1 - pose.opening),
+      2.12 + 0.08 * pose.travel + pose.lift,
+      4.38 - 0.55 * pose.pull - (4.38 - 0.55 - readingDistance) * pose.travel,
     );
     reading.root.scaling.setAll(pose.scale);
     reading.root.rotation.x = -0.035 * Math.sin(pose.travel * Math.PI);
     reading.hinge.rotation.y = pose.coverYaw;
+    if (!paperDrawn) {
+      reading.draw(library, null);
+      paperDrawn = true;
+    }
+    if (volume?.cover) reading.outside.material = volume.cover;
     for (const v of volumes)
-      v.root.setEnabled(v.id !== volume?.id || progress < 0.01);
-    if (library.bookOpen) lastReadingModel = library;
-    reading.draw(
-      lastReadingModel ?? library,
-      s.wall === "bookshelf" ? (s.focused ?? hoverControl) : null,
-    );
+      v.root.setEnabled(v !== volume || progress === 0);
+    const arrived = target === 1 && progress === 1;
+    if (arrived !== bookReady) {
+      bookReady = arrived;
+      onBookReady(arrived);
+    }
     ledger.draw(
       modelFor("desk"),
       s.wall === "desk" ? (s.focused ?? hoverControl) : null,
