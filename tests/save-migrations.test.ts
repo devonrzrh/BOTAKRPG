@@ -28,14 +28,19 @@ const route = content.entities.find(
 )!;
 
 describe("journal migration", () => {
-  it("defaults shadows off for existing journals and preserves opt-in", () => {
+  it("defaults missing graphics preferences on and preserves saved choices", () => {
     const save = initialSave();
-    const { shadows, ...previousSettings } = save.settings;
-    expect(shadows).toBe(false);
+    const { shadows, postEffects, graphicsCheck, ...previousSettings } = save.settings;
+    expect([shadows, postEffects, graphicsCheck]).toEqual([true, true, "pending"]);
     expect(parseSave({ ...save, settings: previousSettings }, content)).toEqual(
       save,
     );
-    save.settings.shadows = true;
+    expect(parseSave({
+      ...save,
+      settings: { ...previousSettings, shadows: false },
+    }, content).settings.shadows).toBe(false);
+    save.settings.shadows = false;
+    save.settings.graphicsCheck = "manual";
     expect(parseSave(JSON.parse(JSON.stringify(save)), content)).toEqual(save);
   });
 
@@ -165,7 +170,7 @@ describe("journal migration", () => {
       story: { ...input.story, legacyFinale: false },
       supply: initialSave().supply,
       character: { ...input.character, skills: ["insight", "ward", "trace"] },
-      settings: { ...input.settings, shadows: false },
+      settings: { ...input.settings, shadows: true, postEffects: true, graphicsCheck: "pending" },
     });
     expect(parseSave(JSON.parse(JSON.stringify(save)), content)).toEqual(save);
   });
@@ -247,7 +252,7 @@ describe("journal migration", () => {
     expect(local).toEqual({
       ...input,
       version: 7,
-      settings: { ...input.settings, shadows: false },
+      settings: { ...input.settings, shadows: true, postEffects: true, graphicsCheck: "pending" },
       puzzlePrograms: {},
       finaleOutcome: null,
       curriculumVersion: 3,

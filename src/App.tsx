@@ -1446,6 +1446,29 @@ export default function App() {
       }
     }
   }, []);
+  const finishGraphicsCheck = (result: "kept" | "reduced") => {
+    if (saveRef.current.settings.graphicsCheck !== "pending") return;
+    updateSave((s) => ({
+      ...s,
+      settings: {
+        ...s.settings,
+        graphicsCheck: result,
+        ...(result === "reduced" ? { shadows: false, postEffects: false } : {}),
+      },
+    }));
+    if (result === "reduced")
+      notify(
+        "Frame rate was low, so shadows and post-processing were turned off. You can turn either back on in Settings & saves.",
+      );
+  };
+  const setGraphicsOption = (
+    option: "shadows" | "postEffects",
+    enabled: boolean,
+  ) =>
+    updateSave((s) => ({
+      ...s,
+      settings: { ...s.settings, [option]: enabled, graphicsCheck: "manual" },
+    }));
   const officeUi = useMemo(
     () =>
       createOfficeUi({
@@ -1824,6 +1847,22 @@ export default function App() {
             maze={maze}
             renderer={save.settings.renderer}
             shadows={save.settings.shadows}
+            postEffects={save.settings.postEffects}
+            onGraphicsCheck={
+              booted &&
+              save.settings.graphicsCheck === "pending" &&
+              save.story.prologueSeen &&
+              !intakeOpen &&
+              !prologueReplay &&
+              !homeMoving &&
+              !bookOpen &&
+              !dialogueId &&
+              !cutsceneId &&
+              !tutorialId &&
+              (!panel || panel === "maze" || panel === "battle")
+                ? finishGraphicsCheck
+                : undefined
+            }
             reducedMotion={save.settings.reducedMotion}
             locked={
               intakeOpen ||
@@ -3001,17 +3040,27 @@ export default function App() {
                       type="checkbox"
                       checked={save.settings.shadows}
                       onChange={(e) =>
-                        updateSave((s) => ({
-                          ...s,
-                          settings: {
-                            ...s.settings,
-                            shadows: e.target.checked,
-                          },
-                        }))
+                        setGraphicsOption("shadows", e.target.checked)
                       }
                     />{" "}
                     Cast shadows in the office and battles
                   </label>
+                  <label className="checkbox-label">
+                    <input
+                      type="checkbox"
+                      checked={save.settings.postEffects}
+                      onChange={(e) =>
+                        setGraphicsOption("postEffects", e.target.checked)
+                      }
+                    />{" "}
+                    Post-processing effects
+                  </label>
+                  {save.settings.graphicsCheck === "reduced" && (
+                    <p className="muted">
+                      Shadows and post-processing were turned off after the
+                      first performance check.
+                    </p>
+                  )}
                   <label className="checkbox-label">
                     <input
                       type="checkbox"

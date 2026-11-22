@@ -160,7 +160,11 @@ export const saveSchema = z
     trialBest: z.number().nonnegative().nullable(),
     settings: z.object({
       renderer: z.enum(["auto", "webgpu", "webgl"]),
-      shadows: z.boolean().default(false),
+      shadows: z.boolean().default(true),
+      postEffects: z.boolean().default(true),
+      graphicsCheck: z
+        .enum(["pending", "kept", "reduced", "manual"])
+        .default("pending"),
       reducedMotion: z.boolean(),
       combatMuted: z.boolean().default(false),
       battleAutoAdvance: z.boolean().default(true),
@@ -219,7 +223,9 @@ export function initialSave(): Save {
     trialBest: null,
     settings: {
       renderer: "auto",
-      shadows: false,
+      shadows: true,
+      postEffects: true,
+      graphicsCheck: "pending",
       reducedMotion: false,
       combatMuted: false,
       battleAutoAdvance: true,

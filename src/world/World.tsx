@@ -26,6 +26,8 @@ import { buildEnemyModel } from "./EnemyModel";
 import type { EncounterRank } from "../game/enemyIdentity";
 import { buildBattleArena } from "./BattleArena";
 import { attachSoftShadows } from "./SoftShadows";
+import { attachSceneEffects } from "./SceneEffects";
+import { graphicsCheckResult } from "../game/graphicsCheck";
 import { attachWorldParticles } from "./WorldParticles";
 import type { BattleCue } from "../game/combatPresentation";
 import "@babylonjs/core/Rendering/edgesRenderer";
@@ -73,6 +75,8 @@ interface Props {
   maze: Maze;
   renderer: RendererPreference;
   shadows: boolean;
+  postEffects: boolean;
+  onGraphicsCheck?: (result: "kept" | "reduced") => void;
   reducedMotion: boolean;
   locked: boolean;
   onInteract: (id: string) => void;
@@ -139,6 +143,14 @@ function WorldCanvas(props: Props) {
   useEffect(() => {
     let disposed = false;
     let engine: AbstractEngine | null = null;
+    let checkedScene: Scene | null = null;
+    let windows: number[] = [];
+    let warmingUp = true;
+    const resetGraphicsCheck = () => {
+      checkedScene = null;
+      windows = [];
+      warmingUp = true;
+    };
     const start = async () => {
       try {
         if (props.renderer !== "webgl") {
@@ -182,6 +194,15 @@ function WorldCanvas(props: Props) {
         engine.runRenderLoop(() => {
           const scene = sceneRef.current;
           if (!scene) return;
+          const check = document.hidden
+            ? undefined
+            : latest.current.onGraphicsCheck;
+          if (check && checkedScene !== scene) {
+            resetGraphicsCheck();
+            checkedScene = scene;
+          } else if (!check && checkedScene) {
+            resetGraphicsCheck();
+          }
           const actor = actorRef.current;
           if (actor) {
             const p = latest.current;
@@ -217,6 +238,15 @@ function WorldCanvas(props: Props) {
           if (performance.now() - lastReport > 1200) {
             const sorted = [...ticks].sort((a, b) => a - b),
               avg = ticks.reduce((a, b) => a + b, 0) / (ticks.length || 1);
+            if (check && windows.length < 3 && delta > 0 && scene.isReady()) {
+              if (warmingUp) {
+                warmingUp = false;
+              } else {
+                windows.push(sorted[Math.floor(sorted.length / 2)] ?? delta);
+                const result = graphicsCheckResult(windows);
+                if (result) check(result);
+              }
+            }
             latest.current.onMetrics({
               backend: engine!.isWebGPU ? "WebGPU" : "WebGL2",
               fps: Math.round(1000 / (avg || 16)),
@@ -246,11 +276,13 @@ function WorldCanvas(props: Props) {
       if (!disposed && engine && engineRef.current === engine) engine.resize();
     };
     window.addEventListener("resize", resize);
+    document.addEventListener("visibilitychange", resetGraphicsCheck);
     const sizeObserver = new ResizeObserver(resize);
     if (canvas.current) sizeObserver.observe(canvas.current);
     return () => {
       disposed = true;
       window.removeEventListener("resize", resize);
+      document.removeEventListener("visibilitychange", resetGraphicsCheck);
       sizeObserver.disconnect();
       sceneRef.current?.dispose();
       sceneRef.current = null;
@@ -295,6 +327,15 @@ function WorldCanvas(props: Props) {
         (action) => latest.current.onOfficeAction?.(action),
         (ready) => latest.current.onBookReady?.(ready),
       );
+      attachSceneEffects(
+        scene,
+        "office",
+        () =>
+          latest.current.postEffects &&
+          !latest.current.officeUi?.some(
+            (model) => model.id === "bookshelf" && model.bookOpen,
+          ),
+      );
       return () => {
         disposeUi();
         disposeOffice();
@@ -313,6 +354,9 @@ function WorldCanvas(props: Props) {
       scene,
     );
     camera.mode = ArcRotateCamera.ORTHOGRAPHIC_CAMERA;
+    attachSceneEffects(scene, props.encounter ? "battle" : "network", () =>
+      latest.current.postEffects,
+    );
     const rank = props.encounterRank ?? "regular";
     const enemyScale = { regular: 1, miniboss: 1.28, boss: 1.42, final: 1.62 }[rank];
     const majorEncounter = props.encounter && rank !== "regular";
