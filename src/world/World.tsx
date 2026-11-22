@@ -29,6 +29,7 @@ import { attachSoftShadows } from "./SoftShadows";
 import { attachSceneEffects } from "./SceneEffects";
 import { graphicsCheckResult } from "../game/graphicsCheck";
 import { attachWorldParticles } from "./WorldParticles";
+import { attachExplorationMotes } from "./AmbientParticles";
 import type { BattleCue } from "../game/combatPresentation";
 import "@babylonjs/core/Rendering/edgesRenderer";
 import { PointerEventTypes } from "@babylonjs/core/Events/pointerEvents";
@@ -301,6 +302,9 @@ function WorldCanvas(props: Props) {
     sceneRef.current = scene;
     if (props.scene === "desk") {
       actorRef.current = null;
+      const readingBook = () => latest.current.officeUi?.find((model) =>
+        model.id === "bookshelf",
+      )?.bookOpen ?? false;
       const disposeOffice = buildOffice(
         scene,
         canvas.current!.parentElement!,
@@ -308,8 +312,7 @@ function WorldCanvas(props: Props) {
           wall: latest.current.homeWall ?? "investigation",
           reducedMotion: latest.current.reducedMotion || motionQuery.matches,
           locked: latest.current.homeLookLocked ?? false,
-          reading: latest.current.officeUi?.find((m) => m.id === "bookshelf")
-            ?.bookOpen,
+          reading: readingBook(),
         }),
         () => sound("cameraMove"),
         () => latest.current.shadows,
@@ -330,13 +333,15 @@ function WorldCanvas(props: Props) {
       attachSceneEffects(
         scene,
         "office",
-        () =>
-          latest.current.postEffects &&
-          !latest.current.officeUi?.some(
-            (model) => model.id === "bookshelf" && model.bookOpen,
-          ),
+        () => latest.current.postEffects && !readingBook(),
+      );
+      const disposeMotes = attachExplorationMotes(
+        scene,
+        "desk",
+        () => latest.current.reducedMotion || motionQuery.matches || readingBook(),
       );
       return () => {
+        disposeMotes();
         disposeUi();
         disposeOffice();
         if (sceneRef.current === scene) sceneRef.current = null;
@@ -783,6 +788,11 @@ function WorldCanvas(props: Props) {
         props.maze.position[1] - props.maze.size / 2,
       );
     else actor.position.copyFrom(hubPosition.current);
+    const disposeMotes = props.encounter
+      ? undefined
+      : attachExplorationMotes(scene, props.scene, () =>
+          latest.current.reducedMotion || motionQuery.matches,
+        );
     const disposeWorldParticles = !props.encounter
       ? attachWorldParticles(scene, () => {
           const current = latest.current;
@@ -943,6 +953,7 @@ function WorldCanvas(props: Props) {
       actorRef.current = null;
       disposeBattleEffects?.();
       disposeBattleArena?.();
+      disposeMotes?.();
       disposeWorldParticles?.();
       scene.dispose();
     };

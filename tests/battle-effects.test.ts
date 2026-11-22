@@ -266,7 +266,7 @@ describe("battle effects", () => {
     const removeObserver = vi.spyOn(scene!.onBeforeRenderObservable, "remove");
     const meshes = scene!.meshes.length;
     const materials = scene!.materials.length;
-    expect(meshes).toBe(29);
+    expect(meshes).toBe(49);
     rig.setState({ cue: cue(), reducedMotion: false });
     rig.frame();
     for (let i = 2; i <= 12; i++) {
@@ -304,8 +304,8 @@ describe("battle effects", () => {
     rig.frame(combatCueDuration(false) * 0.31);
     expect(sparks().some((mesh) => mesh.isVisible)).toBe(false);
     rig.frame(combatCueDuration(false) * 0.03);
-    expect(sparks().filter((mesh) => mesh.isVisible)).toHaveLength(24);
-    expect(scene!.meshes).toHaveLength(29);
+    expect(sparks().filter((mesh) => mesh.isVisible)).toHaveLength(44);
+    expect(scene!.meshes).toHaveLength(49);
     rig.setState({
       cue: cue({ sequence: 2, kind: "poison", skill: null }),
       reducedMotion: false,

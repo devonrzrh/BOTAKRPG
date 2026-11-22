@@ -524,10 +524,7 @@ export function buildBattleArena(
   rim.intensity = final ? 2.2 : major ? 1.75 : 1.35;
   rim.range = 9;
   const lights = [key, rim];
-  const disposeAtmosphere =
-    rank === "regular"
-      ? undefined
-      : attachBattleAtmosphere(root, enemyId, rank, rim.diffuse, reducedMotion);
+  const disposeAtmosphere = attachBattleAtmosphere(root, enemyId, rank, rim.diffuse, reducedMotion);
   let disposed = false;
   return {
     kind,
@@ -540,7 +537,7 @@ export function buildBattleArena(
     dispose: () => {
       if (disposed) return;
       disposed = true;
-      disposeAtmosphere?.();
+      disposeAtmosphere();
       root.dispose();
       lights.forEach((light) => light.dispose());
       materials.forEach((material) => material.dispose());

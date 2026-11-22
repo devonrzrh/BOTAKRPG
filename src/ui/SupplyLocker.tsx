@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import type { Content, Item } from "../content/schema";
 import { supplyPool } from "../game/gacha";
 import type { Save } from "../game/state";
+import { useGameParticles } from "./GameParticles";
 import { useGameSound } from "./GameSound";
 import { SupplyIcon } from "./SupplyIcon";
 import { RpgIcon } from "./RpgIcon";
@@ -49,7 +50,9 @@ export function SupplyLocker({
 }) {
   const [draw, setDraw] = useState<Draw>();
   const timer = useRef<number | undefined>(undefined);
+  const stage = useRef<HTMLDivElement>(null);
   const sound = useGameSound();
+  const particles = useGameParticles();
   useEffect(() => () => window.clearTimeout(timer.current), []);
 
   const opening = !!draw?.before;
@@ -86,6 +89,13 @@ export function SupplyLocker({
       timer.current = undefined;
       setDraw(result);
       sound("clue");
+      const bounds = stage.current?.getBoundingClientRect();
+      if (bounds) {
+        particles(item.rarity === "epic" ? "levelUp" : "success", {
+          x: bounds.left + bounds.width / 2,
+          y: bounds.top + bounds.height / 2,
+        });
+      }
     }, openingDuration);
   }
 
@@ -104,6 +114,7 @@ export function SupplyLocker({
         >
           <div
             className="supply-stage"
+            ref={stage}
             aria-hidden="true"
             key={draw?.sequence ?? 0}
           >

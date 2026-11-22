@@ -24,8 +24,9 @@ type Particle = {
   startZ: number;
 };
 
-const POOL_SIZE = 32;
-const STEP_COUNT = 14;
+const STEP_COUNT = 24;
+const GOAL_COUNT = 30;
+const POOL_SIZE = STEP_COUNT + GOAL_COUNT;
 const LIFE_MS = 450;
 
 /** Subtle pooled footstep motes and a one-shot arrival burst for 3D exploration. */
@@ -99,7 +100,7 @@ export function attachWorldParticles(
   ) => {
     // The two reserved portions of the fixed pool prevent a goal burst from consuming step slots.
     const start = amberParticle ? STEP_COUNT : 0;
-    const count = amberParticle ? POOL_SIZE - STEP_COUNT : STEP_COUNT;
+    const count = amberParticle ? GOAL_COUNT : STEP_COUNT;
     const particle = particles[start + (cursor++ % count)]!;
     particle.age = 0;
     particle.life = LIFE_MS;
@@ -134,16 +135,16 @@ export function attachWorldParticles(
       !state.reducedMotion &&
       !hidden
     ) {
-      for (let i = 0; i < 18; i++) {
-        const angle = (i / 18) * Math.PI * 2;
-        const speed = 0.18 + (i % 4) * 0.045;
+      for (let i = 0; i < GOAL_COUNT; i++) {
+        const angle = (i / GOAL_COUNT) * Math.PI * 2;
+        const speed = 0.4 + (i % 4) * 0.26;
         emit(
           true,
           state.goal.x,
           state.goal.y + 0.12,
           state.goal.z,
           Math.cos(angle) * speed,
-          0.24 + (i % 3) * 0.04,
+          0.45 + (i % 3) * 0.18,
           Math.sin(angle) * speed,
         );
       }
@@ -186,24 +187,20 @@ export function attachWorldParticles(
         sx * sx + sy * sy + sz * sz >= 0.09 &&
         now - lastStepAt >= 100
       ) {
-        emit(
-          false,
-          state.position.x,
-          state.position.y + 0.08,
-          state.position.z,
-          -0.035,
-          0.16,
-          -0.02,
-        );
-        emit(
-          false,
-          state.position.x,
-          state.position.y + 0.06,
-          state.position.z,
-          0.035,
-          0.12,
-          0.02,
-        );
+        for (let i = 0; i < 4; i++) {
+          const angle = i * Math.PI / 2 + 0.5;
+          const x = Math.cos(angle);
+          const z = Math.sin(angle);
+          emit(
+            false,
+            state.position.x + x * 0.13,
+            state.position.y + 0.06,
+            state.position.z + z * 0.13,
+            x * 0.26,
+            0.16 + (i % 2) * 0.12,
+            z * 0.26,
+          );
+        }
         lastStepX = state.position.x;
         lastStepY = state.position.y;
         lastStepZ = state.position.z;

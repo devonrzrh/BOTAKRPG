@@ -15,13 +15,13 @@ export type UiParticle = {
 export type ParticleOrigin = { x: number; y: number };
 
 const recipes: Record<UiParticleKind, { count: number; lifetime: number }> = {
-  success: { count: 12, lifetime: 620 },
-  clue: { count: 14, lifetime: 700 },
-  levelUp: { count: 20, lifetime: 780 },
-  train: { count: 9, lifetime: 560 },
+  success: { count: 24, lifetime: 650 },
+  clue: { count: 30, lifetime: 720 },
+  levelUp: { count: 46, lifetime: 800 },
+  train: { count: 20, lifetime: 600 },
 };
 
-export const MAX_UI_PARTICLES = 80;
+export const MAX_UI_PARTICLES = 120;
 export const MAX_PARTICLE_LIFETIME = 800;
 
 /** Stable recipe generation keeps the engine deterministic and easy to test. */
@@ -36,7 +36,7 @@ export function createBurst(
     const value = Math.sin((seed + index * 17) * 78.233) * 43758.5453;
     const random = value - Math.floor(value);
     const angle = random * Math.PI * 2;
-    const speed = 32 + ((index * 13 + seed * 7) % 50);
+    const speed = 45 + ((index * 13 + seed * 7) % 105);
     return {
       x: origin.x,
       y: origin.y,

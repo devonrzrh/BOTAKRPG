@@ -10,13 +10,12 @@ import {
 } from "../src/game/uiParticles";
 
 describe("UI particle recipes", () => {
-  it("creates repeatable, restrained bursts for each semantic event", () => {
-    const kinds: UiParticleKind[] = ["success", "clue", "levelUp", "train"];
-    for (const kind of kinds) {
+  it("creates repeatable bursts sized for each semantic event", () => {
+    const counts = { success: 24, clue: 30, levelUp: 46, train: 20 };
+    for (const kind of Object.keys(counts) as UiParticleKind[]) {
       const burst = createBurst(kind, { x: 30, y: 40 }, 100, 4);
       expect(burst).toEqual(createBurst(kind, { x: 30, y: 40 }, 100, 4));
-      expect(burst.length).toBeGreaterThan(0);
-      expect(burst.length).toBeLessThanOrEqual(20);
+      expect(burst).toHaveLength(counts[kind]);
       expect(
         burst.every((particle) => particle.x === 30 && particle.y === 40),
       ).toBe(true);

@@ -30,7 +30,7 @@ describe("battle arenas", () => {
       expect(arena.meshes.length).toBeLessThan(65);
       expect(arena.materials).toHaveLength(3);
       expect(arena.lights).toHaveLength(2);
-      expect(scene.onBeforeRenderObservable.observers).toHaveLength(0);
+      expect(scene.onBeforeRenderObservable.observers).toHaveLength(1);
       for (const mesh of arena.meshes) {
         expect(mesh.isPickable).toBe(false);
         expect(mesh.isDescendantOf(arena.root)).toBe(true);
@@ -106,11 +106,13 @@ describe("battle arenas", () => {
         const result = {
           halos: arena.meshes.filter((mesh) => mesh.name.endsWith("command halo")),
           rim: arena.lights[1].intensity,
+          particles: (scene.getMeshByName("arena background particles") as Mesh).thinInstanceCount,
         };
         arena.dispose();
         return result;
       });
       expect(layouts.map(({ halos }) => halos.length)).toEqual([0, 1, 2]);
+      expect(layouts.map(({ particles }) => particles)).toEqual([48, 72, 156]);
       expect(layouts[2].rim).toBeGreaterThan(layouts[1].rim);
       expect(layouts[1].rim).toBeGreaterThan(layouts[0].rim);
       expect(scene.meshes).toHaveLength(0);
@@ -130,7 +132,7 @@ describe("battle arenas", () => {
       if (!(flecks instanceof Mesh)) throw new Error("Missing arena particles");
       expect(flecks.parent).toBe(arena.root);
       expect(flecks.isPickable).toBe(false);
-      expect(flecks.thinInstanceCount).toBe(104);
+      expect(flecks.thinInstanceCount).toBe(156);
       expect(flecks.thinInstanceGetWorldMatrices().every((matrix) =>
         matrix.getTranslation().z > 3,
       )).toBe(true);

@@ -106,14 +106,15 @@ export function attachBattleEffects(
   particleSource.material = particleMaterial;
   particleSource.isVisible = false;
   particleSource.isPickable = false;
-  const particles: Particle[] = Array.from({ length: 24 }, (_, i) => {
+  const particleCount = 44;
+  const particles: Particle[] = Array.from({ length: particleCount }, (_, i) => {
     const mesh = particleSource.createInstance(`battle particle ${i}`);
     mesh.isVisible = false;
     mesh.isPickable = false;
     return {
       mesh,
-      angle: (i / 24) * Math.PI * 2,
-      speed: 0.55 + (i % 4) * 0.12,
+      angle: (i / particleCount) * Math.PI * 2,
+      speed: 0.53 + (i % 5) * 0.18,
       lift: ((i % 5) - 2) * 0.1,
     };
   });
@@ -281,10 +282,11 @@ export function attachBattleEffects(
         impactHeight + Math.sin(angle) * radius + progress * lift,
         3.5 + Math.sin(angle * 2) * radius * 0.25,
       );
+      const fade = (0.75 + (i % 5) * 0.12) * (1 - progress * 0.85);
       mesh.scaling.set(
-        shard ? 0.72 : 0.45,
-        shard ? 1.45 : 0.45,
-        shard ? 0.55 : 0.45,
+        (shard ? 0.72 : 0.45) * fade,
+        (shard ? 1.45 : 0.45) * fade,
+        (shard ? 0.55 : 0.45) * fade,
       );
       mesh.rotation.set(progress * (i % 3), progress * 3 + angle, progress * 2);
     });
