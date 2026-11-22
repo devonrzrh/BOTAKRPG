@@ -2292,24 +2292,6 @@ export default function App() {
                   question={currentQuestion}
                   answer={answer}
                   notice={battleNotice}
-                  onToggleSound={() =>
-                    updateSave((s) => ({
-                      ...s,
-                      settings: {
-                        ...s.settings,
-                        combatMuted: !s.settings.combatMuted,
-                      },
-                    }))
-                  }
-                  onToggleAutoAdvance={() =>
-                    updateSave((s) => ({
-                      ...s,
-                      settings: {
-                        ...s.settings,
-                        battleAutoAdvance: !s.settings.battleAutoAdvance,
-                      },
-                    }))
-                  }
                   onAnswer={setAnswer}
                   onSkill={(skill) => {
                     if (battleRef.current !== battle) return;
@@ -2845,6 +2827,39 @@ export default function App() {
               )}
               {panel === "settings" && (
                 <div className="settings-content">
+                  <h3>Battle</h3>
+                  <label className="checkbox-label">
+                    <input
+                      type="checkbox"
+                      checked={!save.settings.combatMuted}
+                      onChange={(e) =>
+                        updateSave((s) => ({
+                          ...s,
+                          settings: {
+                            ...s.settings,
+                            combatMuted: !e.target.checked,
+                          },
+                        }))
+                      }
+                    />
+                    Battle sound
+                  </label>
+                  <label className="checkbox-label">
+                    <input
+                      type="checkbox"
+                      checked={save.settings.battleAutoAdvance}
+                      onChange={(e) =>
+                        updateSave((s) => ({
+                          ...s,
+                          settings: {
+                            ...s.settings,
+                            battleAutoAdvance: e.target.checked,
+                          },
+                        }))
+                      }
+                    />
+                    Automatically advance battle turns
+                  </label>
                   <h3>Audio</h3>
                   <label>
                     Music volume
@@ -2864,8 +2879,7 @@ export default function App() {
                   </label>
                   <p className="muted">
                     The score changes with the room and quiets under dialogue.
-                    Set it to 0 to silence music; battle cues keep their own
-                    sound toggle.
+                    Set it to 0 to silence music.
                   </p>
                   <label>
                     Sound effects volume{" "}

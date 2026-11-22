@@ -33,11 +33,6 @@ import { createCombatAudio } from "../game/combatAudio";
 import { createCombatHaptics } from "../game/combatHaptics";
 import { useBattleFeedback } from "./useBattleFeedback";
 import "./BattleFeedback.css";
-import {
-  Volume2,
-  VolumeX,
-  BookOpen,
-} from "lucide-react";
 
 interface Props {
   paused?: boolean;
@@ -60,8 +55,6 @@ interface Props {
   onSpare: () => void;
   onEvade: (collisions: number) => void;
   onSubmit: (answer?: number[], elapsedMs?: number, quizOrigin?: QuizOrigin) => void;
-  onToggleSound: () => void;
-  onToggleAutoAdvance: () => void;
   onHint: () => void;
   onContinue: () => void;
   onReview: () => void;
@@ -751,34 +744,6 @@ export function BattleScreen(p: Props) {
                 </span>
               )}
           </div>
-          <details className="battle-playback">
-            <summary>Battle options</summary>
-            <div className="battle-playback-options">
-              <button
-                onClick={p.onToggleSound}
-                aria-label={
-                  save.settings.combatMuted
-                    ? "Enable battle sound"
-                    : "Mute battle sound"
-                }
-              >
-                {save.settings.combatMuted ? (
-                  <VolumeX size={18} />
-                ) : (
-                  <Volume2 size={18} />
-                )}
-                {save.settings.combatMuted ? "Sound off" : "Sound on"}
-              </button>
-              <button
-                aria-pressed={save.settings.battleAutoAdvance}
-                onClick={p.onToggleAutoAdvance}
-              >
-                {save.settings.battleAutoAdvance
-                  ? "Auto turns"
-                  : "Manual turns"}
-              </button>
-            </div>
-          </details>
         </header>
         {resultChanges.length > 0 && (
           <div
