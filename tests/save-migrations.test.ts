@@ -28,6 +28,17 @@ const route = content.entities.find(
 )!;
 
 describe("journal migration", () => {
+  it("defaults shadows off for existing journals and preserves opt-in", () => {
+    const save = initialSave();
+    const { shadows, ...previousSettings } = save.settings;
+    expect(shadows).toBe(false);
+    expect(parseSave({ ...save, settings: previousSettings }, content)).toEqual(
+      save,
+    );
+    save.settings.shadows = true;
+    expect(parseSave(JSON.parse(JSON.stringify(save)), content)).toEqual(save);
+  });
+
   it("upgrades v1 in place without mutating input, losing data, or paying inherited gates", () => {
     const input = structuredClone(legacy);
     const original = structuredClone(input);
@@ -154,6 +165,7 @@ describe("journal migration", () => {
       story: { ...input.story, legacyFinale: false },
       supply: initialSave().supply,
       character: { ...input.character, skills: ["insight", "ward", "trace"] },
+      settings: { ...input.settings, shadows: false },
     });
     expect(parseSave(JSON.parse(JSON.stringify(save)), content)).toEqual(save);
   });
@@ -235,6 +247,7 @@ describe("journal migration", () => {
     expect(local).toEqual({
       ...input,
       version: 7,
+      settings: { ...input.settings, shadows: false },
       puzzlePrograms: {},
       finaleOutcome: null,
       curriculumVersion: 3,

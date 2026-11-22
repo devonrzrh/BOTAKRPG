@@ -25,6 +25,7 @@ import { createBattleSpeechAnchor } from "./BattleSpeechAnchor";
 import { buildEnemyModel } from "./EnemyModel";
 import type { EncounterRank } from "../game/enemyIdentity";
 import { buildBattleArena } from "./BattleArena";
+import { attachSoftShadows } from "./SoftShadows";
 import { attachWorldParticles } from "./WorldParticles";
 import type { BattleCue } from "../game/combatPresentation";
 import "@babylonjs/core/Rendering/edgesRenderer";
@@ -70,6 +71,7 @@ interface Props {
   homeLookLocked?: boolean;
   maze: Maze;
   renderer: RendererPreference;
+  shadows: boolean;
   reducedMotion: boolean;
   locked: boolean;
   onInteract: (id: string) => void;
@@ -277,6 +279,7 @@ function WorldCanvas(props: Props) {
             ?.bookOpen,
         }),
         () => sound("cameraMove"),
+        () => latest.current.shadows,
       );
       const disposeUi = attachOfficeSurfaces(
         scene,
@@ -554,6 +557,13 @@ function WorldCanvas(props: Props) {
       );
       disposeBattleArena = arena.dispose;
       const enemyRig = buildEnemyModel(scene, enemyId, enemyScale);
+      attachSoftShadows(
+        arena.keyLight,
+        new Vector3(5, 1, 4).subtract(arena.keyLight.position),
+        enemyRig.meshes,
+        arena.meshes.filter((mesh) => mesh.metadata.region === "floor"),
+        () => latest.current.shadows,
+      );
       disposeBattleEffects = attachBattleEffects(
         scene,
         enemyRig,

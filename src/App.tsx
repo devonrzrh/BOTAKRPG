@@ -1772,6 +1772,7 @@ export default function App() {
             enemyId={battle.enemyId}
             maze={maze}
             renderer={save.settings.renderer}
+            shadows={save.settings.shadows}
             reducedMotion={save.settings.reducedMotion}
             locked={
               intakeOpen ||
@@ -2943,6 +2944,22 @@ export default function App() {
                     Both backends use the same world and rules. Compare on this
                     device; the fastest option depends on your hardware.
                   </p>
+                  <label className="checkbox-label">
+                    <input
+                      type="checkbox"
+                      checked={save.settings.shadows}
+                      onChange={(e) =>
+                        updateSave((s) => ({
+                          ...s,
+                          settings: {
+                            ...s.settings,
+                            shadows: e.target.checked,
+                          },
+                        }))
+                      }
+                    />{" "}
+                    Cast shadows in the office and battles
+                  </label>
                   <label className="checkbox-label">
                     <input
                       type="checkbox"

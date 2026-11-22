@@ -7,6 +7,7 @@ import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 import { PointLight } from "@babylonjs/core/Lights/pointLight";
+import { attachSoftShadows } from "./SoftShadows";
 
 export type HomeWall = "investigation" | "bookshelf" | "quests" | "desk";
 export const wallYaw: Record<HomeWall, number> = {
@@ -29,6 +30,7 @@ export function buildOffice(
     reading?: boolean;
   },
   onCameraTurn?: () => void,
+  shadows: () => boolean = () => false,
 ) {
   scene.clearColor = new Color4(0.025, 0.035, 0.045, 1);
   const camera = new UniversalCamera(
@@ -179,10 +181,10 @@ export function buildOffice(
         }
       }
     } else {
-      box("desk top", 0, 1, 3.4, 6.2, 0.18, 2.7, "#64503e", wall);
+      const deskTop = box("desk top", 0, 1, 3.4, 6.2, 0.18, 2.7, "#64503e", wall);
       for (const x of [-2.8, 2.8])
         box("drawers", x, 0.45, 3.6, 0.9, 0.9, 2, "#3a342f", wall);
-      box("desk mat", 0, 1.11, 3.1, 4, 0.025, 1.9, "#192a30", wall);
+      const deskMat = box("desk mat", 0, 1.11, 3.1, 4, 0.025, 1.9, "#192a30", wall);
 
       for (const x of [-2.7, 2.7])
         for (const z of [2.3, 4.45])
@@ -255,6 +257,7 @@ export function buildOffice(
       handle.position.set(3.07, 1.34, 4.05);
       handle.rotation.z = Math.PI / 2;
       handle.material = mat("#c0b294");
+      const deskProps = [mug, handle];
       for (const [x, color] of [
         [-2.9, "#739c8b"],
         [-2.55, "#a5895b"],
@@ -267,10 +270,12 @@ export function buildOffice(
         vial.parent = wall;
         vial.position.set(x, 1.36, 4.3);
         vial.material = mat(color);
-        box("bottle cap", x, 1.63, 4.3, 0.16, 0.1, 0.16, "#b5aa8c", wall);
+        const cap = box("bottle cap", x, 1.63, 4.3, 0.16, 0.1, 0.16, "#b5aa8c", wall);
+        deskProps.push(vial, cap);
       }
       // A working evidence tray makes the desk read as a detective's clue station.
-      box("evidence tray", -2.75, 1.2, 3.25, 0.68, 0.16, 0.82, "#443b32", wall);
+      const tray = box("evidence tray", -2.75, 1.2, 3.25, 0.68, 0.16, 0.82, "#443b32", wall);
+      deskProps.push(tray);
       box("case folder", -2.75, 1.3, 3.25, 0.54, 0.08, 0.62, "#b29b6c", wall);
       box("evidence sheet", -2.75, 1.35, 3.25, 0.44, 0.025, 0.47, "#d8c7a1", wall);
       box("redacted evidence mark", -2.75, 1.368, 3.22, 0.24, 0.008, 0.045, "#964d39", wall);
@@ -285,6 +290,14 @@ export function buildOffice(
       deskLamp.diffuse = Color3.FromHexString("#ffc27c");
       deskLamp.intensity = 1.25;
       deskLamp.range = 5.5;
+      attachSoftShadows(
+        deskLamp,
+        new Vector3(0.6, -1, -0.35),
+        deskProps,
+        [deskTop, deskMat],
+        shadows,
+        true,
+      );
 
       const windowLight = new PointLight(
         "night window fill",

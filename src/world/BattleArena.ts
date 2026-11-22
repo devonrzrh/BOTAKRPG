@@ -535,6 +535,7 @@ export function buildBattleArena(
     meshes,
     materials,
     lights,
+    keyLight: key,
     impactColor: major ? rim.diffuse : undefined,
     dispose: () => {
       if (disposed) return;
