@@ -2,6 +2,9 @@ import { NullEngine } from "@babylonjs/core/Engines/nullEngine";
 import { Matrix } from "@babylonjs/core/Maths/math.vector";
 import { Scene } from "@babylonjs/core/scene";
 import { describe, expect, it } from "vitest";
+import { validateContent } from "../src/content/schema";
+import { encounterRank } from "../src/game/enemyIdentity";
+import raw from "../src/generated/content.json";
 import {
   buildEnemyModel,
   enemyArchetype,
@@ -19,8 +22,11 @@ const cases = [
   ["guard-source-ds-07", "weaver", "articulated edge"],
   ["guard-source-ai-02", "array", "receiver lens"],
   ["archive-keeper", "keeper", "archive cabinet"],
-  ["routing-warden", "warden", "tower shield"],
+  ["route-warden", "warden", "tower shield"],
   ["signal-mimic", "mimic", "phishing hook"],
+  ["checkpoint-echo", "echo", "pursuit projector"],
+  ["dispatch-quartermaster", "drone", "loader tine"],
+  ["simulation-warden", "warden", "containment frame"],
   ["echo-7", "echo", "visor"],
 ] as const;
 
@@ -34,7 +40,7 @@ describe("enemy silhouettes", () => {
       expect(enemyThreatName(id)).toBeTruthy();
       expect(rig.root.metadata.archetype).toBe(kind);
       expect(
-        rig.meshes.some((mesh) => mesh.name === `${kind} ${feature}`),
+        rig.meshes.some((mesh) => mesh.name.endsWith(` ${feature}`)),
       ).toBe(true);
       expect(rig.leftArm.parent).toBe(rig.root);
       expect(rig.rightArm.parent).toBe(rig.root);
@@ -64,6 +70,14 @@ describe("enemy silhouettes", () => {
     const engine = new NullEngine();
     const scene = new Scene(engine);
     try {
+      const content = validateContent(raw);
+      for (const entity of content.entities) {
+        if (entity.type !== "activity" || !entity.enemy) continue;
+        const { id, tactics } = entity.enemy;
+        if (encounterRank(id, tactics?.boss ?? false) !== "regular") {
+          expect(cases.map(([caseId]) => caseId)).toContain(id);
+        }
+      }
       const fingerprints = cases.map(([id]) => {
         const rig = buildEnemyModel(scene, id);
         return rig.meshes

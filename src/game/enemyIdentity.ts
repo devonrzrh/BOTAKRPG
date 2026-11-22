@@ -43,8 +43,11 @@ export function encounterRank(enemyId: string, boss: boolean): EncounterRank {
   return enemyId === "checkpoint-echo" ? "miniboss" : "regular";
 }
 
-export const enemyThreatName = (id: string) =>
-  ({
+export function enemyThreatName(id: string) {
+  if (id === "checkpoint-echo") return "Pursuit Recorder";
+  if (id === "dispatch-quartermaster") return "Battery Loader";
+  if (id === "simulation-warden") return "Containment Frame";
+  return {
     echo: "Reconstructed Chassis",
     warden: "Firewall Warden",
     keeper: "Cache Vault Keeper",
@@ -57,4 +60,5 @@ export const enemyThreatName = (id: string) =>
     weaver: "Graph Weaver",
     array: "Inference Array",
     sentinel: "Gateway Sentinel",
-  })[enemyArchetype(id)];
+  }[enemyArchetype(id)];
+}

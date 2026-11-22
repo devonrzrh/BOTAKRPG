@@ -12,10 +12,22 @@ import echoMesh from "./echoMesh.json";
 import sentinelMesh from "./sentinelMesh.json";
 export { enemyArchetype, enemyThreatName } from "../game/enemyIdentity";
 
-/** Each enemy has its own silhouette, not a reskinned humanoid. Scene owns the rig. */
+const encounterModels = {
+  "checkpoint-echo": "recorder",
+  "dispatch-quartermaster": "loader",
+  "simulation-warden": "containment",
+} as const;
+
+/** The scene owns the rig and its materials. */
 export function buildEnemyModel(scene: Scene, id: string, scale = 1) {
-  const kind = enemyArchetype(id);
+  const archetype = enemyArchetype(id);
+  const kind = Object.hasOwn(encounterModels, id)
+    ? encounterModels[id as keyof typeof encounterModels]
+    : archetype;
   const palettes = {
+    recorder: ["#244653", "#719fa7", "#8cffee"],
+    loader: ["#352f2a", "#bf964e", "#ffda8b"],
+    containment: ["#342a49", "#a27c91", "#ff99c4"],
     echo: ["#3c5666", "#64848f", "#8adce7"],
     warden: ["#433025", "#bd8b51", "#ffc368"],
     keeper: ["#302b48", "#9d88be", "#d4b9ff"],
@@ -44,7 +56,7 @@ export function buildEnemyModel(scene: Scene, id: string, scale = 1) {
   const root = new TransformNode("enemy combat rig", scene);
   root.position.set(5, 0, 4);
   root.scaling.setAll(scale);
-  root.metadata = { archetype: kind };
+  root.metadata = { archetype };
   const leftArm = new TransformNode("left shoulder pivot", scene);
   const rightArm = new TransformNode("right shoulder pivot", scene);
   let sentinelHead: TransformNode | undefined;
@@ -259,7 +271,197 @@ export function buildEnemyModel(scene: Scene, id: string, scale = 1) {
       parent,
     );
 
-  if (kind === "mantis") {
+  if (kind === "recorder") {
+    const projector = armorPlate(
+      "pursuit projector",
+      0,
+      2.12,
+      0.1,
+      1.36,
+      0.94,
+      0.92,
+    );
+    projector.rotation.x = -0.23;
+    ring("playback lens seal", 0, 2.16, -0.42, 0.61, 0.1, shell);
+    sphere("playback lens", 0, 2.16, -0.48, 0.43, signal).scaling.z = 0.48;
+    for (const [pivot, side] of [
+      [leftArm, -1],
+      [rightArm, 1],
+    ] as const) {
+      pivot.position.set(side * 0.58, 2.05, 0.18);
+      armorPlate(
+        "swept antenna",
+        side * 0.61,
+        0.23,
+        0.17,
+        1.61,
+        0.37,
+        0.54,
+        shell,
+        pivot,
+      ).rotation.set(0, side * -0.32, side * 0.43);
+      tube(
+        "antenna trace",
+        [
+          [0, 0.06, -0.2],
+          [side * 0.75, 0.3, -0.15],
+          [side * 1.23, 0.51, 0.05],
+        ],
+        0.041,
+        signal,
+        pivot,
+      );
+    }
+    for (let i = 0; i < 3; i++) {
+      const frame = joint(
+        "playback spindle",
+        0,
+        1.6 - i * 0.35,
+        0.18 + i * 0.17,
+      );
+      armorPlate(
+        "recorded frame",
+        0,
+        0,
+        0,
+        0.84 - i * 0.18,
+        0.14,
+        0.44,
+        alloy,
+        frame,
+      );
+      box(
+        "frame edge",
+        0,
+        0,
+        -0.24,
+        0.57 - i * 0.13,
+        0.06,
+        0.05,
+        signal,
+        frame,
+      );
+    }
+  } else if (kind === "loader") {
+    armorPlate("cargo chassis", 0, 0.72, 0.27, 2.46, 0.65, 1.53, shell);
+    armorPlate("battery cradle", 0, 1.21, 0.42, 2.27, 0.44, 1.17);
+    const cargo = joint("battery carriage", 0, 1.38, 0.37);
+    for (const [pivot, side] of [
+      [leftArm, -1],
+      [rightArm, 1],
+    ] as const) {
+      pivot.position.set(side * 0.86, 0.89, -0.13);
+      for (const z of [-0.48, 0.79]) {
+        const wheel = MeshBuilder.CreateCylinder(
+          "loader roller tire",
+          {
+            diameter: 0.78,
+            height: 0.42,
+            tessellation: 16,
+          },
+          scene,
+        );
+        place(wheel, side * 1.02, 0.42, z).rotation.z = Math.PI / 2;
+        ring("roller hub", side * 1.24, 0.42, z, 0.43, 0.1, alloy).rotation.y =
+          Math.PI / 2;
+      }
+      armorPlate("lifting mast", 0, 0.43, -0.3, 0.3, 1.34, 0.39, alloy, pivot);
+      armorPlate(
+        "loader tine",
+        0,
+        -0.12,
+        -0.98,
+        0.35,
+        0.28,
+        1.67,
+        alloy,
+        pivot,
+      );
+      box("tine marker", 0, 0.03, -1.56, 0.25, 0.04, 0.22, signal, pivot);
+    }
+    for (let i = -1; i <= 1; i++) {
+      const height = i === 0 ? 1.2 : 0.8;
+      armorPlate(
+        "battery pack",
+        i * 0.61,
+        height / 2,
+        0,
+        0.55,
+        height,
+        0.83,
+        shell,
+        cargo,
+      );
+      box(
+        "charge column",
+        i * 0.61,
+        height / 2,
+        -0.44,
+        0.13,
+        height * 0.56,
+        0.045,
+        signal,
+        cargo,
+      );
+    }
+    box("dispatch scanner", 0, 1.05, -0.54, 0.71, 0.14, 0.09, signal);
+  } else if (kind === "containment") {
+    const core = joint("prisoner core", 0, 1.89, 0);
+    shard("suspended cell", 0, 0, 0, 0.68, shell, core).scaling.set(
+      0.67,
+      1.65,
+      0.78,
+    );
+    shard("cell beacon", 0, 0, -0.31, 0.31, signal, core).scaling.set(
+      0.73,
+      1.68,
+      0.58,
+    );
+    armorPlate("anchor plinth", 0, 0.36, 0.14, 1.32, 0.39, 1.28, shell);
+    shard("cage keystone", 0, 3.02, 0.17, 0.3, signal);
+    for (const [pivot, side] of [
+      [leftArm, -1],
+      [rightArm, 1],
+    ] as const) {
+      pivot.position.set(side * 0.92, 1.64, 0.2);
+      tube(
+        "containment frame",
+        [
+          [side * -0.82, 1.35, 0],
+          [side * 0.35, 0.34, 0],
+          [side * 0.2, -0.61, 0.18],
+          [side * -0.72, -1.19, -0.06],
+        ],
+        0.14,
+        alloy,
+        pivot,
+      );
+      const lock = armorPlate(
+        "cage lock",
+        side * 0.31,
+        0.27,
+        -0.08,
+        0.5,
+        0.55,
+        0.56,
+        shell,
+        pivot,
+      );
+      lock.rotation.z = side * -0.47;
+      tube(
+        "containment rail",
+        [
+          [side * -0.73, 1.28, -0.17],
+          [side * 0.25, 0.31, -0.32],
+          [side * 0.1, -0.53, -0.13],
+          [side * -0.71, -1.1, -0.19],
+        ],
+        0.043,
+        signal,
+        pivot,
+      );
+    }
+  } else if (kind === "mantis") {
     armorPlate("split thorax", 0, 1.63, 0.08, 0.65, 1.48, 0.8, shell);
     const head = joint("optics swivel", 0, 2.56, -0.17);
     armorPlate("mantis crown", 0, 0, 0, 0.93, 0.53, 0.57, alloy, head);
@@ -1059,6 +1261,8 @@ export function buildEnemyModel(scene: Scene, id: string, scale = 1) {
   const animateIdle = (seconds: number) => {
     const breath = Math.sin(seconds * 1.8);
     const floating = [
+      "recorder",
+      "containment",
       "drone",
       "interceptor",
       "mimic",
@@ -1077,6 +1281,20 @@ export function buildEnemyModel(scene: Scene, id: string, scale = 1) {
       echoHead.rotation.y = Math.sin(seconds * 1.1) * 0.14;
     }
     switch (kind) {
+      case "recorder":
+        joints.forEach((frame, i) => {
+          frame.rotation.y = seconds * (i % 2 === 0 ? 0.8 : -0.8);
+        });
+        break;
+      case "loader":
+        joints[0].position.y += (1 + breath) * 0.04;
+        leftArm.rotation.z = rightArm.rotation.z = 0;
+        break;
+      case "containment":
+        joints[0].rotation.y = Math.sin(seconds * 1.4) * 0.55;
+        leftArm.rotation.y = breath * 0.13;
+        rightArm.rotation.y = -leftArm.rotation.y;
+        break;
       case "mantis":
         joints[0].rotation.y = Math.sin(seconds * 1.2) * 0.26;
         leftArm.rotation.y = breath * 0.13;
@@ -1153,6 +1371,24 @@ export function buildEnemyModel(scene: Scene, id: string, scale = 1) {
     const hit = ease((t - 0.42) / 0.2) * (1 - ease((t - 0.62) / 0.38));
     const strike = hit * force;
     switch (kind) {
+      case "recorder":
+        leftArm.rotation.y += wind * 0.5 - strike * 0.68;
+        rightArm.rotation.y -= wind * 0.5 - strike * 0.68;
+        joints.forEach((frame, i) => {
+          frame.position.z -= strike * (i + 1) * 0.27;
+        });
+        break;
+      case "loader":
+        leftArm.position.y += wind * 0.35 - strike * 0.12;
+        rightArm.position.y += wind * 0.35 - strike * 0.12;
+        joints[0].position.y += wind * 0.24;
+        root.position.z -= strike * 0.62;
+        break;
+      case "containment":
+        leftArm.rotation.y += wind * 0.68 - strike * 0.63;
+        rightArm.rotation.y -= wind * 0.68 - strike * 0.63;
+        joints[0].position.z -= strike * 0.69;
+        break;
       case "mantis":
         leftArm.rotation.y += wind * -0.78 + strike * 0.95;
         rightArm.rotation.y += wind * 0.78 - strike * 0.95;
@@ -1258,7 +1494,7 @@ export function buildEnemyModel(scene: Scene, id: string, scale = 1) {
     rightArm,
     materials,
     meshes,
-    archetype: kind,
+    archetype,
     animateIdle,
     animateAttack,
     resetIdle,

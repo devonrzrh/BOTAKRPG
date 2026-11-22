@@ -49,6 +49,9 @@ it.each([
   "archive-keeper",
   "routing-warden",
   "signal-mimic",
+  "checkpoint-echo",
+  "dispatch-quartermaster",
+  "simulation-warden",
   "echo-7",
 ])(
   "animates %s at rest without drifting, and freezes immediately for reduced motion",
@@ -87,6 +90,9 @@ it.each([
   ["guard-source-ai-02", "array upper receiver"],
   ["archive-keeper", "keeper drawer slide"],
   ["signal-mimic", "mimic left mask hinge"],
+  ["checkpoint-echo", "left shoulder pivot"],
+  ["dispatch-quartermaster", "left shoulder pivot"],
+  ["simulation-warden", "left shoulder pivot"],
 ])("animates %s's %s through wind-up and impact and resets it", (id, joint) => {
   const { rig, state, frame, dispose } = setup(id);
   const pivot = rig.root
