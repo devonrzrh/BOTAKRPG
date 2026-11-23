@@ -18,6 +18,7 @@ import {
 } from "../game/bookAnimation";
 import { drawQuestGraph } from "./QuestGraphSurface";
 import { drawLedgerSurface } from "./LedgerSurface";
+import { buildSupplyCrate } from "./SupplyCrate";
 import { hitSurfaceZone, measureSurfaceText, type SurfaceZone as Zone } from "./SurfaceLayout";
 import {
   GRAPH_AREA,
@@ -25,7 +26,7 @@ import {
   zoomGraph,
   type GraphView,
 } from "../game/questGraph";
-import { wallYaw, type HomeWall } from "./Office";
+import { deskOffsetZ, wallYaw, type HomeWall } from "./Office";
 export interface OfficeSurfaceState {
   models: SurfaceModel[];
   wall: HomeWall;
@@ -563,43 +564,15 @@ export function attachOfficeSurfaces(
     false,
   );
 
-  const locker = sheet(
-    "supply locker label",
-    "desk",
-    -0.2,
-    1.58,
-    4.85,
-    1.3,
-    0.82,
-    0,
-    (c, m) => {
-      c.save();
-      c.translate(600, 0);
-      c.scale(-1, 1);
-      c.fillStyle = "#273b3d";
-      c.fillRect(0, 0, 600, 260);
-      c.strokeStyle = "#b39862";
-      c.lineWidth = 4;
-      c.strokeRect(18, 18, 564, 224);
-      ink(c, "SUPPLY", 105, 43, 94, 485, "#ead6a4");
-      ink(c, "LOCKER", 105, 141, 94, 485, "#ead6a4");
-      c.restore();
-      return zone(m, "supply-locker", 0, 0, 600, 260);
-    },
-    false,
-    600,
-    260,
-  );
-  widgets.at(-1)!.face.rotation.y = Math.PI;
-  const lockerBody = MeshBuilder.CreateBox(
-    "steel supply locker",
-    { width: 1.3, height: 0.82, depth: 0.4 },
-    scene,
-  );
-  lockerBody.parent = locker;
-  lockerBody.position.z = 0.2;
-  lockerBody.material = material("locker steel", "#34494a");
-  lockerBody.isPickable = false;
+  const locker = buildSupplyCrate(scene).root;
+  locker.parent = anchors.get("desk")!;
+  locker.position.set(0.38, 1.78, 4.37);
+  locker.scaling.setAll(0.82);
+  const lockerMeshes = new Set(locker.getChildMeshes());
+  for (const mesh of lockerMeshes) mesh.isPickable = true;
+  const lockerOutline = outline(locker, 1.95, 1.22, 0);
+  lockerOutline.position.y = 0.76;
+  lockerOutline.rotation.x = Math.PI / 2;
 
   // Books have a real spine and hinged cover. The library volume leaves its shelf.
   const makeBook = (name: string, wall: HomeWall) => {
@@ -709,7 +682,7 @@ export function attachOfficeSurfaces(
   };
   const reading = makeBook("selected reference book", "bookshelf"),
     ledger = makeBook("clue ledger", "desk");
-  ledger.root.position.set(0, 1.14, 3.35);
+  ledger.root.position.set(0, 1.14, 3.35 + deskOffsetZ);
   ledger.root.rotation.x = Math.PI / 2;
   ledger.root.scaling.setAll(0.8);
   ledger.hinge.rotation.y = 0;
@@ -782,6 +755,11 @@ export function attachOfficeSurfaces(
     ledger.draw(
       modelFor("desk"),
       s.wall === "desk" ? (s.focused ?? hoverControl) : null,
+    );
+    lockerOutline.setEnabled(
+      !s.locked &&
+        s.wall === "desk" &&
+        (hoverControl === "supply-locker" || s.focused === "supply-locker"),
     );
     for (const w of widgets) {
       const m = modelFor(w.wall);
@@ -923,6 +901,13 @@ export function attachOfficeSurfaces(
           (1 - uv.y) * 576,
         );
     }
+    if (
+      !s.locked &&
+      s.wall === "desk" &&
+      pick?.pickedMesh &&
+      lockerMeshes.has(pick.pickedMesh)
+    )
+      selected = control(modelFor("desk"), "supply-locker");
     if (info.type === PointerEventTypes.POINTERMOVE) {
       hovered = nextWidget;
       hoverControl = selected?.id ?? null;

@@ -1,7 +1,8 @@
 import { Box, Coins } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import type { Content, Item } from "../content/schema";
 import { supplyPool } from "../game/gacha";
+import { crateOpeningMs } from "../game/supplyCratePresentation";
 import type { Save } from "../game/state";
 import { useGameParticles } from "./GameParticles";
 import { useGameSound } from "./GameSound";
@@ -19,12 +20,13 @@ const chanceFormat = new Intl.NumberFormat(undefined, {
   style: "percent",
   maximumFractionDigits: 1,
 });
-const openingDuration = 820;
+const SupplyCrateCanvas = lazy(() => import("../world/SupplyCrateCanvas"));
 
 type Draw = {
   item: Item;
   sequence: number;
   before?: Save["supply"];
+  openingAt?: number;
 };
 
 function ItemDetails({ item }: { item: Item }) {
@@ -75,6 +77,7 @@ export function SupplyLocker({
     if (!item) return;
 
     const result = { item, sequence: (draw?.sequence ?? 0) + 1 };
+    sound("blocked");
     if (
       save.settings.reducedMotion ||
       window.matchMedia("(prefers-reduced-motion: reduce)").matches
@@ -84,7 +87,7 @@ export function SupplyLocker({
       return;
     }
 
-    setDraw({ ...result, before: save.supply });
+    setDraw({ ...result, before: save.supply, openingAt: performance.now() });
     timer.current = window.setTimeout(() => {
       timer.current = undefined;
       setDraw(result);
@@ -93,10 +96,10 @@ export function SupplyLocker({
       if (bounds) {
         particles(item.rarity === "epic" ? "levelUp" : "success", {
           x: bounds.left + bounds.width / 2,
-          y: bounds.top + bounds.height / 2,
+          y: bounds.top + bounds.height * 0.42,
         });
       }
-    }, openingDuration);
+    }, crateOpeningMs);
   }
 
   return (
@@ -106,31 +109,22 @@ export function SupplyLocker({
           className="supply-result"
           data-phase={opening ? "opening" : reward ? "revealed" : "ready"}
           data-rarity={reward?.rarity}
-          style={
-            {
-              "--supply-opening-time": `${openingDuration}ms`,
-            } as React.CSSProperties
-          }
         >
-          <div
-            className="supply-stage"
-            ref={stage}
-            aria-hidden="true"
-            key={draw?.sequence ?? 0}
-          >
-            <div className="supply-reticle" />
-            {reward && <div className="supply-burst" />}
-            {reward ? (
-              <div className="supply-emblem">
-                <SupplyIcon item={reward} size={70} />
-              </div>
-            ) : (
-              <div className="supply-crate">
-                <div className="supply-crate-door" />
-                <div className="supply-crate-door" />
-                <span className="supply-crate-lock">
-                  <Box size={24} />
-                </span>
+          <div className="supply-stage" ref={stage} aria-hidden="true">
+            {!reward && <Box className="supply-fallback" size={68} />}
+            <Suspense fallback={null}>
+              <SupplyCrateCanvas
+                key={save.settings.renderer}
+                renderer={save.settings.renderer}
+                openingAt={draw?.openingAt}
+                opened={!!reward}
+                reseal={(draw?.sequence ?? 0) > 1}
+                shadows={save.settings.shadows}
+              />
+            </Suspense>
+            {reward && (
+              <div className="supply-emblem" key={draw?.sequence}>
+                <SupplyIcon item={reward} size={66} />
               </div>
             )}
           </div>
@@ -148,13 +142,9 @@ export function SupplyLocker({
                   </span>
                 )}
               </div>
-            ) : (
-              <p>
-                {opening
-                  ? "Opening crate…"
-                  : "Draw a weapon, armor, or consumable."}
-              </p>
-            )}
+            ) : opening ? (
+              <p>Opening box…</p>
+            ) : null}
           </div>
         </div>
         <div className="supply-controls">
@@ -169,7 +159,7 @@ export function SupplyLocker({
             onClick={startDraw}
           >
             <RpgIcon name="items" />
-            Draw · 1 token
+            Open box · 1 token
           </button>
         </div>
         <p className="supply-token-source">

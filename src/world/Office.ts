@@ -10,6 +10,10 @@ import { PointLight } from "@babylonjs/core/Lights/pointLight";
 import { attachSoftShadows } from "./SoftShadows";
 
 export type HomeWall = "investigation" | "bookshelf" | "quests" | "desk";
+export const deskOffsetZ = -1.03;
+const deskEye = new Vector3(-0.48, 4.56, 0);
+const roomEye = new Vector3(0, 2.2, 0);
+const deskPitch = 0.94;
 export const wallYaw: Record<HomeWall, number> = {
   investigation: 0,
   bookshelf: Math.PI / 2,
@@ -35,15 +39,15 @@ export function buildOffice(
   scene.clearColor = new Color4(0.025, 0.035, 0.045, 1);
   const camera = new UniversalCamera(
     "office first person",
-    new Vector3(0, 2.2, 0),
+    roomEye.clone(),
     scene,
   );
   camera.fov = 1.03;
   camera.minZ = 0.05;
   camera.rotation.y = wallYaw[state().wall];
   if (state().wall === "desk") {
-    camera.position.set(-1.25, 4.3, 0);
-    camera.rotation.x = 0.98;
+    camera.position.copyFrom(deskEye);
+    camera.rotation.x = deskPitch;
   }
   let previousWall = state().wall;
   const ambient = new HemisphericLight(
@@ -181,14 +185,20 @@ export function buildOffice(
         }
       }
     } else {
-      const deskTop = box("desk top", 0, 1, 3.4, 6.2, 0.18, 2.7, "#64503e", wall);
+      const table = new TransformNode("detective table", scene);
+      table.parent = wall;
+      table.position.z = deskOffsetZ;
+      const deskTop = box("desk top", 0, 1, 3.4, 6.2, 0.18, 2.7, "#64503e", table);
       for (const x of [-2.8, 2.8])
-        box("drawers", x, 0.45, 3.6, 0.9, 0.9, 2, "#3a342f", wall);
-      const deskMat = box("desk mat", 0, 1.11, 3.1, 4, 0.025, 1.9, "#192a30", wall);
+        box("drawers", x, 0.45, 3.6, 0.9, 0.9, 2, "#3a342f", table);
+      const deskMat = box("desk mat", 0, 1.11, 3.1, 4, 0.025, 1.9, "#192a30", table);
+      box("supply shelf", 0.38, 1.72, 4.42, 1.83, 0.12, 1.04, "#4b4438", wall);
+      for (const x of [-0.2, 0.96])
+        box("shelf bracket", x, 1.53, 4.74, 0.08, 0.29, 0.36, "#343b39", wall);
 
       for (const x of [-2.7, 2.7])
         for (const z of [2.3, 4.45])
-          box("desk leg", x, 0.45, z, 0.14, 0.9, 0.14, "#3d3026", wall);
+          box("desk leg", x, 0.45, z, 0.14, 0.9, 0.14, "#3d3026", table);
       for (let n = 0; n < 3; n++) {
         box(
           "drawer front",
@@ -199,7 +209,7 @@ export function buildOffice(
           0.22,
           0.1,
           "#72553c",
-          wall,
+          table,
         );
         box(
           "brass handle",
@@ -210,7 +220,7 @@ export function buildOffice(
           0.035,
           0.07,
           "#b39764",
-          wall,
+          table,
         );
       }
       box("window frame", 0, 3.25, 4.98, 6.8, 2.15, 0.13, "#171e23", wall);
@@ -237,7 +247,7 @@ export function buildOffice(
         { diameter: 0.35, height: 0.4, tessellation: 24 },
         scene,
       );
-      mug.parent = wall;
+      mug.parent = table;
       mug.position.set(2.85, 1.33, 4.05);
       mug.material = mat("#c0b294");
       const coffee = MeshBuilder.CreateCylinder(
@@ -245,7 +255,7 @@ export function buildOffice(
         { diameter: 0.3, height: 0.012, tessellation: 24 },
         scene,
       );
-      coffee.parent = wall;
+      coffee.parent = table;
       coffee.position.set(2.85, 1.54, 4.05);
       coffee.material = mat("#2b1d16");
       const handle = MeshBuilder.CreateTorus(
@@ -253,7 +263,7 @@ export function buildOffice(
         { diameter: 0.26, thickness: 0.05, tessellation: 16 },
         scene,
       );
-      handle.parent = wall;
+      handle.parent = table;
       handle.position.set(3.07, 1.34, 4.05);
       handle.rotation.z = Math.PI / 2;
       handle.material = mat("#c0b294");
@@ -267,26 +277,26 @@ export function buildOffice(
           { diameter: 0.23, height: 0.47, tessellation: 16 },
           scene,
         );
-        vial.parent = wall;
+        vial.parent = table;
         vial.position.set(x, 1.36, 4.3);
         vial.material = mat(color);
-        const cap = box("bottle cap", x, 1.63, 4.3, 0.16, 0.1, 0.16, "#b5aa8c", wall);
+        const cap = box("bottle cap", x, 1.63, 4.3, 0.16, 0.1, 0.16, "#b5aa8c", table);
         deskProps.push(vial, cap);
       }
       // A working evidence tray makes the desk read as a detective's clue station.
-      const tray = box("evidence tray", -2.75, 1.2, 3.25, 0.68, 0.16, 0.82, "#443b32", wall);
+      const tray = box("evidence tray", -2.75, 1.2, 3.25, 0.68, 0.16, 0.82, "#443b32", table);
       deskProps.push(tray);
-      box("case folder", -2.75, 1.3, 3.25, 0.54, 0.08, 0.62, "#b29b6c", wall);
-      box("evidence sheet", -2.75, 1.35, 3.25, 0.44, 0.025, 0.47, "#d8c7a1", wall);
-      box("redacted evidence mark", -2.75, 1.368, 3.22, 0.24, 0.008, 0.045, "#964d39", wall);
-      box("lamp stem", -3, 1.9, 4.4, 0.05, 1.6, 0.05, "#b09566", wall);
-      box("lamp shade", -3, 2.65, 4.4, 0.8, 0.25, 0.5, "#957953", wall);
+      box("case folder", -2.75, 1.3, 3.25, 0.54, 0.08, 0.62, "#b29b6c", table);
+      box("evidence sheet", -2.75, 1.35, 3.25, 0.44, 0.025, 0.47, "#d8c7a1", table);
+      box("redacted evidence mark", -2.75, 1.368, 3.22, 0.24, 0.008, 0.045, "#964d39", table);
+      box("lamp stem", -3, 1.9, 4.4, 0.05, 1.6, 0.05, "#b09566", table);
+      box("lamp shade", -3, 2.65, 4.4, 0.8, 0.25, 0.5, "#957953", table);
       const deskLamp = new PointLight(
         "desk lamp",
         new Vector3(-3, 2.48, 4.18),
         scene,
       );
-      deskLamp.parent = wall;
+      deskLamp.parent = table;
       deskLamp.diffuse = Color3.FromHexString("#ffc27c");
       deskLamp.intensity = 1.25;
       deskLamp.range = 5.5;
@@ -339,8 +349,7 @@ export function buildOffice(
     const target = wallYaw[s.wall] + (steady ? 0 : px * 0.025);
     const turn = shortestTurn(camera.rotation.y, target);
     const blend = s.reducedMotion ? 1 : 1 - Math.exp(-dt * 19);
-    const eye =
-      s.wall === "desk" ? new Vector3(-1.25, 4.3, 0) : new Vector3(0, 2.2, 0);
+    const eye = s.wall === "desk" ? deskEye : roomEye;
     camera.position = Vector3.Lerp(
       camera.position,
       eye,
@@ -348,7 +357,7 @@ export function buildOffice(
     );
     camera.rotation.y += turn * blend;
     camera.rotation.x +=
-      ((s.wall === "desk" ? 0.98 : 0) +
+      ((s.wall === "desk" ? deskPitch : 0) +
         (steady ? 0 : py * 0.018) -
         camera.rotation.x) *
       blend;
