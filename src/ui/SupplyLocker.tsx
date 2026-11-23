@@ -83,7 +83,7 @@ export function SupplyLocker({
       window.matchMedia("(prefers-reduced-motion: reduce)").matches
     ) {
       setDraw(result);
-      sound("clue");
+      sound("success");
       return;
     }
 
@@ -91,7 +91,7 @@ export function SupplyLocker({
     timer.current = window.setTimeout(() => {
       timer.current = undefined;
       setDraw(result);
-      sound("clue");
+      sound("success");
       const bounds = stage.current?.getBoundingClientRect();
       if (bounds) {
         particles(item.rarity === "epic" ? "levelUp" : "success", {
