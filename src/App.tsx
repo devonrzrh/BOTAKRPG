@@ -71,6 +71,7 @@ import {
 import { BattleScreen } from "./ui/BattleScreen";
 import { battleCue, type BattleCue, type QuizOrigin } from "./game/combatPresentation";
 import { XpMeter } from "./ui/XpMeter";
+import detectiveAvatar from "./assets/detective-avatar.svg?url";
 import { GameNotice } from "./ui/GameNotice";
 import { LearningQuest } from "./ui/LearningQuest";
 import {
@@ -1694,7 +1695,7 @@ export default function App() {
             data-sfx-silent
             onClick={() => open("character")}
           >
-            {playerInitials(save.character.name)}
+            <img src={detectiveAvatar} alt="" />
           </button>
           <XpMeter
             key={booted ? "ready" : "loading"}
