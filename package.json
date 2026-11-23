@@ -10,6 +10,7 @@
     "predev": "npm run content && npm run runtime",
     "dev": "vite --host 127.0.0.1",
     "build": "npm run content && npm run runtime && tsc -b && vite build",
+    "export": "npm run build && node scripts/export-game.mjs",
     "preview": "vite preview --host 127.0.0.1",
     "test": "vitest run",
     "check": "tsc -b"

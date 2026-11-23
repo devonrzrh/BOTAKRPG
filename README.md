@@ -31,7 +31,10 @@ npm test        # model, content, save and worker tests
 npm run check   # TypeScript only, no build
 npm run build   # validate content, copy Python runtime, type-check, build dist/
 npm run preview # serve dist/ with the required COOP/COEP headers
+npm run export  # build and write BOTAKRPG.zip
 ```
+
+`BOTAKRPG.zip` contains the playable build and [RUN-GAME.txt](RUN-GAME.txt). The export uses the built-in `tar` on Windows and macOS. On Linux, install `bsdtar` first.
 
 `npm run dev` and `npm run build` regenerate `src/generated/content.json` and copy the installed Pyodide files into `public/pyodide/` automatically. `dist/` is build output; do not edit it by hand.
 
