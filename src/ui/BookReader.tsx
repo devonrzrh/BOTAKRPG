@@ -113,6 +113,7 @@ export function BookReader(p: {
   type Position = { block: number; offset: number };
   const currentAnchor = useRef<Position>({ block: 0, offset: 0 });
   const pendingAnchor = useRef<Position | null>(null);
+  const displayedChapter = useRef(p.lesson.id);
   const pagination = useRef({ step: 0, height: 0 });
   const displayedSpread = useRef(0);
   const displayedScrollTop = useRef(0);
@@ -172,7 +173,7 @@ export function BookReader(p: {
   useEffect(() => {
     sound("bookOpen");
   }, [sound]);
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (reducedMotion) setSheet(null);
   }, [reducedMotion]);
   const closeBook = () => {
@@ -184,6 +185,7 @@ export function BookReader(p: {
     )
       savePosition();
     setClosing(true);
+    setSheet(null);
     p.onClosing?.();
     if (reducedMotion) {
       p.onClose();
@@ -204,7 +206,7 @@ export function BookReader(p: {
       }
       const style = getComputedStyle(page);
       const next = bookLayout(
-        frame.clientWidth,
+        frame.getBoundingClientRect().width,
         page.scrollWidth,
         parseFloat(style.columnGap) || 0,
         Number(style.columnCount) || 1,
@@ -215,8 +217,10 @@ export function BookReader(p: {
         (contentChanged ||
           before.step !== next.step ||
           before.height !== frame.clientHeight)
-      )
+      ) {
         pendingAnchor.current ??= currentAnchor.current;
+        setSheet(null);
+      }
       pagination.current = { step: next.step, height: frame.clientHeight };
       setLayout(next);
       if (next.columns === 1) setSheet(null);
@@ -269,6 +273,12 @@ export function BookReader(p: {
     pendingAnchor.current = currentAnchor.current;
     setJumpOpen(false);
     page.focus({ preventScroll: true });
+    if (displayedChapter.current !== p.lesson.id) {
+      displayedChapter.current = p.lesson.id;
+      if (!reducedMotion) {
+        page.animate([{ opacity: 0.55 }, { opacity: 1 }], 150);
+      }
+    }
   }, [p.lesson.id]);
   useLayoutEffect(() => {
     const frame = viewport.current;
@@ -294,6 +304,7 @@ export function BookReader(p: {
       displayedScrollTop.current = 0;
       frame.scrollTo(0, 0);
       setSpread(0);
+      setPageInput("1");
       return;
     }
     currentAnchor.current = anchor;
@@ -320,7 +331,7 @@ export function BookReader(p: {
     } else {
       const style = getComputedStyle(page);
       const next = bookLayout(
-        frame.clientWidth,
+        bounds.width,
         page.scrollWidth,
         parseFloat(style.columnGap) || 0,
         Number(style.columnCount) || 1,
@@ -339,6 +350,7 @@ export function BookReader(p: {
       displayedSpread.current = target;
       frame.scrollLeft = target * next.step;
       setSpread(target);
+      setPageInput(String(target * next.columns + 1));
     }
   }, [mode, fontSize, p.lesson.id, layout]);
   const rememberAnchor = () => {
@@ -396,16 +408,18 @@ export function BookReader(p: {
       clone
         .querySelectorAll("[id]")
         .forEach((element) => element.removeAttribute("id"));
-      const half = frame.clientWidth / 2;
+      const { width, height } = frame.getBoundingClientRect();
+      const frontSpread = frame.scrollLeft;
+      const backSpread = target * layout.step;
       setSheet({
         direction,
         html: clone.innerHTML,
-        width: frame.clientWidth,
-        height: frame.clientHeight,
+        width,
+        height,
         gap: getComputedStyle(page).columnGap,
-        front: frame.scrollLeft + (direction === "next" ? half : 0),
-        back: target * layout.step + (direction === "previous" ? half : 0),
-        stationary: frame.scrollLeft + (direction === "previous" ? half : 0),
+        front: frontSpread + (direction === "next" ? width / 2 : 0),
+        back: backSpread + (direction === "previous" ? width / 2 : 0),
+        stationary: frontSpread + (direction === "previous" ? width / 2 : 0),
       });
     } else if (!reducedMotion) {
       page?.animate([{ opacity: 0.55 }, { opacity: 1 }], 150);
@@ -417,6 +431,7 @@ export function BookReader(p: {
   const selectChapter = (id: string) => {
     if (closing || sheet || id === p.lesson.id) return;
     sound("page");
+    setDrawer(null);
     p.onSelect(id);
   };
   const continueChapter = () => {
@@ -575,8 +590,13 @@ export function BookReader(p: {
               ref={viewport}
               onLoadCapture={() => measure(true)}
               onScroll={() => {
-                if (mode !== "fullscreen" || pendingAnchor.current) return;
+                if (pendingAnchor.current) return;
                 const frame = viewport.current!;
+                if (mode === "book") {
+                  // Native focus and horizontal gestures can scroll the clipped viewport.
+                  frame.scrollLeft = displayedSpread.current * layout.step;
+                  return;
+                }
                 if (frame.scrollTop === displayedScrollTop.current) return;
                 displayedScrollTop.current = frame.scrollTop;
                 setProgress(readingProgress(frame));
@@ -588,6 +608,7 @@ export function BookReader(p: {
               }}
             >
               <article
+                key={p.lesson.id}
                 ref={article}
                 className="markdown reader-content"
                 tabIndex={0}
