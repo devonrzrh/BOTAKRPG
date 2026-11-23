@@ -3,14 +3,18 @@ NULL / TRACE
 Play online
 https://botakrpg.pages.dev
 
-Run the exported game locally
+Run from source
 1. Install Node.js 22 or newer with npm.
 2. Extract BOTAKRPG.zip and open a terminal in the extracted folder.
-3. Run this command. The first launch downloads Vite if it is not cached.
+3. Install the locked dependencies. This requires internet access.
 
-   npx --yes vite@6.4.5 preview --host 127.0.0.1 --config export-preview.config.mjs
+   npm ci
 
-4. Open the Local URL printed in the terminal in a modern desktop browser
+4. Start the game.
+
+   npm run dev
+
+5. Open the Local URL printed in the terminal in a modern desktop browser
    with WebGPU or WebGL2. Leave the terminal running while you play.
    Press Ctrl+C in the terminal to stop the game server.
 
@@ -18,7 +22,8 @@ Use the printed URL so the browser Python worker receives the headers it
 needs. Opening index.html directly bypasses the server. No separate Python
 installation is needed.
 
-To host the game, publish the contents of dist/ at the root of a static
-HTTPS site. Keep _headers on hosts that support it, or configure these headers:
+To make a production build, run npm run build. Preview it with npm run preview.
+To host it, publish the contents of dist/ at the root of a static HTTPS site.
+Keep _headers on hosts that support it, or configure these headers:
    Cross-Origin-Opener-Policy: same-origin
    Cross-Origin-Embedder-Policy: require-corp
