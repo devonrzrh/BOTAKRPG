@@ -1687,12 +1687,22 @@ export default function App() {
           <span>NULL / TRACE</span>
         </a>
         <MenuBar onSelect={open} />
-        <XpMeter
-          key={booted ? "ready" : "loading"}
-          compact
-          xp={save.character.xp}
-          reducedMotion={save.settings.reducedMotion}
-        />
+        <div className="topbar-progress">
+          <button
+            className="avatar"
+            aria-label="Open character"
+            data-sfx-silent
+            onClick={() => open("character")}
+          >
+            {playerInitials(save.character.name)}
+          </button>
+          <XpMeter
+            key={booted ? "ready" : "loading"}
+            compact
+            xp={save.character.xp}
+            reducedMotion={save.settings.reducedMotion}
+          />
+        </div>
         <div className="chapter">
           <span className="chapter-dot" />
           CASE 007 <span className="top-divider">/</span> ECHO-7
@@ -1722,14 +1732,6 @@ export default function App() {
             onClick={() => open("settings")}
           >
             <Settings size={19} />
-          </button>
-          <button
-            className="avatar"
-            aria-label="Open character"
-            data-sfx-silent
-            onClick={() => open("character")}
-          >
-            {playerInitials(save.character.name)}
           </button>
         </div>
       </header>

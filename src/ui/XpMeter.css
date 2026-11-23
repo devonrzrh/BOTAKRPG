@@ -25,12 +25,17 @@
   margin-top: 7px;
   color: #c5d1d5;
 }
-.topbar .xp-compact {
+.topbar-progress,
+.topbar-progress .xp-compact {
   display: flex;
   align-items: center;
   gap: 16px;
-  margin-left: auto;
   flex-shrink: 0;
+}
+.topbar-progress {
+  margin-left: auto;
+}
+.topbar-progress .xp-compact {
   font-size: 16px;
   color: #dce2dd;
 }
@@ -61,8 +66,12 @@
   .app .topbar .save-status {
     display: none;
   }
-  .topbar .xp-compact {
+  .topbar-progress,
+  .topbar-progress .xp-compact {
     gap: 10px;
+  }
+  .xp-compact-track {
+    width: 105px;
   }
 }
 @media (max-width: 900px) {
@@ -70,10 +79,7 @@
   .app .topbar .avatar {
     display: none;
   }
-  .xp-compact-track {
-    width: 105px;
-  }
-  .topbar .xp-compact {
+  .topbar-progress .xp-compact {
     gap: 8px;
   }
 }

@@ -613,9 +613,6 @@ button.pinned-paper:hover:not(:disabled) {
     padding: 9px 7px;
     font-size: 11px;
   }
-  .top-actions .avatar {
-    display: none;
-  }
   .investigation-board {
     width: 94vw;
     border-width: 8px;

@@ -128,7 +128,7 @@
 .reduced-motion .menu-bar .menu-trigger > svg:last-child {
   transition: none;
 }
-@media (max-width: 760px) {
+@media (max-width: 1050px) {
   .menu-bar {
     gap: 1px;
   }
