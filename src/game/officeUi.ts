@@ -4,6 +4,8 @@ import {
   questComplete,
   nextObjective,
   activityUnlocked,
+  investigationProgress,
+  type InvestigationProgress,
 } from "./investigation";
 import type { Save } from "./state";
 import { recoveredClues } from "./evidence";
@@ -59,6 +61,7 @@ export interface SurfaceText {
 }
 export interface SurfaceModel {
   graph?: QuestGraph;
+  investigationProgress?: InvestigationProgress;
   ledger?: {
     count: number;
     pageLabel: string;
@@ -182,6 +185,8 @@ export function createOfficeUi(input: OfficeUiInput): SurfaceModel[] {
       disabled,
     });
   const investigation = panel("investigation", "CASE 007 / ECHO-7", "cork");
+  const progress = investigationProgress(save, content);
+  investigation.investigationProgress = progress;
   text(investigation, 48, 100, "ECHO-7", 34);
   text(
     investigation,
@@ -202,11 +207,7 @@ export function createOfficeUi(input: OfficeUiInput): SurfaceModel[] {
     investigation,
     48,
     335,
-    closed
-      ? "CASE CLOSED"
-      : save.story.caseAccepted
-        ? "INVESTIGATION ACTIVE"
-        : "CASE UNASSIGNED",
+    `Investigation progress: ${progress.percent}%. ${progress.stage}.`,
     17,
   );
   button(

@@ -310,7 +310,7 @@ export function attachOfficeSurfaces(
       ink(c, "ECHO-7", 40, 610, 53);
       ink(
         c,
-        m.texts.some((t) => t.text === "CASE CLOSED")
+        m.investigationProgress?.percent === 100
           ? "CONTAINED"
           : "UNIT MISSING",
         40,
@@ -331,12 +331,17 @@ export function attachOfficeSurfaces(
     0.065,
     (c, m) => {
       paper(c);
-      ink(c, "CASE 007", 40, 65, 60);
-      rule(c, 170);
-      ink(c, "RECALL ORDER", 40, 225, 43);
-      ink(c, "ECHO-7 / missing unit", 40, 330, 40);
-      ink(c, "Gateway access records", 40, 470, 40);
-      ink(c, "OPEN CASE FILE", 40, 676, 36, 530, "#844e38");
+      const { percent, stage } = m.investigationProgress!;
+      ink(c, "CASE 007", 40, 67, 56);
+      rule(c, 188);
+      ink(c, "INVESTIGATION PROGRESS", 40, 228, 40);
+      ink(c, `${percent}%`, 40, 322, 100);
+      c.fillStyle = "#8c7a5e";
+      c.fillRect(40, 499, 520, 21);
+      c.fillStyle = "#324f4a";
+      c.fillRect(40, 499, (520 * percent) / 100, 21);
+      ink(c, stage, 40, 568, 42);
+      ink(c, "OPEN CASE FILE", 40, 695, 36, 530, "#844e38");
       return zone(m, "quests");
     },
   );

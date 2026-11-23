@@ -345,17 +345,18 @@ button.pinned-paper:hover:not(:disabled) {
 .terminal-note {
   background: #9aaba3;
 }
-.board-stamp {
+.board-progress {
   position: absolute;
-  bottom: 20px;
-  left: 43%;
-  color: #b6a48288;
-  font: 12px monospace;
-  border: 2px solid #ac987250;
-  padding: 5px 13px;
-  transform: rotate(-6deg);
-  letter-spacing: 3px;
-  pointer-events: none;
+  bottom: 5px;
+  right: 7%;
+  padding: 4px 9px;
+  background: #dfd0aa;
+  color: #292820;
+  font: 16px/1.2 var(--typewriter);
+  box-shadow: 1px 3px 5px #0004;
+}
+.board-progress span {
+  display: block;
 }
 .home-panel {
   top: 5%;

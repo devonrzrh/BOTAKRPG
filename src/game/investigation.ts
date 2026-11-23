@@ -52,3 +52,57 @@ export function finaleAvailable(save: Save, content: Content) {
       questUnlocked(save, finale, content)),
   );
 }
+
+export type InvestigationProgress = { percent: number; stage: string };
+
+export function investigationProgress(
+  save: Save,
+  content: Content,
+): InvestigationProgress {
+  const quests = content.entities.filter((entity) => entity.type === "quest");
+  const finale = quests.find((quest) => quest.kind === "finale");
+  const cleared = new Set(save.completed);
+  if (
+    finale &&
+    (questComplete(save, finale) ||
+      (save.story.legacyFinale && cleared.has("echo-battle")))
+  ) {
+    return { percent: 100, stage: "Case closed" };
+  }
+
+  const objectives = new Set<string>();
+  const visited = new Set<string>();
+  const addRequired = (quest: Quest) => {
+    if (visited.has(quest.id)) return;
+    visited.add(quest.id);
+    quest.objectives.forEach((id) => objectives.add(id));
+    for (const id of quest.prerequisites) {
+      const prerequisite = quests.find((candidate) => candidate.id === id);
+      if (prerequisite) addRequired(prerequisite);
+    }
+  };
+  if (finale) addRequired(finale);
+
+  const opening = [
+    save.story.prologueSeen,
+    save.story.caseAccepted,
+    save.story.networkIntroSeen,
+  ];
+  const done =
+    opening.filter(Boolean).length +
+    [...objectives].filter((id) => cleared.has(id)).length;
+  const percent = Math.min(
+    99,
+    Math.floor((done / (opening.length + objectives.size)) * 100),
+  );
+  const stage = !save.story.caseAccepted
+    ? "Awaiting briefing"
+    : finale && finaleAvailable(save, content)
+      ? cleared.has("evidence-chain")
+        ? "Confront ECHO-7"
+        : "Reconstruct evidence"
+      : save.story.networkIntroSeen
+        ? "Following leads"
+        : "Connect to gateway";
+  return { percent, stage };
+}

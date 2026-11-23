@@ -5,6 +5,9 @@ import {
   FolderSearch,
   ArrowUpRight,
 } from "lucide-react";
+import { useLayoutEffect, useRef } from "react";
+import type { InvestigationProgress } from "../game/investigation";
+
 export function HomeBoard({
   onSelect,
   accepted,
@@ -12,6 +15,7 @@ export function HomeBoard({
   total,
   finaleReady,
   caseClosed,
+  progress,
 }: {
   onSelect: (id: string) => void;
   accepted: boolean;
@@ -19,6 +23,7 @@ export function HomeBoard({
   total: number;
   finaleReady: boolean;
   caseClosed: boolean;
+  progress: InvestigationProgress;
 }) {
   const threads = useRef<SVGSVGElement>(null);
   useLayoutEffect(() => {
@@ -141,10 +146,10 @@ export function HomeBoard({
           <ArrowUpRight size={17} />
         </button>
       </div>
-      <span className="board-stamp">
-        {caseClosed ? "CLOSED" : accepted ? "ACTIVE" : "UNASSIGNED"}
-      </span>
+      <div className="board-progress">
+        Investigation progress {progress.percent}%
+        <span>{progress.stage}</span>
+      </div>
     </section>
   );
 }
-import { useLayoutEffect, useRef } from "react";

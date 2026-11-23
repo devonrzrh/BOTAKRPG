@@ -15,6 +15,7 @@ import {
 import {
   activityUnlocked,
   finaleAvailable,
+  investigationProgress,
   questUnlocked,
 } from "../src/game/investigation";
 import {
@@ -46,6 +47,43 @@ const firewall = content.entities.find(
 const probe = content.entities.find(
   (e): e is Skill => e.type === "skill" && e.id === "insight",
 )!;
+it("tracks required steps across the opening, leads and finale", () => {
+  let save = initialSave();
+  const progress = () => investigationProgress(save, content);
+  expect(progress()).toEqual({ percent: 0, stage: "Awaiting briefing" });
+  save.story.prologueSeen = true;
+  expect(progress().percent).toBeGreaterThan(0);
+  save.story.caseAccepted = true;
+  expect(progress().stage).toBe("Connect to gateway");
+  save.story.networkIntroSeen = true;
+  const firstLead = progress();
+  expect(firstLead.stage).toBe("Following leads");
+  save.character.xp += 300;
+  expect(progress()).toEqual(firstLead);
+  save = completeActivity(save, branches[0].objectives[0]);
+  const oneObjective = progress();
+  expect(oneObjective.percent).toBeGreaterThan(firstLead.percent);
+  save = completeActivity(save, branches[0].objectives[0]);
+  expect(progress()).toEqual(oneObjective);
+  for (const branch of branches)
+    for (const id of branch.objectives) save = completeActivity(save, id);
+  expect(progress().stage).toBe("Reconstruct evidence");
+  save = completeActivity(save, "evidence-chain");
+  expect(progress().stage).toBe("Confront ECHO-7");
+  expect(progress().percent).toBeLessThan(100);
+  save = completeActivity(save, "echo-battle");
+  expect(progress()).toEqual({ percent: 100, stage: "Case closed" });
+});
+
+it("keeps a completed legacy investigation closed", () => {
+  const save = completeActivity(initialSave(), "echo-battle");
+  save.story.legacyFinale = true;
+  expect(investigationProgress(save, content)).toEqual({
+    percent: 100,
+    stage: "Case closed",
+  });
+});
+
 it("allows all branch orders and unlocks the boss only after every clue", () => {
   const orders = (ids: string[]): string[][] =>
     ids.length

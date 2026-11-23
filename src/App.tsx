@@ -1898,6 +1898,10 @@ export default function App() {
             accepted={save.story.caseAccepted}
             finaleReady={finaleAvailable(save, content)}
             caseClosed={save.completed.includes("echo-battle")}
+            progress={
+              officeUi.find((model) => model.id === "investigation")!
+                .investigationProgress!
+            }
             total={branches.length}
             completed={branches
               .filter((branch) => branch.objectives.every((id) => save.completed.includes(id)))
