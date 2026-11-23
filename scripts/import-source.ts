@@ -150,15 +150,6 @@ let outline = await readFile(
   "utf8",
 );
 outline = rewriteLinks(outline, "Content/Markdown/Module Outline.md");
-const supporting: string[] = [];
-for (const [folder] of groups)
-  for (const file of (
-    await readdir(`${root}/Content/Markdown/${folder}`)
-  ).filter((f) => !/^\d/.test(f))) {
-    supporting.push(
-      `### ${folder}: ${file.replace(/\.md$/, "")}\n\n${rewriteLinks(await readFile(`${root}/Content/Markdown/${folder}/${file}`, "utf8"), `Content/Markdown/${folder}/${file}`)}`,
-    );
-  }
 const supplementary: string[] = [];
 for (const directory of [
   "Content/Videos",
@@ -178,7 +169,7 @@ for (const directory of [
 }
 await writeFile(
   "content/source/guide.md",
-  `---\n${stringify({ type: "lesson", id: "source-guide", title: "Module guide and review notes", topic: "algorithms", summary: "Curriculum map, source reviews and original resources", source: "Source/Content/Markdown/Module Outline.md" })}---\n\n${outline}\n\n## Reading and running examples\n\nStart with the Python chapter. Maze scripts run in the game's Python worker using its maze API. General examples may use normal Python; PyTorch examples need a separate Python environment with PyTorch installed. The maze worker does not provide PyTorch or arbitrary application data.\n\n[Full test bank](#lesson=source-test-bank)\n\n## Source review notes\n\nThe following are the supplied peer reviews. They are retained as review records; their recommendations are not claims that every source issue has been corrected. Original files are preserved unchanged.\n\n${supporting.join("\n\n")}\n\n## Supplementary materials\n\n${supplementary.join("\n")}\n`,
+  `---\n${stringify({ type: "lesson", id: "source-guide", title: "Module guide", topic: "algorithms", summary: "Curriculum map and original resources", source: "Source/Content/Markdown/Module Outline.md" })}---\n\n${outline}\n\n## Reading and running examples\n\nStart with the Python chapter. Maze scripts run in the game's Python worker using its maze API. General examples may use normal Python; PyTorch examples need a separate Python environment with PyTorch installed. The maze worker does not provide PyTorch or arbitrary application data.\n\n[Full test bank](#lesson=source-test-bank)\n\n## Supplementary materials\n\n${supplementary.join("\n")}\n`,
 );
 
 const pdf = "BOTAK_Stage2_TestBank_V1_Robot_InstantAnswers.pdf";

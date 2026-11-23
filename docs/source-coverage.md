@@ -14,7 +14,7 @@ All chapter prose, examples, diagrams and practice exercises remain in their boo
 
 There are **119 playable questions**: six existing questions, 31 chapter checkpoints, and 82 imported objective questions (40 true/false and 42 multiple choice, including two select-all questions). All reference a lesson for review and mastery. Chapter checkpoints cover topics missing from the PDF. The test-bank book contains all 95 questions, including the 13 open-ended prompts and model answers in disclosure sections. Written responses use personal notes and are self-assessed; no automatic free-text grading is claimed. The original illustrated PDF is also linked.
 
-The module guide retains the supplied outline and four peer review records. Its supplementary links now include the three supplied videos and the Markdown test bank; empty placeholder indexes are omitted. Videos are linked original files, not downloaded during ordinary reading. README artwork and all diagrams are included in the archive. SVGs retain their authored dark/light styles, with the book requesting light colors for readable contrast. Reduced motion uses still editions under `public/materials-still/`.
+The module guide contains the supplied outline. Peer reviews remain in the original source archive. Its supplementary links now include the three supplied videos and the Markdown test bank; empty placeholder indexes are omitted. Videos are linked original files, not downloaded during ordinary reading. README artwork and all diagrams are included in the archive. SVGs retain their authored dark/light styles, with the book requesting light colors for readable contrast. Reduced motion uses still editions under `public/materials-still/`.
 
 ## Editorial changes in the game edition
 

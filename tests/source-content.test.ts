@@ -55,6 +55,13 @@ it("resolves chapter contents anchors and repaired module-guide links", async ()
   }
   const guide = content.entities.find((e) => e.id === "source-guide")!;
   if (guide.type !== "lesson") throw new Error("Missing guide");
+  expect(guide.title).toBe("Module guide");
+  expect(guide.body).toContain(
+    "[Introduction to Python Programming](#lesson=source-alg-00)",
+  );
+  expect(guide.body).not.toMatch(
+    /^#{1,6}\s+.*(?:\breviews?\b|\d_\w+)/im,
+  );
   expect(guide.body).not.toMatch(
     /\]\((?:Algorithm|Data-Structures|Connetionist-AI)\//,
   );
