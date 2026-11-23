@@ -10,6 +10,11 @@ preserve the existing storyline and boss requirements.
 | Stalled packet relay | Queue | Rotate/dispatch the FIFO front |
 | Scrambled transit log | Basic Sorting Algorithms | Swap adjacent timestamps into ascending order |
 | Relay blackout | Graph Searching | Traverse weighted edges within a signal budget |
+| Scrambled witness list | Basic Sorting Algorithms | Restore the interview order in five adjacent swaps |
+| The missing receipt | Binary Search | Locate a receipt in four probes |
+| Off the dispatch map | Graph Searching | Reconstruct a courier's route under a charge limit |
+
+The three night courier cases support Manual, Blockly, and Python.
 
 Every first completion files a clue and grants 25 XP. Replays grant no extra XP.
 An unaided solution records puzzle mastery evidence separately from quiz answers.

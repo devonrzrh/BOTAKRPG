@@ -143,6 +143,18 @@ it("ships solvable Markdown puzzle variants with library and reward links", () =
       index,
     })),
     "puzzle-route-detour": [3, 2, 5, 6].map((node) => ({ type: "move", node })),
+    "puzzle-courier-contacts": [0, 2, 1, 3, 2].map((index) => ({
+      type: "swap",
+      index,
+    })),
+    "puzzle-courier-receipt": [5, 8, 9, 10].map((index) => ({
+      type: "probe",
+      index,
+    })),
+    "puzzle-courier-handoff": [3, 5, 6].map((node) => ({
+      type: "move",
+      node,
+    })),
   };
   for (const [id, commands] of Object.entries(solutions)) {
     const puzzle = content.entities.find(
