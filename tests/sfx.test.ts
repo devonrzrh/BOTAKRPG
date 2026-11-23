@@ -97,6 +97,14 @@ describe("bundled interface SFX", () => {
     expect(
       clips.slice(-12).every((clip) => clip.pause.mock.calls.length > 0),
     ).toBe(true);
+    sfx.setVolume(0.65);
+    sfx.play("battleInsight");
+    const stopStrike = sfx.play("battleStrike");
+    const strike = clips.at(-1)!;
+    const other = clips.at(-2)!;
+    stopStrike?.();
+    expect(strike.pause).toHaveBeenCalledOnce();
+    expect(other.pause).not.toHaveBeenCalled();
     sfx.dispose();
   });
 

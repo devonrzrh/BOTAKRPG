@@ -128,9 +128,16 @@ export const storySchema = z.object({
         time: z.string(),
         shot: id,
         alt: z.string().min(1),
-        heading: z.string(),
-        body: z.string(),
-        steps: z.number().int().min(1).max(20).default(1),
+        dialogue: z
+          .array(
+            z.object({
+              speaker: z.string().min(1),
+              text: z.string().min(1),
+              holdMs: z.number().int().min(1500).max(12000).default(3400),
+            }),
+          )
+          .min(1)
+          .max(12),
       }),
     )
     .min(1)

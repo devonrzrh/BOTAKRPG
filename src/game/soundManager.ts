@@ -28,6 +28,7 @@ import forceField from "../../sounds/sfx/kenney_sci-fi-sounds/Audio/forceField_0
 import laserRetro from "../../sounds/sfx/kenney_sci-fi-sounds/Audio/laserRetro_000.ogg?url";
 import laserSmall from "../../sounds/sfx/kenney_sci-fi-sounds/Audio/laserSmall_000.ogg?url";
 import cameraSwoosh from "../../sounds/sfx/swoosh.mp3?url";
+import cinematicTrain from "../../sounds/sfx/cinematic-train-pass.ogg?url";
 
 export const SFX_CUES = {
   click: { label: "Menu click", source: uiClick, cooldown: 90 },
@@ -52,6 +53,11 @@ export const SFX_CUES = {
   connect: { label: "Connect", source: digitalZap, cooldown: 250 },
   pursuit: { label: "Pursuit", source: rpgFootstepRun, cooldown: 120 },
   train: { label: "Train", source: digitalPhaseJump, cooldown: 180 },
+  cinematicTrain: {
+    label: "Passing railcar",
+    source: cinematicTrain,
+    cooldown: 180,
+  },
   scan: { label: "Scan", source: digitalPhaser, cooldown: 180 },
   hazard: { label: "Hazard warning", source: digitalHighDown, cooldown: 180 },
   dodge: { label: "Dodge", source: digitalPhaseJump, cooldown: 180 },
@@ -86,6 +92,8 @@ export const SFX_GAINS: Partial<Record<SfxName, number>> = {
   speechRobot: 0.12,
   speechEcho: 0.12,
   speechSoft: 0.12,
+  cinematicTrain: 0.72,
+  pursuit: 0.48,
   battleStrike: 0.65,
   battleInsight: 0.55,
   battleWard: 0.55,
@@ -152,6 +160,7 @@ export function createSoundManager() {
       } catch {
         release();
       }
+      return release;
     } catch {
       /* Audio may be unavailable or blocked. */
     }

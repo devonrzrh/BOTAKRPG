@@ -23,6 +23,10 @@ ORIGINS = {
     "head": (0, -0.02, 3.09),
     "left": (-0.88, 0, 2.44),
     "right": (0.88, 0, 2.44),
+    "left-thigh": (-0.43, 0.03, 1.28),
+    "right-thigh": (0.43, 0.03, 1.28),
+    "left-shin": (-0.43, -0.11, 0.76),
+    "right-shin": (0.43, -0.11, 0.76),
 }
 
 
@@ -124,19 +128,20 @@ def build():
                   0.079, 0.22, 0.15, 1, bevel=0.012)
         block("Thumb", arm, (side * 0.065, -0.22, -1.15), 0.10, 0.19, 0.18, 0)
 
-        leg = side * 0.43
-        block("Thigh actuator", "body", (leg, 0.055, 1.05), 0.40, 0.52, 0.47, 0)
-        block("Thigh plate", "body", (leg, -0.18, 1.08), 0.44, 0.41, 0.25, 1, taper=0.76)
-        hub("Knee bearing", "body", (leg, -0.11, 0.76), 0.22, 0.47, 0)
-        hub("Knee cap", "body", (leg, -0.325, 0.76), 0.19, 0.18, 1, sides=6)
-        boot = leg + side * 0.08
-        block("Shin housing", "body", (boot, 0, 0.43), 0.48, 0.58, 0.54, 0, taper=1.15)
-        plate("Shin guard", "body", (boot, -0.25, 0.43), mirror([
+        thigh = f"{arm}-thigh"
+        shin = f"{arm}-shin"
+        block("Thigh actuator", thigh, (0, 0.025, -0.23), 0.40, 0.52, 0.47, 0)
+        block("Thigh plate", thigh, (0, -0.21, -0.20), 0.44, 0.41, 0.25, 1, taper=0.76)
+        hub("Knee bearing", shin, (0, 0, 0), 0.22, 0.47, 0)
+        hub("Knee cap", shin, (0, -0.215, 0), 0.19, 0.18, 1, sides=6)
+        boot = side * 0.08
+        block("Shin housing", shin, (boot, 0.11, -0.33), 0.48, 0.58, 0.54, 0, taper=1.15)
+        plate("Shin guard", shin, (boot, -0.14, -0.33), mirror([
             (-0.15, 0.25), (0.15, 0.25), (0.23, 0.11),
             (0.20, -0.24), (-0.20, -0.24),
         ]), 0.25, 1, 0.035)
-        block("Boot", "body", (boot, -0.14, 0.14), 0.53, 0.28, 0.87, 0, taper=1.08)
-        block("Boot toe", "body", (boot, -0.48, 0.15), 0.49, 0.19, 0.30, 1)
+        block("Boot", shin, (boot, -0.03, -0.62), 0.53, 0.28, 0.87, 0, taper=1.08)
+        block("Boot toe", shin, (boot, -0.37, -0.61), 0.49, 0.19, 0.30, 1)
     return collection
 
 

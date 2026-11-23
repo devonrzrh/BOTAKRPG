@@ -3,6 +3,7 @@ import { readFile } from "node:fs/promises";
 import { parseMarkdown } from "../scripts/compile-content";
 import { validateContent } from "../src/content/schema";
 import raw from "../src/generated/content.json";
+import { cinematicShots } from "../src/world/CinematicStage";
 it("preserves nested Markdown code fences inside a structured worked example", async () => {
   const records = parseMarkdown(
     await readFile("content/11-algorithm-chapters.md", "utf8"),
@@ -59,7 +60,7 @@ it("rejects missing dialogue targets and ambiguous choices", () => {
     }),
   ).toThrow(/exactly one/);
 });
-it("supports reusable cutscenes with different frame counts and pursuit steps", () => {
+it("compiles timed dialogue across the pursuit and first connection", () => {
   const c = validateContent(raw);
   const intro = c.entities.find(
     (e) => e.type === "story" && e.id === "rogue-signal",
@@ -67,7 +68,13 @@ it("supports reusable cutscenes with different frame counts and pursuit steps", 
   const connection = c.entities.find(
     (e) => e.type === "story" && e.id === "first-connection",
   );
-  expect(intro?.type === "story" && intro.frames[1].steps).toBe(6);
+  expect(intro?.type === "story" && intro.frames[1]).toMatchObject({
+    shot: "rail-pursuit",
+    dialogue: [
+      { speaker: "Detective", holdMs: 3000 },
+      { speaker: "Dispatch", holdMs: 3400 },
+    ],
+  });
   expect(connection?.type === "story" && connection.frames.length).toBe(2);
 });
 it.each(["pacified", "defeated"])(
@@ -80,8 +87,8 @@ it.each(["pacified", "defeated"])(
     expect(finale).toMatchObject({
       visual: "finale",
       frames: [
-        { steps: 1 },
-        { time: "Detective’s office / First light", steps: 1 },
+        { shot: outcome === "pacified" ? "echo-surrender" : "echo-isolation" },
+        { time: "Detective’s office / First light" },
       ],
     });
   },
@@ -93,6 +100,7 @@ it("ships accessible artwork for every cutscene frame", async () => {
   await Promise.all(
     stories.flatMap((story) =>
       story.frames.map(async ({ shot, alt }) => {
+        expect(cinematicShots).toContain(shot);
         expect(alt.trim()).not.toBe("");
         const image = await readFile(`public/cutscenes/${shot}.webp`);
         expect(image.toString("ascii", 8, 12)).toBe("WEBP");

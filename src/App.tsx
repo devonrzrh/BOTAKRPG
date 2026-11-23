@@ -1186,6 +1186,10 @@ export default function App() {
         (e): e is Story => e.type === "story" && e.id === cutsceneId,
       )!
     : story;
+  const cinematicActive =
+    booted &&
+    !intakeOpen &&
+    (!save.story.prologueSeen || prologueReplay || Boolean(cutsceneId));
   const applyBattle = (
     nextBattle: Battle,
     nextSave: Save,
@@ -1522,7 +1526,7 @@ export default function App() {
         boss: bossBattle,
         battleWon: battleView && battle.phase === "won",
         battleLost: battleView && battle.phase === "lost",
-        dialogue: Boolean(dialogueId || cutsceneId || chapterId),
+        dialogue: cinematicActive || Boolean(dialogueId || chapterId),
       }),
     [
       intakeOpen,
@@ -1533,7 +1537,7 @@ export default function App() {
       bossBattle,
       battle.phase,
       dialogueId,
-      cutsceneId,
+      cinematicActive,
       chapterId,
     ],
   );
@@ -1865,6 +1869,7 @@ export default function App() {
                 : undefined
             }
             reducedMotion={save.settings.reducedMotion}
+            cinematicActive={cinematicActive}
             locked={
               intakeOpen ||
               debugOpen ||
@@ -3471,48 +3476,48 @@ export default function App() {
           </button>
         </div>
       </aside>
-      {booted &&
-        !intakeOpen &&
-        (!save.story.prologueSeen || prologueReplay || cutsceneId) && (
-          <Cutscene
-            key={cutsceneId ?? "intro"}
-            savedName={save.character.name}
-            story={activeStory}
-            onFinish={() => {
-              if (activeStory.visual === "finale") {
-                setCutsceneId(null);
-                open("journal");
-              } else if (cutsceneId) {
-                updateSave((s) => ({
-                  ...s,
-                  story: { ...s.story, networkIntroSeen: true },
-                }));
-                setCutsceneId(null);
-                setRealm("desk");
-                setScene("desk");
-                setHomeWall("quests");
-                setPanel("journal");
-                if (pendingActivity) {
-                  const id = pendingActivity;
-                  setPendingActivity(null);
-                  open(id);
-                }
-              } else {
-                updateSave((s) => ({
-                  ...s,
-                  story: { ...s.story, prologueSeen: true },
-                }));
-                setPrologueReplay(false);
-                setRealm("desk");
-                setScene("desk");
-                setPanel(null);
-                setHomeWall("investigation");
-                if (!saveRef.current.story.briefingSeen)
-                  setDialogueId("case-briefing");
+      {cinematicActive && (
+        <Cutscene
+          key={cutsceneId ?? "intro"}
+          savedName={save.character.name}
+          story={activeStory}
+          renderer={save.settings.renderer}
+          reducedMotion={save.settings.reducedMotion}
+          onFinish={() => {
+            if (activeStory.visual === "finale") {
+              setCutsceneId(null);
+              open("journal");
+            } else if (cutsceneId) {
+              updateSave((s) => ({
+                ...s,
+                story: { ...s.story, networkIntroSeen: true },
+              }));
+              setCutsceneId(null);
+              setRealm("desk");
+              setScene("desk");
+              setHomeWall("quests");
+              setPanel("journal");
+              if (pendingActivity) {
+                const id = pendingActivity;
+                setPendingActivity(null);
+                open(id);
               }
-            }}
-          />
-        )}
+            } else {
+              updateSave((s) => ({
+                ...s,
+                story: { ...s.story, prologueSeen: true },
+              }));
+              setPrologueReplay(false);
+              setRealm("desk");
+              setScene("desk");
+              setPanel(null);
+              setHomeWall("investigation");
+              if (!saveRef.current.story.briefingSeen)
+                setDialogueId("case-briefing");
+            }
+          }}
+        />
+      )}
       {chapterId &&
         (() => {
           const chapter = content.entities.find(

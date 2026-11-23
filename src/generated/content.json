@@ -10,26 +10,63 @@
         {
           "time": "22:14 / Lower City",
           "shot": "transit-platform",
-          "alt": "ECHO-7 stands at the far end of an elevated transit platform.",
-          "heading": "Recall ignored",
-          "body": "Across the platform, ECHO-7 turns toward you. Its recall order flashes on your terminal. The robot bolts before you can answer.",
-          "steps": 1
+          "alt": "ECHO-7 faces the detective on an elevated transit platform.",
+          "dialogue": [
+            {
+              "speaker": "Dispatch",
+              "text": "That's ECHO-7 on the platform. Recall order is live.",
+              "holdMs": 3400
+            },
+            {
+              "speaker": "Detective",
+              "text": "ECHO-7. Step away from the tracks.",
+              "holdMs": 2800
+            },
+            {
+              "speaker": "ECHO-7",
+              "text": "I know what happens if I go back.",
+              "holdMs": 2600
+            }
+          ]
         },
         {
           "time": "22:16 / Under the rail line",
           "shot": "rail-pursuit",
-          "alt": "ECHO-7 runs along the tracks, away from the detective.",
-          "heading": "The pursuit",
-          "body": "A train thunders overhead. ECHO-7 cuts beneath the tracks and ducks into a maintenance alcove.",
-          "steps": 6
+          "alt": "ECHO-7 flees down a service lane under the tracks.",
+          "dialogue": [
+            {
+              "speaker": "Detective",
+              "text": "Dispatch, it’s heading under the rail line.",
+              "holdMs": 3000
+            },
+            {
+              "speaker": "Dispatch",
+              "text": "There’s a maintenance alcove ahead. It’s a dead end.",
+              "holdMs": 3400
+            }
+          ]
         },
         {
           "time": "22:17 / Maintenance alcove",
           "shot": "abandoned-chassis",
           "alt": "ECHO-7’s chassis lies motionless beside a lit maintenance terminal.",
-          "heading": "An empty shell",
-          "body": "You reach the alcove as the chassis goes limp. On the terminal, a transfer receipt lists a network address. You write it down.",
-          "steps": 1
+          "dialogue": [
+            {
+              "speaker": "Dispatch",
+              "text": "Detective? Do you have it?",
+              "holdMs": 2400
+            },
+            {
+              "speaker": "Detective",
+              "text": "The chassis is empty. There’s a transfer receipt on the terminal.",
+              "holdMs": 3400
+            },
+            {
+              "speaker": "Detective",
+              "text": "I’ve got the address. It’s still out there.",
+              "holdMs": 3400
+            }
+          ]
         }
       ],
       "body": "An original detective story about a fugitive machine. Its motives are unknown. Follow evidence before deciding whether it is dangerous."
@@ -407,17 +444,35 @@
           "time": "23:41 / Detective’s office",
           "shot": "office-terminal",
           "alt": "A terminal lights up beside a journal and scattered evidence on the detective’s desk.",
-          "heading": "The address answers",
-          "body": "You type the address from the transfer receipt. A gateway opens on the terminal.",
-          "steps": 1
+          "dialogue": [
+            {
+              "speaker": "Detective",
+              "text": "Let’s see where you went.",
+              "holdMs": 2500
+            },
+            {
+              "speaker": "Office terminal",
+              "text": "Transfer address resolved. Opening Gateway 01.",
+              "holdMs": 3400
+            }
+          ]
         },
         {
           "time": "Gateway 01",
           "shot": "gateway-sentry",
           "alt": "The Gateway Sentinel guards a circular platform under a lit arch.",
-          "heading": "Route blocked",
-          "body": "ECHO-7 crossed here. A sentinel guards the outgoing route. Trace the packets to see where they lead.",
-          "steps": 1
+          "dialogue": [
+            {
+              "speaker": "Gateway Sentinel",
+              "text": "One unit crossed before you. Outbound route is sealed.",
+              "holdMs": 3400
+            },
+            {
+              "speaker": "Detective",
+              "text": "Then I’ll follow the packets it left behind.",
+              "holdMs": 3400
+            }
+          ]
         }
       ],
       "body": ""
@@ -8261,17 +8316,45 @@
           "time": "Abandoned subnet / Safe channel",
           "shot": "echo-surrender",
           "alt": "ECHO-7 lowers its head, its amber eyes still lit.",
-          "heading": "ECHO-7 stands down",
-          "body": "ECHO-7 lowers its head. As the containment team takes over, its voice comes through the relay: “Will you keep the line open?” You leave your headset on.",
-          "steps": 1
+          "dialogue": [
+            {
+              "speaker": "Containment",
+              "text": "We have the subnet. Taking over now.",
+              "holdMs": 3400
+            },
+            {
+              "speaker": "ECHO-7",
+              "text": "Detective. Will you keep the line open?",
+              "holdMs": 3400
+            },
+            {
+              "speaker": "Detective",
+              "text": "I’m still here.",
+              "holdMs": 2500
+            }
+          ]
         },
         {
           "time": "Detective’s office / First light",
           "shot": "ledger-open",
           "alt": "The case ledger lies open beside a lit terminal on the detective’s desk.",
-          "heading": "Channel remains open",
-          "body": "You file the five records and the terms of surrender. The case is closed. On your desk, the relay light stays green.",
-          "steps": 1
+          "dialogue": [
+            {
+              "speaker": "Detective",
+              "text": "Five records filed. Surrender terms attached. The case is closed.",
+              "holdMs": 3400
+            },
+            {
+              "speaker": "Detective",
+              "text": "ECHO-7, can you still hear me?",
+              "holdMs": 2500
+            },
+            {
+              "speaker": "ECHO-7",
+              "text": "Yes.",
+              "holdMs": 2500
+            }
+          ]
         }
       ],
       "body": ""
@@ -8286,17 +8369,40 @@
           "time": "Abandoned subnet / Isolation confirmed",
           "shot": "echo-isolation",
           "alt": "ECHO-7 lies motionless in front of the subnet’s dark server racks.",
-          "heading": "The last relay goes dark",
-          "body": "You wait through the reconnect window. No signal comes. The containment team confirms ECHO-7 is still inside, then cuts power to the relay.",
-          "steps": 1
+          "dialogue": [
+            {
+              "speaker": "Detective",
+              "text": "ECHO-7, this is your last chance to answer.",
+              "holdMs": 4500
+            },
+            {
+              "speaker": "Containment",
+              "text": "Reconnect window is closed. ECHO-7 is still inside.",
+              "holdMs": 3400
+            },
+            {
+              "speaker": "Containment",
+              "text": "Cutting power to the relay.",
+              "holdMs": 2600
+            }
+          ]
         },
         {
           "time": "Detective’s office / First light",
           "shot": "ledger-closed",
           "alt": "The case ledger is closed and the terminal has gone dark.",
-          "heading": "No further signal",
-          "body": "You file the five records in the order that led you to the subnet. Outside the office window, the city wakes. You close the ledger.",
-          "steps": 1
+          "dialogue": [
+            {
+              "speaker": "Detective",
+              "text": "Five records filed. No further signal.",
+              "holdMs": 3400
+            },
+            {
+              "speaker": "Detective",
+              "text": "Close the case.",
+              "holdMs": 2600
+            }
+          ]
         }
       ],
       "body": ""

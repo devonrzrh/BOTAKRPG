@@ -7,13 +7,26 @@ frames:
   - time: "Abandoned subnet / Safe channel"
     shot: echo-surrender
     alt: "ECHO-7 lowers its head, its amber eyes still lit."
-    heading: ECHO-7 stands down
-    body: 'ECHO-7 lowers its head. As the containment team takes over, its voice comes through the relay: “Will you keep the line open?” You leave your headset on.'
+    dialogue:
+      - speaker: Containment
+        text: "We have the subnet. Taking over now."
+      - speaker: ECHO-7
+        text: "Detective. Will you keep the line open?"
+      - speaker: Detective
+        text: "I’m still here."
+        holdMs: 2500
   - time: "Detective’s office / First light"
     shot: ledger-open
     alt: "The case ledger lies open beside a lit terminal on the detective’s desk."
-    heading: Channel remains open
-    body: 'You file the five records and the terms of surrender. The case is closed. On your desk, the relay light stays green.'
+    dialogue:
+      - speaker: Detective
+        text: "Five records filed. Surrender terms attached. The case is closed."
+      - speaker: Detective
+        text: "ECHO-7, can you still hear me?"
+        holdMs: 2500
+      - speaker: ECHO-7
+        text: "Yes."
+        holdMs: 2500
 ```
 
 ```entity
@@ -25,11 +38,22 @@ frames:
   - time: "Abandoned subnet / Isolation confirmed"
     shot: echo-isolation
     alt: "ECHO-7 lies motionless in front of the subnet’s dark server racks."
-    heading: The last relay goes dark
-    body: 'You wait through the reconnect window. No signal comes. The containment team confirms ECHO-7 is still inside, then cuts power to the relay.'
+    dialogue:
+      - speaker: Detective
+        text: "ECHO-7, this is your last chance to answer."
+        holdMs: 4500
+      - speaker: Containment
+        text: "Reconnect window is closed. ECHO-7 is still inside."
+      - speaker: Containment
+        text: "Cutting power to the relay."
+        holdMs: 2600
   - time: "Detective’s office / First light"
     shot: ledger-closed
     alt: "The case ledger is closed and the terminal has gone dark."
-    heading: No further signal
-    body: 'You file the five records in the order that led you to the subnet. Outside the office window, the city wakes. You close the ledger.'
+    dialogue:
+      - speaker: Detective
+        text: "Five records filed. No further signal."
+      - speaker: Detective
+        text: "Close the case."
+        holdMs: 2600
 ```

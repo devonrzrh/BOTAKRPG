@@ -10,7 +10,7 @@ import {
 import { createSoundManager, type SfxName } from "../game/soundManager";
 
 const SoundContext = createContext({
-  play: (_name: SfxName) => {},
+  play: (_name: SfxName): (() => void) | undefined => undefined,
   setVolume: (_volume: number) => {},
 });
 

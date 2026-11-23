@@ -1,48 +1,155 @@
-import { useEffect, useRef, useState } from "react";
+import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import { preload } from "react-dom";
-import { ArrowRight, SkipForward } from "lucide-react";
+import { ArrowRight, Pause, Play, SkipForward } from "lucide-react";
 import type { Story } from "../content/schema";
+import type { RendererPreference } from "../game/contracts";
+import { dialogueVoice } from "../game/dialogueSpeech";
 import { personalizeText } from "../game/player";
+import type { SfxName } from "../game/soundManager";
 import { useGameSound } from "./GameSound";
 import "./Cutscene.css";
 
+const CinematicCanvas = lazy(() => import("../world/CinematicCanvas"));
 const shotUrl = (shot: string) =>
   `${import.meta.env.BASE_URL}cutscenes/${shot}.webp`;
+
+const effects: Partial<Record<string, [atMs: number, sound: SfxName][]>> = {
+  "transit-platform": [
+    [400, "scan"],
+    [4550, "cinematicTrain"],
+    [7470, "pursuit"],
+    [7810, "pursuit"],
+    [8150, "pursuit"],
+  ],
+  "rail-pursuit": [
+    [1850, "cinematicTrain"],
+    ...Array.from({ length: 18 }, (_, step): [number, SfxName] => [
+      170 + step * 334,
+      "pursuit",
+    ]),
+  ],
+  "abandoned-chassis": [
+    [400, "move"],
+    [2100, "scan"],
+    [3100, "clue"],
+  ],
+  "office-terminal": [
+    [300, "click"],
+    [490, "click"],
+    [680, "click"],
+    [2500, "connect"],
+  ],
+  "gateway-sentry": [
+    [1150, "blocked"],
+    [1660, "hazard"],
+  ],
+  "echo-surrender": [[1420, "blocked"]],
+  "echo-isolation": [[8570, "close"]],
+  "ledger-open": [
+    [800, "page"],
+    [6500, "clue"],
+  ],
+  "ledger-closed": [
+    [3490, "page"],
+    [5140, "bookClose"],
+  ],
+};
 
 export function Cutscene({
   story,
   savedName = "",
+  renderer,
+  reducedMotion,
   onFinish,
 }: {
   story: Story;
   savedName?: string;
+  renderer: RendererPreference;
+  reducedMotion: boolean;
   onFinish: () => void;
 }) {
   const sound = useGameSound();
-  const [{ frame, step }, setPosition] = useState({ frame: 0, step: 0 });
+  const [{ frame, line }, setPosition] = useState({ frame: 0, line: 0 });
+  const [paused, setPaused] = useState(false);
+  const [systemReducedMotion, setSystemReducedMotion] = useState(
+    () => window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+  );
+  const elapsed = useRef(0);
+  const stops = useRef<(() => void)[]>([]);
   const nextButton = useRef<HTMLButtonElement>(null);
   useEffect(() => {
     const previous = document.activeElement as HTMLElement | null;
+    const query = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const update = () => setSystemReducedMotion(query.matches);
+    query.addEventListener("change", update);
     nextButton.current?.focus();
     return () => {
+      query.removeEventListener("change", update);
       if (previous?.isConnected) previous.focus();
     };
   }, []);
 
+  const still = reducedMotion || systemReducedMotion;
   const current = story.frames[frame];
   const next = story.frames[frame + 1];
-  const chasing = current.steps > 1;
+  const cue = current.dialogue[line];
+  const nextLine = line + 1 < current.dialogue.length;
+  const cueStart = current.dialogue
+    .slice(0, line)
+    .reduce((time, entry) => time + entry.holdMs, 0);
+  const cueEnd = cueStart + cue.holdMs;
   if (next) preload(shotUrl(next.shot), { as: "image" });
 
+  useEffect(() => {
+    return () => {
+      for (const stop of stops.current) stop();
+      stops.current = [];
+    };
+  }, [frame, paused, still]);
+
+  useEffect(() => {
+    const stop = sound(dialogueVoice(cue.speaker));
+    return stop;
+  }, [cue, sound]);
+
+  useEffect(() => {
+    if (paused || still) return;
+    let request: number;
+    let previous: number | undefined;
+    const tick = (now: number) => {
+      // Bound the delta so returning to the tab never skips dialogue.
+      const delta = previous === undefined ? 0 : Math.min(100, now - previous);
+      previous = now;
+      const from = elapsed.current;
+      elapsed.current = Math.min(cueEnd, from + delta);
+      for (const [at, effect] of effects[current.shot] ?? []) {
+        if (from < at && at <= elapsed.current) {
+          const stop = sound(effect);
+          if (stop) stops.current.push(stop);
+        }
+      }
+      if (elapsed.current < cueEnd) {
+        request = requestAnimationFrame(tick);
+      } else if (nextLine) {
+        setPosition({ frame, line: line + 1 });
+      } else if (next) {
+        elapsed.current = 0;
+        setPosition({ frame: frame + 1, line: 0 });
+      }
+    };
+    request = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(request);
+  }, [current.shot, cueEnd, frame, line, next, nextLine, paused, sound, still]);
+
   const advance = () => {
-    if (step + 1 < current.steps) {
-      sound("pursuit");
-      setPosition({ frame, step: step + 1 });
+    sound("dialogue");
+    if (nextLine) {
+      elapsed.current = cueEnd;
+      setPosition({ frame, line: line + 1 });
     } else if (next) {
-      sound(story.visual === "chase" && !chasing ? "pursuit" : "connect");
-      setPosition({ frame: frame + 1, step: 0 });
+      elapsed.current = 0;
+      setPosition({ frame: frame + 1, line: 0 });
     } else {
-      sound("dialogue");
       onFinish();
     }
   };
@@ -71,44 +178,60 @@ export function Cutscene({
       }}
     >
       <div className="cutscene-picture">
-        <img
-          key={current.shot}
-          src={shotUrl(current.shot)}
-          alt={current.alt}
-          style={{
-            translate: `${step * -1}% 0`,
-            scale: 1 + step * 0.035,
-          }}
-        />
-        <button className="cutscene-skip" onClick={onFinish}>
-          <SkipForward size={16} aria-hidden="true" />
-          Skip scene
-        </button>
+        <img key={current.shot} src={shotUrl(current.shot)} alt={current.alt} />
+        {!still && (
+          <Suspense fallback={null}>
+            <CinematicCanvas
+              key={renderer}
+              shot={current.shot}
+              renderer={renderer}
+              elapsed={elapsed}
+            />
+          </Suspense>
+        )}
       </div>
-      <div className="prologue-copy">
+      <p className="cutscene-location">{current.time}</p>
+      <button className="cutscene-skip" onClick={onFinish}>
+        <SkipForward size={16} aria-hidden="true" />
+        Skip scene
+      </button>
+      <div className="cutscene-footer">
         <div className="cutscene-caption" aria-live="polite" aria-atomic="true">
-          <p className="cutscene-time">{current.time}</p>
-          <h1>{personalizeText(current.heading, savedName)}</h1>
-          <p>{personalizeText(current.body, savedName)}</p>
+          <p className="cutscene-speaker">
+            {personalizeText(cue.speaker, savedName)}
+          </p>
+          <p>{personalizeText(cue.text, savedName)}</p>
         </div>
-        <div className="cutscene-action">
-          <button ref={nextButton} className="primary" onClick={advance}>
-            {next
-              ? chasing
-                ? "Give chase"
-                : "Continue"
-              : story.visual === "network"
-                ? "Enter network"
-                : "Return to office"}
+        <div className="cutscene-actions">
+          {!still && (
+            <button
+              className="cutscene-pause"
+              aria-label={paused ? "Play scene" : "Pause scene"}
+              title={paused ? "Play scene" : "Pause scene"}
+              onClick={() => setPaused(!paused)}
+            >
+              {paused ? (
+                <Play size={18} aria-hidden="true" />
+              ) : (
+                <Pause size={18} aria-hidden="true" />
+              )}
+            </button>
+          )}
+          <button
+            ref={nextButton}
+            className="primary"
+            onClick={advance}
+            data-sfx-silent
+          >
+            {nextLine
+              ? "Next line"
+              : next
+                ? "Next shot"
+                : story.visual === "network"
+                  ? "Enter network"
+                  : "Return to office"}
             <ArrowRight size={18} aria-hidden="true" />
           </button>
-          {chasing && (
-            <progress
-              value={step + 1}
-              max={current.steps}
-              aria-label="Pursuit progress"
-            />
-          )}
         </div>
       </div>
     </section>

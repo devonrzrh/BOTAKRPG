@@ -8,8 +8,7 @@ import {
 } from "react";
 import { useGameSound } from "../ui/GameSound";
 import { LoadingScreen } from "../ui/LoadingScreen";
-import { Engine } from "@babylonjs/core/Engines/engine";
-import { WebGPUEngine } from "@babylonjs/core/Engines/webgpuEngine";
+import { openWorldEngine } from "./WorldEngine";
 import { Scene } from "@babylonjs/core/scene";
 import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
@@ -80,6 +79,7 @@ interface Props {
   fsr: boolean;
   onGraphicsCheck?: (result: "kept" | "reduced") => void;
   reducedMotion: boolean;
+  cinematicActive?: boolean;
   locked: boolean;
   onInteract: (id: string) => void;
   onMove: (direction: Direction) => void;
@@ -144,6 +144,7 @@ function WorldCanvas(props: Props) {
   const hubPosition = useRef(new Vector3(0, 0.5, 1));
   useEffect(() => {
     let disposed = false;
+    const startup = new AbortController();
     let engine: AbstractEngine | null = null;
     let checkedScene: Scene | null = null;
     let windows: number[] = [];
@@ -155,47 +156,25 @@ function WorldCanvas(props: Props) {
     };
     const start = async () => {
       try {
-        if (props.renderer !== "webgl") {
-          try {
-            if (await WebGPUEngine.IsSupportedAsync) {
-              const gpu = new WebGPUEngine(canvas.current!, {
-                antialias: true,
-              });
-              engine = gpu;
-              await gpu.initAsync();
-              setNotice("");
-            } else if (props.renderer === "webgpu")
-              setNotice("WebGPU is unavailable here. Using WebGL2.");
-          } catch {
-            engine?.dispose();
-            engine = null;
-            setNotice("WebGPU initialization failed. Using WebGL2.");
-          }
-        }
-        if (!engine) {
-          const gl = new Engine(canvas.current!, true, {
-            preserveDrawingBuffer: true,
-            stencil: true,
-            disableWebGL2Support: false,
-          });
-          engine = gl;
-          if (gl.webGLVersion < 2)
-            throw new Error("WebGL2 or WebGPU is required.");
-          if (props.renderer === "webgl" || props.renderer === "auto")
-            setNotice("");
-        }
+        const opened = await openWorldEngine(
+          canvas.current!,
+          props.renderer,
+          startup.signal,
+        );
+        engine = opened.engine;
         if (disposed) {
           engine.dispose();
           return;
         }
         engineRef.current = engine;
+        setNotice(opened.notice);
         setReady((n) => n + 1);
         let ticks: number[] = [],
           lastReport = performance.now();
         let hasRendered = false;
         engine.runRenderLoop(() => {
           const scene = sceneRef.current;
-          if (!scene) return;
+          if (!scene || latest.current.cinematicActive) return;
           const check = document.hidden
             ? undefined
             : latest.current.onGraphicsCheck;
@@ -283,6 +262,7 @@ function WorldCanvas(props: Props) {
     if (canvas.current) sizeObserver.observe(canvas.current);
     return () => {
       disposed = true;
+      startup.abort();
       window.removeEventListener("resize", resize);
       document.removeEventListener("visibilitychange", resetGraphicsCheck);
       sizeObserver.disconnect();
