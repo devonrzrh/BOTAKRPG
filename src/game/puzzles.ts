@@ -21,12 +21,49 @@ const rawPuzzleConfigSchema = z.discriminatedUnion("kind", [
   z.object({ ...base, kind: z.literal("sorting") }),
   z.object({ ...base, kind: z.literal("search") }),
   z.object({ ...base, kind: z.literal("hanoi") }),
+  z.object({ ...base, kind: z.literal("deduction"), labels: z.array(z.string().min(1)).min(3).max(8) }),
+  z.object({
+    ...base,
+    kind: z.literal("allocation"),
+    values: z.array(z.number().int()).min(2).max(10),
+    labels: z.array(z.string().min(1)).min(2).max(10),
+    loads: z.array(z.object({
+      cost: z.number().int().positive().max(100),
+      coverage: z.number().int().positive().max(100),
+    })).min(2).max(10),
+    capacity: z.number().int().positive().max(100),
+  }),
   z.object({
     ...base,
     kind: z.literal("routing"),
     edges: z.array(edgeSchema).min(1).max(128),
   }),
 ]);
+
+type AllocationConfig = Extract<z.infer<typeof rawPuzzleConfigSchema>, { kind: "allocation" }>;
+
+export function allocationTotals(config: AllocationConfig, selection: number[]) {
+  return selection.reduce(
+    ({ cost, coverage }, value) => {
+      const load = config.loads[config.values.indexOf(value)];
+      return { cost: cost + load.cost, coverage: coverage + load.coverage };
+    },
+    { cost: 0, coverage: 0 },
+  );
+}
+
+export function findAllocation(config: AllocationConfig): number[] | undefined {
+  function choose(index: number, cost: number, coverage: number): number[] | undefined {
+    if (cost > config.capacity) return undefined;
+    if (coverage >= config.target[0]) return [];
+    if (index >= config.values.length) return undefined;
+    const value = config.values[index];
+    const load = config.loads[index];
+    const included = choose(index + 1, cost + load.cost, coverage + load.coverage);
+    return included ? [value, ...included] : choose(index + 1, cost, coverage);
+  }
+  return choose(0, 0, 0);
+}
 
 function sameMultiset(a: number[], b: number[]) {
   return (
@@ -139,6 +176,34 @@ export const puzzleConfigSchema = rawPuzzleConfigSchema.superRefine(
         path: ["budget"],
         message: "Action budget must be a positive integer.",
       });
+    if (config.kind === "deduction") {
+      if (
+        config.target.length < 2 ||
+        config.target.length >= config.values.length ||
+        new Set(config.target).size !== config.target.length ||
+        config.target.some((id) => !config.values.includes(id))
+      )
+        ctx.addIssue({
+          code: "custom",
+          path: ["target"],
+          message: "Cite at least two distinct listed records and leave a distractor.",
+        });
+      return;
+    }
+    if (config.kind === "allocation") {
+      if (
+        config.loads.length !== config.values.length ||
+        config.target.length !== 1 ||
+        config.target[0] < 1 ||
+        !findAllocation(config)
+      )
+        ctx.addIssue({
+          code: "custom",
+          path: ["target"],
+          message: "Supply one reachable coverage goal and one load per request.",
+        });
+      return;
+    }
     if (config.kind === "routing") {
       const nodes = new Set(config.values);
       if (nodes.size !== config.values.length)
@@ -445,6 +510,7 @@ export type PuzzleCommand =
   | { type: "dispatch" }
   | { type: "swap"; index: number }
   | { type: "move"; node: number }
+  | { type: "submit"; selection: number[] }
   | { type: "probe"; index: number }
   | { type: "transfer"; from: number; to: number };
 
@@ -491,7 +557,44 @@ export function puzzleCommand(
   if (config.kind !== "routing" && state.moves >= config.budget)
     return unchanged(state, "Move budget exhausted. Reset to try again.");
   let next: PuzzleState | undefined;
-  if (config.kind === "search" && command.type === "probe") {
+  if (
+    (config.kind === "deduction" || config.kind === "allocation") &&
+    command.type === "submit"
+  ) {
+    const { selection } = command;
+    if (
+      !selection.length ||
+      new Set(selection).size !== selection.length ||
+      selection.some((value) => !config.values.includes(value))
+    )
+      return unchanged(state, "Choose distinct entries from the board.");
+    if (config.kind === "deduction") {
+      if (selection.length !== config.target.length)
+        return unchanged(state, `Cite exactly ${config.target.length} records.`);
+      const solved = config.target.every((value) => selection.includes(value));
+      next = {
+        ...state,
+        output: selection,
+        moves: state.moves + 1,
+        solved,
+        message: solved
+          ? "The cited records prove the report was forged."
+          : "Those records do not establish the contradiction.",
+      };
+    } else {
+      const { cost, coverage } = allocationTotals(config, selection);
+      const solved = cost <= config.capacity && coverage >= config.target[0];
+      next = {
+        ...state,
+        output: selection,
+        moves: state.moves + 1,
+        solved,
+        message: solved
+          ? "Power plan approved."
+          : `The plan uses ${cost} charge and serves ${coverage} callers. Check both limits.`,
+      };
+    }
+  } else if (config.kind === "search" && command.type === "probe") {
     const i = command.index;
     if (!Number.isInteger(i) || i < state.low || i > state.high)
       return unchanged(state, "Choose a slot inside the remaining range.");

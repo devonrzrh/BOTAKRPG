@@ -2,6 +2,7 @@ import { expect } from "vitest";
 import type { Activity } from "../../src/content/schema";
 import {
   createPuzzle,
+  findAllocation,
   puzzleCommand,
   type PuzzleCommand,
 } from "../../src/game/puzzles";
@@ -49,6 +50,10 @@ export function solvePuzzle(activity: Activity) {
       transfer(count - 1, spare, to, from);
     };
     transfer(config.values.length, 0, 2, 1);
+  } else if (config.kind === "deduction") {
+    act({ type: "submit", selection: config.target });
+  } else if (config.kind === "allocation") {
+    act({ type: "submit", selection: findAllocation(config)! });
   } else {
     const pending = [
       { node: config.target[0], cost: 0, route: [] as number[] },

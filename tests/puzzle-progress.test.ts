@@ -6,6 +6,7 @@ import { rewardPuzzle } from "../src/game/puzzleProgress";
 import {
   createPuzzle,
   puzzleCommand,
+  puzzleConfigSchema,
   type PuzzleCommand,
 } from "../src/game/puzzles";
 const content = validateContent(raw);
@@ -28,6 +29,21 @@ it("awards first puzzle completion once and separates hints from mastery", () =>
   expect(parseSave(JSON.parse(JSON.stringify(replay)), content)).toEqual(
     replay,
   );
+});
+
+it("accepts either feasible power plan and rejects packed or impossible boards", () => {
+  const activity = content.entities.find(
+    (entity) => entity.type === "activity" && entity.id === "puzzle-emergency-load",
+  );
+  if (activity?.type !== "activity" || activity.puzzle?.kind !== "allocation")
+    throw new Error("Missing power plan");
+  const config = activity.puzzle;
+  const state = createPuzzle(config);
+  expect(puzzleCommand(state, { type: "submit", selection: [1, 2, 3] }).solved).toBe(true);
+  expect(puzzleCommand(state, { type: "submit", selection: [2, 4, 5] }).solved).toBe(false);
+  expect(puzzleCommand(state, { type: "submit", selection: [4, 4] }).moves).toBe(0);
+  expect(puzzleConfigSchema.safeParse({ ...config, capacity: 5 }).success).toBe(false);
+  expect(puzzleConfigSchema.safeParse({ ...config, loads: config.loads.slice(1) }).success).toBe(false);
 });
 
 it("restores in-progress commands and rejects incompatible imports", () => {
@@ -155,6 +171,14 @@ it("ships solvable Markdown puzzle variants with library and reward links", () =
       type: "move",
       node,
     })),
+    "puzzle-courier-alibi": [
+      { type: "submit", selection: [1, 2] },
+      { type: "submit", selection: [4, 2] },
+    ],
+    "puzzle-emergency-load": [
+      { type: "submit", selection: [5] },
+      { type: "submit", selection: [2, 4] },
+    ],
   };
   for (const [id, commands] of Object.entries(solutions)) {
     const puzzle = content.entities.find(

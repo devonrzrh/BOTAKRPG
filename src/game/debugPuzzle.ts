@@ -1,5 +1,6 @@
 import {
   createPuzzle,
+  findAllocation,
   puzzleCommand,
   shortestPuzzleRoute,
   type PuzzleCommand,
@@ -17,6 +18,12 @@ export function solvePuzzleForDebug(config: PuzzleConfig): PuzzleCommand[] {
   };
 
   switch (config.kind) {
+    case "deduction":
+      act({ type: "submit", selection: config.target });
+      break;
+    case "allocation":
+      act({ type: "submit", selection: findAllocation(config)! });
+      break;
     case "stack":
       for (const value of config.target) {
         while (state.buffer.at(-1) !== value) act({ type: "push" });

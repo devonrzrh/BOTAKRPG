@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import type { Activity } from "../content/schema";
 import {
+  allocationTotals,
   createPuzzle,
   puzzleCommand,
   puzzleProgramCall,
@@ -73,6 +74,7 @@ export function PuzzleScreen(p: {
   };
   const [hintLevel, setHintLevel] = useState(p.run?.assisted ? 1 : 0);
   const [selectedPeg, setSelectedPeg] = useState<number | null>(null);
+  const [draft, setDraft] = useState<number[] | null>(null);
   const assisted = useRef(p.run?.assisted ?? false);
   const commands = useRef<PuzzleCommand[]>(
     (p.run?.commands ?? []).slice(0, 1000),
@@ -162,10 +164,15 @@ export function PuzzleScreen(p: {
     setState(initial);
     setHintLevel(0);
     setSelectedPeg(null);
+    setDraft(null);
     completeSent.current = false;
     setRewardEarned(false);
   };
   const solved = puzzleSolved(state);
+  const selected = draft ?? state.output;
+  const totals = config.kind === "allocation"
+    ? allocationTotals(config, selected)
+    : undefined;
   const routeCoordinates: Record<number, { x: number; y: number }> = {
     1: { x: 65, y: 160 },
     2: { x: 220, y: 65 },
@@ -313,6 +320,52 @@ export function PuzzleScreen(p: {
             className={`puzzle-board puzzle-${config.kind}`}
             aria-label={`${config.kind} puzzle`}
           >
+            {(config.kind === "deduction" || config.kind === "allocation") && (
+              <fieldset className="puzzle-selection">
+                <legend>
+                  {config.kind === "deduction"
+                    ? `Cite ${config.target.length} records`
+                    : `Serve at least ${config.target[0]} callers with at most ${config.capacity} charge`}
+                </legend>
+                {config.values.map((value, index) => (
+                  <label key={value}>
+                    <input
+                      type="checkbox"
+                      checked={selected.includes(value)}
+                      disabled={solved || state.moves >= config.budget}
+                      onChange={(event) =>
+                        setDraft(event.currentTarget.checked
+                          ? [...selected, value]
+                          : selected.filter((entry) => entry !== value))
+                      }
+                    />
+                    {label(value)}
+                    {config.kind === "allocation" && (
+                      <span>
+                        {config.loads[index].cost} charge · {config.loads[index].coverage} callers
+                      </span>
+                    )}
+                  </label>
+                ))}
+                {totals && (
+                  <p role="status">
+                    Selected plan uses {totals.cost} charge and serves {totals.coverage} callers.
+                  </p>
+                )}
+                <button
+                  className="puzzle-primary"
+                  disabled={
+                    solved || state.moves >= config.budget ||
+                    (config.kind === "deduction"
+                      ? selected.length !== config.target.length
+                      : selected.length === 0)
+                  }
+                  onClick={() => act({ type: "submit", selection: selected })}
+                >
+                  {config.kind === "deduction" ? "File evidence" : "Submit power plan"}
+                </button>
+              </fieldset>
+            )}
             {config.kind === "search" && (
               <>
                 <p className="board-instruction">
@@ -648,7 +701,8 @@ export function PuzzleScreen(p: {
           </section>
           <div className="puzzle-meta">
             <span>
-              {config.kind === "routing" ? "Route cost" : "Actions"}{" "}
+              {config.kind === "routing" ? "Route cost" :
+                config.kind === "allocation" || config.kind === "deduction" ? "Attempts" : "Actions"}{" "}
               <b>
                 {config.kind === "routing"
                   ? `${state.cost} / ${config.budget}`

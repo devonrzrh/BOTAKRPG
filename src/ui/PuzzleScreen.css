@@ -160,6 +160,45 @@
 .puzzle-board.puzzle-routing {
   --puzzle-accent: #7bc5ce;
 }
+.puzzle-selection {
+  display: grid;
+  gap: 8px;
+  min-inline-size: 0;
+  border: 0;
+  margin: 0;
+  padding: 0;
+  font-size: 18px;
+}
+.puzzle-selection legend {
+  padding: 0 0 12px;
+}
+.puzzle-selection label {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border: 1px solid #446367;
+}
+.puzzle-selection label:hover,
+.puzzle-selection label:focus-within {
+  border-color: #e9d49e;
+}
+.puzzle-selection input {
+  width: 19px;
+  height: 19px;
+  accent-color: #e9d49e;
+}
+.puzzle-selection label span {
+  margin-inline-start: auto;
+  color: #a8b8b4;
+}
+.puzzle-selection p {
+  margin: 4px 0;
+}
+.puzzle-selection button {
+  justify-self: start;
+}
 .puzzle-board h2 {
   font-size: 17px;
   letter-spacing: 0.08em;

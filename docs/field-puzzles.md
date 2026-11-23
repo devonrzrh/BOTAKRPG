@@ -13,8 +13,11 @@ preserve the existing storyline and boss requirements.
 | Scrambled witness list | Basic Sorting Algorithms | Restore the interview order in five adjacent swaps |
 | The missing receipt | Binary Search | Locate a receipt in four probes |
 | Off the dispatch map | Graph Searching | Reconstruct a courier's route under a charge limit |
+| The backdated dispatch | Data Versioning | Cite the two records that disprove a report |
+| Nine units until dawn | Dynamic Programming | Choose which stations to power under a shared charge cap |
 
 The three night courier cases support Manual, Blockly, and Python.
+The two investigation puzzles use manual evidence selection and allocation.
 
 Every first completion files a clue and grants 25 XP. Replays grant no extra XP.
 An unaided solution records puzzle mastery evidence separately from quiz answers.
@@ -41,6 +44,12 @@ For routing, `values` lists node IDs, `target` is `[start, goal]`, and `edges`
 contains undirected `{from, to, cost}` entries. Its budget measures total cost;
 other puzzle budgets measure actions. Content validation rejects impossible
 targets, insufficient budgets, unknown nodes, and duplicate graph connections.
+
+For deduction, `values` lists record IDs, `labels` contains the records, and
+`target` lists the required citations in any order. For allocation, `values`
+lists request IDs, `loads` has a `{cost, coverage}` entry per request, and
+`target` holds the minimum total coverage under `capacity`. In both cases,
+`budget` counts submitted attempts.
 
 A `kind: case` quest connects its puzzle objective to the one-time XP reward.
 The TypeScript model implements operations; Markdown never executes code.

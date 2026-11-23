@@ -27,6 +27,10 @@ const puzzleRunSchema = z.object({
         }),
         z.object({ type: z.literal("move"), node: z.number().int() }),
         z.object({
+          type: z.literal("submit"),
+          selection: z.array(z.number().int()).min(1).max(10),
+        }),
+        z.object({
           type: z.literal("probe"),
           index: z.number().int().nonnegative(),
         }),

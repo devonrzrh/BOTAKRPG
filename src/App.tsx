@@ -2610,6 +2610,7 @@ export default function App() {
                           current, currentPuzzle, content, assisted,
                         );
                         updateSave(() => next);
+                        if (booted && storageReady) persistSave();
                         if (next.supply.tokens > current.supply.tokens)
                           notify("Puzzle cleared. +1 Supply Token");
                       }}
