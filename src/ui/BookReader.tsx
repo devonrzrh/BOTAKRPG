@@ -90,8 +90,9 @@ export function BookReader(p: {
     extent: 1,
   });
   const [pageInput, setPageInput] = useState("1");
+  type TurnDirection = "next" | "previous";
   const [sheet, setSheet] = useState<{
-    direction: "next" | "previous";
+    direction: TurnDirection;
     html: string;
     width: number;
     height: number;
@@ -100,6 +101,7 @@ export function BookReader(p: {
     back: number;
     stationary: number;
   } | null>(null);
+  const [chapterTurn, setChapterTurn] = useState<TurnDirection | null>(null);
   const [atEnd, setAtEnd] = useState(false);
   const nextChapter = nextBookChapter(p.lessons, p.lesson);
   const [diagram, setDiagram] = useState<{ src: string; alt: string } | null>(
@@ -174,7 +176,10 @@ export function BookReader(p: {
     sound("bookOpen");
   }, [sound]);
   useLayoutEffect(() => {
-    if (reducedMotion) setSheet(null);
+    if (reducedMotion) {
+      setSheet(null);
+      setChapterTurn(null);
+    }
   }, [reducedMotion]);
   const closeBook = () => {
     if (closing) return;
@@ -186,6 +191,7 @@ export function BookReader(p: {
       savePosition();
     setClosing(true);
     setSheet(null);
+    setChapterTurn(null);
     p.onClosing?.();
     if (reducedMotion) {
       p.onClose();
@@ -274,10 +280,13 @@ export function BookReader(p: {
     setJumpOpen(false);
     page.focus({ preventScroll: true });
     if (displayedChapter.current !== p.lesson.id) {
+      const previous = p.lessons.findIndex(
+        (lesson) => lesson.id === displayedChapter.current,
+      );
+      const next = p.lessons.findIndex((lesson) => lesson.id === p.lesson.id);
       displayedChapter.current = p.lesson.id;
-      if (!reducedMotion) {
-        page.animate([{ opacity: 0.55 }, { opacity: 1 }], 150);
-      }
+      if (reducedMotion) sound("page");
+      else setChapterTurn(next < previous ? "previous" : "next");
     }
   }, [p.lesson.id]);
   useLayoutEffect(() => {
@@ -360,6 +369,7 @@ export function BookReader(p: {
     if (sheet || closing) return;
     setDiagram(null);
     if (next !== mode) {
+      setChapterTurn(null);
       rememberAnchor();
       setMode(next);
       p.onPreferences(next, fontSize);
@@ -393,6 +403,7 @@ export function BookReader(p: {
     setDiagram(null);
     const target = clampSpread(next, layout.pages, layout.columns);
     if (target === spread) return;
+    setChapterTurn(null);
     sound("page");
     const direction = target > spread ? "next" : "previous";
     const frame = viewport.current,
@@ -430,7 +441,6 @@ export function BookReader(p: {
   const pageEnd = Math.min(layout.pages, pageStart + layout.columns - 1);
   const selectChapter = (id: string) => {
     if (closing || sheet || id === p.lesson.id) return;
-    sound("page");
     setDrawer(null);
     p.onSelect(id);
   };
@@ -698,6 +708,37 @@ export function BookReader(p: {
                     {turnInk(sheet.back)}
                   </div>
                 </div>
+              </div>
+            )}
+            {chapterTurn && !reducedMotion && (
+              <div
+                key={p.lesson.id}
+                className={`reader-turn-layer reader-chapter-turn turn-${chapterTurn}${mode === "fullscreen" || layout.columns === 1 ? " reader-chapter-single" : ""}`}
+                aria-hidden="true"
+                inert
+              >
+                {[0, 145, 290].map((delay, index, leaves) => (
+                  <div
+                    key={delay}
+                    className="reader-turn-sheet"
+                    style={
+                      { "--sheet-delay": `${delay}ms` } as React.CSSProperties
+                    }
+                    onAnimationStart={(event) => {
+                      if (event.target === event.currentTarget) sound("page");
+                    }}
+                    onAnimationEnd={(event) => {
+                      if (
+                        index === leaves.length - 1 &&
+                        event.target === event.currentTarget
+                      )
+                        setChapterTurn(null);
+                    }}
+                  >
+                    <div className="reader-turn-face" />
+                    <div className="reader-turn-face reader-turn-back" />
+                  </div>
+                ))}
               </div>
             )}
           </div>
