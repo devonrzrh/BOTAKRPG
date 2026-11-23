@@ -310,7 +310,7 @@ export function attachOfficeSurfaces(
       ink(c, "ECHO-7", 40, 610, 53);
       ink(
         c,
-        m.investigationProgress?.percent === 100
+        m.investigationProgress?.caseClosed
           ? "CONTAINED"
           : "UNIT MISSING",
         40,
@@ -336,13 +336,17 @@ export function attachOfficeSurfaces(
       rule(c, 188);
       ink(c, "INVESTIGATION PROGRESS", 40, 228, 40);
       ink(c, `${percent}%`, 40, 322, 100);
+      ink(c, "+", 510, 350, 62, 55, "#844e38");
       c.fillStyle = "#8c7a5e";
       c.fillRect(40, 499, 520, 21);
       c.fillStyle = "#324f4a";
       c.fillRect(40, 499, (520 * percent) / 100, 21);
       ink(c, stage, 40, 568, 42);
       ink(c, "OPEN CASE FILE", 40, 695, 36, 530, "#844e38");
-      return zone(m, "quests");
+      return [
+        ...zone(m, "investigation-progress", 0, 0, 600, 655),
+        ...zone(m, "quests", 0, 655, 600, 145),
+      ];
     },
   );
   const routingMap = sheet(

@@ -358,6 +358,74 @@ button.pinned-paper:hover:not(:disabled) {
 .board-progress span {
   display: block;
 }
+.board-progress:hover,
+.board-progress:focus-visible {
+  outline: 2px solid #f8e2aa;
+  outline-offset: 2px;
+}
+.investigation-breakdown {
+  box-sizing: border-box;
+  width: min(560px, calc(100% - 32px));
+  max-height: calc(100dvh - var(--top-height) - 28px);
+  margin-block: auto;
+  inset-block-start: var(--top-height);
+  padding: 18px 22px 22px;
+  border: 1px solid #697972;
+  border-top: 3px solid #bda677;
+  background: #15232a;
+  color: #ede8d7;
+  box-shadow: 0 14px 42px #05090caa;
+  font: 400 16px/1.4 var(--typewriter);
+}
+.investigation-breakdown::backdrop {
+  background: linear-gradient(transparent var(--top-height), #090e13bd var(--top-height));
+}
+.investigation-breakdown header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.investigation-breakdown h2 {
+  margin: 0;
+  font: 400 22px/1.2 var(--typewriter);
+}
+.investigation-breakdown .icon-button:is(:hover, :focus-visible) {
+  outline: 2px solid #e0c38c;
+  outline-offset: 2px;
+}
+.investigation-overall {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  margin: 7px 0 13px;
+  color: #e4ca92;
+}
+.investigation-overall strong {
+  font: 400 32px/1.1 var(--typewriter);
+}
+.investigation-breakdown ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.investigation-breakdown li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(3rem, 22%) 5ch;
+  align-items: center;
+  gap: 10px;
+  min-height: 38px;
+  border-top: 1px solid #435456;
+}
+.investigation-breakdown li > :last-child {
+  text-align: end;
+  font-variant-numeric: tabular-nums;
+}
+.investigation-breakdown progress {
+  width: 100%;
+  height: 6px;
+  accent-color: #c2ac79;
+}
 .home-panel {
   top: 5%;
   bottom: 100px;

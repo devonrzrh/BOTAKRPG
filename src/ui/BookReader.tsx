@@ -42,6 +42,16 @@ function readingProgress(frame: HTMLElement) {
   );
 }
 
+function measuredBookLayout(frame: HTMLDivElement, page: HTMLElement) {
+  const style = getComputedStyle(page);
+  return bookLayout(
+    frame.getBoundingClientRect().width,
+    page.scrollWidth,
+    parseFloat(style.columnGap) || 0,
+    Number(style.columnCount) || 1,
+  );
+}
+
 export function BookReader(p: {
   lessons: Lesson[];
   lesson: Lesson;
@@ -51,6 +61,7 @@ export function BookReader(p: {
   reading: Save["reading"];
   onPreferences: (mode: "book" | "fullscreen", size: 20 | 22 | 24) => void;
   onPosition: (id: string, position: { block: number; offset: number }) => void;
+  onReadingFinished: (id: string) => void;
   onSelect: (id: string) => void;
   onClose: () => void;
   onClosing?: () => void;
@@ -210,13 +221,7 @@ export function BookReader(p: {
         );
         return;
       }
-      const style = getComputedStyle(page);
-      const next = bookLayout(
-        frame.getBoundingClientRect().width,
-        page.scrollWidth,
-        parseFloat(style.columnGap) || 0,
-        Number(style.columnCount) || 1,
-      );
+      const next = measuredBookLayout(frame, page);
       const before = pagination.current;
       if (
         before.step &&
@@ -338,13 +343,7 @@ export function BookReader(p: {
       setProgress(readingProgress(frame));
       setAtEnd(frame.scrollHeight - frame.clientHeight - frame.scrollTop <= 8);
     } else {
-      const style = getComputedStyle(page);
-      const next = bookLayout(
-        bounds.width,
-        page.scrollWidth,
-        parseFloat(style.columnGap) || 0,
-        Number(style.columnCount) || 1,
-      );
+      const next = measuredBookLayout(frame, page);
       const target = clampSpread(
         Math.floor(
           ((rect.left - bounds.left) *
@@ -439,6 +438,49 @@ export function BookReader(p: {
   };
   const pageStart = spread * layout.columns + 1;
   const pageEnd = Math.min(layout.pages, pageStart + layout.columns - 1);
+  const readingFinished = p.reading.finishedLessons?.includes(p.lesson.id);
+  useEffect(() => {
+    const frame = viewport.current;
+    const page = article.current;
+    if (
+      !frame ||
+      !page ||
+      readingFinished ||
+      closing ||
+      (mode === "book" ? pageEnd < layout.pages : !atEnd)
+    )
+      return;
+    let active = true;
+    // Images and fonts can change which spread is the last one.
+    void Promise.all([
+      document.fonts.ready,
+      ...Array.from(page.querySelectorAll("img"), (img) =>
+        img.complete ? undefined : img.decode().catch(() => undefined),
+      ),
+    ]).then(() => {
+      if (!active || article.current !== page) return;
+      if (mode === "fullscreen") {
+        if (frame.scrollHeight - frame.clientHeight - frame.scrollTop > 8) return;
+      } else {
+        const current = measuredBookLayout(frame, page);
+        const currentSpread = Math.round(frame.scrollLeft / current.step);
+        if ((currentSpread + 1) * current.columns < current.pages) return;
+      }
+      p.onReadingFinished(p.lesson.id);
+    });
+    return () => {
+      active = false;
+    };
+  }, [
+    atEnd,
+    closing,
+    layout,
+    mode,
+    pageEnd,
+    p.lesson.id,
+    p.onReadingFinished,
+    readingFinished,
+  ]);
   const selectChapter = (id: string) => {
     if (closing || sheet || id === p.lesson.id) return;
     setDrawer(null);

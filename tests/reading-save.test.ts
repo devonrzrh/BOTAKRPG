@@ -21,8 +21,15 @@ it("round trips reading preferences and per lesson positions", () => {
     fontSize: 24,
     positions: { "graph-search": { block: 7, offset: 0.625 } },
     lastChapterByTopic: { algorithms: "graph-search" },
+    finishedLessons: ["graph-search"],
   };
   expect(parseSave(JSON.parse(JSON.stringify(save)), content)).toEqual(save);
+});
+
+it("validates completed reading against the library", () => {
+  const save = initialSave();
+  save.reading.finishedLessons = ["missing"];
+  expect(() => parseSave(save, content)).toThrow(/unknown lesson/i);
 });
 
 it("rejects a saved volume chapter from a different subject", () => {

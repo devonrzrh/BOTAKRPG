@@ -113,6 +113,7 @@ export function WorldUiControls({
         <button
           key={b.id}
           disabled={b.disabled}
+          aria-haspopup={b.id === "investigation-progress" ? "dialog" : undefined}
           data-sfx-silent={
             (b.action.kind === "open" && silentNavigation(b.action.id)) ||
             (b.action.kind === "lesson" && model.id !== "bookshelf") ||

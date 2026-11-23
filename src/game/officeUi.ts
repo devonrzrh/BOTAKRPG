@@ -212,6 +212,17 @@ export function createOfficeUi(input: OfficeUiInput): SurfaceModel[] {
   );
   button(
     investigation,
+    "investigation-progress",
+    48,
+    335,
+    300,
+    58,
+    `Investigation progress ${progress.percent}%`,
+    "open",
+    "investigation-progress",
+  );
+  button(
+    investigation,
     "briefing",
     48,
     402,

@@ -53,7 +53,22 @@ export function finaleAvailable(save: Save, content: Content) {
   );
 }
 
-export type InvestigationProgress = { percent: number; stage: string };
+export type InvestigationCategory = {
+  id: string;
+  title: string;
+  done: number;
+  total: number;
+  percent: number;
+};
+export type InvestigationProgress = {
+  percent: number;
+  stage: string;
+  caseClosed: boolean;
+  categories: InvestigationCategory[];
+};
+
+const percentage = (done: number, total: number) =>
+  total ? Math.floor((done / total) * 100) : 0;
 
 export function investigationProgress(
   save: Save,
@@ -62,47 +77,76 @@ export function investigationProgress(
   const quests = content.entities.filter((entity) => entity.type === "quest");
   const finale = quests.find((quest) => quest.kind === "finale");
   const cleared = new Set(save.completed);
-  if (
-    finale &&
-    (questComplete(save, finale) ||
-      (save.story.legacyFinale && cleared.has("echo-battle")))
-  ) {
-    return { percent: 100, stage: "Case closed" };
-  }
+  const legacyClosed = save.story.legacyFinale && cleared.has("echo-battle");
+  const caseClosed = Boolean(
+    finale && (legacyClosed || questComplete(save, finale)),
+  );
 
-  const objectives = new Set<string>();
-  const visited = new Set<string>();
-  const addRequired = (quest: Quest) => {
-    if (visited.has(quest.id)) return;
-    visited.add(quest.id);
-    quest.objectives.forEach((id) => objectives.add(id));
-    for (const id of quest.prerequisites) {
-      const prerequisite = quests.find((candidate) => candidate.id === id);
-      if (prerequisite) addRequired(prerequisite);
-    }
+  const categories: InvestigationCategory[] = [];
+  const addCategory = (
+    id: string,
+    title: string,
+    done: number,
+    total: number,
+  ) => {
+    categories.push({
+      id,
+      title,
+      done,
+      total,
+      percent: percentage(done, total),
+    });
   };
-  if (finale) addRequired(finale);
-
   const opening = [
     save.story.prologueSeen,
     save.story.caseAccepted,
     save.story.networkIntroSeen,
   ];
+  const openingDone = legacyClosed
+    ? opening.length
+    : opening.filter(Boolean).length;
+  addCategory("opening", "Opening", openingDone, opening.length);
+
+  const objectiveDone = (id: string) => legacyClosed || cleared.has(id);
+  const objectives = new Set<string>();
+  const visited = new Set<string>();
+  const addRequired = (quest: Quest) => {
+    if (visited.has(quest.id)) return;
+    visited.add(quest.id);
+    for (const id of quest.prerequisites) {
+      const prerequisite = quests.find((candidate) => candidate.id === id);
+      if (prerequisite) addRequired(prerequisite);
+    }
+    const unique = [...new Set(quest.objectives)];
+    unique.forEach((id) => objectives.add(id));
+    addCategory(
+      quest.id,
+      quest.kind === "finale" ? "Finale" : quest.title,
+      unique.filter(objectiveDone).length,
+      unique.length,
+    );
+  };
+  if (finale) addRequired(finale);
+
+  const lessons = content.entities.filter((entity) => entity.type === "lesson");
+  const finished = new Set(save.reading.finishedLessons);
+  const readingDone = lessons.filter((lesson) =>
+    finished.has(lesson.id),
+  ).length;
+  addCategory("reading", "Reading", readingDone, lessons.length);
   const done =
-    opening.filter(Boolean).length +
-    [...objectives].filter((id) => cleared.has(id)).length;
-  const percent = Math.min(
-    99,
-    Math.floor((done / (opening.length + objectives.size)) * 100),
-  );
-  const stage = !save.story.caseAccepted
-    ? "Awaiting briefing"
-    : finale && finaleAvailable(save, content)
-      ? cleared.has("evidence-chain")
-        ? "Confront ECHO-7"
-        : "Reconstruct evidence"
-      : save.story.networkIntroSeen
-        ? "Following leads"
-        : "Connect to gateway";
-  return { percent, stage };
+    openingDone + [...objectives].filter(objectiveDone).length + readingDone;
+  const total = opening.length + objectives.size + lessons.length;
+  const stage = caseClosed
+    ? "Case closed"
+    : !save.story.caseAccepted
+      ? "Awaiting briefing"
+      : finale && finaleAvailable(save, content)
+        ? cleared.has("evidence-chain")
+          ? "Confront ECHO-7"
+          : "Reconstruct evidence"
+        : save.story.networkIntroSeen
+          ? "Following leads"
+          : "Connect to gateway";
+  return { percent: percentage(done, total), stage, caseClosed, categories };
 }

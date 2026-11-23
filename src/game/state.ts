@@ -68,6 +68,7 @@ const readingSchema = z
     lastChapterByTopic: z
       .record(lessonSchema.shape.topic, z.string())
       .optional(),
+    finishedLessons: z.array(z.string()).optional(),
   })
   .default({ mode: "book", fontSize: 22, positions: {} });
 const signalSampleSchema = z.object({
@@ -443,6 +444,7 @@ export function parseSave(input: unknown, content: Content): Save {
   check(save.bookmarks, "lesson");
   check(Object.keys(save.notes), "lesson");
   check(Object.keys(save.reading.positions), "lesson");
+  check(save.reading.finishedLessons ?? [], "lesson");
   for (const [topic, id] of Object.entries(
     save.reading.lastChapterByTopic ?? {},
   )) {

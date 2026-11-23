@@ -71,6 +71,7 @@ import {
 import { BattleScreen } from "./ui/BattleScreen";
 import { battleCue, type BattleCue, type QuizOrigin } from "./game/combatPresentation";
 import { XpMeter } from "./ui/XpMeter";
+import { InvestigationBreakdown } from "./ui/InvestigationBreakdown";
 import detectiveAvatar from "./assets/detective-avatar.svg?url";
 import { GameNotice } from "./ui/GameNotice";
 import { LearningQuest } from "./ui/LearningQuest";
@@ -307,6 +308,7 @@ export default function App() {
   const [prologueReplay, setPrologueReplay] = useState(false);
   const [officeFallback, setOfficeFallback] = useState(false);
   const [officePage, setOfficePage] = useState(0);
+  const [progressOpen, setProgressOpen] = useState(false);
   const [bookOpen, setBookOpen] = useState(false);
   const [bookClosing, setBookClosing] = useState(false);
   const [bookReady, setBookReady] = useState(false);
@@ -676,6 +678,11 @@ export default function App() {
       if (activeBattle && id !== "settings" && id !== "exit" && !confirmedExit) {
         battleExitFocus.current = document.activeElement as HTMLElement | null;
         setPendingBattleExit({ kind: "open", id, debugTravel });
+        return;
+      }
+      if (id === "investigation-progress") {
+        sound("open");
+        setProgressOpen(true);
         return;
       }
       if (id === "settings" && panel === "battle") setSettingsFromBattle(true);
@@ -1506,6 +1513,8 @@ export default function App() {
       questView,
     ],
   );
+  const caseProgress = officeUi.find((model) => model.id === "investigation")!
+    .investigationProgress!;
   const useWorldUi = realm === "desk" && !officeFallback;
   const showBookReader =
     bookOpen &&
@@ -1836,6 +1845,7 @@ export default function App() {
             homeWall={homeWall}
             homeLookLocked={
               intakeOpen ||
+              progressOpen ||
               debugOpen ||
               bookOpen ||
               panel === "settings" ||
@@ -1898,10 +1908,7 @@ export default function App() {
             accepted={save.story.caseAccepted}
             finaleReady={finaleAvailable(save, content)}
             caseClosed={save.completed.includes("echo-battle")}
-            progress={
-              officeUi.find((model) => model.id === "investigation")!
-                .investigationProgress!
-            }
+            progress={caseProgress}
             total={branches.length}
             completed={branches
               .filter((branch) => branch.objectives.every((id) => save.completed.includes(id)))
@@ -3282,6 +3289,14 @@ export default function App() {
                 saveRef.current.reading.mode === "book",
               )
             }
+            onReadingFinished={(id) =>
+              updateReading((reading) => {
+                const finished = reading.finishedLessons ?? [];
+                return finished.includes(id)
+                  ? reading
+                  : { ...reading, finishedLessons: [...finished, id] };
+              })
+            }
             onSelect={selectReadingLesson}
             onClosing={() => setBookClosing(true)}
             onClose={() => {
@@ -3318,6 +3333,7 @@ export default function App() {
               wall={homeWall}
               disabled={
                 debugOpen ||
+                progressOpen ||
                 intakeOpen ||
                 !booted ||
                 panel === "settings" ||
@@ -3701,6 +3717,15 @@ export default function App() {
             </div>
           </section>
         </div>
+      )}
+      {progressOpen && (
+        <InvestigationBreakdown
+          progress={caseProgress}
+          onClose={() => {
+            sound("close");
+            setProgressOpen(false);
+          }}
+        />
       )}
       {toast && !(panel === "battle" && battle.phase === "lost") && (
         <GameNotice

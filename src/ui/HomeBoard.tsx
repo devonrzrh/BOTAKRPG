@@ -146,10 +146,14 @@ export function HomeBoard({
           <ArrowUpRight size={17} />
         </button>
       </div>
-      <div className="board-progress">
+      <button
+        className="board-progress"
+        aria-haspopup="dialog"
+        onClick={() => onSelect("investigation-progress")}
+      >
         Investigation progress {progress.percent}%
         <span>{progress.stage}</span>
-      </div>
+      </button>
     </section>
   );
 }

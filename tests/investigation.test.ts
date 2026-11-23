@@ -50,7 +50,7 @@ const probe = content.entities.find(
 it("tracks required steps across the opening, leads and finale", () => {
   let save = initialSave();
   const progress = () => investigationProgress(save, content);
-  expect(progress()).toEqual({ percent: 0, stage: "Awaiting briefing" });
+  expect(progress()).toMatchObject({ percent: 0, stage: "Awaiting briefing" });
   save.story.prologueSeen = true;
   expect(progress().percent).toBeGreaterThan(0);
   save.story.caseAccepted = true;
@@ -72,14 +72,28 @@ it("tracks required steps across the opening, leads and finale", () => {
   expect(progress().stage).toBe("Confront ECHO-7");
   expect(progress().percent).toBeLessThan(100);
   save = completeActivity(save, "echo-battle");
-  expect(progress()).toEqual({ percent: 100, stage: "Case closed" });
+  const closed = progress();
+  expect(closed).toMatchObject({ stage: "Case closed", caseClosed: true });
+  expect(closed.percent).toBeLessThan(100);
+  expect(closed.categories.find((category) => category.title === "Finale"))
+    .toMatchObject({ percent: 100 });
+  expect(closed.categories.find((category) => category.title === "Reading"))
+    .toMatchObject({ percent: 0 });
+  const lessons = content.entities.filter((entity) => entity.type === "lesson");
+  save.reading.finishedLessons = lessons.slice(0, 5).map((lesson) => lesson.id);
+  save.reading.finishedLessons.push(lessons[0].id);
+  expect(progress().percent).toBeGreaterThan(closed.percent);
+  expect(progress().categories.find((category) => category.title === "Reading"))
+    .toMatchObject({ done: 5, total: lessons.length });
+  save.reading.finishedLessons = lessons.map((lesson) => lesson.id);
+  expect(progress()).toMatchObject({ percent: 100, stage: "Case closed" });
 });
 
 it("keeps a completed legacy investigation closed", () => {
   const save = completeActivity(initialSave(), "echo-battle");
   save.story.legacyFinale = true;
-  expect(investigationProgress(save, content)).toEqual({
-    percent: 100,
+  expect(investigationProgress(save, content)).toMatchObject({
+    caseClosed: true,
     stage: "Case closed",
   });
 });
