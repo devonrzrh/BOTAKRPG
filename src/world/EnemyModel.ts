@@ -1,6 +1,11 @@
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
+import { CreateBox } from "@babylonjs/core/Meshes/Builders/boxBuilder";
+import { CreateCylinder } from "@babylonjs/core/Meshes/Builders/cylinderBuilder";
+import { CreatePolyhedron } from "@babylonjs/core/Meshes/Builders/polyhedronBuilder";
+import { CreateSphere } from "@babylonjs/core/Meshes/Builders/sphereBuilder";
+import { CreateTorus } from "@babylonjs/core/Meshes/Builders/torusBuilder";
+import { CreateTube } from "@babylonjs/core/Meshes/Builders/tubeBuilder";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { VertexData } from "@babylonjs/core/Meshes/mesh.vertexData";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
@@ -105,7 +110,7 @@ export function buildEnemyModel(scene: Scene, id: string, scale = 1) {
     parent = root,
   ) =>
     place(
-      MeshBuilder.CreateBox(
+      CreateBox(
         `${kind} ${name}`,
         { width: w, height: h, depth: d },
         scene,
@@ -126,7 +131,7 @@ export function buildEnemyModel(scene: Scene, id: string, scale = 1) {
     parent = root,
   ) =>
     place(
-      MeshBuilder.CreateSphere(
+      CreateSphere(
         `${kind} ${name}`,
         { diameter, segments: 12 },
         scene,
@@ -204,7 +209,7 @@ export function buildEnemyModel(scene: Scene, id: string, scale = 1) {
     parent = root,
   ) => {
     const mesh = place(
-      MeshBuilder.CreateTorus(
+      CreateTorus(
         `${kind} ${name}`,
         { diameter, thickness, tessellation: 24 },
         scene,
@@ -228,7 +233,7 @@ export function buildEnemyModel(scene: Scene, id: string, scale = 1) {
     parent = root,
   ) =>
     place(
-      MeshBuilder.CreatePolyhedron(`${kind} ${name}`, { type: 1, size }, scene),
+      CreatePolyhedron(`${kind} ${name}`, { type: 1, size }, scene),
       x,
       y,
       z,
@@ -256,7 +261,7 @@ export function buildEnemyModel(scene: Scene, id: string, scale = 1) {
     parent = root,
   ) =>
     place(
-      MeshBuilder.CreateTube(
+      CreateTube(
         `${kind} ${name}`,
         {
           path: points.map(([x, y, z]) => new Vector3(x, y, z)),
@@ -353,7 +358,7 @@ export function buildEnemyModel(scene: Scene, id: string, scale = 1) {
     ] as const) {
       pivot.position.set(side * 0.86, 0.89, -0.13);
       for (const z of [-0.48, 0.79]) {
-        const wheel = MeshBuilder.CreateCylinder(
+        const wheel = CreateCylinder(
           "loader roller tire",
           {
             diameter: 0.78,
@@ -783,7 +788,7 @@ export function buildEnemyModel(scene: Scene, id: string, scale = 1) {
   } else if (kind === "drone") {
     // A literal tracking cookie watches through its embedded surveillance eye.
     const cookie = place(
-      MeshBuilder.CreateCylinder(
+      CreateCylinder(
         "drone cookie body",
         { diameter: 1.95, height: 0.36, tessellation: 20 },
         scene,
@@ -1061,7 +1066,7 @@ export function buildEnemyModel(scene: Scene, id: string, scale = 1) {
       );
     });
     place(
-      MeshBuilder.CreateTube(
+      CreateTube(
         "mimic phishing hook",
         { path: hookPath, radius: 0.045, tessellation: 6 },
         scene,

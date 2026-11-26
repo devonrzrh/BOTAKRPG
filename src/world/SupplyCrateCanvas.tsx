@@ -6,7 +6,7 @@ import { PointLight } from "@babylonjs/core/Lights/pointLight";
 import { Color3, Color4 } from "@babylonjs/core/Maths/math.color";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
-import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
+import { CreateGround } from "@babylonjs/core/Meshes/Builders/groundBuilder";
 import { Scene } from "@babylonjs/core/scene";
 import { attachSoftShadows } from "./SoftShadows";
 import type { RendererPreference } from "../game/contracts";
@@ -83,7 +83,7 @@ export default function SupplyCrateCanvas(props: Props) {
         );
         rim.diffuse = Color3.FromHexString("#89c9d5");
         rim.intensity = 1.3;
-        const bench = MeshBuilder.CreateGround(
+        const bench = CreateGround(
           "supply bench",
           { width: 24, height: 24 },
           scene,

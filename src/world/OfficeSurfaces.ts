@@ -1,6 +1,9 @@
 import type { Scene } from "@babylonjs/core/scene";
 import "@babylonjs/core/Culling/ray";
-import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
+import { CreateBox } from "@babylonjs/core/Meshes/Builders/boxBuilder";
+import { CreateCylinder } from "@babylonjs/core/Meshes/Builders/cylinderBuilder";
+import { CreatePlane } from "@babylonjs/core/Meshes/Builders/planeBuilder";
+import { CreateTube } from "@babylonjs/core/Meshes/Builders/tubeBuilder";
 import type { Mesh } from "@babylonjs/core/Meshes/mesh";
 import type { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
@@ -83,7 +86,7 @@ export function attachOfficeSurfaces(
   outlineMat.emissiveColor = Color3.FromHexString("#f0c986");
   outlineMat.disableLighting = true;
   const outline = (parent: TransformNode, w: number, h: number, z: number) => {
-    const border = MeshBuilder.CreateTube(
+    const border = CreateTube(
       "hover outline",
       {
         path: [
@@ -143,7 +146,7 @@ export function attachOfficeSurfaces(
     h: number,
     t: DynamicTexture,
   ) => {
-    const m = MeshBuilder.CreatePlane(name, { width: w, height: h }, scene);
+    const m = CreatePlane(name, { width: w, height: h }, scene);
     m.parent = parent;
     const mat = material(name + " ink", "#ffffff");
     mat.diffuseTexture = t;
@@ -153,7 +156,7 @@ export function attachOfficeSurfaces(
     return m;
   };
   const pin = (parent: TransformNode, x: number, y: number, z: number) => {
-    const p = MeshBuilder.CreateCylinder(
+    const p = CreateCylinder(
       "drawing pin",
       { diameter: 0.07, height: 0.065, tessellation: 12 },
       scene,
@@ -186,7 +189,7 @@ export function attachOfficeSurfaces(
     root.parent = anchors.get(wall)!;
     root.position.set(x, y, z);
     root.rotation.z = roll;
-    const body = MeshBuilder.CreateBox(
+    const body = CreateBox(
       name + " paper thickness",
       { width: w, height: h, depth: 0.018 },
       scene,
@@ -263,7 +266,7 @@ export function attachOfficeSurfaces(
       fastener.computeWorldMatrix(true);
       return Vector3.TransformCoordinates(fastener.getAbsolutePosition(), toBoard);
     });
-    const wire = MeshBuilder.CreateTube(
+    const wire = CreateTube(
       "evidence thread",
       { path, radius: 0.009, tessellation: 6 },
       scene,
@@ -473,7 +476,7 @@ export function attachOfficeSurfaces(
       "cloth / " + book.id,
       ["#425d68", "#70483b", "#5d6b4d"][index % 3],
     );
-    const binding = MeshBuilder.CreateBox(
+    const binding = CreateBox(
       "cloth binding",
       { width: 0.9, height: 1.07, depth: 0.06 },
       scene,
@@ -482,7 +485,7 @@ export function attachOfficeSurfaces(
     binding.material = cloth;
     binding.isPickable = false;
     for (const z of [-0.04, 0.04]) {
-      const cover = MeshBuilder.CreateBox(
+      const cover = CreateBox(
         "book cover",
         { width: 0.93, height: 1.1, depth: 0.02 },
         scene,
@@ -594,7 +597,7 @@ export function attachOfficeSurfaces(
       [root, 1.45],
       [hinge, -1.45],
     ] as const) {
-      const cover = MeshBuilder.CreateBox(
+      const cover = CreateBox(
         name + " cover",
         { width: 2.98, height: 3.34, depth: 0.065 },
         scene,
@@ -603,7 +606,7 @@ export function attachOfficeSurfaces(
       cover.position.set(x, 0, 0.015);
       cover.material = coverMat;
       cover.isPickable = false;
-      const block = MeshBuilder.CreateBox(
+      const block = CreateBox(
         "page edges",
         { width: 2.87, height: 3.23, depth: 0.035 },
         scene,

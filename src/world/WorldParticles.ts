@@ -1,7 +1,7 @@
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
-import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
+import { CreateBox } from "@babylonjs/core/Meshes/Builders/boxBuilder";
 import type { Scene } from "@babylonjs/core/scene";
 
 type Point3 = { x: number; y: number; z: number };
@@ -40,7 +40,7 @@ export function attachWorldParticles(
   const amber = new StandardMaterial("world goal mote material", scene);
   amber.emissiveColor = new Color3(1, 0.62, 0.16);
   amber.diffuseColor = new Color3(0.28, 0.13, 0.03);
-  const tealSource = MeshBuilder.CreateBox(
+  const tealSource = CreateBox(
     "world step mote source",
     { size: 0.055 },
     scene,

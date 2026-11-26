@@ -1,6 +1,8 @@
 import { Color3, Color4 } from "@babylonjs/core/Maths/math.color";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
+import { CreateBox } from "@babylonjs/core/Meshes/Builders/boxBuilder";
+import { CreateCylinder } from "@babylonjs/core/Meshes/Builders/cylinderBuilder";
+import { CreateTorus } from "@babylonjs/core/Meshes/Builders/torusBuilder";
 import type { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
@@ -86,7 +88,7 @@ export function buildBattleArena(
     material = shell,
   ) =>
     place(
-      MeshBuilder.CreateBox(
+      CreateBox(
         `${kind} ${name}`,
         { width: w, height: h, depth: d },
         scene,
@@ -105,7 +107,7 @@ export function buildBattleArena(
     material = floor,
   ) =>
     place(
-      MeshBuilder.CreateCylinder(
+      CreateCylinder(
         `${kind} ${name}`,
         { diameter, height: 0.22, tessellation: vertices },
         scene,
@@ -126,7 +128,7 @@ export function buildBattleArena(
     material = accent,
   ) =>
     place(
-      MeshBuilder.CreateTorus(
+      CreateTorus(
         `${kind} ${name}`,
         { diameter, thickness: 0.055, tessellation: 32 },
         scene,
@@ -230,7 +232,7 @@ export function buildBattleArena(
         );
       }
     const hub = place(
-      MeshBuilder.CreateCylinder(
+      CreateCylinder(
         "cache-vault recessed lock hub",
         { diameter: 1.45, height: 0.18, tessellation: 12 },
         scene,

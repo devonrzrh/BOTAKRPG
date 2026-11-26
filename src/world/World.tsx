@@ -12,7 +12,10 @@ import { openWorldEngine } from "./WorldEngine";
 import { Scene } from "@babylonjs/core/scene";
 import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
+import { CreateBox } from "@babylonjs/core/Meshes/Builders/boxBuilder";
+import { CreateCylinder } from "@babylonjs/core/Meshes/Builders/cylinderBuilder";
+import { CreatePlane } from "@babylonjs/core/Meshes/Builders/planeBuilder";
+import { CreateSphere } from "@babylonjs/core/Meshes/Builders/sphereBuilder";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 import { DirectionalLight } from "@babylonjs/core/Lights/directionalLight";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
@@ -172,6 +175,7 @@ function WorldCanvas(props: Props) {
         let ticks: number[] = [],
           lastReport = performance.now();
         let hasRendered = false;
+        const mazeTarget = new Vector3();
         engine.runRenderLoop(() => {
           const scene = sceneRef.current;
           if (!scene || latest.current.cinematicActive) return;
@@ -187,18 +191,19 @@ function WorldCanvas(props: Props) {
           const actor = actorRef.current;
           if (actor) {
             const p = latest.current;
-            let target: Vector3;
-            if (p.scene === "maze")
-              target = new Vector3(
-                p.maze.position[0] - p.maze.size / 2,
-                0.5,
-                p.maze.position[1] - p.maze.size / 2,
-              );
-            else target = hubPosition.current;
-            actor.position = Vector3.Lerp(
+            const target =
+              p.scene === "maze"
+                ? mazeTarget.set(
+                    p.maze.position[0] - p.maze.size / 2,
+                    0.5,
+                    p.maze.position[1] - p.maze.size / 2,
+                  )
+                : hubPosition.current;
+            Vector3.LerpToRef(
               actor.position,
               target,
               p.reducedMotion ? 1 : Math.min(1, engine!.getDeltaTime() / 85),
+              actor.position,
             );
           }
           try {
@@ -426,7 +431,7 @@ function WorldCanvas(props: Props) {
       d: number,
       m = stone,
     ) => {
-      const mesh = MeshBuilder.CreateBox(
+      const mesh = CreateBox(
         name,
         { width: w, height: h, depth: d },
         scene,
@@ -445,7 +450,7 @@ function WorldCanvas(props: Props) {
       m = stone,
       vertices = 12,
     ) => {
-      const mesh = MeshBuilder.CreateCylinder(
+      const mesh = CreateCylinder(
         name,
         { diameter: r * 2, height: h, tessellation: vertices },
         scene,
@@ -483,7 +488,7 @@ function WorldCanvas(props: Props) {
       material.useAlphaFromDiffuseTexture = true;
       material.backFaceCulling = false;
       material.disableLighting = true;
-      const plane = MeshBuilder.CreatePlane(
+      const plane = CreatePlane(
         `sign-${id}`,
         { width: 4.8, height: 0.8 },
         scene,
@@ -704,7 +709,7 @@ function WorldCanvas(props: Props) {
       cylinder("garden water", -5, 0.28, 4, 2, 0.1, teal, 32);
       for (let i = 0; i < 7; i++) {
         const a = (i / 7) * Math.PI * 2;
-        const node = MeshBuilder.CreateSphere(
+        const node = CreateSphere(
           "neuron",
           { diameter: 0.45, segments: 8 },
           scene,
@@ -749,7 +754,7 @@ function WorldCanvas(props: Props) {
     const actor = cylinder("wanderer", 0, 0.5, 0, 0.24, 0.75, red, 8);
     actorRef.current = actor;
     if (props.encounter) actor.setEnabled(false);
-    const head = MeshBuilder.CreateSphere(
+    const head = CreateSphere(
       "wanderer head",
       { diameter: 0.4, segments: 8 },
       scene,
@@ -757,7 +762,7 @@ function WorldCanvas(props: Props) {
     head.parent = actor;
     head.position.y = 0.58;
     head.material = light;
-    const hat = MeshBuilder.CreateCylinder(
+    const hat = CreateCylinder(
       "wanderer hat",
       { diameterTop: 0, diameterBottom: 0.65, height: 0.55, tessellation: 7 },
       scene,

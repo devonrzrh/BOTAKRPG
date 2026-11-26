@@ -5,7 +5,10 @@ import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { DynamicTexture } from "@babylonjs/core/Materials/Textures/dynamicTexture";
 import { Color3, Color4 } from "@babylonjs/core/Maths/math.color";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
+import { CreateBox } from "@babylonjs/core/Meshes/Builders/boxBuilder";
+import { CreateCylinder } from "@babylonjs/core/Meshes/Builders/cylinderBuilder";
+import { CreateGround } from "@babylonjs/core/Meshes/Builders/groundBuilder";
+import { CreatePlane } from "@babylonjs/core/Meshes/Builders/planeBuilder";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { Scene } from "@babylonjs/core/scene";
@@ -100,7 +103,7 @@ export function buildCinematicStage(scene: Scene, shot: string) {
     glow = false,
     parent?: TransformNode,
   ) => {
-    const mesh = MeshBuilder.CreateBox(name, { width, height, depth }, scene);
+    const mesh = CreateBox(name, { width, height, depth }, scene);
     if (parent) mesh.parent = parent;
     mesh.position.set(x, y, z);
     mesh.material = material(color, glow);
@@ -126,7 +129,7 @@ export function buildCinematicStage(scene: Scene, shot: string) {
       false,
       parent,
     );
-    const glass = MeshBuilder.CreatePlane(
+    const glass = CreatePlane(
       "terminal glass",
       { width, height },
       scene,
@@ -176,7 +179,7 @@ export function buildCinematicStage(scene: Scene, shot: string) {
   contact.disableLighting = true;
   contact.emissiveColor.set(0.018, 0.024, 0.04);
   const shadow = (size: number) => {
-    const decal = MeshBuilder.CreateGround(
+    const decal = CreateGround(
       "ground contact",
       { width: size, height: size },
       scene,
@@ -533,7 +536,7 @@ export function buildCinematicStage(scene: Scene, shot: string) {
   const visor = rig.materials[2];
   const visorColor = Color3.FromHexString(signal);
   const stage = gateway
-    ? MeshBuilder.CreateCylinder(
+    ? CreateCylinder(
         "gateway dais",
         { diameter: 5.4, height: 0.17, tessellation: 32 },
         scene,

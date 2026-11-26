@@ -1,7 +1,8 @@
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { DynamicTexture } from "@babylonjs/core/Materials/Textures/dynamicTexture";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
-import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
+import { CreateBox } from "@babylonjs/core/Meshes/Builders/boxBuilder";
+import { CreateGround } from "@babylonjs/core/Meshes/Builders/groundBuilder";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import type { Scene } from "@babylonjs/core/scene";
 
@@ -30,7 +31,7 @@ export function buildSupplyCrate(scene: Scene) {
     surface: StandardMaterial,
     parent = root,
   ) => {
-    const mesh = MeshBuilder.CreateBox(name, { width, height, depth }, scene);
+    const mesh = CreateBox(name, { width, height, depth }, scene);
     mesh.parent = parent;
     mesh.position.set(...at);
     mesh.material = surface;
@@ -71,7 +72,7 @@ export function buildSupplyCrate(scene: Scene) {
       edge,
       hinge,
     );
-  const plate = MeshBuilder.CreateGround(
+  const plate = CreateGround(
     "supplies nameplate",
     { width: 1.3, height: 0.32 },
     scene,

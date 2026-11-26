@@ -1,7 +1,7 @@
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Matrix, Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
-import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
+import { CreateBox } from "@babylonjs/core/Meshes/Builders/boxBuilder";
 import "@babylonjs/core/Meshes/thinInstanceMesh";
 import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import type { Scene } from "@babylonjs/core/scene";
@@ -25,7 +25,7 @@ export function attachAmbientParticles(
   const material = new StandardMaterial(`${name} material`, scene);
   material.disableLighting = true;
   material.emissiveColor = color;
-  const flecks = MeshBuilder.CreateBox(name, { size: 1 }, scene);
+  const flecks = CreateBox(name, { size: 1 }, scene);
   if (parent) flecks.parent = parent;
   flecks.material = material;
   flecks.isPickable = false;

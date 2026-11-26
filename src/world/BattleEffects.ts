@@ -1,7 +1,10 @@
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import type { Scene } from "@babylonjs/core/scene";
-import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
+import { CreateBox } from "@babylonjs/core/Meshes/Builders/boxBuilder";
+import { CreatePolyhedron } from "@babylonjs/core/Meshes/Builders/polyhedronBuilder";
+import { CreateSphere } from "@babylonjs/core/Meshes/Builders/sphereBuilder";
+import { CreateTorus } from "@babylonjs/core/Meshes/Builders/torusBuilder";
 import type { Mesh } from "@babylonjs/core/Meshes/mesh";
 import type { InstancedMesh } from "@babylonjs/core/Meshes/instancedMesh";
 import "@babylonjs/core/Meshes/instancedMesh";
@@ -56,20 +59,20 @@ export function attachBattleEffects(
   ): Flash => {
     const mesh =
       shape === "ring"
-        ? MeshBuilder.CreateTorus(
+        ? CreateTorus(
             name,
             { diameter: 0.8, thickness: 0.045, tessellation: 20 },
             scene,
           )
         : shape === "shield"
-          ? MeshBuilder.CreateSphere(name, { diameter: 1, segments: 8 }, scene)
+          ? CreateSphere(name, { diameter: 1, segments: 8 }, scene)
           : shape === "beam"
-            ? MeshBuilder.CreateBox(
+            ? CreateBox(
                 name,
                 { width: 0.06, height: 0.06, depth: 1 },
                 scene,
               )
-            : MeshBuilder.CreateSphere(
+            : CreateSphere(
                 name,
                 { diameter: 0.12, segments: 6 },
                 scene,
@@ -99,7 +102,7 @@ export function attachBattleEffects(
   particleMaterial.emissiveColor = colors.white.clone();
   particleMaterial.diffuseColor = colors.white.scale(0.2);
   particleMaterial.alpha = 0.95;
-  const particleSource = MeshBuilder.CreatePolyhedron(
+  const particleSource = CreatePolyhedron(
     "battle particle source",
     { type: 1, size: 0.09 },
     scene,

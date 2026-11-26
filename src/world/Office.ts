@@ -2,7 +2,9 @@ import { Scene } from "@babylonjs/core/scene";
 import { UniversalCamera } from "@babylonjs/core/Cameras/universalCamera";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Color3, Color4 } from "@babylonjs/core/Maths/math.color";
-import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
+import { CreateBox } from "@babylonjs/core/Meshes/Builders/boxBuilder";
+import { CreateCylinder } from "@babylonjs/core/Meshes/Builders/cylinderBuilder";
+import { CreateTorus } from "@babylonjs/core/Meshes/Builders/torusBuilder";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
@@ -88,7 +90,7 @@ export function buildOffice(
     color: string,
     parent?: TransformNode,
   ) => {
-    const mesh = MeshBuilder.CreateBox(
+    const mesh = CreateBox(
       name,
       { width: w, height: h, depth: d },
       scene,
@@ -242,7 +244,7 @@ export function buildOffice(
       for (const x of [-1.1, 1.1])
         box("window mullion", x, 3.25, 4.75, 0.05, 2, 0.08, "#171e23", wall);
       box("window crossbar", 0, 3.3, 4.75, 6.6, 0.05, 0.08, "#171e23", wall);
-      const mug = MeshBuilder.CreateCylinder(
+      const mug = CreateCylinder(
         "coffee cup",
         { diameter: 0.35, height: 0.4, tessellation: 24 },
         scene,
@@ -250,7 +252,7 @@ export function buildOffice(
       mug.parent = table;
       mug.position.set(2.85, 1.33, 4.05);
       mug.material = mat("#c0b294");
-      const coffee = MeshBuilder.CreateCylinder(
+      const coffee = CreateCylinder(
         "coffee",
         { diameter: 0.3, height: 0.012, tessellation: 24 },
         scene,
@@ -258,7 +260,7 @@ export function buildOffice(
       coffee.parent = table;
       coffee.position.set(2.85, 1.54, 4.05);
       coffee.material = mat("#2b1d16");
-      const handle = MeshBuilder.CreateTorus(
+      const handle = CreateTorus(
         "cup handle",
         { diameter: 0.26, thickness: 0.05, tessellation: 16 },
         scene,
@@ -272,7 +274,7 @@ export function buildOffice(
         [-2.9, "#739c8b"],
         [-2.55, "#a5895b"],
       ] as const) {
-        const vial = MeshBuilder.CreateCylinder(
+        const vial = CreateCylinder(
           "supply bottle",
           { diameter: 0.23, height: 0.47, tessellation: 16 },
           scene,
