@@ -4,6 +4,8 @@ import { parseMarkdown } from "../scripts/compile-content";
 import { validateContent } from "../src/content/schema";
 import raw from "../src/generated/content.json";
 import { cinematicShots } from "../src/world/CinematicStage";
+import { acknowledgeStory, pendingStory } from "../src/game/questStory";
+import { initialSave, parseSave } from "../src/game/state";
 it("preserves nested Markdown code fences inside a structured worked example", async () => {
   const records = parseMarkdown(
     await readFile("content/11-algorithm-chapters.md", "utf8"),
@@ -71,12 +73,35 @@ it("compiles timed dialogue across the pursuit and first connection", () => {
   expect(intro?.type === "story" && intro.frames[1]).toMatchObject({
     shot: "rail-pursuit",
     dialogue: [
-      { speaker: "Detective", holdMs: 3000 },
-      { speaker: "Dispatch", holdMs: 3400 },
+      { speaker: "Detective", holdMs: 2600 },
+      { speaker: "Dispatch", holdMs: 4000 },
     ],
   });
   expect(connection?.type === "story" && connection.frames.length).toBe(2);
 });
+it.each([
+  ["evidence-chain", "five-records"],
+  ["echo-battle", "last-window"],
+])(
+  "serves the %s cutscene once and preserves that across a reload",
+  (activity, id) => {
+    const content = validateContent(raw);
+    const save = initialSave();
+    const beat = pendingStory(save, content, activity, "before")!;
+    expect(beat).toMatchObject({ id, type: "story" });
+    const seen = parseSave(acknowledgeStory(save, beat), content);
+    expect(seen.story.seenDialogues).toContain(id);
+    expect(pendingStory(seen, content, activity, "before")).toBeUndefined();
+    expect(
+      pendingStory(
+        { ...save, completed: [activity] },
+        content,
+        activity,
+        "before",
+      ),
+    ).toBeUndefined();
+  },
+);
 it.each(["pacified", "defeated"])(
   "compiles the %s ECHO-7 epilogue",
   (outcome) => {

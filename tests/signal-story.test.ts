@@ -1,4 +1,4 @@
-import { expect, it } from "vitest";
+import { assert, expect, it } from "vitest";
 import raw from "../src/generated/content.json";
 import {
   validateContent,
@@ -230,11 +230,12 @@ it("plays the signal investigation through ordered chapter practice, combat, sav
   );
 
   const ending = pendingStory(save, content, "signal-mimic", "after");
-  expect(ending?.id).toBe("signal-resolution");
-  expect(ending!.nodes.map((n) => n.text).join(" ")).toMatch(
+  assert(ending?.type === "dialogue");
+  expect(ending.id).toBe("signal-resolution");
+  expect(ending.nodes.map((n) => n.text).join(" ")).toMatch(
     /Verified handshake.*M-04/is,
   );
-  save = acknowledgeStory(save, ending!);
+  save = acknowledgeStory(save, ending);
   save = claimQuest(save, signal, content);
   expect(save.claimed).toContain(signal.id);
   expect(claimQuest(save, signal, content)).toBe(save);

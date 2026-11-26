@@ -1,4 +1,4 @@
-import { expect, it } from "vitest";
+import { assert, expect, it } from "vitest";
 import raw from "../src/generated/content.json";
 import {
   validateContent,
@@ -56,8 +56,8 @@ it("plays the complete routing story from the maze to the Warden and files its r
   for (const id of route.objectives) {
     expect(nextObjective(save, route)).toBe(id);
     expect(activityUnlocked(save, id, content)).toBe(true);
-    const scene = pendingStory(save, content, id, "before")!;
-    expect(scene, id).toBeDefined();
+    const scene = pendingStory(save, content, id, "before");
+    assert(scene?.type === "dialogue", id);
     expect(scene.nodes.every((n) => n.choices.length > 0)).toBe(true);
     save = acknowledgeStory(save, scene);
     expect(pendingStory(save, content, id, "before")).toBeUndefined();
@@ -107,7 +107,8 @@ it("plays the complete routing story from the maze to the Warden and files its r
   }
   expect(turns).toBeLessThan(100);
   expect(questComplete(save, route)).toBe(true);
-  const ending = pendingStory(save, content, "route-warden", "after")!;
+  const ending = pendingStory(save, content, "route-warden", "after");
+  assert(ending?.type === "dialogue");
   expect(ending.nodes.map((n) => n.text).join(" ")).toMatch(/R-17.*02:14/);
   save = acknowledgeStory(save, ending);
   save = claimQuest(save, route, content);

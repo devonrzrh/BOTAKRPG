@@ -492,7 +492,13 @@ export function parseSave(input: unknown, content: Content): Save {
     if (progress.practiced && (!progress.introduced || progress.attempts < 1))
       throw new Error(`Invalid chapter progress: ${id}`);
   }
-  check(save.story.seenDialogues, "dialogue");
+  for (const id of save.story.seenDialogues) {
+    if (
+      ids.get(id) !== "dialogue" &&
+      !content.entities.some((e) => e.id === id && e.type === "story" && e.trigger)
+    )
+      throw new Error(`Save contains unknown dialogue or cutscene: ${id}`);
+  }
   for (const quest of content.entities.filter(
     (e): e is Quest => e.type === "quest" && e.kind === "finale",
   )) {

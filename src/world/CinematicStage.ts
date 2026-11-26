@@ -15,8 +15,18 @@ import { Scene } from "@babylonjs/core/scene";
 import { buildEnemyModel } from "./EnemyModel";
 
 const cityShots = ["transit-platform", "rail-pursuit", "abandoned-chassis"];
-const networkShots = ["gateway-sentry", "echo-surrender", "echo-isolation"];
-const deskShots = ["office-terminal", "ledger-open", "ledger-closed"];
+const networkShots = [
+  "gateway-sentry",
+  "echo-threshold",
+  "echo-surrender",
+  "echo-isolation",
+];
+const deskShots = [
+  "office-terminal",
+  "evidence-board",
+  "ledger-open",
+  "ledger-closed",
+];
 export const cinematicShots = [...cityShots, ...networkShots, ...deskShots];
 
 const cyan = "#77e9ef";
@@ -129,11 +139,7 @@ export function buildCinematicStage(scene: Scene, shot: string) {
       false,
       parent,
     );
-    const glass = CreatePlane(
-      "terminal glass",
-      { width, height },
-      scene,
-    );
+    const glass = CreatePlane("terminal glass", { width, height }, scene);
     if (parent) glass.parent = parent;
     glass.position.set(x, y, z - 0.012);
     const texture = new DynamicTexture(
@@ -218,6 +224,99 @@ export function buildCinematicStage(scene: Scene, shot: string) {
     box("lamp stem", -2.7, 1.76, 0.6, 0.11, 1.45, 0.1, "#a28357");
     box("lamp shade", -2.45, 2.48, 0.58, 1.15, 0.24, 0.64, "#9b7045");
     box("lamp diffuser", -2.45, 2.35, 0.58, 1.02, 0.026, 0.51, amber, true);
+    if (shot === "evidence-board") {
+      const boardZ = 2.24;
+      box(
+        "evidence board frame",
+        0,
+        2.68,
+        boardZ + 0.11,
+        5.22,
+        2.95,
+        0.2,
+        "#443329",
+      );
+      box("cork", 0, 2.68, boardZ + 0.04, 5.02, 2.75, 0.1, "#876244");
+      const boardLamp = light("board lamp", -1.35, 3.65, 0.8, "#ffd4a1", 0.9, 6);
+      const pins = [
+        [-1.77, 3.63],
+        [-0.89, 2.58],
+        [0.12, 3.7],
+        [1.07, 2.58],
+        [1.84, 3.54],
+      ];
+      pins.forEach(([x, y], index) => {
+        const paper = new TransformNode("evidence sheet", scene);
+        paper.position.set(x, y, boardZ);
+        paper.rotation.z = index % 2 ? -0.12 : 0.12;
+        box(
+          "document",
+          0,
+          -0.42,
+          0,
+          0.83,
+          1.0,
+          0.025,
+          index % 2 ? "#b8c9bc" : "#e2c99e",
+          false,
+          paper,
+        );
+        box(
+          "document heading",
+          0,
+          -0.19,
+          -0.016,
+          0.52,
+          0.06,
+          0.008,
+          "#514b3e",
+          false,
+          paper,
+        );
+        for (let row = 0; row < 5; row++)
+          box(
+            "document entry",
+            -0.03,
+            -0.33 - row * 0.093,
+            -0.016,
+            0.52 - (row % 3) * 0.08,
+            0.024,
+            0.008,
+            "#777367",
+            false,
+            paper,
+          );
+        box("pin", x, y, boardZ - 0.073, 0.085, 0.085, 0.07, "#d27556");
+        if (index === 0) return;
+        const [fromX, fromY] = pins[index - 1];
+        const dx = x - fromX;
+        const dy = y - fromY;
+        const thread = box(
+          "evidence thread",
+          (x + fromX) / 2,
+          (y + fromY) / 2,
+          boardZ - 0.079,
+          Math.hypot(dx, dy),
+          0.024,
+          0.022,
+          "#d27556",
+        );
+        thread.rotation.z = Math.atan2(dy, dx);
+      });
+      return (t: number) => {
+        boardLamp.intensity = 0.2 + smooth(0.65, 1.2, t) * 0.7;
+        const push = smooth(0, 8.2, t);
+        view(
+          -1.9 + push * 2.03,
+          2.79 + push * 0.16,
+          -4.58 + push * 1.31,
+          0,
+          2.67,
+          boardZ,
+          0.6,
+        );
+      };
+    }
     const terminal = new TransformNode("office terminal", scene);
     terminal.position.set(-0.83, 0.94, 0.9);
     terminal.rotation.y = -0.12;
@@ -364,6 +463,7 @@ export function buildCinematicStage(scene: Scene, shot: string) {
   const chase = shot === "rail-pursuit";
   const platform = shot === "transit-platform";
   const gateway = shot === "gateway-sentry";
+  const threshold = shot === "echo-threshold";
   const surrender = shot === "echo-surrender";
   const signal = gateway || city ? amber : cyan;
   light("cold backlight", 0, 5, 6, "#5acde8", 2.7, 13);
@@ -377,6 +477,10 @@ export function buildCinematicStage(scene: Scene, shot: string) {
     13,
   );
   if (city) scene.fogDensity = 0.052;
+  if (threshold) {
+    scene.fogDensity = 0.058;
+    fill.intensity = 0.17;
+  }
   box("floor foundation", 0, -0.18, 8, 14, 0.32, 65, black);
   const scenery = new Map<StandardMaterial, Mesh[]>();
   const setBox = (...args: Parameters<typeof box>) => {
@@ -498,7 +602,10 @@ export function buildCinematicStage(scene: Scene, shot: string) {
       chase ? amber : cyan,
       true,
     );
-    if (chase) setBox("rail deck", -0.4, 5.53, z, 6, 0.35, 2.99, black);
+    if (chase) {
+      setBox("rail deck", 2.96, 5.53, z, 4.75, 0.35, 2.99, black);
+      setBox("rail parapet", 0.63, 5.96, z, 0.13, 0.68, 2.98, steel);
+    }
     if (platform) setBox("track ties", 5.65, -0.12, z, 2.9, 0.2, 0.3, steel);
   }
   if (platform)
@@ -507,6 +614,10 @@ export function buildCinematicStage(scene: Scene, shot: string) {
   for (const cohort of scenery.values()) Mesh.MergeMeshes(cohort);
 
   const train = new TransformNode("passing train", scene);
+  const passingLight =
+    platform || chase
+      ? light("passing train light", 0, 0, 0, "#ffd8a2", 0, 16)
+      : null;
   if (platform || chase) {
     for (let i = 0; i < 3; i++) {
       const z = i * 5.5;
@@ -526,6 +637,43 @@ export function buildCinematicStage(scene: Scene, shot: string) {
           train,
         );
     }
+  }
+  const doors = threshold
+    ? [-1, 1].map((side) => {
+        const leaf = new TransformNode("bulkhead leaf", scene);
+        box("bulkhead", 0, 2.65, 0, 3.14, 5.32, 0.33, steel, false, leaf);
+        box(
+          "bulkhead rib",
+          -side * 1.22,
+          2.64,
+          -0.19,
+          0.24,
+          5.1,
+          0.09,
+          black,
+          false,
+          leaf,
+        );
+        box(
+          "bulkhead clearance light",
+          -side * 1.42,
+          2.64,
+          -0.25,
+          0.046,
+          3.4,
+          0.08,
+          cyan,
+          true,
+          leaf,
+        );
+        return leaf;
+      })
+    : [];
+  if (threshold) {
+    box("bulkhead lintel", 0, 5.36, 0.25, 10.6, 0.4, 0.78, steel);
+    for (const side of [-1, 1])
+      box("bulkhead jamb", side * 3.3, 2.66, 0.25, 0.46, 5.3, 0.78, steel);
+    box("end wall", 0, 3.1, 11.7, 10.6, 6.2, 0.5, black);
   }
   const rig = buildEnemyModel(
     scene,
@@ -558,6 +706,14 @@ export function buildCinematicStage(scene: Scene, shot: string) {
     terminal = display(1.18, 1.82, 1.48, 1.6, 0.8);
     light("receipt spill", 1.12, 1.8, 0.8, cyan, 0.72, 4);
   }
+  if (chase) {
+    box("service wall", -1.48, 2.6, 16.85, 5.66, 5.2, 0.28, panel);
+    box("alcove jamb", 4.14, 2.6, 16.85, 0.76, 5.2, 0.28, panel);
+    box("alcove lintel", 2.55, 4.45, 16.85, 2.42, 1.5, 0.28, panel);
+    box("alcove interior", 2.55, 2.6, 19.35, 2.42, 5.2, 0.28, black);
+    const marker = display(2.55, 4.25, 16.65, 1.55, 0.71);
+    marker("MAINTENANCE", "ALCOVE 04", amber);
+  }
   const runPose = (t: number, weight: number) => {
     const angle = t * 9.4;
     const swing = Math.sin(angle);
@@ -579,66 +735,87 @@ export function buildCinematicStage(scene: Scene, shot: string) {
     rig.animateIdle(t);
     let power = 1;
     if (platform) {
-      const escape = smooth(7.05, 8.8, t);
+      const escape = smooth(6.28, 8, t);
+      const turn = smooth(5.72, 6.74, t);
       rig.root.position.set(
-        escape * 2,
-        0.07 * Math.sin(t * 2),
+        escape * 2.35,
+        escape * 0.06 * Math.abs(Math.sin(t * 9.4)),
         1.6 + escape * 10,
       );
-      rig.root.rotation.y = -0.48 + escape * 3.62;
-      runPose(t, smooth(7.2, 7.7, t));
-      train.position.set(5.65, 1.14, -24 + smooth(3.8, 8.6, t) * 60);
+      rig.root.rotation.y = -0.32 + turn * 3.72;
+      if (rig.head)
+        rig.head.rotation.y = -smooth(3.3, 4.7, t) * (1 - turn) * 0.55;
+      runPose(t, smooth(6.2, 6.65, t));
+      train.position.set(5.65, 1.14, -40 + t * 9.1);
+      passingLight?.position.set(4.2, 1.88, train.position.z + 7);
+      if (passingLight) passingLight.intensity = 2.7;
+      const tension = smooth(0, 5.8, t);
       view(
-        -2.7 + smooth(0, 7.1, t) * 1.1,
-        2.11,
-        -7.2 + smooth(0, 7.1, t) * 1.15,
-        0.05,
-        1.26,
-        1.7,
+        -3.1 + tension * 1.42,
+        2.28 - tension * 0.36,
+        -7.45 + tension * 3.8,
+        escape * 1.3,
+        1.32,
+        1.6 + escape * 2.8,
+        0.68,
       );
     } else if (chase) {
-      const run = smooth(0, 6.4, t);
-      const stride = Math.sin(t * 9);
-      const turn = smooth(4.1, 6.1, t);
-      const z = -0.6 + t * 2.55;
+      const stride = Math.sin(t * 9.4);
+      const turn = smooth(4.15, 6.5, t);
+      const z = -0.6 + t * 2.73;
       rig.root.position.set(
-        Math.sin(t * 1.4) * 0.33 + turn * 3.3,
-        0.15 + Math.abs(stride) * 0.12,
+        Math.sin(t * 1.4) * 0.19 + turn * 2.65,
+        Math.abs(stride) * 0.085,
         z,
       );
       rig.root.rotation.set(
-        0.24,
-        Math.PI - turn * 1.25,
-        Math.sin(t * 9) * 0.12,
+        -0.21,
+        Math.PI + smooth(4.15, 5.3, t) * 0.48,
+        stride * 0.068,
       );
       runPose(t, 1);
       if (rig.head)
         rig.head.rotation.y =
-          -smooth(1, 1.6, t) * (1 - smooth(2, 2.7, t)) * 0.85;
-      train.position.set(3.6, 6.42, z - 16 + run * 54);
+          -smooth(1.35, 2.35, t) * (1 - smooth(2.85, 3.4, t)) * 0.94;
+      train.position.set(2.98, 6.66, -32 + t * 10);
+      passingLight?.position.set(0.92, 4.85, train.position.z + 9);
+      if (passingLight) passingLight.intensity = 2.35;
+      key.intensity = 1.7;
       key.position.z = z - 2;
-      view(
-        -2.1 + turn,
-        2.22 + stride * 0.03,
-        z - 6.85 - turn * 0.75,
-        rig.root.position.x * 0.9,
-        1.7,
-        z + 0.6,
-        0.72,
-      );
+      if (t < 2.6) {
+        view(-2.2, 1.42, z - 5.65, 0, 1.45, z + 0.75, 0.74);
+      } else if (t < 4.75) {
+        view(-4.15, 1.67, z + 1.42, rig.root.position.x, 1.23, z + 0.4, 0.88);
+      } else {
+        view(
+          -2.65 + turn * 1.36,
+          2.52,
+          9.9 + (t - 4.75) * 0.49,
+          rig.root.position.x,
+          1.58,
+          z + 0.5,
+          0.68,
+        );
+      }
     } else if (alcove) {
       rig.root.position.set(-2.08, 0.44, 0.4);
       rig.root.rotation.set(1.48, 0.83, 0);
-      power = 0.09;
-      terminal?.("TRANSFER COMPLETE", "GATEWAY 01 / RECEIPT");
-      const look = smooth(1.65, 6.2, t);
+      const transfer = smooth(0.8, 2.3, t);
+      power = 0.52 * (1 - transfer);
+      terminal?.(
+        transfer === 1 ? "TRANSFER COMPLETE" : "UPLINK ACTIVE",
+        transfer === 1 ? "GATEWAY 01 / RECEIPT" : "SENDING…",
+        transfer === 1 ? cyan : amber,
+      );
+      const look = smooth(0.5, 4.9, t);
       view(
         -2.55 + look * 1.86,
         2.44 - look * 0.54,
         -4.85 + look * 1.1,
-        -0.65 + look * 1.85,
-        0.94 + look * 0.63,
+        -0.65 + look * 1.21,
+        0.94 + look * 0.46,
         1.53,
+        0.72,
       );
     } else if (gateway) {
       const seal = smooth(0.42, 1.7, t);
@@ -646,6 +823,24 @@ export function buildCinematicStage(scene: Scene, shot: string) {
       rig.leftArm.rotation.x = -seal * 0.85;
       rig.leftArm.rotation.z = seal * 0.48;
       view(2.55 - smooth(0, 6.8, t) * 1.65, 1.52, -6.1, 0, 1.67, 2.02);
+    } else if (threshold) {
+      const opening = smooth(1.8, 3.6, t);
+      doors.forEach((door, index) => {
+        door.position.set((index * 2 - 1) * (1.57 + opening * 2.98), 0, 0.25);
+      });
+      rig.root.position.set(0, 0, 5.45 - smooth(4, 6.6, t) * 1.35);
+      runPose(t * 0.6, Math.sin(smooth(4, 6.6, t) * Math.PI) * 0.56);
+      const approach = smooth(2.45, 10.4, t);
+      view(
+        -0.38 + approach * 0.52,
+        1.85,
+        -5.32 + approach * 4.06,
+        0,
+        1.68,
+        rig.root.position.z,
+        0.61,
+      );
+      power = 0.44 + smooth(3, 4.15, t) * 0.56;
     } else if (surrender) {
       const standDown = smooth(0.45, 4.5, t);
       rig.root.position.y = -standDown * 0.22;

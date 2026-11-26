@@ -118,10 +118,16 @@ export const questSchema = z.object({
     })
     .optional(),
 });
+const storyTrigger = z.object({
+  activity: id,
+  when: z.enum(["before", "after"]),
+});
+
 export const storySchema = z.object({
   ...base,
   type: z.literal("story"),
   visual: z.enum(["chase", "network", "finale"]).default("chase"),
+  trigger: storyTrigger.optional(),
   frames: z
     .array(
       z.object({
@@ -147,9 +153,7 @@ export const storySchema = z.object({
 export const dialogueSchema = z.object({
   ...base,
   type: z.literal("dialogue"),
-  trigger: z
-    .object({ activity: id, when: z.enum(["before", "after"]) })
-    .optional(),
+  trigger: storyTrigger.optional(),
   enemyName: z.string().min(1).optional(),
   start: id,
   nodes: z
@@ -210,7 +214,10 @@ export function validateContent(input: unknown): Content {
   const map = new Map<string, Entity>();
   const triggers = new Set<string>();
   for (const entity of content.entities) {
-    if (entity.type === "dialogue" && entity.trigger) {
+    if (
+      (entity.type === "dialogue" || entity.type === "story") &&
+      entity.trigger
+    ) {
       const key = `${entity.trigger.activity}:${entity.trigger.when}`;
       if (triggers.has(key))
         throw new Error(`${entity.id}: duplicate story trigger '${key}'`);
@@ -252,7 +259,10 @@ export function validateContent(input: unknown): Content {
       throw new Error(
         `${entity.id}: puzzle needs config, brief, hint and solution`,
       );
-    if (entity.type === "dialogue" && entity.trigger)
+    if (
+      (entity.type === "dialogue" || entity.type === "story") &&
+      entity.trigger
+    )
       ref(entity.id, entity.trigger.activity, "activity");
     if (entity.type === "lesson")
       for (const prerequisite of entity.prerequisites)

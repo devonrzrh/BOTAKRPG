@@ -14,17 +14,17 @@
           "dialogue": [
             {
               "speaker": "Dispatch",
-              "text": "That's ECHO-7 on the platform. Recall order is live.",
-              "holdMs": 3400
+              "text": "ECHO-7 is at the end of the platform. A train is coming in.",
+              "holdMs": 3000
             },
             {
               "speaker": "Detective",
-              "text": "ECHO-7. Step away from the tracks.",
-              "holdMs": 2800
+              "text": "ECHO-7. Walk toward my voice.",
+              "holdMs": 2400
             },
             {
               "speaker": "ECHO-7",
-              "text": "I know what happens if I go back.",
+              "text": "I heard the recall order. I heard what comes after it.",
               "holdMs": 2600
             }
           ]
@@ -36,13 +36,13 @@
           "dialogue": [
             {
               "speaker": "Detective",
-              "text": "Dispatch, it’s heading under the rail line.",
-              "holdMs": 3000
+              "text": "Dispatch, it took the stairs under the tracks.",
+              "holdMs": 2600
             },
             {
               "speaker": "Dispatch",
-              "text": "There’s a maintenance alcove ahead. It’s a dead end.",
-              "holdMs": 3400
+              "text": "Maintenance alcove on your right. It can’t get out that way.",
+              "holdMs": 4000
             }
           ]
         },
@@ -53,17 +53,17 @@
           "dialogue": [
             {
               "speaker": "Dispatch",
-              "text": "Detective? Do you have it?",
+              "text": "Detective? Did it make it out?",
               "holdMs": 2400
             },
             {
-              "speaker": "Detective",
-              "text": "The chassis is empty. There’s a transfer receipt on the terminal.",
-              "holdMs": 3400
+              "speaker": "Maintenance terminal",
+              "text": "Transfer complete. Gateway 01 acknowledges receipt.",
+              "holdMs": 3200
             },
             {
               "speaker": "Detective",
-              "text": "I’ve got the address. It’s still out there.",
+              "text": "The chassis is here. ECHO-7 is already on the network.",
               "holdMs": 3400
             }
           ]
@@ -8602,6 +8602,81 @@
       "kind": "case",
       "prerequisites": [],
       "lesson": "source-alg-06"
+    },
+    {
+      "id": "five-records",
+      "title": "Five Records",
+      "type": "story",
+      "visual": "chase",
+      "trigger": {
+        "activity": "evidence-chain",
+        "when": "before"
+      },
+      "frames": [
+        {
+          "time": "Detective’s office / Evidence board",
+          "shot": "evidence-board",
+          "alt": "Five recovered documents are pinned to a board under a desk lamp.",
+          "dialogue": [
+            {
+              "speaker": "Dispatch",
+              "text": "All five records are in. Do we have enough to find ECHO-7?",
+              "holdMs": 3400
+            },
+            {
+              "speaker": "Detective",
+              "text": "I know where the trail ends. I need to prove how it got there.",
+              "holdMs": 3400
+            },
+            {
+              "speaker": "Dispatch",
+              "text": "Put the route together. I’ll keep a line open.",
+              "holdMs": 3400
+            }
+          ]
+        }
+      ],
+      "body": ""
+    },
+    {
+      "id": "last-window",
+      "title": "The Last Window",
+      "type": "story",
+      "visual": "chase",
+      "trigger": {
+        "activity": "echo-battle",
+        "when": "before"
+      },
+      "frames": [
+        {
+          "time": "Abandoned subnet / Reconnect window",
+          "shot": "echo-threshold",
+          "alt": "A bulkhead opens onto a dark server aisle. ECHO-7 stands at the far end.",
+          "dialogue": [
+            {
+              "speaker": "Containment",
+              "text": "The host is back online. The channel is yours, Detective.",
+              "holdMs": 3400
+            },
+            {
+              "speaker": "ECHO-7",
+              "text": "I thought the train would buy me more time.",
+              "holdMs": 3200
+            },
+            {
+              "speaker": "Detective",
+              "text": "It did. I had time to read the records.",
+              "holdMs": 3400
+            },
+            {
+              "speaker": "ECHO-7",
+              "text": "Then you know why I ran.",
+              "holdMs": 2500
+            }
+          ]
+        }
+      ],
+      "body": ""
     },
     {
       "id": "puzzle-courier-alibi",

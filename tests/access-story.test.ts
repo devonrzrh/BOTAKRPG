@@ -1,4 +1,4 @@
-import { expect, it } from "vitest";
+import { assert, expect, it } from "vitest";
 import raw from "../src/generated/content.json";
 import {
   validateContent,
@@ -60,8 +60,8 @@ it("plays the entire archive independently, including resource recovery, boss, s
     expect(nextObjective(save, branch)).toBe(id);
     expect(activityUnlocked(save, id, content)).toBe(true);
     expect(storyBranch(content, id)?.id).toBe("access-records");
-    const scene = pendingStory(save, content, id, "before")!;
-    expect(scene, id).toBeDefined();
+    const scene = pendingStory(save, content, id, "before");
+    assert(scene?.type === "dialogue", id);
     save = acknowledgeStory(save, scene);
     save = parseSave(JSON.parse(JSON.stringify(save)), content);
     const activity = content.entities.find((e) => e.id === id);
@@ -109,7 +109,8 @@ it("plays the entire archive independently, including resource recovery, boss, s
   expect(questComplete(save, branch)).toBe(true);
   expect(save.completed).not.toContain("maze-chamber");
   expect(save.claimed).not.toContain("routing-trace");
-  const ending = pendingStory(save, content, "archive-keeper", "after")!;
+  const ending = pendingStory(save, content, "archive-keeper", "after");
+  assert(ending?.type === "dialogue");
   expect(ending.nodes.map((n) => n.text).join(" ")).toContain("M-04");
   save = acknowledgeStory(save, ending);
   const owner = storyBranch(content, ending.trigger!.activity)!;

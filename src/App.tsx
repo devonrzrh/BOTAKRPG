@@ -1163,6 +1163,19 @@ export default function App() {
     setTrial(false);
     trialRef.current = false;
   };
+  const finishStoryBeat = (beat: DialogueContent | Story) => {
+    if (!beat.trigger) return;
+    const { activity, when } = beat.trigger;
+    updateSave((s) => acknowledgeStory(s, beat));
+    if (when === "before") {
+      open(activityDestination(activity));
+    } else {
+      const owner = storyBranch(content, activity);
+      if (owner) claimWithFeedback(owner);
+      open("journal");
+      notify(`${owner?.title ?? "Case"} evidence filed.`);
+    }
+  };
   const continueBranch = (activity: string) => {
     stop();
     const branch = storyBranch(content, activity);
@@ -1189,15 +1202,15 @@ export default function App() {
     save.finaleOutcome
       ? `echo-epilogue-${save.finaleOutcome}`
       : null;
-  const activeStory = cutsceneId
-    ? content.entities.find(
-        (e): e is Story => e.type === "story" && e.id === cutsceneId,
-      )!
-    : story;
+  const activeDialogue = dialogueContent.find((e) => e.id === dialogueId);
+  const activeCinematic = content.entities.find(
+    (e): e is Story => e.type === "story" && e.id === (cutsceneId ?? dialogueId),
+  );
+  const activeStory = activeCinematic ?? story;
   const cinematicActive =
     booted &&
     !intakeOpen &&
-    (!save.story.prologueSeen || prologueReplay || Boolean(cutsceneId));
+    (!save.story.prologueSeen || prologueReplay || Boolean(activeCinematic));
   const applyBattle = (
     nextBattle: Battle,
     nextSave: Save,
@@ -3502,13 +3515,17 @@ export default function App() {
       </aside>
       {cinematicActive && (
         <Cutscene
-          key={cutsceneId ?? "intro"}
+          key={activeStory.id}
           savedName={save.character.name}
           story={activeStory}
           renderer={save.settings.renderer}
           reducedMotion={save.settings.reducedMotion}
           onFinish={() => {
-            if (activeStory.visual === "finale") {
+            if (activeStory.trigger) {
+              setCutsceneId(null);
+              setDialogueId(null);
+              if (activeStory.id === dialogueId) finishStoryBeat(activeStory);
+            } else if (activeStory.visual === "finale") {
               setCutsceneId(null);
               open("journal");
             } else if (cutsceneId) {
@@ -3590,30 +3607,21 @@ export default function App() {
             />
           );
         })()}
-      {dialogueId &&
+      {activeDialogue &&
         save.story.prologueSeen &&
         !prologueReplay &&
         !cutsceneId && (
           <Dialogue
-            key={dialogueId}
+            key={activeDialogue.id}
             savedName={save.character.name}
             reducedMotion={save.settings.reducedMotion}
-            dialogue={dialogueContent.find((d) => d.id === dialogueId)!}
+            dialogue={activeDialogue}
             onAction={(action) => {
-              const beat = dialogueContent.find((d) => d.id === dialogueId)!;
+              const beat = activeDialogue;
               if (beat.trigger) {
                 setDialogueId(null);
-                if (action === "continue") {
-                  updateSave((s) => acknowledgeStory(s, beat));
-                  if (beat.trigger.when === "before")
-                    open(activityDestination(beat.trigger.activity));
-                  else {
-                    const owner = storyBranch(content, beat.trigger.activity);
-                    if (owner) claimWithFeedback(owner);
-                    open("journal");
-                    notify(`${owner?.title ?? "Case"} evidence filed.`);
-                  }
-                } else open("journal");
+                if (action === "continue") finishStoryBeat(beat);
+                else open("journal");
                 return;
               }
               updateSave((s) => ({

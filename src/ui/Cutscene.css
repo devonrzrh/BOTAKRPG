@@ -161,3 +161,9 @@
     max-width: calc(100% - 166px);
   }
 }
+
+@media (max-aspect-ratio: 1/1) {
+  .cutscene-picture img {
+    object-fit: contain;
+  }
+}

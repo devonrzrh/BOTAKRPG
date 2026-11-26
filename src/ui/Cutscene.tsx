@@ -16,22 +16,32 @@ const shotUrl = (shot: string) =>
 const effects: Partial<Record<string, [atMs: number, sound: SfxName][]>> = {
   "transit-platform": [
     [400, "scan"],
-    [4550, "cinematicTrain"],
-    [7470, "pursuit"],
-    [7810, "pursuit"],
-    [8150, "pursuit"],
+    [3970, "cinematicTrain"],
+    [6500, "pursuit"],
+    [6834, "pursuit"],
+    [7168, "pursuit"],
   ],
   "rail-pursuit": [
-    [1850, "cinematicTrain"],
-    ...Array.from({ length: 18 }, (_, step): [number, SfxName] => [
+    [1150, "cinematicTrain"],
+    ...Array.from({ length: 19 }, (_, step): [number, SfxName] => [
       170 + step * 334,
       "pursuit",
     ]),
+    [6400, "blocked"],
   ],
   "abandoned-chassis": [
-    [400, "move"],
-    [2100, "scan"],
-    [3100, "clue"],
+    [350, "move"],
+    [1150, "scan"],
+    [2300, "connect"],
+    [3500, "clue"],
+  ],
+  "evidence-board": [
+    [850, "page"],
+    [3350, "clue"],
+  ],
+  "echo-threshold": [
+    [1800, "open"],
+    [3000, "connect"],
   ],
   "office-terminal": [
     [300, "click"],
@@ -227,9 +237,11 @@ export function Cutscene({
               ? "Next line"
               : next
                 ? "Next shot"
-                : story.visual === "network"
-                  ? "Enter network"
-                  : "Return to office"}
+                : story.trigger
+                  ? "Continue"
+                  : story.visual === "network"
+                    ? "Enter network"
+                    : "Return to office"}
             <ArrowRight size={18} aria-hidden="true" />
           </button>
         </div>
