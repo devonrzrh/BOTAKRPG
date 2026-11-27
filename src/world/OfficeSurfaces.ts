@@ -472,19 +472,18 @@ export function attachOfficeSurfaces(
     const root = new TransformNode("reference volume / " + book.id, scene);
     root.parent = anchors.get("bookshelf")!;
     root.position.set(-2.2 + index * 2.2, 2.12, 4.38);
-    const cloth = material(
-      "cloth / " + book.id,
-      ["#425d68", "#70483b", "#5d6b4d"][index % 3],
-    );
+    const color = ["#425d68", "#70483b", "#5d6b4d"][index % 3];
+    const cloth = material("cloth / " + book.id, color);
     const binding = CreateBox(
       "cloth binding",
-      { width: 0.9, height: 1.07, depth: 0.06 },
+      { width: 0.9, height: 1.07, depth: 0.3 },
       scene,
     );
     binding.parent = root;
+    binding.position.z = 0.11;
     binding.material = cloth;
     binding.isPickable = false;
-    for (const z of [-0.04, 0.04]) {
+    for (const z of [-0.04, 0.26]) {
       const cover = CreateBox(
         "book cover",
         { width: 0.93, height: 1.1, depth: 0.02 },
@@ -499,7 +498,7 @@ export function attachOfficeSurfaces(
       p = face("clickable book spine", root, 0.89, 1.06, t);
     p.position.z = -0.052;
     const draw = (c: Ctx, m: SurfaceModel) => {
-      c.fillStyle = ["#425d68", "#70483b", "#5d6b4d"][index % 3];
+      c.fillStyle = color;
       c.fillRect(0, 0, 600, 800);
       c.strokeStyle = "#c3aa75";
       c.lineWidth = 5;
@@ -512,10 +511,14 @@ export function attachOfficeSurfaces(
         ["DATA", "STRUCTURES"],
         ["NEURAL", "NETWORKS"],
       ][index] ?? [book.topic];
+      c.textAlign = "center";
       title.forEach((line, row) =>
-        ink(c, line, 40, 300 + row * 100, 80, 530, "#e0ca95"),
+        ink(
+          c, line, 300, 365 + (row - (title.length - 1) / 2) * 115,
+          94, 550, "#e0ca95",
+        ),
       );
-      ink(c, String(index + 1).padStart(2, "0"), 235, 705, 65, 130, "#e0ca95");
+      c.textAlign = "start";
       return zone(m, "lesson-" + book.id);
     };
     const widget = {
@@ -540,37 +543,31 @@ export function attachOfficeSurfaces(
     widgets.push(widget);
     return { id: book.id, root, index, cover: p.material };
   });
-  // Small library index card; the shelf itself remains completely visible.
   sheet(
-    "library index card",
+    "library catalog",
     "bookshelf",
-    3.0,
-    1.1,
-    4.1,
-    1.35,
-    0.75,
-    -0.03,
+    0,
+    0.92,
+    4.75,
+    1.95,
+    0.84,
+    0,
     (c, m) => {
-      paper(c);
-      ink(c, "INDEX", 35, 60, 65);
-      const query = control(m, "search")?.label.replace(/^Search: /, "");
-      ink(
-        c,
-        query && query !== "all lessons" ? query.slice(0, 14) : "Find book",
-        35,
-        300,
-        55,
-      );
-      ink(
-        c,
-        (control(m, "topic")?.label ?? "Topic: all").replace("Topic: ", ""),
-        35,
-        575,
-        55,
-      );
+      paper(c, "#b9aa8c");
+      c.strokeStyle = "#74634c";
+      c.lineWidth = 3;
+      c.strokeRect(16, 30, 568, 740);
+      rule(c, 400);
+      const search = control(m, "search")?.label ?? "";
+      const query = search === "Search: all lessons" ? "" : search.replace(/^Search: /, "");
+      const topic = control(m, "topic")?.label.replace(/^Topic: /, "") ?? "all";
+      c.textAlign = "center";
+      ink(c, query ? query.slice(0, 12) : "Search books", 300, 85, 71, 540, "#2b2b25");
+      ink(c, topic === "all" ? "All topics" : topic, 300, 485, 71, 540, "#2b2b25");
+      c.textAlign = "start";
       return [
-        ...zone(m, "search", 0, 250, 600, 280),
-        ...zone(m, "topic", 0, 530, 600, 270),
+        ...zone(m, "search", 0, 0, 600, 400),
+        ...zone(m, "topic", 0, 400, 600, 400),
       ];
     },
     false,

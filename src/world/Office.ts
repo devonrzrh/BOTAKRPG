@@ -165,25 +165,31 @@ export function buildOffice(
       for (let row = 0; row < 4; row++) {
         const y = 0.3 + row * 1.25;
         box("shelf", 0, y, 4.5, 8, 0.12, 0.95, "#71604b", wall);
-        for (let n = 0; n < 25; n++) {
-          if (
-            row === 1 &&
-            [-2.2, 0, 2.2].some((x) => Math.abs(-3.7 + n * 0.3 - x) < 0.65)
-          )
-            continue;
-          const height = 0.42 + ((n * 7 + row * 3) % 8) * 0.045;
-          const book = box(
-            "reference book",
-            -3.7 + n * 0.3,
-            y + 0.09 + height / 2,
-            4.45,
-            0.22,
-            height,
-            0.55,
-            ["#677d7d", "#957953", "#545e6c", "#8e6553"][n % 4],
-            wall,
-          );
-          book.rotation.z = n % 9 === 0 ? 0.08 : 0;
+        // Leave the reading shelf and the catalog's bay clear.
+        const groups = [2, 0, 3, 2][row];
+        for (let group = 0; group < groups; group++) {
+          const start = groups === 3 ? -3.4 + group * 2.65 : -3.42 + group * 5.38;
+          for (let n = 0; n < 5 + (group % 2); n++) {
+            const x = start + n * 0.28;
+            const height = 0.51 + ((n * 3 + group * 2 + row) % 7) * 0.055;
+            const width = 0.18 + ((n + row) % 3) * 0.038;
+            const depth = 0.35 + ((n + group) % 3) * 0.045;
+            const spine = 4.66 - depth / 2;
+            const color =
+              ["#41494b", "#604b3e", "#465048", "#5a453f"][(n + group + row) % 4];
+            box(
+              "archive binding", x, y + 0.06 + height / 2, spine,
+              width, height, depth, color, wall,
+            );
+            box(
+              "archive pages", x, y + 0.06 + height, spine + 0.016,
+              width - 0.038, 0.008, depth - 0.063, "#8d8068", wall,
+            );
+            box(
+              "archive spine band", x, y + height - 0.055, spine - depth / 2,
+              width - 0.026, 0.025, 0.006, "#8e7655", wall,
+            );
+          }
         }
       }
     } else {
@@ -266,9 +272,9 @@ export function buildOffice(
         scene,
       );
       handle.parent = table;
-      handle.position.set(3.07, 1.34, 4.05);
-      handle.rotation.z = Math.PI / 2;
-      handle.material = mat("#c0b294");
+      handle.position.set(2.98, 1.33, 3.92);
+      handle.rotation.set(Math.PI / 2, Math.PI / 4, 0);
+      handle.material = mug.material;
       const deskProps = [mug, handle];
       for (const [x, color] of [
         [-2.9, "#739c8b"],
