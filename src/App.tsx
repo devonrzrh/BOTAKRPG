@@ -1273,8 +1273,8 @@ export default function App() {
       );
       applyBattle(result.battle, next, undefined, undefined, quizOrigin);
       setBattleNotice(
-        !result.correct ? "Incorrect · turn spent"
-          : result.battle.hp === battle.hp ? "Correct · time expired, no damage"
+        result.battle.answerOutcome === "incorrect" ? "Incorrect · turn spent"
+          : result.battle.answerOutcome === "expired" ? "Correct · time expired, no damage"
           : "Correct",
       );
     } catch (e) {

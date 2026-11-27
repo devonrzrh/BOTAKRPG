@@ -63,11 +63,15 @@ describe("one combat momentum resource", () => {
 
     expect(selected.hp - slow.battle.hp).toBe(Math.ceil((selected.hp - fast.battle.hp) / 2));
     expect(expired.correct).toBe(true);
+    expect(fast.battle.answerOutcome).toBe("hit");
+    expect(expired.battle.answerOutcome).toBe("expired");
     expect(expired.battle.hp).toBe(selected.hp);
     expect(expired.battle.momentum).toBe(0);
     expect(expired.battle.resolve).toBe(selected.resolve);
     expect(expired.battle.phase).toBe("feedback");
-    expect(answerBattle(selected, save, content, [], 0).battle.hp).toBe(selected.hp);
+    const incorrect = answerBattle(selected, save, content, [], 0);
+    expect(incorrect.battle.hp).toBe(selected.hp);
+    expect(incorrect.battle.answerOutcome).toBe("incorrect");
   });
 
   it("earns 25 per correct hit, caps at 100, and has no hidden consecutive-hit damage multiplier", () => {

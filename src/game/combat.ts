@@ -27,6 +27,7 @@ export interface Battle {
   phase: "choose" | "question" | "feedback" | "won" | "lost";
   skill: string | null;
   question: string | null;
+  answerOutcome?: "hit" | "expired" | "incorrect";
   effects: ActiveEffect[];
   log: string[];
   assisted: boolean;
@@ -312,6 +313,7 @@ export function selectSkill(
     phase: "question",
     skill: skill.id,
     question: chosen.id,
+    answerOutcome: undefined,
     assisted: false,
     asked: [...cycle, chosen.id],
   };
@@ -374,6 +376,7 @@ export function answerBattle(
   const damage = correct
     ? Math.ceil((previewDamage(next, save, skill, content) * remaining) / duration)
     : 0;
+  next.answerOutcome = !correct ? "incorrect" : damage > 0 ? "hit" : "expired";
   if (correct && damage > 0) {
     const consumedStagger = Boolean(next.tactics && next.staggered);
     if (consumedStagger) {

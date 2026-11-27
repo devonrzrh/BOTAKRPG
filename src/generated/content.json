@@ -7643,18 +7643,18 @@
       "type": "question",
       "lesson": "source-alg-07",
       "format": "multiple",
-      "prompt": "Which pairs make 6 using coins from {1, 2, 3, 4}? Coins may repeat.",
+      "prompt": "Make 8 with coins of value 1, 4 and 6. Greedy always takes the largest coin that fits. Which statements are true?",
       "options": [
-        "4 + 2",
-        "3 + 3",
-        "4 + 1",
-        "2 + 2"
+        "Greedy takes 6 first",
+        "Two coins of value 4 use fewer coins",
+        "Greedy takes 4 first",
+        "Greedy finishes with a total of two coins"
       ],
       "answer": [
         0,
         1
       ],
-      "explanation": "Both 4 + 2 and 3 + 3 satisfy the sum and coin limit."
+      "explanation": "Greedy picks 6, then two 1s. Two 4s reach the same amount using fewer coins."
     },
     {
       "id": "battle-alg-08-reuse",
@@ -7692,7 +7692,7 @@
         0,
         1
       ],
-      "explanation": "The first option averages to 4, and the second always costs 4."
+      "explanation": "A half chance each of 0 and 8 averages to 4. Paying 4 every time also averages to 4."
     },
     {
       "id": "battle-alg-10-policy",
@@ -8194,18 +8194,18 @@
       "type": "question",
       "lesson": "source-ai-06",
       "format": "multiple",
-      "prompt": "Which observations could justify investigating data drift?",
+      "prompt": "Demand stays at or below the model's P90 forecast on 72 of 100 comparable days. Which statements about this sample are true?",
       "options": [
-        "Recent inputs differ systematically from training inputs",
-        "Error rises across recent batches",
-        "The dashboard layout changed",
-        "The server case was replaced"
+        "Observed coverage falls below 90%",
+        "Demand exceeds the forecast on 28 days",
+        "Average demand exceeds the forecast by 28 units",
+        "Every forecast is too low"
       ],
       "answer": [
         0,
         1
       ],
-      "explanation": "Input changes or a sustained performance drop can signal drift worth investigating."
+      "explanation": "The forecasts cover 72% of outcomes in this sample. Demand exceeds the forecast on the other 28 days, but these counts do not measure the size of the errors."
     },
     {
       "id": "battle-ai-07-online",
@@ -8285,6 +8285,927 @@
         2
       ],
       "explanation": "Early stopping, regularization, and better training data can improve generalization."
+    },
+    {
+      "id": "battle-alg-04-stalled",
+      "title": "Field check",
+      "type": "question",
+      "lesson": "source-alg-04",
+      "format": "choice",
+      "prompt": "probe(n) stops at n = 0. For positive n it calls probe(n + 1). What happens starting at 3?",
+      "options": [
+        "It reaches 0 in three calls",
+        "It returns 3 immediately",
+        "It moves away from the base case",
+        "It repeats the same argument"
+      ],
+      "answer": [
+        2
+      ],
+      "explanation": "Each call increases n, so the sequence never reaches 0."
+    },
+    {
+      "id": "battle-alg-04-pending",
+      "title": "Field check",
+      "type": "question",
+      "lesson": "source-alg-04",
+      "format": "multiple",
+      "prompt": "sum_down(0) returns 0. For n > 0, sum_down(n) returns n + sum_down(n − 1). While evaluating sum_down(2), which additions are pending when the call for n = 0 begins?",
+      "options": [
+        "The call with n = 2 adding 2",
+        "The call with n = 1 adding 1",
+        "The base case adding 0",
+        "The call with n = 2 adding 1"
+      ],
+      "answer": [
+        0,
+        1
+      ],
+      "explanation": "The two non-base calls each keep their own pending addition until the next call returns."
+    },
+    {
+      "id": "battle-alg-04-depth",
+      "title": "Field check",
+      "type": "question",
+      "lesson": "source-alg-04",
+      "format": "choice",
+      "prompt": "count(7) repeatedly calls count(n - 2) and stops when n ≤ 1. At the deepest point, how many calls are on the stack, including count(7)?",
+      "options": [
+        "3",
+        "4",
+        "6",
+        "7"
+      ],
+      "answer": [
+        1
+      ],
+      "explanation": "The active calls have arguments 7, 5, 3 and 1, including the base case."
+    },
+    {
+      "id": "battle-alg-05-fixed-inner",
+      "title": "Field check",
+      "type": "question",
+      "lesson": "source-alg-05",
+      "format": "choice",
+      "prompt": "A scanner checks exactly five fields for each of n reports. How many field checks does it make?",
+      "options": [
+        "5",
+        "n + 5",
+        "5n",
+        "n²"
+      ],
+      "answer": [
+        2
+      ],
+      "explanation": "Each of the n reports causes five checks, so the count is 5n."
+    },
+    {
+      "id": "battle-alg-05-sequential",
+      "title": "Field check",
+      "type": "question",
+      "lesson": "source-alg-05",
+      "format": "multiple",
+      "prompt": "Which plans perform exactly 2n checks for every positive n?",
+      "options": [
+        "Scan all n records twice",
+        "Run two checks on each of n records",
+        "Check all n records once and check the first record again",
+        "For each of n records, check all n records"
+      ],
+      "answer": [
+        0,
+        1
+      ],
+      "explanation": "Two full scans and two checks per record both total 2n."
+    },
+    {
+      "id": "battle-alg-05-pairs",
+      "title": "Field check",
+      "type": "question",
+      "lesson": "source-alg-05",
+      "format": "choice",
+      "prompt": "A report compares every unique unordered pair of 8 different records once. How many comparisons does it make?",
+      "options": [
+        "8",
+        "16",
+        "28",
+        "64"
+      ],
+      "answer": [
+        2
+      ],
+      "explanation": "Each record pairs with every later one: 7 + 6 + 5 + 4 + 3 + 2 + 1 = 28."
+    },
+    {
+      "id": "battle-alg-05-growth-order",
+      "title": "Field check",
+      "type": "question",
+      "lesson": "source-alg-05",
+      "format": "ordering",
+      "prompt": "Order these operation counts from slowest-growing to fastest-growing for large n.",
+      "options": [
+        "20",
+        "2n",
+        "n²",
+        "n³"
+      ],
+      "answer": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "explanation": "Constant, linear, quadratic, and cubic counts grow in that order. The factor of 2 does not change the linear class."
+    },
+    {
+      "id": "battle-alg-07-settle",
+      "title": "Field check",
+      "type": "question",
+      "lesson": "source-alg-07",
+      "format": "choice",
+      "prompt": "Dijkstra's unsettled relays have tentative total distances A = 6, B = 4, C = 9. Which relay does it settle next?",
+      "options": [
+        "A",
+        "B",
+        "C",
+        "Whichever was discovered first"
+      ],
+      "answer": [
+        1
+      ],
+      "explanation": "Dijkstra settles the unsettled relay with the smallest tentative total distance from the start."
+    },
+    {
+      "id": "battle-alg-07-routes",
+      "title": "Field check",
+      "type": "question",
+      "lesson": "source-alg-07",
+      "format": "multiple",
+      "prompt": "Two routes leave S: S→A costs 2 then A→G costs 9. S→B costs 5 then B→G costs 1. Which statements are true?",
+      "options": [
+        "The cheapest first edge goes to A",
+        "The cheapest complete route goes through B",
+        "The route through A costs 6",
+        "Both complete routes have equal cost"
+      ],
+      "answer": [
+        0,
+        1
+      ],
+      "explanation": "The first edge to A is cheaper, but the route through B costs 6 versus 11 through A."
+    },
+    {
+      "id": "battle-alg-07-relax",
+      "title": "Field check",
+      "type": "question",
+      "lesson": "source-alg-07",
+      "format": "ordering",
+      "prompt": "Trace Dijkstra settling A at distance 3 and examining an edge A→B of cost 2. B's current tentative distance is 8.",
+      "options": [
+        "Settle A at distance 3",
+        "Compute the candidate distance 3 + 2",
+        "Compare the candidate with 8",
+        "Replace B's tentative distance with 5"
+      ],
+      "answer": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "explanation": "The new route reaches B at total cost 5, so it improves on the previous cost of 8."
+    },
+    {
+      "id": "battle-alg-07-negative",
+      "title": "Field check",
+      "type": "question",
+      "lesson": "source-alg-07",
+      "format": "choice",
+      "prompt": "Which edge cost invalidates Dijkstra's usual guarantee of a shortest path?",
+      "options": [
+        "0",
+        "2",
+        "10",
+        "−2"
+      ],
+      "answer": [
+        3
+      ],
+      "explanation": "A negative edge can later improve a distance the algorithm already settled."
+    },
+    {
+      "id": "battle-alg-08-dependencies",
+      "title": "Field check",
+      "type": "question",
+      "lesson": "source-alg-08",
+      "format": "multiple",
+      "prompt": "F(0)=0, F(1)=1, and F(n)=F(n−1)+F(n−2). Which two entries directly determine F(6)?",
+      "options": [
+        "F(3)",
+        "F(4)",
+        "F(5)",
+        "F(7)"
+      ],
+      "answer": [
+        1,
+        2
+      ],
+      "explanation": "The recurrence for F(6) reads F(5) and F(4)."
+    },
+    {
+      "id": "battle-alg-08-tabulate",
+      "title": "Field check",
+      "type": "question",
+      "lesson": "source-alg-08",
+      "format": "ordering",
+      "prompt": "A table uses T(0)=2 and T(n)=T(n−1)+n. Order the work needed to fill through T(3).",
+      "options": [
+        "Enter T(0)",
+        "Calculate T(1)",
+        "Calculate T(2)",
+        "Calculate T(3)"
+      ],
+      "answer": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "explanation": "Every entry after the base case uses the immediately preceding entry."
+    },
+    {
+      "id": "battle-alg-08-routes",
+      "title": "Field check",
+      "type": "question",
+      "lesson": "source-alg-08",
+      "format": "choice",
+      "prompt": "A counter sums the ways to reach a square from the left or above. There are 3 ways to its left neighbor and 5 to its upper neighbor. How many ways reach the square?",
+      "options": [
+        "2",
+        "5",
+        "8",
+        "15"
+      ],
+      "answer": [
+        2
+      ],
+      "explanation": "The possible last moves are distinct, so add the counts from the two neighbors."
+    },
+    {
+      "id": "battle-alg-08-cache",
+      "title": "Field check",
+      "type": "question",
+      "lesson": "source-alg-08",
+      "format": "multiple",
+      "prompt": "A route lookup is called twice with the same state. Which steps allow memoization to avoid doing the work twice?",
+      "options": [
+        "Check the cache before recomputing",
+        "Store the first computed result under that state",
+        "Clear the cache after each result",
+        "Always use the same cache key for different states"
+      ],
+      "answer": [
+        0,
+        1
+      ],
+      "explanation": "Store results by state and look up the matching state before doing the work again."
+    },
+    {
+      "id": "battle-alg-09-shortage",
+      "title": "Field check",
+      "type": "question",
+      "lesson": "source-alg-09",
+      "format": "choice",
+      "prompt": "You stock 3 units and demand is 5. Each unmet unit costs 4 credits. What is the shortage cost?",
+      "options": [
+        "2",
+        "4",
+        "8",
+        "20"
+      ],
+      "answer": [
+        2
+      ],
+      "explanation": "Demand exceeds stock by two units, so the shortage costs 2 × 4 credits."
+    },
+    {
+      "id": "battle-alg-09-leftovers",
+      "title": "Field check",
+      "type": "question",
+      "lesson": "source-alg-09",
+      "format": "multiple",
+      "prompt": "You stock 4 units. Leftovers cost 2 credits each and unmet units cost 3 each. Which outcomes cost exactly 6 credits?",
+      "options": [
+        "Demand is 1",
+        "Demand is 2",
+        "Demand is 5",
+        "Demand is 6"
+      ],
+      "answer": [
+        0,
+        3
+      ],
+      "explanation": "Demand of 1 leaves three leftovers. Demand of 6 leaves two units unmet. Both cost 6."
+    },
+    {
+      "id": "battle-alg-09-compare-stock",
+      "title": "Field check",
+      "type": "question",
+      "lesson": "source-alg-09",
+      "format": "choice",
+      "prompt": "One unit of demand is as likely as three. Leftovers cost 1 credit each and shortages cost 5 each. Which of stocking 1, 2 or 3 units has the lowest expected cost?",
+      "options": [
+        "Stock 1",
+        "Stock 2",
+        "Stock 3",
+        "All three tie"
+      ],
+      "answer": [
+        2
+      ],
+      "explanation": "The expected costs for stocking 1, 2, and 3 are 5, 3, and 1 credit respectively."
+    },
+    {
+      "id": "battle-alg-09-weight-outcomes",
+      "title": "Field check",
+      "type": "question",
+      "lesson": "source-alg-09",
+      "format": "ordering",
+      "prompt": "Order the steps for finding expected inventory cost for a fixed stock level.",
+      "options": [
+        "Calculate the cost for each demand outcome",
+        "Multiply each outcome cost by its probability",
+        "Add the weighted costs"
+      ],
+      "answer": [
+        0,
+        1,
+        2
+      ],
+      "explanation": "Weight every possible outcome by its probability and sum the contributions."
+    },
+    {
+      "id": "battle-alg-10-passes",
+      "title": "Field check",
+      "type": "question",
+      "lesson": "source-alg-10",
+      "format": "choice",
+      "prompt": "You have two passes and can earn 4, 9 and 6 points on days 1, 2 and 3. Each day allows at most one pass. Which days maximize total points?",
+      "options": [
+        "Days 1 and 2",
+        "Days 1 and 3",
+        "Days 2 and 3",
+        "Day 2 only"
+      ],
+      "answer": [
+        2
+      ],
+      "explanation": "Saving both passes for the two highest rewards earns 9 + 6 = 15 points."
+    },
+    {
+      "id": "battle-alg-10-update-state",
+      "title": "Field check",
+      "type": "question",
+      "lesson": "source-alg-10",
+      "format": "ordering",
+      "prompt": "Use one pass today, starting with two passes. Order the steps that determine tomorrow's options.",
+      "options": [
+        "Read today's remaining pass count",
+        "Spend one pass on today's action",
+        "Carry one pass into tomorrow",
+        "Check which actions one pass allows"
+      ],
+      "answer": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "explanation": "Today's action changes the remaining pass count used by tomorrow's decision."
+    },
+    {
+      "id": "battle-alg-10-risky-reward",
+      "title": "Field check",
+      "type": "question",
+      "lesson": "source-alg-10",
+      "format": "choice",
+      "prompt": "Spend your only pass now for 5 points or save it for tomorrow, when it pays 12 points half the time and zero otherwise. Which choice maximizes expected points?",
+      "options": [
+        "Spend today for 5",
+        "Save it for an expected 6",
+        "Save it for an expected 12",
+        "Either choice gives 5"
+      ],
+      "answer": [
+        1
+      ],
+      "explanation": "Saving yields 0.5 × 12 + 0.5 × 0 = 6 expected points."
+    },
+    {
+      "id": "battle-alg-10-plan-value",
+      "title": "Field check",
+      "type": "question",
+      "lesson": "source-alg-10",
+      "format": "multiple",
+      "prompt": "A repair earns 6 points today and makes a 3-point task available tomorrow. A reroute earns 2 today and opens an 8-point task tomorrow. Which comparisons are correct?",
+      "options": [
+        "Repair pays more today",
+        "Reroute pays more across both days",
+        "Repair totals 11 points",
+        "Both plans total 9 points"
+      ],
+      "answer": [
+        0,
+        1
+      ],
+      "explanation": "Repair totals 6 + 3 = 9, while reroute totals 2 + 8 = 10."
+    },
+    {
+      "id": "battle-ds-02-physical-order",
+      "title": "Field check",
+      "type": "question",
+      "lesson": "source-ds-02",
+      "format": "multiple",
+      "prompt": "A list's head is C, with links C→A→B. Moving a record can change its address. Which changes preserve the list's logical order?",
+      "options": [
+        "Move B and update A's link to its new address",
+        "Move C and update the head to its new address",
+        "Change the head to A",
+        "Change C's next link from A to B"
+      ],
+      "answer": [
+        0,
+        1
+      ],
+      "explanation": "The head still selects C and the links still lead from C to A to B when their stored addresses are updated."
+    },
+    {
+      "id": "battle-ds-02-ring",
+      "title": "Field check",
+      "type": "question",
+      "lesson": "source-ds-02",
+      "format": "choice",
+      "prompt": "A ring's links are A→B→C→A. If B is the head, what are the first three records in a traversal?",
+      "options": [
+        "A, B, C",
+        "B, A, C",
+        "B, C, A",
+        "C, A, B"
+      ],
+      "answer": [
+        2
+      ],
+      "explanation": "Start at B regardless of how the ring is drawn. Following its links reaches C and then A."
+    },
+    {
+      "id": "battle-ds-04-remove-head",
+      "title": "Field check",
+      "type": "question",
+      "lesson": "source-ds-04",
+      "format": "choice",
+      "prompt": "The list starts at A and follows A→B→C. What single update removes A from the list while keeping B and C reachable?",
+      "options": [
+        "Set the head to B",
+        "Set the head to C",
+        "Set B's next link to A",
+        "Clear A's next link"
+      ],
+      "answer": [
+        0
+      ],
+      "explanation": "B becomes the first reachable node and retains its link to C."
+    },
+    {
+      "id": "battle-ds-04-append",
+      "title": "Field check",
+      "type": "question",
+      "lesson": "source-ds-04",
+      "format": "multiple",
+      "prompt": "An empty list has both head and tail set to None. You append a new node X whose next link is None. Which references must now point to X?",
+      "options": [
+        "The head",
+        "The tail",
+        "X's next link",
+        "The head of a different list"
+      ],
+      "answer": [
+        0,
+        1
+      ],
+      "explanation": "The only node is both first and last. Its next link stays None."
+    },
+    {
+      "id": "battle-ds-04-middle-remove",
+      "title": "Field check",
+      "type": "question",
+      "lesson": "source-ds-04",
+      "format": "ordering",
+      "prompt": "Unlink B from A→B→C and clear its next link. Put the steps in order so C stays reachable from A throughout.",
+      "options": [
+        "Read C from B's next link",
+        "Set A's next link to C",
+        "Clear B's next link"
+      ],
+      "answer": [
+        0,
+        1,
+        2
+      ],
+      "explanation": "Read B's successor and connect A to it before clearing B's link."
+    },
+    {
+      "id": "battle-ds-04-cycle",
+      "title": "Field check",
+      "type": "question",
+      "lesson": "source-ds-04",
+      "format": "choice",
+      "prompt": "A singly linked list starts at A and follows A→B→C→None. Someone sets C's next link to B. What happens if traversal keeps following links until None?",
+      "options": [
+        "It stops normally at C",
+        "It skips B after visiting A",
+        "It loops between B and C",
+        "It follows the same order in reverse"
+      ],
+      "answer": [
+        2
+      ],
+      "explanation": "The traversal now returns from C to B and never sees a None link."
+    },
+    {
+      "id": "battle-ds-06-peek",
+      "title": "Field check",
+      "type": "question",
+      "lesson": "source-ds-06",
+      "format": "multiple",
+      "prompt": "A FIFO queue contains N, R and T in arrival order. You peek once. Which statements are true immediately afterward?",
+      "options": [
+        "Peek returned N",
+        "The next dequeue still returns N",
+        "Peek removed N",
+        "T moved to the front"
+      ],
+      "answer": [
+        0,
+        1
+      ],
+      "explanation": "Peek reads the front without changing the queue, so N remains next to be dequeued."
+    },
+    {
+      "id": "battle-ds-06-fifo-priority",
+      "title": "Field check",
+      "type": "question",
+      "lesson": "source-ds-06",
+      "format": "choice",
+      "prompt": "Audit job A arrives before emergency job B. Which rule serves B next because it is urgent?",
+      "options": [
+        "FIFO removal",
+        "Priority-based removal with urgent jobs ranked first",
+        "Peeking twice",
+        "Adding B at the rear of a FIFO queue"
+      ],
+      "answer": [
+        1
+      ],
+      "explanation": "A priority queue can serve a newer job first when its priority outranks the waiting job."
+    },
+    {
+      "id": "battle-ds-07-shared-parent",
+      "title": "Field check",
+      "type": "question",
+      "lesson": "source-ds-07",
+      "format": "choice",
+      "prompt": "A case file must keep two distinct parent-folder links, one to Archive and one to Fieldwork. How can you model both without duplicating the file?",
+      "options": [
+        "Store it as a single node with both parent links in a graph",
+        "Put it at the top of a stack",
+        "Use a rooted tree where it has just one parent",
+        "Put the newer parent in a FIFO queue"
+      ],
+      "answer": [
+        0
+      ],
+      "explanation": "A general graph can retain links to both parent folders. An ordinary rooted tree allows one parent per non-root node."
+    },
+    {
+      "id": "battle-ds-07-tree-paths",
+      "title": "Field check",
+      "type": "question",
+      "lesson": "source-ds-07",
+      "format": "multiple",
+      "prompt": "Which statements hold in an ordinary rooted tree?",
+      "options": [
+        "Each non-root node has one parent",
+        "The root has a unique path to each node",
+        "Each node must have exactly two children",
+        "A child can also be an ancestor of its own parent"
+      ],
+      "answer": [
+        0,
+        1
+      ],
+      "explanation": "A rooted tree has a single parent for each non-root node, which gives one path from the root."
+    },
+    {
+      "id": "battle-ds-07-containment",
+      "title": "Field check",
+      "type": "question",
+      "lesson": "source-ds-07",
+      "format": "ordering",
+      "prompt": "The Records cabinet contains Case 4. Case 4 contains Evidence, and Evidence contains Tape 9. Order the path from the cabinet to the tape.",
+      "options": [
+        "Records",
+        "Case 4",
+        "Evidence",
+        "Tape 9"
+      ],
+      "answer": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "explanation": "Each step descends one level of containment in the hierarchy."
+    },
+    {
+      "id": "battle-ds-07-tree-or-graph",
+      "title": "Field check",
+      "type": "question",
+      "lesson": "source-ds-07",
+      "format": "choice",
+      "prompt": "The relay links East–West, West–South, and South–East must all be represented. Why can't these links all be the edges of a tree?",
+      "options": [
+        "The links form a cycle",
+        "There are only three relays",
+        "A tree cannot branch",
+        "The names have no natural order"
+      ],
+      "answer": [
+        0
+      ],
+      "explanation": "The links return to East without retracing an edge, creating a cycle. A tree has no cycles."
+    },
+    {
+      "id": "battle-ds-09-directed-route",
+      "title": "Field check",
+      "type": "question",
+      "lesson": "source-ds-09",
+      "format": "ordering",
+      "prompt": "Starting at S, follow the only outgoing edge at each step until G. The graph also contains G→S. Edges on the way are S→R, B→G and R→B. Order the visited vertices up to the first arrival at G.",
+      "options": [
+        "S",
+        "R",
+        "B",
+        "G"
+      ],
+      "answer": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "explanation": "Follow S→R→B→G in the stated direction. The edge out of G is beyond the requested route."
+    },
+    {
+      "id": "battle-ds-10-correction",
+      "title": "Field check",
+      "type": "question",
+      "lesson": "source-ds-10",
+      "format": "choice",
+      "prompt": "A reviewer changes one incorrect timestamp and exports the corrected records in the same format. What should the journal record?",
+      "options": [
+        "A child revision linked to the original",
+        "Only a file-format conversion",
+        "An unrelated root revision",
+        "A copy with identical records"
+      ],
+      "answer": [
+        0
+      ],
+      "explanation": "The timestamp correction changes the records, so the new revision should record the original as its parent."
+    },
+    {
+      "id": "battle-ds-10-provenance",
+      "title": "Field check",
+      "type": "question",
+      "lesson": "source-ds-10",
+      "format": "multiple",
+      "prompt": "Two reports disagree after a timestamp correction. Which journal entries help a reviewer establish the correction's provenance?",
+      "options": [
+        "The corrected revision's parent ID",
+        "The reason the reviewer made the correction",
+        "The color of the folder icon",
+        "The width of the report's columns"
+      ],
+      "answer": [
+        0,
+        1
+      ],
+      "explanation": "The parent identifies the source revision and the recorded reason explains why the change was made."
+    },
+    {
+      "id": "battle-ds-10-same-records",
+      "title": "Field check",
+      "type": "question",
+      "lesson": "source-ds-10",
+      "format": "multiple",
+      "prompt": "Which actions can change the saved bytes while preserving the represented records?",
+      "options": [
+        "Export the same records from CSV to JSON",
+        "Change the JSON indentation without editing values",
+        "Change one recorded timestamp",
+        "Remove one case from the dataset"
+      ],
+      "answer": [
+        0,
+        1
+      ],
+      "explanation": "Format and whitespace affect the byte sequence without changing the record values."
+    },
+    {
+      "id": "battle-ds-10-trace-revision",
+      "title": "Field check",
+      "type": "question",
+      "lesson": "source-ds-10",
+      "format": "choice",
+      "prompt": "Revision R3 names R2 as its parent. R2 names R1 as its parent. Which revision is R3's immediate predecessor?",
+      "options": [
+        "R1",
+        "R2",
+        "R3",
+        "Every earlier revision"
+      ],
+      "answer": [
+        1
+      ],
+      "explanation": "R3 directly names R2 as its parent. R1 is an ancestor one step further back."
+    },
+    {
+      "id": "battle-ai-03-detector-precision",
+      "title": "Field check",
+      "type": "question",
+      "lesson": "source-ai-03",
+      "format": "choice",
+      "prompt": "A detector flags 8 packets, and 6 of those are truly rogue. What is the precision of its flags?",
+      "options": [
+        "25%",
+        "60%",
+        "75%",
+        "80%"
+      ],
+      "answer": [
+        2
+      ],
+      "explanation": "Precision is true flags divided by all flags, so 6 ÷ 8 = 75%."
+    },
+    {
+      "id": "battle-ai-03-missed-signals",
+      "title": "Field check",
+      "type": "question",
+      "lesson": "source-ai-03",
+      "format": "ordering",
+      "prompt": "Order the steps for calculating rogue-packet recall from an evaluation set.",
+      "options": [
+        "Identify all truly rogue packets from their labels",
+        "Count the truly rogue packets the detector flagged",
+        "Divide the flagged rogue count by the total rogue count"
+      ],
+      "answer": [
+        0,
+        1,
+        2
+      ],
+      "explanation": "Recall is the share of actual rogue packets the detector found."
+    },
+    {
+      "id": "battle-ai-04-leaky-compare",
+      "title": "Field check",
+      "type": "question",
+      "lesson": "source-ai-04",
+      "format": "ordering",
+      "prompt": "Order the outputs from smallest to largest when these activation rules receive −5.",
+      "options": [
+        "Leaky ReLU with negative slope 0.2",
+        "Leaky ReLU with negative slope 0.1",
+        "Ordinary ReLU"
+      ],
+      "answer": [
+        0,
+        1,
+        2
+      ],
+      "explanation": "The outputs are −1, −0.5 and 0. The larger negative-branch slope gives the more negative output."
+    },
+    {
+      "id": "battle-ai-05-signed-errors",
+      "title": "Field check",
+      "type": "question",
+      "lesson": "source-ai-05",
+      "format": "multiple",
+      "prompt": "Actual counts are 7 and 12. Their forecasts are 10 and 9. Using forecast minus actual for each error, which results are correct?",
+      "options": [
+        "Signed bias of 0",
+        "Mean absolute error of 3",
+        "Signed bias of 3",
+        "Mean absolute error of 0"
+      ],
+      "answer": [
+        0,
+        1
+      ],
+      "explanation": "The signed errors +3 and −3 cancel, while both magnitudes are 3."
+    },
+    {
+      "id": "battle-ai-06-pinball-under",
+      "title": "Field check",
+      "type": "question",
+      "lesson": "source-ai-06",
+      "format": "choice",
+      "prompt": "For a P80 forecast of 40 and actual demand of 50, what is the pinball loss?",
+      "options": [
+        "2",
+        "8",
+        "10",
+        "40"
+      ],
+      "answer": [
+        1
+      ],
+      "explanation": "The forecast is 10 too low, so the underprediction loss is 0.8 × 10 = 8."
+    },
+    {
+      "id": "battle-ai-07-state-summary",
+      "title": "Field check",
+      "type": "question",
+      "lesson": "source-ai-07",
+      "format": "multiple",
+      "prompt": "You want to update the exact mean of a growing stream whenever one new reading arrives. Which stored values do you need alongside that reading?",
+      "options": [
+        "The previous number of readings",
+        "The previous mean",
+        "The previous maximum",
+        "The first reading's timestamp"
+      ],
+      "answer": [
+        0,
+        1
+      ],
+      "explanation": "The previous mean and count reconstruct the previous total. Add the new reading and divide by the new count."
+    },
+    {
+      "id": "battle-ai-07-drift-window",
+      "title": "Field check",
+      "type": "question",
+      "lesson": "source-ai-07",
+      "format": "choice",
+      "prompt": "A signal's usual value jumps from about 10 to about 30. Which average will typically react fastest if the jump persists?",
+      "options": [
+        "The mean of the latest 5 readings",
+        "The mean of the latest 500 readings",
+        "The mean of 10,000 earlier readings plus every new reading",
+        "The mean computed before the jump and never updated"
+      ],
+      "answer": [
+        0
+      ],
+      "explanation": "The five-reading window drops the old observations most quickly."
+    },
+    {
+      "id": "battle-ai-08-rank-score",
+      "title": "Field check",
+      "type": "question",
+      "lesson": "source-ai-08",
+      "format": "ordering",
+      "prompt": "A user vector [2, 1] scores items by dot product. Rank these item vectors from highest score to lowest.",
+      "options": [
+        "[3, 1]",
+        "[1, 2]",
+        "[0, 1]"
+      ],
+      "answer": [
+        0,
+        1,
+        2
+      ],
+      "explanation": "The dot-product scores are 7, 4 and 1 in descending order."
+    },
+    {
+      "id": "battle-ai-10-batch-loss",
+      "title": "Field check",
+      "type": "question",
+      "lesson": "source-ai-10",
+      "format": "ordering",
+      "prompt": "Two validation batches have different numbers of examples. Order the steps for computing the overall mean loss from each batch's mean and size.",
+      "options": [
+        "Multiply each batch mean by its example count",
+        "Add the batch loss totals",
+        "Divide by the total number of examples"
+      ],
+      "answer": [
+        0,
+        1,
+        2
+      ],
+      "explanation": "Weighting each batch mean by its size recovers its total loss before averaging across examples."
     },
     {
       "id": "echo-epilogue-pacified",
@@ -9336,7 +10257,7 @@
       "type": "question",
       "lesson": "source-alg-03",
       "format": "choice",
-      "prompt": "If an algorithm is O(n²), doubling the input size roughly doubles the work.",
+      "prompt": "An algorithm processes each cell of an n × n grid exactly once. Doubling n doubles the number of cells processed.",
       "options": [
         "True",
         "False"
@@ -9344,7 +10265,7 @@
       "answer": [
         1
       ],
-      "explanation": "(2n)² = 4n², so the work roughly quadruples. It is O(n) algorithms whose work roughly doubles."
+      "explanation": "There are n² cells before doubling and (2n)² = 4n² afterward. The number of cells processed quadruples."
     },
     {
       "id": "bank-a14",
@@ -9794,7 +10715,7 @@
       "answer": [
         2
       ],
-      "explanation": "An algorithm can be written in any form (steps, pseudocode, flowchart) or any language. A, B and D are required properties: output, definiteness and finiteness."
+      "explanation": "An algorithm produces an output, has precise steps, and finishes after finitely many steps. You can describe it in pseudocode, a flowchart, or any programming language."
     },
     {
       "id": "bank-b2",
@@ -9830,7 +10751,7 @@
       "answer": [
         1
       ],
-      "explanation": "5 > 1, swap → [1, 5, 4]; 5 > 4, swap → [1, 4, 5]. Option A is the list after only the first comparison."
+      "explanation": "The first comparison swaps 5 and 1, giving [1, 5, 4]. The second swaps 5 and 4, completing the pass at [1, 4, 5]."
     },
     {
       "id": "bank-b4",
@@ -9866,7 +10787,7 @@
       "answer": [
         0
       ],
-      "explanation": "Pass 1 finds the smallest value, 1, and swaps it with the first card, 4: [1, 3, 4, 2]. Option B is one pass of bubble sort, option C is the fully sorted list, and option D shifts the others instead of swapping."
+      "explanation": "The first pass finds the smallest value, 1, and swaps it with 4 at the front. This gives [1, 3, 4, 2]."
     },
     {
       "id": "bank-b6",
@@ -9902,7 +10823,7 @@
       "answer": [
         3
       ],
-      "explanation": "Middle of 8 items = 8 (14 is larger, keep 10–16); middle = 12 (keep 14–16); middle = 14, found. Option A is linear search."
+      "explanation": "The lower middle is 8, so keep 10 through 16. The new lower middle is 12, so keep 14 and 16. The next lower middle is 14, the target."
     },
     {
       "id": "bank-b8",
@@ -9928,17 +10849,17 @@
       "type": "question",
       "lesson": "source-alg-03",
       "format": "choice",
-      "prompt": "Which growth rate means the most work for very large n?",
+      "prompt": "Which expression grows fastest as n increases?",
       "options": [
-        "O(1)",
-        "O(log n)",
-        "O(n)",
-        "O(n²)"
+        "1",
+        "log₂ n",
+        "n",
+        "n²"
       ],
       "answer": [
         3
       ],
-      "explanation": "For large n: 1 < log n < n < n². For n = 1,000,000, n² is a trillion."
+      "explanation": "For large n, the order is 1 < log₂ n < n < n². At n = 1,000,000, n² is already a trillion."
     },
     {
       "id": "bank-b10",
@@ -9946,17 +10867,17 @@
       "type": "question",
       "lesson": "source-alg-03",
       "format": "choice",
-      "prompt": "Which operation takes O(n) time in the worst case?",
+      "prompt": "Which operation can require checking all n elements of an unsorted array?",
       "options": [
         "Reading an array item by its index",
-        "Linear search in an unsorted list",
-        "Pushing onto a stack",
-        "Dequeuing the front item of a queue"
+        "Linear search for a target",
+        "Replacing the first item",
+        "Reading the length of the array"
       ],
       "answer": [
         1
       ],
-      "explanation": "Linear search may check all n items. The other three are O(1) operations."
+      "explanation": "A linear search for a missing target checks each of the n items before it can report that the target is absent."
     },
     {
       "id": "bank-b11",
@@ -9992,7 +10913,7 @@
       "answer": [
         1
       ],
-      "explanation": "BFS goes level by level: A (distance 0), B and C (distance 1), then D, E, F (distance 2). Option A is the DFS order."
+      "explanation": "BFS visits A first, then B and C at distance 1, then D, E, and F at distance 2. The order A, B, D, E, C, F follows depth-first search."
     },
     {
       "id": "bank-b13",
@@ -10028,7 +10949,7 @@
       "answer": [
         2
       ],
-      "explanation": "Settle S (0) → A = 1, B = 2; settle A → G = 9; settle B → C = 4; settle C → G = min(9, 6) = 6. The route is S → B → C → G. Option A (9) is the fewest-edges route S → A → G that BFS would choose."
+      "explanation": "The route S → B → C → G costs 2 + 2 + 2 = 6. The route S → A → G uses fewer edges but costs 1 + 8 = 9."
     },
     {
       "id": "bank-b15",
@@ -10082,7 +11003,7 @@
       "answer": [
         0
       ],
-      "explanation": "That is the definition of a node. Nodes can be anywhere in memory (B false), reaching the k-th node takes O(n) (C false), and lists grow easily by adding nodes (D false)."
+      "explanation": "Each node stores a value and a link to its successor, so nodes can be stored separately. Reaching the k-th node from the head takes k − 1 links, and adding a node changes the adjacent links."
     },
     {
       "id": "bank-b18",
@@ -10192,7 +11113,7 @@
       "answer": [
         0
       ],
-      "explanation": "Input (adding) is restricted to one end; removing is allowed at both ends. Option B describes an output-restricted deque, and option C a priority queue."
+      "explanation": "An input-restricted deque accepts items at only one end and removes them at either end. An output-restricted deque restricts removals instead."
     },
     {
       "id": "bank-b24",
@@ -10264,7 +11185,7 @@
       "answer": [
         2
       ],
-      "explanation": "0, because there is no edge between Nicky and Glen. They are two edges apart, but a matrix cell only records a direct edge. Option D is what an adjacency list stores for Nicky."
+      "explanation": "The cell is 0 because Nicky and Glen have no direct edge. Nicky's adjacency list would contain Darren and Neil, its two direct neighbours."
     },
     {
       "id": "bank-b28",
@@ -10282,7 +11203,7 @@
       "answer": [
         0
       ],
-      "explanation": "z = 0.5 × 1 − 0.5 × 3 + 0.2 = −0.8. ReLU turns negative values into 0, so the output is 0. Option B forgets the activation."
+      "explanation": "The weighted sum plus bias is 0.5 × 1 − 0.5 × 3 + 0.2 = −0.8. ReLU clips that negative value to 0."
     },
     {
       "id": "bank-b29",
@@ -10300,7 +11221,7 @@
       "answer": [
         3
       ],
-      "explanation": "4 × 2 = 8 weights plus 2 biases = 10. Option A forgets the biases."
+      "explanation": "Each of the two neurons has four weights and one bias. That gives eight weights plus two biases, for a total of ten parameters."
     },
     {
       "id": "bank-b30",
@@ -10318,7 +11239,7 @@
       "answer": [
         1
       ],
-      "explanation": "new w = w − learning rate × gradient = 0.5 − 0.1 × 2 = 0.3. A positive gradient means increasing w would raise the loss, so w goes down. Option A moves in the wrong direction."
+      "explanation": "The update subtracts the learning rate times the gradient, giving 0.5 − 0.1 × 2 = 0.3."
     },
     {
       "id": "bank-b31",
@@ -10354,7 +11275,7 @@
       "answer": [
         2
       ],
-      "explanation": "Sigmoid's slope is at most 0.25, so multiplying it across many layers makes the gradient vanish. ReLU is not bounded above (A false), is non-linear (B false), and outputs 0 for negative inputs (D false)."
+      "explanation": "The sigmoid slope is at most 0.25, which can shrink gradients at each layer. For positive inputs, ReLU has slope 1 and passes the gradient through the activation unchanged."
     },
     {
       "id": "bank-b33",
@@ -10391,7 +11312,7 @@
       "answer": [
         2
       ],
-      "explanation": "The errors (forecast − actual) are +2, −2 and +3; their absolute values add up to 7, and 7 / 3 ≈ 2.33. Option A is the bias (average signed error), and option B is the total before dividing."
+      "explanation": "The errors are +2, −2, and +3. The absolute errors sum to 7, so their mean is 7 ÷ 3 ≈ 2.33. The mean signed error is 1."
     },
     {
       "id": "bank-b35",
@@ -10427,7 +11348,7 @@
       "answer": [
         3
       ],
-      "explanation": "The forecast is too high by 10, so the loss is (1 − 0.9) × 10 = 1. If it had been too low by 10, the loss would be 0.9 × 10 = 9 (option A)."
+      "explanation": "The forecast is too high by 10, so the loss is (1 − 0.9) × 10 = 1. Underforecasting by the same amount would cost 0.9 × 10 = 9."
     },
     {
       "id": "bank-b37",
@@ -10445,7 +11366,7 @@
       "answer": [
         1
       ],
-      "explanation": "new mean = old mean + (new value − old mean) / n = 6 + (12 − 6) / 6 = 7. Check: (5 × 6 + 12) / 6 = 42 / 6 = 7. Option A averages only the old mean and the new value."
+      "explanation": "The five old values sum to 5 × 6 = 30. Add the new value and divide by six to get (30 + 12) ÷ 6 = 7."
     },
     {
       "id": "bank-b38",
@@ -10463,7 +11384,7 @@
       "answer": [
         3
       ],
-      "explanation": "Precision@5 = relevant shown / shown = 2 / 5 = 0.4. Recall@5 = relevant shown / all relevant = 2 / 4 = 0.5. Option A swaps them."
+      "explanation": "Precision@5 divides the two relevant films shown by the five films shown, giving 0.4. Recall@5 divides those two films by all four relevant films, giving 0.5."
     },
     {
       "id": "bank-b39",
@@ -10499,7 +11420,7 @@
       "answer": [
         3
       ],
-      "explanation": "target = r + γ × max Q(s′, a′) = 1 + 0.9 × 1 = 1.9. new Q = 0.5 + 0.2 × (1.9 − 0.5) = 0.5 + 0.28 = 0.78. Option A is the target itself, which the update only moves part of the way towards."
+      "explanation": "The target is 1 + 0.9 × 1 = 1.9. The update moves 20% of the way from 0.5 to that target, giving 0.5 + 0.2 × (1.9 − 0.5) = 0.78."
     },
     {
       "id": "bank-b41",
@@ -10517,7 +11438,7 @@
       "answer": [
         3
       ],
-      "explanation": "With probability ε = 0.1 it explores (acts randomly); otherwise it exploits the best-known action. Option A would never explore, and option B swaps exploring and exploiting."
+      "explanation": "With ε = 0.1, the agent explores by choosing randomly about 10% of the time. It chooses its current best-known action the other 90% of the time."
     },
     {
       "id": "bank-b42",

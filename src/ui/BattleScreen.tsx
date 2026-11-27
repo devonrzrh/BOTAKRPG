@@ -222,14 +222,14 @@ export function BattleScreen(p: Props) {
     p.onSubmit(answer, clock.elapsed + running, origin);
   };
   const remaining = Math.max(0, quizDuration - quizElapsed);
-  const correctFeedback = b.phase === "feedback" && p.notice === "Correct";
+  const hitFeedback = b.phase === "feedback" && b.answerOutcome === "hit";
   useEffect(() => {
-    if (q && (b.phase === "feedback" || b.phase === "won"))
+    if (q && b.answerOutcome && (b.phase === "feedback" || b.phase === "won"))
       lastAnswer.current = {
         question: q,
-        correct: p.notice === "Correct",
+        correct: b.answerOutcome !== "incorrect",
       };
-  }, [b.phase, q, p.notice]);
+  }, [b.phase, q, b.answerOutcome]);
   useEffect(() => {
     setReviewing(false);
     if (b.phase === "choose") setMenu("skills");
@@ -238,7 +238,7 @@ export function BattleScreen(p: Props) {
     if (
       sceneTransitioning ||
       p.paused ||
-      !correctFeedback ||
+      !hitFeedback ||
       reviewing ||
       !save.settings.battleAutoAdvance
     )
@@ -247,7 +247,7 @@ export function BattleScreen(p: Props) {
     return () => clearTimeout(timer);
   }, [
     b,
-    correctFeedback,
+    hitFeedback,
     reviewing,
     reducedMotion,
     save.settings.battleAutoAdvance,
@@ -690,7 +690,7 @@ export function BattleScreen(p: Props) {
           <section
             key={`${b.turn}:${b.phase}:${menu}`}
             ref={b.phase === "question" ? quizCard : undefined}
-            className={`battle-decision ${b.phase === "choose" ? "command-panel" : "quiz-panel"} ${inspecting ? "analysis-panel" : ""} ${b.phase === "feedback" ? "feedback-panel" : ""} ${correctFeedback ? "answer-correct" : ""}`}
+            className={`battle-decision ${b.phase === "choose" ? "command-panel" : "quiz-panel"} ${inspecting ? "analysis-panel" : ""} ${b.phase === "feedback" ? "feedback-panel" : ""} ${hitFeedback ? "answer-correct" : ""}`}
             aria-label={
               b.phase === "question" ? "Battle question" : "Battle decision"
             }
@@ -978,12 +978,12 @@ export function BattleScreen(p: Props) {
                 <h2 ref={title} tabIndex={-1}>
                   {p.notice}
                 </h2>
-                {(!correctFeedback ||
+                {(!hitFeedback ||
                   reviewing ||
                   !save.settings.battleAutoAdvance) && (
                   <p className="battle-explanation">{q?.explanation}</p>
                 )}
-                {!correctFeedback && q && (
+                {b.answerOutcome === "incorrect" && q && (
                   <p className="battle-correct-answer">
                     Correct answer:{" "}
                     {q.answer
@@ -994,9 +994,9 @@ export function BattleScreen(p: Props) {
                 <footer>
                   <button className="primary" onClick={advance}>
                     <RpgIcon name="advance" />
-                    {correctFeedback ? "Next turn" : "Continue"}
+                    {hitFeedback ? "Next turn" : "Continue"}
                   </button>
-                  {correctFeedback && !reviewing && (
+                  {hitFeedback && !reviewing && (
                     <button
                       onClick={() => {
                         setReviewing(true);

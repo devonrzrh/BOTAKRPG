@@ -1812,14 +1812,15 @@ id: bank-a13
 title: Test bank A13
 lesson: source-alg-03
 format: choice
-prompt: If an algorithm is O(n²), doubling the input size roughly doubles the work.
+prompt: "An algorithm processes each cell of an n × n grid exactly once.
+  Doubling n doubles the number of cells processed."
 options:
   - "True"
   - "False"
 answer:
   - 1
-explanation: (2n)² = 4n², so the work roughly quadruples. It is O(n) algorithms
-  whose work roughly doubles.
+explanation: "There are n² cells before doubling and (2n)² = 4n² afterward.
+  The number of cells processed quadruples."
 ```
 
 ```question
@@ -2291,9 +2292,9 @@ options:
   - It finishes after a finite number of steps.
 answer:
   - 2
-explanation: "An algorithm can be written in any form (steps, pseudocode,
-  flowchart) or any language. A, B and D are required properties: output,
-  definiteness and finiteness."
+explanation: "An algorithm produces an output, has precise steps, and finishes
+  after finitely many steps. You can describe it in pseudocode, a flowchart,
+  or any programming language."
 ```
 
 ```question
@@ -2330,8 +2331,8 @@ options:
   - "[4, 1, 5]"
 answer:
   - 1
-explanation: 5 > 1, swap → [1, 5, 4]; 5 > 4, swap → [1, 4, 5]. Option A is the
-  list after only the first comparison.
+explanation: "The first comparison swaps 5 and 1, giving [1, 5, 4]. The second
+  swaps 5 and 4, completing the pass at [1, 4, 5]."
 ```
 
 ```question
@@ -2369,9 +2370,8 @@ options:
   - "[1, 4, 3, 2]"
 answer:
   - 0
-explanation: "Pass 1 finds the smallest value, 1, and swaps it with the first
-  card, 4: [1, 3, 4, 2]. Option B is one pass of bubble sort, option C is the
-  fully sorted list, and option D shifts the others instead of swapping."
+explanation: "The first pass finds the smallest value, 1, and swaps it with 4
+  at the front. This gives [1, 3, 4, 2]."
 ```
 
 ```question
@@ -2409,8 +2409,8 @@ options:
   - 8, 12, 14
 answer:
   - 3
-explanation: Middle of 8 items = 8 (14 is larger, keep 10–16); middle = 12 (keep
-  14–16); middle = 14, found. Option A is linear search.
+explanation: "The lower middle is 8, so keep 10 through 16. The new lower
+  middle is 12, so keep 14 and 16. The next lower middle is 14, the target."
 ```
 
 ```question
@@ -2438,15 +2438,16 @@ id: bank-b9
 title: Test bank B9
 lesson: source-alg-03
 format: choice
-prompt: Which growth rate means the most work for very large n?
+prompt: "Which expression grows fastest as n increases?"
 options:
-  - O(1)
-  - O(log n)
-  - O(n)
-  - O(n²)
+  - "1"
+  - "log₂ n"
+  - "n"
+  - "n²"
 answer:
   - 3
-explanation: "For large n: 1 < log n < n < n². For n = 1,000,000, n² is a trillion."
+explanation: "For large n, the order is 1 < log₂ n < n < n². At n = 1,000,000,
+  n² is already a trillion."
 ```
 
 ```question
@@ -2455,15 +2456,17 @@ id: bank-b10
 title: Test bank B10
 lesson: source-alg-03
 format: choice
-prompt: Which operation takes O(n) time in the worst case?
+prompt: "Which operation can require checking all n elements of an unsorted
+  array?"
 options:
-  - Reading an array item by its index
-  - Linear search in an unsorted list
-  - Pushing onto a stack
-  - Dequeuing the front item of a queue
+  - "Reading an array item by its index"
+  - "Linear search for a target"
+  - "Replacing the first item"
+  - "Reading the length of the array"
 answer:
   - 1
-explanation: Linear search may check all n items. The other three are O(1) operations.
+explanation: "A linear search for a missing target checks each of the n items
+  before it can report that the target is absent."
 ```
 
 ```question
@@ -2500,8 +2503,8 @@ options:
   - D, E, B, F, C, A
 answer:
   - 1
-explanation: "BFS goes level by level: A (distance 0), B and C (distance 1),
-  then D, E, F (distance 2). Option A is the DFS order."
+explanation: "BFS visits A first, then B and C at distance 1, then D, E, and F
+  at distance 2. The order A, B, D, E, C, F follows depth-first search."
 ```
 
 ```question
@@ -2539,9 +2542,8 @@ options:
   - "5"
 answer:
   - 2
-explanation: Settle S (0) → A = 1, B = 2; settle A → G = 9; settle B → C = 4;
-  settle C → G = min(9, 6) = 6. The route is S → B → C → G. Option A (9) is the
-  fewest-edges route S → A → G that BFS would choose.
+explanation: "The route S → B → C → G costs 2 + 2 + 2 = 6. The route S → A → G
+  uses fewer edges but costs 1 + 8 = 9."
 ```
 
 ```question
@@ -2597,9 +2599,9 @@ options:
   - It cannot grow after it is created.
 answer:
   - 0
-explanation: That is the definition of a node. Nodes can be anywhere in memory
-  (B false), reaching the k-th node takes O(n) (C false), and lists grow easily
-  by adding nodes (D false).
+explanation: "Each node stores a value and a link to its successor, so nodes
+  can be stored separately. Reaching the k-th node from the head takes k − 1
+  links, and adding a node changes the adjacent links."
 ```
 
 ```question
@@ -2714,9 +2716,9 @@ options:
   - Items can only be added when the deque is empty.
 answer:
   - 0
-explanation: Input (adding) is restricted to one end; removing is allowed at
-  both ends. Option B describes an output-restricted deque, and option C a
-  priority queue.
+explanation: "An input-restricted deque accepts items at only one end and
+  removes them at either end. An output-restricted deque restricts removals
+  instead."
 ```
 
 ```question
@@ -2796,9 +2798,9 @@ options:
   - Darren, Neil
 answer:
   - 2
-explanation: 0, because there is no edge between Nicky and Glen. They are two
-  edges apart, but a matrix cell only records a direct edge. Option D is what an
-  adjacency list stores for Nicky.
+explanation: "The cell is 0 because Nicky and Glen have no direct edge.
+  Nicky's adjacency list would contain Darren and Neil, its two direct
+  neighbours."
 ```
 
 ```question
@@ -2816,8 +2818,8 @@ options:
   - "2.2"
 answer:
   - 0
-explanation: z = 0.5 × 1 − 0.5 × 3 + 0.2 = −0.8. ReLU turns negative values into
-  0, so the output is 0. Option B forgets the activation.
+explanation: "The weighted sum plus bias is 0.5 × 1 − 0.5 × 3 + 0.2 = −0.8.
+  ReLU clips that negative value to 0."
 ```
 
 ```question
@@ -2835,7 +2837,8 @@ options:
   - "10"
 answer:
   - 3
-explanation: 4 × 2 = 8 weights plus 2 biases = 10. Option A forgets the biases.
+explanation: "Each of the two neurons has four weights and one bias. That
+  gives eight weights plus two biases, for a total of ten parameters."
 ```
 
 ```question
@@ -2853,9 +2856,8 @@ options:
   - "0.2"
 answer:
   - 1
-explanation: new w = w − learning rate × gradient = 0.5 − 0.1 × 2 = 0.3. A
-  positive gradient means increasing w would raise the loss, so w goes down.
-  Option A moves in the wrong direction.
+explanation: "The update subtracts the learning rate times the gradient,
+  giving 0.5 − 0.1 × 2 = 0.3."
 ```
 
 ```question
@@ -2894,9 +2896,9 @@ options:
   - ReLU never outputs 0.
 answer:
   - 2
-explanation: Sigmoid's slope is at most 0.25, so multiplying it across many
-  layers makes the gradient vanish. ReLU is not bounded above (A false), is
-  non-linear (B false), and outputs 0 for negative inputs (D false).
+explanation: "The sigmoid slope is at most 0.25, which can shrink gradients at
+  each layer. For positive inputs, ReLU has slope 1 and passes the gradient
+  through the activation unchanged."
 ```
 
 ```question
@@ -2934,9 +2936,8 @@ options:
   - "0.33"
 answer:
   - 2
-explanation: The errors (forecast − actual) are +2, −2 and +3; their absolute
-  values add up to 7, and 7 / 3 ≈ 2.33. Option A is the bias (average signed
-  error), and option B is the total before dividing.
+explanation: "The errors are +2, −2, and +3. The absolute errors sum to 7, so
+  their mean is 7 ÷ 3 ≈ 2.33. The mean signed error is 1."
 ```
 
 ```question
@@ -2975,8 +2976,8 @@ options:
   - "1"
 answer:
   - 3
-explanation: The forecast is too high by 10, so the loss is (1 − 0.9) × 10 = 1.
-  If it had been too low by 10, the loss would be 0.9 × 10 = 9 (option A).
+explanation: "The forecast is too high by 10, so the loss is (1 − 0.9) × 10 =
+  1. Underforecasting by the same amount would cost 0.9 × 10 = 9."
 ```
 
 ```question
@@ -2994,9 +2995,8 @@ options:
   - "12"
 answer:
   - 1
-explanation: "new mean = old mean + (new value − old mean) / n = 6 + (12 − 6) /
-  6 = 7. Check: (5 × 6 + 12) / 6 = 42 / 6 = 7. Option A averages only the old
-  mean and the new value."
+explanation: "The five old values sum to 5 × 6 = 30. Add the new value and
+  divide by six to get (30 + 12) ÷ 6 = 7."
 ```
 
 ```question
@@ -3014,8 +3014,9 @@ options:
   - 0.4 and 0.5
 answer:
   - 3
-explanation: Precision@5 = relevant shown / shown = 2 / 5 = 0.4. Recall@5 =
-  relevant shown / all relevant = 2 / 4 = 0.5. Option A swaps them.
+explanation: "Precision@5 divides the two relevant films shown by the five
+  films shown, giving 0.4. Recall@5 divides those two films by all four
+  relevant films, giving 0.5."
 ```
 
 ```question
@@ -3053,9 +3054,8 @@ options:
   - "0.78"
 answer:
   - 3
-explanation: target = r + γ × max Q(s′, a′) = 1 + 0.9 × 1 = 1.9. new Q = 0.5 +
-  0.2 × (1.9 − 0.5) = 0.5 + 0.28 = 0.78. Option A is the target itself, which
-  the update only moves part of the way towards.
+explanation: "The target is 1 + 0.9 × 1 = 1.9. The update moves 20% of the way
+  from 0.5 to that target, giving 0.5 + 0.2 × (1.9 − 0.5) = 0.78."
 ```
 
 ```question
@@ -3073,9 +3073,9 @@ options:
     otherwise.
 answer:
   - 3
-explanation: With probability ε = 0.1 it explores (acts randomly); otherwise it
-  exploits the best-known action. Option A would never explore, and option B
-  swaps exploring and exploiting.
+explanation: "With ε = 0.1, the agent explores by choosing randomly about 10%
+  of the time. It chooses its current best-known action the other 90% of the
+  time."
 ```
 
 ```question

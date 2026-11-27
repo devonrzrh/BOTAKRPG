@@ -130,7 +130,9 @@ it("gives each chapter a varied six-question opening and changes the first promp
       return questions.find((q) => q.id === battle.question)!;
     });
     expect(new Set(opening.map((q) => q.id)).size, encounter.id).toBe(6);
-    expect(opening[0].lesson, encounter.id).toBe(encounter.lesson);
+    expect(opening.map((question) => question.lesson), encounter.id).toEqual(
+      Array(6).fill(encounter.lesson),
+    );
     expect(opening[1].format, encounter.id).not.toBe(opening[0].format);
     const rematch = selectSkill(
       createBattle(encounter.enemy!, 1),
