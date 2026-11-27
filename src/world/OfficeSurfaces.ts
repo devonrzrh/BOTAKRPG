@@ -547,28 +547,20 @@ export function attachOfficeSurfaces(
     "library catalog",
     "bookshelf",
     0,
-    0.92,
+    1.1,
     4.75,
-    1.95,
-    0.84,
+    2.15,
+    0.41,
     0,
     (c, m) => {
       paper(c, "#b9aa8c");
       c.strokeStyle = "#74634c";
       c.lineWidth = 3;
       c.strokeRect(16, 30, 568, 740);
-      rule(c, 400);
-      const search = control(m, "search")?.label ?? "";
-      const query = search === "Search: all lessons" ? "" : search.replace(/^Search: /, "");
-      const topic = control(m, "topic")?.label.replace(/^Topic: /, "") ?? "all";
       c.textAlign = "center";
-      ink(c, query ? query.slice(0, 12) : "Search books", 300, 85, 71, 540, "#2b2b25");
-      ink(c, topic === "all" ? "All topics" : topic, 300, 485, 71, 540, "#2b2b25");
+      ink(c, control(m, "search")?.label ?? "Find a chapter", 300, 158, 67, 550, "#2b2b25");
       c.textAlign = "start";
-      return [
-        ...zone(m, "search", 0, 0, 600, 400),
-        ...zone(m, "topic", 0, 400, 600, 400),
-      ];
+      return zone(m, "search");
     },
     false,
   );

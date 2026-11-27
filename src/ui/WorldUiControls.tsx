@@ -11,9 +11,6 @@ export function WorldUiControls({
   noteEditing,
   noteDraft,
   onNoteDraft,
-  searchEditing,
-  search,
-  onSearch,
 }: {
   model: SurfaceModel;
   blocked: boolean;
@@ -24,18 +21,11 @@ export function WorldUiControls({
   noteEditing: boolean;
   noteDraft: string;
   onNoteDraft: (v: string) => void;
-  searchEditing: boolean;
-  search: string;
-  onSearch: (v: string) => void;
 }) {
-  const note = useRef<HTMLTextAreaElement>(null),
-    searchField = useRef<HTMLInputElement>(null);
+  const note = useRef<HTMLTextAreaElement>(null);
   useEffect(() => {
     if (noteEditing) note.current?.focus();
   }, [noteEditing]);
-  useEffect(() => {
-    if (searchEditing) searchField.current?.focus();
-  }, [searchEditing]);
   return (
     <section
       className="world-keyboard-ui"
@@ -150,17 +140,6 @@ export function WorldUiControls({
                 onAction({ kind: "save-note", id: "" });
               }
             }}
-          />
-        </label>
-      )}
-      {searchEditing && (
-        <label>
-          Search world library
-          <input
-            ref={searchField}
-            value={search}
-            onChange={(e) => onSearch(e.target.value)}
-            onKeyDown={(e) => e.stopPropagation()}
           />
         </label>
       )}

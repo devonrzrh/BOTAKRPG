@@ -312,6 +312,7 @@ export default function App() {
   const [bookOpen, setBookOpen] = useState(false);
   const [bookClosing, setBookClosing] = useState(false);
   const [bookReady, setBookReady] = useState(false);
+  const [openBookIndex, setOpenBookIndex] = useState(false);
   useEffect(() => {
     if (!bookOpen) {
       setBookClosing(false);
@@ -323,7 +324,6 @@ export default function App() {
   const [officeFocused, setOfficeFocused] = useState<string | null>(null);
   const [noteEditing, setNoteEditing] = useState<string | null>(null);
   const [noteDraft, setNoteDraft] = useState("");
-  const [searchEditing, setSearchEditing] = useState(false);
   const [homeWall, setHomeWall] = useState<HomeWall>("investigation");
   const [homeMoving, setHomeMoving] = useState(false);
   const [dialogueId, setDialogueId] = useState<string | null>(null);
@@ -824,7 +824,6 @@ export default function App() {
       }
       setBookOpen(false);
       setNoteEditing(null);
-      setSearchEditing(false);
       setOfficeFocused(null);
       if (
         !debugTravel &&
@@ -1156,9 +1155,10 @@ export default function App() {
       };
     });
   };
-  const openLesson = (id: string) => {
+  const openLesson = (id: string, showIndex = false) => {
     if (tutorialRef.current) closeTutorial();
-    selectReadingLesson(id);
+    if (!showIndex) selectReadingLesson(id);
+    setOpenBookIndex(showIndex);
     setOfficePage(0);
     if (officeFallback) {
       open("library");
@@ -1629,13 +1629,11 @@ export default function App() {
     if (action.kind === "close-book") {
       setBookOpen(false);
       setNoteEditing(null);
-      setSearchEditing(false);
     }
     if (action.kind === "open") open(id);
     if (action.kind === "lesson") {
       setOfficePage(0);
       setNoteEditing(null);
-      setSearchEditing(false);
       openLesson(id);
     }
     if (action.kind === "page") {
@@ -1644,11 +1642,10 @@ export default function App() {
       setOfficePage(page);
     }
     if (action.kind === "topic") setTopic(id);
-    if (action.kind === "search") setSearchEditing(true);
+    if (action.kind === "search") openLesson(lessonId, true);
     if (action.kind === "note") {
       setNoteDraft(saveRef.current.notes[id] ?? "");
       setNoteEditing(id);
-      setSearchEditing(false);
     }
     if (action.kind === "save-note" && noteEditing) {
       updateSave((s) => ({
@@ -3282,6 +3279,7 @@ export default function App() {
           <BookReader
             lessons={lessons}
             lesson={currentLesson}
+            openToLibrary={openBookIndex}
             reducedMotion={save.settings.reducedMotion}
             bookmarked={save.bookmarks.includes(lessonId)}
             note={save.notes[lessonId] ?? ""}
@@ -3389,9 +3387,6 @@ export default function App() {
               noteEditing={Boolean(noteEditing)}
               noteDraft={noteDraft}
               onNoteDraft={setNoteDraft}
-              searchEditing={searchEditing}
-              search={search}
-              onSearch={setSearch}
             />
           )}
         <footer className="world-footer">

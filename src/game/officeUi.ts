@@ -795,27 +795,24 @@ export function createOfficeUi(input: OfficeUiInput): SurfaceModel[] {
   if (input.bookOpen === false) {
     library.title = "REFERENCE BOOKSHELF";
     library.texts = [{ x: 30, y: 85, text: "Select a volume to open it." }];
-    library.buttons = library.buttons.filter(
-      (b) => b.id === "search" || b.id === "topic",
-    );
-    // Physical volumes remain subject indexes, including when search finds a chapter.
+    library.buttons = [];
+    button(library, "search", 24, 75, 245, 44, "Find a chapter", "search", "");
     lessons.slice(0, 3).forEach((volume, index) => {
       const lastChapter = input.save.reading.lastChapterByTopic?.[volume.topic];
       const match =
-        visible.find((l) => l.id === lastChapter) ??
-        visible.find((l) => l.topic === volume.topic);
-      if (match)
-        button(
-          library,
-          `lesson-${volume.id}`,
-          24,
-          187 + index * 58,
-          245,
-          50,
-          match.title,
-          "lesson",
-          match.id,
-        );
+        lessons.find((l) => l.id === lastChapter && l.topic === volume.topic) ??
+        volume;
+      button(
+        library,
+        `lesson-${volume.id}`,
+        24,
+        187 + index * 58,
+        245,
+        50,
+        match.title,
+        "lesson",
+        match.id,
+      );
     });
   }
   if (input.bookOpen === true) {

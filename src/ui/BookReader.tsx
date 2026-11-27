@@ -55,6 +55,7 @@ function measuredBookLayout(frame: HTMLDivElement, page: HTMLElement) {
 export function BookReader(p: {
   lessons: Lesson[];
   lesson: Lesson;
+  openToLibrary?: boolean;
   reducedMotion: boolean;
   bookmarked: boolean;
   note: string;
@@ -83,12 +84,12 @@ export function BookReader(p: {
   const [closing, setClosing] = useState(false);
   const [mode, setMode] = useState<"book" | "fullscreen">(p.reading.mode);
   const [drawer, setDrawer] = useState<"contents" | "tools" | "notes" | null>(
-    null,
+    p.openToLibrary ? "contents" : null,
   );
   const [query, setQuery] = useState("");
   const [fontSize, setFontSize] = useState<20 | 22 | 24>(p.reading.fontSize);
   const [contentsTab, setContentsTab] = useState<"chapter" | "library">(
-    "chapter",
+    p.openToLibrary ? "library" : "chapter",
   );
   const [topicFilter, setTopicFilter] = useState("all");
   const [jumpOpen, setJumpOpen] = useState(false);
@@ -275,7 +276,6 @@ export function BookReader(p: {
     setAtEnd(false);
     setSheet(null);
     setPageInput("1");
-    setDrawer(null);
     setDiagram(null);
     currentAnchor.current = p.reading.positions[p.lesson.id] ?? {
       block: 0,
@@ -285,6 +285,7 @@ export function BookReader(p: {
     setJumpOpen(false);
     page.focus({ preventScroll: true });
     if (displayedChapter.current !== p.lesson.id) {
+      setDrawer(null);
       const previous = p.lessons.findIndex(
         (lesson) => lesson.id === displayedChapter.current,
       );
@@ -447,6 +448,7 @@ export function BookReader(p: {
       !page ||
       readingFinished ||
       closing ||
+      drawer ||
       (mode === "book" ? pageEnd < layout.pages : !atEnd)
     )
       return;
@@ -474,6 +476,7 @@ export function BookReader(p: {
   }, [
     atEnd,
     closing,
+    drawer,
     layout,
     mode,
     pageEnd,
@@ -493,7 +496,9 @@ export function BookReader(p: {
     () =>
       p.lessons.filter(
         (l) =>
-          `${l.title} ${l.body}`.toLowerCase().includes(query.toLowerCase()) &&
+          `${l.title} ${l.summary} ${l.body}`
+            .toLowerCase()
+            .includes(query.trim().toLowerCase()) &&
           (topicFilter === "all" || l.topic === topicFilter),
       ),
     [p.lessons, query, topicFilter],
@@ -845,7 +850,7 @@ export function BookReader(p: {
                     aria-label="Contents view"
                   >
                     <button
-                      autoFocus
+                      autoFocus={contentsTab === "chapter"}
                       aria-pressed={contentsTab === "chapter"}
                       onClick={() => setContentsTab("chapter")}
                     >
@@ -881,8 +886,8 @@ export function BookReader(p: {
                       <label>
                         Find a chapter
                         <input
-                          aria-label="Search all materials"
-                          placeholder="Title or topic…"
+                          autoFocus
+                          placeholder="Search by keyword"
                           value={query}
                           onChange={(e) => setQuery(e.target.value)}
                         />
@@ -923,8 +928,8 @@ export function BookReader(p: {
                                           : undefined
                                       }
                                       onClick={() => {
-                                        selectChapter(l.id);
-                                        setDrawer(null);
+                                        if (l.id === p.lesson.id) closeDrawer();
+                                        else selectChapter(l.id);
                                       }}
                                     >
                                       {l.title}

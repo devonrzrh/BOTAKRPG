@@ -155,6 +155,8 @@ it("selects physical volumes before exposing the open book controls", () => {
   const data = { ...input(), bookOpen: false };
   let shelf = createOfficeUi(data).find((m) => m.id === "bookshelf")!;
   expect(shelf.books).toHaveLength(3);
+  expect(shelf.buttons.find((b) => b.id === "search")?.label).toBe("Find a chapter");
+  expect(shelf.buttons.some((b) => b.id === "topic")).toBe(false);
   expect(shelf.buttons.some((b) => b.id === "close-book")).toBe(false);
   expect(shelf.buttons.filter((b) => b.action.kind === "lesson")).toHaveLength(
     3,
@@ -179,7 +181,7 @@ it("selects physical volumes before exposing the open book controls", () => {
   }
 });
 
-it("reopens a volume at its last chapter when it matches the library search", () => {
+it("reopens a volume at its last chapter independently of archive filters", () => {
   const data = { ...input(), bookOpen: false };
   data.save.reading.lastChapterByTopic = { algorithms: "source-alg-09" };
   const volumeAction = () =>
@@ -188,5 +190,6 @@ it("reopens a volume at its last chapter when it matches the library search", ()
       .buttons.find((button) => button.id === "lesson-graph-search")?.action;
   expect(volumeAction()?.id).toBe("source-alg-09");
   data.search = "Finding a way through";
-  expect(volumeAction()?.id).toBe("graph-search");
+  data.topic = "ai";
+  expect(volumeAction()?.id).toBe("source-alg-09");
 });
