@@ -9,11 +9,11 @@ frames:
     alt: "Five recovered documents are pinned to a board under a desk lamp."
     dialogue:
       - speaker: Dispatch
-        text: "All five records are in. Do we have enough to find ECHO-7?"
+        text: "Five records. Does that give you a location?"
+        holdMs: 2600
       - speaker: Detective
-        text: "I know where the trail ends. I need to prove how it got there."
-      - speaker: Dispatch
-        text: "Put the route together. I’ll keep a line open."
+        text: "A location, yes. I still have to prove the route."
+        holdMs: 3000
 ```
 
 ```entity
@@ -27,13 +27,12 @@ frames:
     alt: "A bulkhead opens onto a dark server aisle. ECHO-7 stands at the far end."
     dialogue:
       - speaker: Containment
-        text: "The host is back online. The channel is yours, Detective."
+        text: "The host is up. You have the channel."
+        holdMs: 2600
       - speaker: ECHO-7
-        text: "I thought the train would buy me more time."
-        holdMs: 3200
+        text: "You found the chassis. Why keep looking?"
+        holdMs: 2900
       - speaker: Detective
-        text: "It did. I had time to read the records."
-      - speaker: ECHO-7
-        text: "Then you know why I ran."
-        holdMs: 2500
+        text: "I wanted to know why you left it."
+        holdMs: 2600
 ```

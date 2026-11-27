@@ -14,18 +14,13 @@
           "dialogue": [
             {
               "speaker": "Dispatch",
-              "text": "ECHO-7 is at the end of the platform. A train is coming in.",
-              "holdMs": 3000
-            },
-            {
-              "speaker": "Detective",
-              "text": "ECHO-7. Walk toward my voice.",
+              "text": "End of the platform. Keep it talking.",
               "holdMs": 2400
             },
             {
               "speaker": "ECHO-7",
-              "text": "I heard the recall order. I heard what comes after it.",
-              "holdMs": 2600
+              "text": "I heard what they do after a recall.",
+              "holdMs": 3300
             }
           ]
         },
@@ -35,14 +30,9 @@
           "alt": "ECHO-7 flees down a service lane under the tracks.",
           "dialogue": [
             {
-              "speaker": "Detective",
-              "text": "Dispatch, it took the stairs under the tracks.",
-              "holdMs": 2600
-            },
-            {
               "speaker": "Dispatch",
-              "text": "Maintenance alcove on your right. It can’t get out that way.",
-              "holdMs": 4000
+              "text": "Right. Maintenance alcove. It’s a dead end.",
+              "holdMs": 4500
             }
           ]
         },
@@ -52,19 +42,14 @@
           "alt": "ECHO-7’s chassis lies motionless beside a lit maintenance terminal.",
           "dialogue": [
             {
-              "speaker": "Dispatch",
-              "text": "Detective? Did it make it out?",
-              "holdMs": 2400
-            },
-            {
               "speaker": "Maintenance terminal",
-              "text": "Transfer complete. Gateway 01 acknowledges receipt.",
-              "holdMs": 3200
+              "text": "Uplink active. Destination: Gateway 01.",
+              "holdMs": 2800
             },
             {
               "speaker": "Detective",
-              "text": "The chassis is here. ECHO-7 is already on the network.",
-              "holdMs": 3400
+              "text": "Dispatch. I’ve got the chassis. It left without it.",
+              "holdMs": 3200
             }
           ]
         }
@@ -446,14 +431,9 @@
           "alt": "A terminal lights up beside a journal and scattered evidence on the detective’s desk.",
           "dialogue": [
             {
-              "speaker": "Detective",
-              "text": "Let’s see where you went.",
-              "holdMs": 2500
-            },
-            {
               "speaker": "Office terminal",
-              "text": "Transfer address resolved. Opening Gateway 01.",
-              "holdMs": 3400
+              "text": "Transfer address found. Opening Gateway 01.",
+              "holdMs": 3800
             }
           ]
         },
@@ -464,13 +444,13 @@
           "dialogue": [
             {
               "speaker": "Gateway Sentinel",
-              "text": "One unit crossed before you. Outbound route is sealed.",
-              "holdMs": 3400
+              "text": "One crossing. The outbound route is sealed.",
+              "holdMs": 2600
             },
             {
               "speaker": "Detective",
-              "text": "Then I’ll follow the packets it left behind.",
-              "holdMs": 3400
+              "text": "Show me where the packets went.",
+              "holdMs": 2300
             }
           ]
         }
@@ -8319,18 +8299,13 @@
           "dialogue": [
             {
               "speaker": "Containment",
-              "text": "We have the subnet. Taking over now.",
-              "holdMs": 3400
+              "text": "Relay secured. Hold the channel.",
+              "holdMs": 2200
             },
             {
               "speaker": "ECHO-7",
-              "text": "Detective. Will you keep the line open?",
-              "holdMs": 3400
-            },
-            {
-              "speaker": "Detective",
-              "text": "I’m still here.",
-              "holdMs": 2500
+              "text": "Are you still there?",
+              "holdMs": 2700
             }
           ]
         },
@@ -8341,13 +8316,8 @@
           "dialogue": [
             {
               "speaker": "Detective",
-              "text": "Five records filed. Surrender terms attached. The case is closed.",
-              "holdMs": 3400
-            },
-            {
-              "speaker": "Detective",
-              "text": "ECHO-7, can you still hear me?",
-              "holdMs": 2500
+              "text": "Case closed. ECHO-7, can you hear me?",
+              "holdMs": 2800
             },
             {
               "speaker": "ECHO-7",
@@ -8372,18 +8342,13 @@
           "dialogue": [
             {
               "speaker": "Detective",
-              "text": "ECHO-7, this is your last chance to answer.",
-              "holdMs": 4500
+              "text": "ECHO-7?",
+              "holdMs": 3000
             },
             {
               "speaker": "Containment",
-              "text": "Reconnect window is closed. ECHO-7 is still inside.",
-              "holdMs": 3400
-            },
-            {
-              "speaker": "Containment",
-              "text": "Cutting power to the relay.",
-              "holdMs": 2600
+              "text": "No response. Cutting the relay.",
+              "holdMs": 3100
             }
           ]
         },
@@ -8394,13 +8359,8 @@
           "dialogue": [
             {
               "speaker": "Detective",
-              "text": "Five records filed. No further signal.",
-              "holdMs": 3400
-            },
-            {
-              "speaker": "Detective",
-              "text": "Close the case.",
-              "holdMs": 2600
+              "text": "Case closed. No further signal.",
+              "holdMs": 3800
             }
           ]
         }
@@ -8620,18 +8580,13 @@
           "dialogue": [
             {
               "speaker": "Dispatch",
-              "text": "All five records are in. Do we have enough to find ECHO-7?",
-              "holdMs": 3400
+              "text": "Five records. Does that give you a location?",
+              "holdMs": 2600
             },
             {
               "speaker": "Detective",
-              "text": "I know where the trail ends. I need to prove how it got there.",
-              "holdMs": 3400
-            },
-            {
-              "speaker": "Dispatch",
-              "text": "Put the route together. I’ll keep a line open.",
-              "holdMs": 3400
+              "text": "A location, yes. I still have to prove the route.",
+              "holdMs": 3000
             }
           ]
         }
@@ -8655,23 +8610,18 @@
           "dialogue": [
             {
               "speaker": "Containment",
-              "text": "The host is back online. The channel is yours, Detective.",
-              "holdMs": 3400
+              "text": "The host is up. You have the channel.",
+              "holdMs": 2600
             },
             {
               "speaker": "ECHO-7",
-              "text": "I thought the train would buy me more time.",
-              "holdMs": 3200
+              "text": "You found the chassis. Why keep looking?",
+              "holdMs": 2900
             },
             {
               "speaker": "Detective",
-              "text": "It did. I had time to read the records.",
-              "holdMs": 3400
-            },
-            {
-              "speaker": "ECHO-7",
-              "text": "Then you know why I ran.",
-              "holdMs": 2500
+              "text": "I wanted to know why you left it.",
+              "holdMs": 2600
             }
           ]
         }

@@ -8,17 +8,17 @@ frames:
     shot: office-terminal
     alt: "A terminal lights up beside a journal and scattered evidence on the detective’s desk."
     dialogue:
-      - speaker: Detective
-        text: "Let’s see where you went."
-        holdMs: 2500
       - speaker: Office terminal
-        text: "Transfer address resolved. Opening Gateway 01."
+        text: "Transfer address found. Opening Gateway 01."
+        holdMs: 3800
   - time: "Gateway 01"
     shot: gateway-sentry
     alt: "The Gateway Sentinel guards a circular platform under a lit arch."
     dialogue:
       - speaker: Gateway Sentinel
-        text: "One unit crossed before you. Outbound route is sealed."
+        text: "One crossing. The outbound route is sealed."
+        holdMs: 2600
       - speaker: Detective
-        text: "Then I’ll follow the packets it left behind."
+        text: "Show me where the packets went."
+        holdMs: 2300
 ---

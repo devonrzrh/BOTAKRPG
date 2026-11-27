@@ -22,12 +22,12 @@
   inset: 0;
   content: "";
   pointer-events: none;
-  box-shadow: inset 0 0 10vw #05091055;
+  box-shadow: inset 0 0 11vw #05091099;
   background: linear-gradient(
-    #080e16c9,
-    transparent 23%,
-    transparent 72%,
-    #080e1675
+    #080e16da,
+    transparent 19%,
+    transparent 76%,
+    #080e1690
   );
 }
 
@@ -42,8 +42,13 @@
   object-position: center 44%;
 }
 
-.cutscene-canvas[data-visible="false"] {
+.cutscene-canvas {
   opacity: 0;
+}
+
+.cutscene-canvas[data-visible="true"] {
+  opacity: 1;
+  transition: opacity 180ms ease-out;
 }
 
 .cutscene-location {

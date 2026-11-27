@@ -11,10 +11,12 @@ export default function CinematicCanvas({
   shot,
   renderer,
   elapsed,
+  readyShot,
 }: {
   shot: string;
   renderer: RendererPreference;
   elapsed: RefObject<number>;
+  readyShot: RefObject<string | null>;
 }) {
   const surface = useRef<HTMLCanvasElement>(null);
   const [engine, setEngine] = useState<AbstractEngine | null>(null);
@@ -46,6 +48,7 @@ export default function CinematicCanvas({
   }, [renderer]);
 
   useEffect(() => {
+    readyShot.current = null;
     setVisibleShot(null);
     if (!engine || !cinematicShots.includes(shot)) return;
     const scene = new Scene(engine);
@@ -80,6 +83,7 @@ export default function CinematicCanvas({
           scene.render();
           if (ready) {
             rendered = true;
+            readyShot.current = shot;
             setVisibleShot(shot);
           }
         } catch {
@@ -98,7 +102,7 @@ export default function CinematicCanvas({
       engine.onContextRestoredObservable.remove(restored);
       if (!scene.isDisposed) scene.dispose();
     };
-  }, [elapsed, engine, shot]);
+  }, [elapsed, engine, readyShot, shot]);
 
   return (
     <canvas

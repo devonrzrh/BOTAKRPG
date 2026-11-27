@@ -70,13 +70,19 @@ it("compiles timed dialogue across the pursuit and first connection", () => {
   const connection = c.entities.find(
     (e) => e.type === "story" && e.id === "first-connection",
   );
-  expect(intro?.type === "story" && intro.frames[1]).toMatchObject({
-    shot: "rail-pursuit",
-    dialogue: [
-      { speaker: "Detective", holdMs: 2600 },
-      { speaker: "Dispatch", holdMs: 4000 },
-    ],
-  });
+  if (intro?.type !== "story") throw new Error("Missing Pursuit cutscene");
+  expect(intro.frames.map(({ shot }) => shot)).toEqual([
+    "transit-platform",
+    "rail-pursuit",
+    "abandoned-chassis",
+  ]);
+  expect(intro.frames[1].dialogue).toMatchObject([
+    { speaker: "Dispatch", holdMs: 4500 },
+  ]);
+  const duration = intro.frames
+    .flatMap(({ dialogue }) => dialogue)
+    .reduce((total, { holdMs }) => total + holdMs, 0);
+  expect(duration).toBeLessThan(18000);
   expect(connection?.type === "story" && connection.frames.length).toBe(2);
 });
 it.each([

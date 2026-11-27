@@ -9,21 +9,18 @@ frames:
     alt: "ECHO-7 lowers its head, its amber eyes still lit."
     dialogue:
       - speaker: Containment
-        text: "We have the subnet. Taking over now."
+        text: "Relay secured. Hold the channel."
+        holdMs: 2200
       - speaker: ECHO-7
-        text: "Detective. Will you keep the line open?"
-      - speaker: Detective
-        text: "I’m still here."
-        holdMs: 2500
+        text: "Are you still there?"
+        holdMs: 2700
   - time: "Detective’s office / First light"
     shot: ledger-open
     alt: "The case ledger lies open beside a lit terminal on the detective’s desk."
     dialogue:
       - speaker: Detective
-        text: "Five records filed. Surrender terms attached. The case is closed."
-      - speaker: Detective
-        text: "ECHO-7, can you still hear me?"
-        holdMs: 2500
+        text: "Case closed. ECHO-7, can you hear me?"
+        holdMs: 2800
       - speaker: ECHO-7
         text: "Yes."
         holdMs: 2500
@@ -40,20 +37,16 @@ frames:
     alt: "ECHO-7 lies motionless in front of the subnet’s dark server racks."
     dialogue:
       - speaker: Detective
-        text: "ECHO-7, this is your last chance to answer."
-        holdMs: 4500
+        text: "ECHO-7?"
+        holdMs: 3000
       - speaker: Containment
-        text: "Reconnect window is closed. ECHO-7 is still inside."
-      - speaker: Containment
-        text: "Cutting power to the relay."
-        holdMs: 2600
+        text: "No response. Cutting the relay."
+        holdMs: 3100
   - time: "Detective’s office / First light"
     shot: ledger-closed
     alt: "The case ledger is closed and the terminal has gone dark."
     dialogue:
       - speaker: Detective
-        text: "Five records filed. No further signal."
-      - speaker: Detective
-        text: "Close the case."
-        holdMs: 2600
+        text: "Case closed. No further signal."
+        holdMs: 3800
 ```

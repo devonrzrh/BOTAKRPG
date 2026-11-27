@@ -305,7 +305,7 @@ export function buildCinematicStage(scene: Scene, shot: string) {
       });
       return (t: number) => {
         boardLamp.intensity = 0.2 + smooth(0.65, 1.2, t) * 0.7;
-        const push = smooth(0, 8.2, t);
+        const push = smooth(0, 5.6, t);
         view(
           -1.9 + push * 2.03,
           2.79 + push * 0.16,
@@ -430,8 +430,8 @@ export function buildCinematicStage(scene: Scene, shot: string) {
       true,
     );
     return (t: number) => {
-      const resolved = t >= 2.5;
-      const closed = shot === "ledger-closed" ? smooth(3.4, 5.2, t) : 0;
+      const resolved = t >= 1.85;
+      const closed = shot === "ledger-closed" ? smooth(1.15, 2.65, t) : 0;
       cover.rotation.z = -Math.PI * closed;
       relay.setEnabled(channelOpen || (connecting && resolved));
       if (connecting) {
@@ -453,7 +453,8 @@ export function buildCinematicStage(scene: Scene, shot: string) {
           channelOpen ? "CHANNEL OPEN" : "RELAY OFFLINE",
           channelOpen ? cyan : "#a3a9ad",
         );
-        view(2.3 - smooth(0, 6, t) * 0.7, 3.02, -3.32, 0.62, 1.27, 0.28);
+        const settle = smooth(0, 4, t);
+        view(1.85 - settle * 0.59, 3.48, -2.87, 0.34, 1.21, 0.16, 0.59);
       }
     };
   }
@@ -476,7 +477,10 @@ export function buildCinematicStage(scene: Scene, shot: string) {
     3.0,
     13,
   );
-  if (city) scene.fogDensity = 0.052;
+  if (city) {
+    scene.fogDensity = 0.052;
+    fill.intensity = 0.22;
+  }
   if (threshold) {
     scene.fogDensity = 0.058;
     fill.intensity = 0.17;
@@ -721,10 +725,10 @@ export function buildCinematicStage(scene: Scene, shot: string) {
     rig.rightArm.rotation.x = swing * 0.7 * weight;
     rig.legs?.forEach(({ thigh, shin }, index) => {
       const stride = Math.sin(angle + index * Math.PI);
-      thigh.rotation.x = stride * 0.58 * weight;
+      thigh.rotation.x = stride * 0.72 * weight;
       shin.rotation.x =
         -Math.pow(Math.max(0, Math.cos(angle + index * Math.PI)), 2) *
-        0.9 *
+        1.08 *
         weight;
     });
   };
@@ -735,34 +739,36 @@ export function buildCinematicStage(scene: Scene, shot: string) {
     rig.animateIdle(t);
     let power = 1;
     if (platform) {
-      const escape = smooth(6.28, 8, t);
-      const turn = smooth(5.72, 6.74, t);
+      const escape = smooth(4.12, 5.7, t);
+      const turn = smooth(3.82, 4.45, t);
       rig.root.position.set(
         escape * 2.35,
-        escape * 0.06 * Math.abs(Math.sin(t * 9.4)),
+        escape * 0.10 * Math.abs(Math.sin(t * 9.4)),
         1.6 + escape * 10,
       );
-      rig.root.rotation.y = -0.32 + turn * 3.72;
+      rig.root.rotation.set(-turn * 0.19, -0.32 + turn * 3.72, 0);
       if (rig.head)
-        rig.head.rotation.y = -smooth(3.3, 4.7, t) * (1 - turn) * 0.55;
-      runPose(t, smooth(6.2, 6.65, t));
-      train.position.set(5.65, 1.14, -40 + t * 9.1);
+        rig.head.rotation.y = -smooth(2.1, 3.2, t) * (1 - turn) * 0.55;
+      runPose(t, smooth(4.05, 4.45, t));
+      train.position.set(5.65, 1.14, -28 + t * 10.6);
       passingLight?.position.set(4.2, 1.88, train.position.z + 7);
-      if (passingLight) passingLight.intensity = 2.7;
-      const tension = smooth(0, 5.8, t);
-      view(
-        -3.1 + tension * 1.42,
-        2.28 - tension * 0.36,
-        -7.45 + tension * 3.8,
-        escape * 1.3,
-        1.32,
-        1.6 + escape * 2.8,
-        0.68,
-      );
+      if (passingLight) passingLight.intensity = 3.4;
+      if (t < 2.4) {
+        const drift = smooth(0, 2.4, t);
+        view(-2.8 + drift * 0.46, 1.38, -6.1, 1.05, 1.44, 1.6, 0.72);
+      } else if (t < 4.05) {
+        view(-1.06, 2.72, -0.75, 0.34, 2.53, 1.54, 0.57);
+      } else {
+        view(
+          -2.0, 1.63, -2.47,
+          0.55 + escape * 1.8, 1.58, 2.5 + escape * 3.4,
+          0.75,
+        );
+      }
     } else if (chase) {
       const stride = Math.sin(t * 9.4);
-      const turn = smooth(4.15, 6.5, t);
-      const z = -0.6 + t * 2.73;
+      const turn = smooth(2.86, 4.42, t);
+      const z = -0.6 + t * 3.91;
       rig.root.position.set(
         Math.sin(t * 1.4) * 0.19 + turn * 2.65,
         Math.abs(stride) * 0.085,
@@ -770,28 +776,32 @@ export function buildCinematicStage(scene: Scene, shot: string) {
       );
       rig.root.rotation.set(
         -0.21,
-        Math.PI + smooth(4.15, 5.3, t) * 0.48,
-        stride * 0.068,
+        Math.PI + smooth(2.86, 3.7, t) * 0.55,
+        stride * 0.043,
       );
       runPose(t, 1);
       if (rig.head)
         rig.head.rotation.y =
-          -smooth(1.35, 2.35, t) * (1 - smooth(2.85, 3.4, t)) * 0.94;
+          -smooth(0.7, 1.4, t) * (1 - smooth(1.85, 2.2, t)) * 0.94;
       train.position.set(2.98, 6.66, -32 + t * 10);
       passingLight?.position.set(0.92, 4.85, train.position.z + 9);
       if (passingLight) passingLight.intensity = 2.35;
       key.intensity = 1.7;
       key.position.z = z - 2;
-      if (t < 2.6) {
-        view(-2.2, 1.42, z - 5.65, 0, 1.45, z + 0.75, 0.74);
-      } else if (t < 4.75) {
-        view(-4.15, 1.67, z + 1.42, rig.root.position.x, 1.23, z + 0.4, 0.88);
+      if (t < 1.45) {
+        view(-2.04, 0.78, z - 5.4, 0.48, 1.45, z + 0.75, 0.7);
+      } else if (t < 2.85) {
+        view(
+          -3.84, 1.76, z + 1.42,
+          rig.root.position.x + 0.44, 1.59, z + 0.52,
+          0.84,
+        );
       } else {
         view(
-          -2.65 + turn * 1.36,
-          2.52,
-          9.9 + (t - 4.75) * 0.49,
-          rig.root.position.x,
+          -2.27 + turn * 0.86,
+          2.28,
+          8.0 + (t - 2.85) * 0.55,
+          1.05 + rig.root.position.x * 0.45,
           1.58,
           z + 0.5,
           0.68,
@@ -800,77 +810,64 @@ export function buildCinematicStage(scene: Scene, shot: string) {
     } else if (alcove) {
       rig.root.position.set(-2.08, 0.44, 0.4);
       rig.root.rotation.set(1.48, 0.83, 0);
-      const transfer = smooth(0.8, 2.3, t);
+      const transfer = smooth(1.0, 2.55, t);
       power = 0.52 * (1 - transfer);
       terminal?.(
         transfer === 1 ? "TRANSFER COMPLETE" : "UPLINK ACTIVE",
         transfer === 1 ? "GATEWAY 01 / RECEIPT" : "SENDING…",
         transfer === 1 ? cyan : amber,
       );
-      const look = smooth(0.5, 4.9, t);
-      view(
-        -2.55 + look * 1.86,
-        2.44 - look * 0.54,
-        -4.85 + look * 1.1,
-        -0.65 + look * 1.21,
-        0.94 + look * 0.46,
-        1.53,
-        0.72,
-      );
+      if (t < 2.8) {
+        view(-2.1, 1.89, -4.6, -0.32, 0.8, 0.99, 0.7);
+      } else {
+        const look = smooth(2.8, 6, t);
+        view(1.83 - look * 0.18, 1.99, -1.76, 1.07, 1.62, 1.48, 0.57);
+      }
     } else if (gateway) {
       const seal = smooth(0.42, 1.7, t);
       rig.root.position.set(0, 0.13, 2.85 - seal * 0.88);
       rig.leftArm.rotation.x = -seal * 0.85;
       rig.leftArm.rotation.z = seal * 0.48;
-      view(2.55 - smooth(0, 6.8, t) * 1.65, 1.52, -6.1, 0, 1.67, 2.02);
+      view(2.55 - smooth(0, 4.9, t) * 1.65, 1.52, -6.1, 0, 1.67, 2.02);
     } else if (threshold) {
-      const opening = smooth(1.8, 3.6, t);
+      const opening = smooth(0.88, 2.55, t);
       doors.forEach((door, index) => {
         door.position.set((index * 2 - 1) * (1.57 + opening * 2.98), 0, 0.25);
       });
-      rig.root.position.set(0, 0, 5.45 - smooth(4, 6.6, t) * 1.35);
-      runPose(t * 0.6, Math.sin(smooth(4, 6.6, t) * Math.PI) * 0.56);
-      const approach = smooth(2.45, 10.4, t);
-      view(
-        -0.38 + approach * 0.52,
-        1.85,
-        -5.32 + approach * 4.06,
-        0,
-        1.68,
-        rig.root.position.z,
-        0.61,
-      );
-      power = 0.44 + smooth(3, 4.15, t) * 0.56;
+      const approach = smooth(2.6, 5.5, t);
+      rig.root.position.set(0, 0, 5.45 - approach * 1.35);
+      runPose(t * 0.48, Math.sin(approach * Math.PI) * 0.56);
+      if (t < 5.5) {
+        view(
+          -0.46, 1.83, -5.36 + approach * 3.05,
+          0, 1.58, rig.root.position.z,
+          0.66,
+        );
+      } else {
+        view(-1.46, 2.52, 0.2, 0.25, 2.37, rig.root.position.z, 0.58);
+      }
+      power = 0.22 + smooth(1.95, 2.9, t) * 0.78;
     } else if (surrender) {
-      const standDown = smooth(0.45, 4.5, t);
+      const standDown = smooth(0.45, 2.2, t);
       rig.root.position.y = -standDown * 0.22;
       rig.root.rotation.x = standDown * 0.12;
-      if (rig.head) rig.head.rotation.x = standDown * 0.4;
+      if (rig.head) rig.head.rotation.x = -standDown * 0.4;
       rig.leftArm.rotation.x = -0.25 * (1 - standDown);
       rig.rightArm.rotation.x = -0.25 * (1 - standDown);
+      const listen = smooth(2.2, 4.9, t);
       view(
-        -2.25 + smooth(0, 9.3, t) * 1.52,
-        2.35,
-        -6.4 + smooth(0, 9.3, t) * 1.8,
-        0,
-        1.84,
-        1.35,
+        -2.72 + listen * 0.46, 2.24, -4.34 + listen * 0.44,
+        0.3, 2.19, 1.35,
+        0.59,
       );
     } else {
-      const shutdown = smooth(8.15, 9.5, t);
+      const shutdown = smooth(3.55, 4.65, t);
       rig.root.position.set(-1.15, 0.43, 0.45);
       rig.root.rotation.set(1.51, 0.83, 0);
       power = 0.36 * (1 - shutdown);
       key.intensity = 3 - shutdown * 2.65;
       fill.intensity = 0.32 - shutdown * 0.24;
-      view(
-        2.45 + smooth(0, 10.5, t),
-        2.24,
-        -4.62 - smooth(0, 10.5, t) * 1.35,
-        0.11,
-        0.81,
-        1.65,
-      );
+      view(2.18 + smooth(0, 6.1, t) * 1.42, 2.33, -3.55, -0.79, 0.64, 1.18, 0.63);
     }
     actorShadow.position.x = rig.root.position.x;
     actorShadow.position.z = rig.root.position.z;

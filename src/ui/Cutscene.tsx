@@ -3,7 +3,6 @@ import { preload } from "react-dom";
 import { ArrowRight, Pause, Play, SkipForward } from "lucide-react";
 import type { Story } from "../content/schema";
 import type { RendererPreference } from "../game/contracts";
-import { dialogueVoice } from "../game/dialogueSpeech";
 import { personalizeText } from "../game/player";
 import type { SfxName } from "../game/soundManager";
 import { useGameSound } from "./GameSound";
@@ -15,53 +14,45 @@ const shotUrl = (shot: string) =>
 
 const effects: Partial<Record<string, [atMs: number, sound: SfxName][]>> = {
   "transit-platform": [
-    [400, "scan"],
-    [3970, "cinematicTrain"],
-    [6500, "pursuit"],
-    [6834, "pursuit"],
-    [7168, "pursuit"],
+    [1880, "cinematicTrain"],
+    [4170, "pursuit"],
+    [4504, "pursuit"],
+    [4838, "pursuit"],
   ],
   "rail-pursuit": [
     [1150, "cinematicTrain"],
-    ...Array.from({ length: 19 }, (_, step): [number, SfxName] => [
+    ...Array.from({ length: 13 }, (_, step): [number, SfxName] => [
       170 + step * 334,
       "pursuit",
     ]),
-    [6400, "blocked"],
   ],
   "abandoned-chassis": [
-    [350, "move"],
-    [1150, "scan"],
-    [2300, "connect"],
-    [3500, "clue"],
+    [440, "move"],
+    [2550, "connect"],
   ],
   "evidence-board": [
     [850, "page"],
     [3350, "clue"],
   ],
   "echo-threshold": [
-    [1800, "open"],
-    [3000, "connect"],
+    [880, "open"],
+    [2520, "connect"],
   ],
   "office-terminal": [
     [300, "click"],
     [490, "click"],
     [680, "click"],
-    [2500, "connect"],
+    [1850, "connect"],
   ],
   "gateway-sentry": [
     [1150, "blocked"],
     [1660, "hazard"],
   ],
-  "echo-surrender": [[1420, "blocked"]],
-  "echo-isolation": [[8570, "close"]],
-  "ledger-open": [
-    [800, "page"],
-    [6500, "clue"],
-  ],
+  "echo-isolation": [[4650, "close"]],
+  "ledger-open": [[600, "page"]],
   "ledger-closed": [
-    [3490, "page"],
-    [5140, "bookClose"],
+    [1150, "page"],
+    [2650, "bookClose"],
   ],
 };
 
@@ -85,6 +76,7 @@ export function Cutscene({
     () => window.matchMedia("(prefers-reduced-motion: reduce)").matches,
   );
   const elapsed = useRef(0);
+  const readyShot = useRef<string | null>(null);
   const stops = useRef<(() => void)[]>([]);
   const nextButton = useRef<HTMLButtonElement>(null);
   useEffect(() => {
@@ -118,15 +110,21 @@ export function Cutscene({
   }, [frame, paused, still]);
 
   useEffect(() => {
-    const stop = sound(dialogueVoice(cue.speaker));
-    return stop;
-  }, [cue, sound]);
-
-  useEffect(() => {
     if (paused || still) return;
     let request: number;
     let previous: number | undefined;
+    let waitingFrom: number | undefined;
     const tick = (now: number) => {
+      waitingFrom ??= now;
+      // Give the live shot a head start and keep the poster playable on a slow renderer.
+      if (
+        elapsed.current === 0 &&
+        readyShot.current !== current.shot &&
+        now - waitingFrom < 750
+      ) {
+        request = requestAnimationFrame(tick);
+        return;
+      }
       // Bound the delta so returning to the tab never skips dialogue.
       const delta = previous === undefined ? 0 : Math.min(100, now - previous);
       previous = now;
@@ -196,6 +194,7 @@ export function Cutscene({
               shot={current.shot}
               renderer={renderer}
               elapsed={elapsed}
+              readyShot={readyShot}
             />
           </Suspense>
         )}
