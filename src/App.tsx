@@ -111,7 +111,7 @@ import {
 import type { HomeWall } from "./world/Office";
 import { atGoal, move, shortestPath, type Maze } from "./game/maze";
 import {
-  addXp,
+  rewardBattleVictory,
   claimQuest,
   completeActivity,
   evidence,
@@ -671,6 +671,7 @@ export default function App() {
   );
   const open = useCallback(
     (id: string, debugTravel = false, confirmedExit = false) => {
+      if (id === "echo-battle") id = "echo";
       const activeBattle =
         (panel === "battle" || settingsFromBattle) &&
         battleRef.current.phase !== "won" &&
@@ -693,6 +694,11 @@ export default function App() {
       if (tutorialRef.current) closeTutorial();
       if (id === "exit") return;
       if (!suppressNavigationSfx(id)) sound("open");
+      if (id === "epilogue") {
+        const outcome = saveRef.current.finaleOutcome;
+        if (outcome) setCutsceneId(`echo-epilogue-${outcome}`);
+        return;
+      }
       if (id === "library" && !officeFallback) {
         setHomeWall("bookshelf");
         setRealm("desk");
@@ -787,6 +793,11 @@ export default function App() {
       if (encounter?.type === "activity") {
         if (!debugTravel && !activityUnlocked(saveRef.current, id, content)) {
           notify("Follow the preceding lead on the quest board first.");
+          return;
+        }
+        if (!debugTravel && !saveRef.current.story.networkIntroSeen) {
+          setPendingActivity(id);
+          setCutsceneId("first-connection");
           return;
         }
         setBookOpen(false);
@@ -1236,16 +1247,7 @@ export default function App() {
         content.entities.find(
           (e) => e.type === "activity" && e.enemy?.id === nextBattle.enemyId,
         )?.id ?? "guardian-battle";
-      const first = !nextSave.completed.includes(activity);
-      nextSave = completeActivity(nextSave, activity);
-      if (activity === "echo-battle")
-        nextSave = {
-          ...nextSave,
-          finaleOutcome:
-            nextBattle.resolution === "pacified" ? "pacified" : "defeated",
-        };
-      if (first)
-        nextSave = addXp(nextSave, activity === "echo-battle" ? 60 : 20);
+      nextSave = rewardBattleVictory(nextSave, activity, nextBattle.resolution);
     }
     battleRef.current = nextBattle;
     setBattle(nextBattle);
@@ -2749,6 +2751,7 @@ export default function App() {
                     save={save}
                     content={content}
                     onStart={(id) => open(id)}
+                    onEpilogue={() => open("epilogue")}
                     onClaim={claimWithFeedback}
                   />
                   {content.entities.some(

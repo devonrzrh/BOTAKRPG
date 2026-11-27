@@ -108,6 +108,13 @@ it("keeps finale and reward gates on the 3D quest board", () => {
       .find((m) => m.id === "quests")!
       .buttons.find((b) => b.id === "claim-routing-trace")?.disabled,
   ).toBe(true);
+  expect(quest.graph?.nodes.find((n) => n.id === "finale")?.actions).not.toContain("epilogue");
+  data.save = { ...completeActivity(data.save, "echo-battle"), finaleOutcome: "defeated" };
+  quest = createOfficeUi(data).find((m) => m.id === "quests")!;
+  expect(quest.graph?.nodes.find((n) => n.id === "finale")?.actions).toContain("epilogue");
+  expect(quest.buttons.find((b) => b.id === "epilogue")?.action).toEqual({
+    kind: "open", id: "epilogue",
+  });
 });
 it("paginates and filters materials while preserving Python operators", () => {
   expect(

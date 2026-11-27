@@ -11,6 +11,7 @@ import {
   completeActivity,
   claimQuest,
   parseSave,
+  rewardBattleVictory,
 } from "../src/game/state";
 import {
   activityUnlocked,
@@ -185,11 +186,13 @@ it("uses all material topics in the final boss and can complete the case", () =>
     ),
   ).toEqual(new Set(["algorithms", "structures", "ai"]));
   save = completeActivity(save, "evidence-chain");
-  save = completeActivity(save, "echo-battle");
-  save = claimQuest(save, finale, content);
+  const victory = rewardBattleVictory(save, "echo-battle", "pacified");
+  expect(victory.character.xp).toBe(save.character.xp + 60);
+  expect(victory.supply.tokens).toBe(save.supply.tokens + 1);
+  expect(rewardBattleVictory(victory, "echo-battle", "defeated")).toBe(victory);
+  save = claimQuest(victory, finale, content);
   expect(save.claimed).toContain(finale.id);
   expect(claimQuest(save, finale, content)).toBe(save);
-  save.finaleOutcome = "pacified";
   expect(parseSave(save, content).completed).toContain("echo-battle");
   expect(parseSave(save, content).finaleOutcome).toBe("pacified");
 });

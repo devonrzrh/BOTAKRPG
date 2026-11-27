@@ -480,6 +480,7 @@ export function BattleScreen(p: Props) {
     save.supply.tokens - startingSave.current.supply.tokens,
   );
   const oldStats = stats(startingSave.current, p.content);
+  const onEpilogue = startingSave.current.finaleOutcome ? undefined : p.onEpilogue;
   const levelGain = save.character.level - startingSave.current.character.level;
   const newSkills = p.content.entities.filter(
     (e): e is Skill =>
@@ -1213,12 +1214,12 @@ export function BattleScreen(p: Props) {
             )}
           </div>
           <footer>
-            <button className="primary" onClick={p.onEpilogue ?? p.onJournal}>
-              {p.onEpilogue
+            <button className="primary" onClick={onEpilogue ?? p.onJournal}>
+              {onEpilogue
                 ? "Continue to epilogue"
                 : (p.victoryActionLabel ?? "Quest map")}
             </button>
-            {!p.onEpilogue && (
+            {!onEpilogue && (
               <button onClick={p.onRetreat}>Return to network</button>
             )}
           </footer>

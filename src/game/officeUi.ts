@@ -711,6 +711,8 @@ export function createOfficeUi(input: OfficeUiInput): SurfaceModel[] {
     finale.id,
     !closed || save.claimed.includes(finale.id),
   );
+  if (closed && save.finaleOutcome)
+    button(quests, "epilogue", 428, 395, 360, 45, "View epilogue", "open", "epilogue");
 
   const inventory = panel("desk", "CLUE LEDGER", "paper");
   inventory.buttons.push({

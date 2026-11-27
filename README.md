@@ -1,6 +1,6 @@
 # NULL / TRACE
 
-A local-first learning RPG built with TypeScript, React, Babylon.js, Blockly, and a browser-local Pyodide worker. Detective Vale pursues ECHO-7, a rogue robot that escapes into the network. The home is a first-person room. Its investigation wall, bookshelf, quest board, and clue ledger are connected by quick camera turns. The top menu bar stays visible during gameplay, cutscenes, and dialogue. The first chapter includes an algorithm maze, quiz battle, and perceptron lab.
+A local-first learning RPG built with TypeScript, React, Babylon.js, Blockly, and a browser-local Pyodide worker. Pursue ECHO-7 through five leads, recover the evidence, and confront it in the abandoned subnet. The office connects the investigation wall, bookshelf, quest board, and clue ledger. The top menu bar stays visible during gameplay, cutscenes, and dialogue.
 
 ## Run
 
@@ -14,7 +14,7 @@ A local-first learning RPG built with TypeScript, React, Babylon.js, Blockly, an
 ### Install and start
 
 ```sh
-npm install
+npm ci
 npm run dev
 ```
 
@@ -132,9 +132,9 @@ The persistent top bar shows the current level, XP bar, and XP needed for the ne
 
 Saves contain character stats, completion and reward claims, mastery evidence, notes, bookmarks, code, blocks, seed, trial record, and preferences. Use **Settings → Export journal** before clearing browser storage. Invalid imports leave the existing save untouched. Corrupt stored data is not automatically overwritten; a recovery download and explicit replacement control are available. Collected clues are derived from completed activities and survive save/import. Legacy item inventories and equipped modules are discarded on loading; XP, skills, and evidence remain. Encounter state is session-local.
 
-This slice is single-player, desktop-first, and uses placeholder art. It has no accounts, cloud synchronization, telemetry, LLM generation, or multiplayer. Python is for trusted self-study code: a worker keeps execution off the UI thread, but is not a security boundary against deliberately hostile Python/JS interop. Content cannot define arbitrary executable templates.
+The game is single-player and desktop-first. Journals are stored in the current browser. Run your own code or the supplied examples in the Python worker.
 
-The prologue is a short interactive chase. Five parallel clue quests can be pursued in any order. Each links its materials, activities, story, clue, and reward. Recovering all five clues unlocks ECHO-7 in the abandoned subnet. The final battle draws questions across the curriculum and closes the case on victory. Branch and finale rewards can each be claimed once.
+The prologue is a short interactive chase. The final battle draws questions across the curriculum and closes the case on victory. Select ECHO-7 on the quest board and choose **View epilogue** to revisit the recorded ending. Practice battles leave the recorded ending intact. Branch and finale rewards can each be claimed once.
 
 The room camera follows the cursor slightly. Switching walls adds directional blur driven by camera velocity; Settings → Reduce movement animation disables camera movement and transition blur. Dialogues use validated node graphs in Markdown, and cutscenes support configurable frames and pursuit steps. The first network connection plays once per save.
 
@@ -148,7 +148,7 @@ Controls render into Babylon DynamicTextures. Pointer releases ray-pick mesh UV 
 
 Opened books expand into a full-screen reading view below the menu bar. The spread fits the viewport without cropping; a dark backdrop hides the room. Camera parallax and room-edge turns stay off while reading. Close book returns the volume to the shelf.
 
-The quest screen displays a graph of the current playable investigations, evidence, and ECHO-7 finale. Drag its map to pan and scroll to zoom around the pointer. Select a node for its briefing, activity, book, or reward actions. Overview resets the map; Center finds the selected node. Keyboard users can Tab to nodes, press Enter to inspect them, pan with arrow keys, zoom with plus/minus, and center with Home. Locked evidence is revealed only after its activity is complete. The five expanded story questlines in the design document remain planned content, rather than playable graph entries.
+The quest screen displays a graph of the playable investigations, evidence, and ECHO-7 finale. Drag its map to pan and scroll to zoom around the pointer. Select a node for its briefing, activity, book, or reward actions. Overview resets the map; Center finds the selected node. Keyboard users can Tab to nodes, press Enter to inspect them, pan with arrow keys, zoom with plus/minus, and center with Home. Locked evidence is revealed after its activity is complete.
 
 Left/right screen edges turn after 90 ms of cursor entry. Click, A/D, and arrow keys also turn. Hover advances once per entry; leave the edge before another turn. Typing does not trigger keyboard turns.
 

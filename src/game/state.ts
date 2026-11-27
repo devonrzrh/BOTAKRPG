@@ -322,6 +322,18 @@ export function completeActivity(save: Save, id: string): Save {
         },
       };
 }
+export function rewardBattleVictory(
+  save: Save,
+  activity: string,
+  resolution: Save["finaleOutcome"] = null,
+): Save {
+  const completed = completeActivity(save, activity);
+  const isFinale = activity === "echo-battle";
+  const recorded = isFinale && !save.finaleOutcome
+    ? { ...completed, finaleOutcome: resolution ?? "defeated" }
+    : completed;
+  return completed === save ? recorded : addXp(recorded, isFinale ? 60 : 20);
+}
 export function recordAnswer(
   save: Save,
   lesson: string,

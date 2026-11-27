@@ -301,7 +301,11 @@ export function createQuestGraph(
     y: mid,
     kind: "boss",
     status: closed ? "completed" : ready ? "available" : "locked",
-    actions: ["finale", "finale-reward", "claim-case"],
+    actions: [
+      ...(closed && save.finaleOutcome ? ["epilogue"] : []),
+      "finale",
+      ...(closed ? ["finale-reward"] : []),
+    ],
   });
   return {
     nodes,

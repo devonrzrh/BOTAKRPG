@@ -74,11 +74,13 @@ export function FinaleCard({
   save,
   content,
   onStart,
+  onEpilogue,
   onClaim,
 }: {
   save: Save;
   content: Content;
   onStart: (activityId: string) => void;
+  onEpilogue: () => void;
   onClaim: (q: Quest) => void;
 }) {
   const finale = content.entities.find(
@@ -110,6 +112,9 @@ export function FinaleCard({
               : "All five clues recovered. Reconstruct the verified route before entering the subnet."
             : `${count} / ${branches.length} clues recovered. Follow the remaining branches to locate the robot.`}
         </p>
+      )}
+      {done && save.finaleOutcome && (
+        <button onClick={onEpilogue}>View epilogue</button>
       )}
       <button
         className="primary"
