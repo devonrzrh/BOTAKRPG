@@ -27,6 +27,8 @@ ORIGINS = {
     "right-thigh": (0.43, 0.03, 1.28),
     "left-shin": (-0.43, -0.11, 0.76),
     "right-shin": (0.43, -0.11, 0.76),
+    "left-foot": (-0.43, 0.10, 0.18),
+    "right-foot": (0.43, 0.10, 0.18),
 }
 
 
@@ -130,6 +132,7 @@ def build():
 
         thigh = f"{arm}-thigh"
         shin = f"{arm}-shin"
+        foot = f"{arm}-foot"
         block("Thigh actuator", thigh, (0, 0.025, -0.23), 0.40, 0.52, 0.47, 0)
         block("Thigh plate", thigh, (0, -0.21, -0.20), 0.44, 0.41, 0.25, 1, taper=0.76)
         hub("Knee bearing", shin, (0, 0, 0), 0.22, 0.47, 0)
@@ -140,8 +143,8 @@ def build():
             (-0.15, 0.25), (0.15, 0.25), (0.23, 0.11),
             (0.20, -0.24), (-0.20, -0.24),
         ]), 0.25, 1, 0.035)
-        block("Boot", shin, (boot, -0.03, -0.62), 0.53, 0.28, 0.87, 0, taper=1.08)
-        block("Boot toe", shin, (boot, -0.37, -0.61), 0.49, 0.19, 0.30, 1)
+        block("Boot", foot, (boot, -0.24, -0.04), 0.53, 0.28, 0.87, 0, taper=1.08)
+        block("Boot toe", foot, (boot, -0.58, -0.03), 0.49, 0.19, 0.30, 1)
     return collection
 
 

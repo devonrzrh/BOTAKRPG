@@ -12,6 +12,8 @@ import { CreatePlane } from "@babylonjs/core/Meshes/Builders/planeBuilder";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { Scene } from "@babylonjs/core/scene";
+import { cinematicFootfalls } from "../game/cinematicFootfalls";
+import { createCinematicGait, smooth } from "./CinematicGait";
 import { buildEnemyModel } from "./EnemyModel";
 
 const cityShots = ["transit-platform", "rail-pursuit", "abandoned-chassis"];
@@ -34,10 +36,6 @@ const amber = "#ffbe70";
 const steel = "#364a57";
 const panel = "#19252f";
 const black = "#101820";
-const smooth = (start: number, end: number, t: number) => {
-  const x = Math.max(0, Math.min(1, (t - start) / (end - start)));
-  return x * x * (3 - 2 * x);
-};
 
 export function buildCinematicStage(scene: Scene, shot: string) {
   scene.clearColor = new Color4(0.024, 0.044, 0.066, 1);
@@ -466,8 +464,10 @@ export function buildCinematicStage(scene: Scene, shot: string) {
   const gateway = shot === "gateway-sentry";
   const threshold = shot === "echo-threshold";
   const surrender = shot === "echo-surrender";
+  const isolation = shot === "echo-isolation";
   const signal = gateway || city ? amber : cyan;
-  light("cold backlight", 0, 5, 6, "#5acde8", 2.7, 13);
+  const rim = light("cold backlight", 0, 5, 6, "#5acde8", 2.7, 13);
+  const rackSignal = isolation ? "#69d8e6" : signal;
   const key = light(
     "side key",
     -3,
@@ -531,7 +531,7 @@ export function buildCinematicStage(scene: Scene, shot: string) {
             0.035,
             0.045,
             0.085,
-            signal,
+            rackSignal,
             true,
           );
         }
@@ -718,38 +718,59 @@ export function buildCinematicStage(scene: Scene, shot: string) {
     const marker = display(2.55, 4.25, 16.65, 1.55, 0.71);
     marker("MAINTENANCE", "ALCOVE 04", amber);
   }
-  const runPose = (t: number, weight: number) => {
-    const angle = t * 9.4;
-    const swing = Math.sin(angle);
-    rig.leftArm.rotation.x = -swing * 0.7 * weight;
-    rig.rightArm.rotation.x = swing * 0.7 * weight;
-    rig.legs?.forEach(({ thigh, shin }, index) => {
-      const stride = Math.sin(angle + index * Math.PI);
-      thigh.rotation.x = stride * 0.72 * weight;
-      shin.rotation.x =
-        -Math.pow(Math.max(0, Math.cos(angle + index * Math.PI)), 2) *
-        1.08 *
-        weight;
-    });
+  const platformPath = (time: number) => {
+    const turn = smooth(3.23, 4.28, time);
+    const elapsed = Math.max(0, time - 3.93);
+    const travel = 3.65 * (elapsed - 0.21 * (1 - Math.exp(-elapsed / 0.21)));
+    return { x: travel * 0.21, z: 1.6 + travel, yaw: -0.32 + turn * 3.68 };
+  };
+  const turnStart = 2.73;
+  const turnEnd = 4.22;
+  const chasePath = (time: number) => {
+    const corner = smooth(turnStart, turnEnd, time);
+    const phase = Math.max(0, Math.min(1, (time - turnStart) / (turnEnd - turnStart)));
+    const sideSpeed = 2.55 * 6 * phase * (1 - phase) / (turnEnd - turnStart);
+    return { x: 2.55 * corner, z: 0.84 + time * 3.84, yaw: Math.PI + Math.atan2(sideSpeed, 3.84) };
+  };
+  const thresholdPath = (time: number) => ({
+    x: 0, z: 5.45 - 1.35 * smooth(2.73, 5.2, time), yaw: 0,
+  });
+  const gait = platform
+    ? createCinematicGait(rig, platformPath, cinematicFootfalls["transit-platform"], 3.25, 0.135, 0.28)
+    : chase
+      ? createCinematicGait(rig, chasePath, cinematicFootfalls["rail-pursuit"], -1.15, 0.13, 0.33)
+      : threshold
+        ? createCinematicGait(rig, thresholdPath, cinematicFootfalls["echo-threshold"], 2.2, 0.22, 0.15)
+        : surrender
+          ? createCinematicGait(rig, () => ({ x: 0, z: 1.35, yaw: 0 }), [], 0, 0, 0)
+          : undefined;
+  const rackLights = isolation ? material(rackSignal, true) : undefined;
+  const rackGlow = rackLights?.emissiveColor.clone();
+  const swingArms = (phase: number, amount: number) => {
+    rig.leftArm.rotation.x = -Math.cos(phase) * amount;
+    rig.rightArm.rotation.x = Math.cos(phase) * amount;
   };
   return (t: number) => {
     rig.resetIdle();
     rig.root.position.set(0, 0, 1.35);
     rig.root.rotation.set(0, 0, 0);
-    rig.animateIdle(t);
+    if (!alcove && !isolation) rig.animateIdle(t);
     let power = 1;
     if (platform) {
-      const escape = smooth(4.12, 5.7, t);
-      const turn = smooth(3.82, 4.45, t);
-      rig.root.position.set(
-        escape * 2.35,
-        escape * 0.10 * Math.abs(Math.sin(t * 9.4)),
-        1.6 + escape * 10,
-      );
-      rig.root.rotation.set(-turn * 0.19, -0.32 + turn * 3.72, 0);
-      if (rig.head)
-        rig.head.rotation.y = -smooth(2.1, 3.2, t) * (1 - turn) * 0.55;
-      runPose(t, smooth(4.05, 4.45, t));
+      const { x, z, yaw } = platformPath(t);
+      const glance = smooth(1.72, 2.24, t) * (1 - smooth(3.45, 4.06, t));
+      const brace = smooth(3.14, 3.65, t) * (1 - smooth(3.85, 4.2, t));
+      const run = smooth(3.86, 4.35, t);
+      const phase = (t - 4.02) * Math.PI / 0.34;
+      rig.root.position.set(x, -brace * 0.19 - run * (0.155 + Math.cos(phase * 2) * 0.03), z);
+      rig.root.rotation.set(-run * 0.22, yaw, brace * 0.12);
+      if (rig.head) {
+        rig.head.rotation.y = -glance * 0.62 + brace * 0.28;
+        rig.head.rotation.x += glance * 0.08;
+      }
+      swingArms(phase, run * 0.64);
+      rig.rightArm.rotation.x += brace * 0.55;
+      gait?.(t);
       train.position.set(5.65, 1.14, -28 + t * 10.6);
       passingLight?.position.set(4.2, 1.88, train.position.z + 7);
       if (passingLight) passingLight.intensity = 3.4;
@@ -761,28 +782,29 @@ export function buildCinematicStage(scene: Scene, shot: string) {
       } else {
         view(
           -2.0, 1.63, -2.47,
-          0.55 + escape * 1.8, 1.58, 2.5 + escape * 3.4,
+          0.45 + x * 0.72, 1.58, 2.25 + (z - 1.6) * 0.67,
           0.75,
         );
       }
     } else if (chase) {
-      const stride = Math.sin(t * 9.4);
-      const turn = smooth(2.86, 4.42, t);
-      const z = -0.6 + t * 3.91;
-      rig.root.position.set(
-        Math.sin(t * 1.4) * 0.19 + turn * 2.65,
-        Math.abs(stride) * 0.085,
-        z,
-      );
+      const { x, z, yaw } = chasePath(t);
+      const phase = (t - 0.17) * Math.PI / 0.334;
+      const turn = smooth(turnStart, turnEnd, t);
+      const bank = smooth(2.45, 3.32, t) * (1 - smooth(3.62, 4.33, t));
+      rig.root.position.set(x, -0.172 - Math.cos(phase * 2) * 0.047 - bank * 0.043, z);
       rig.root.rotation.set(
-        -0.21,
-        Math.PI + smooth(2.86, 3.7, t) * 0.55,
-        stride * 0.043,
+        -0.23 + bank * 0.08,
+        yaw + Math.sin(phase) * 0.048,
+        bank * 0.26 + Math.cos(phase) * 0.044,
       );
-      runPose(t, 1);
-      if (rig.head)
-        rig.head.rotation.y =
-          -smooth(0.7, 1.4, t) * (1 - smooth(1.85, 2.2, t)) * 0.94;
+      swingArms(phase, 0.64);
+      rig.leftArm.rotation.z -= bank * 0.29;
+      if (rig.head) {
+        const lookBack = smooth(0.71, 1.18, t) * (1 - smooth(1.57, 2.12, t));
+        rig.head.rotation.y = -lookBack * 0.98 + bank * 0.19;
+        rig.head.rotation.x = 0.15;
+      }
+      gait?.(t);
       train.position.set(2.98, 6.66, -32 + t * 10);
       passingLight?.position.set(0.92, 4.85, train.position.z + 9);
       if (passingLight) passingLight.intensity = 2.35;
@@ -808,9 +830,12 @@ export function buildCinematicStage(scene: Scene, shot: string) {
         );
       }
     } else if (alcove) {
-      rig.root.position.set(-2.08, 0.44, 0.4);
-      rig.root.rotation.set(1.48, 0.83, 0);
       const transfer = smooth(1.0, 2.55, t);
+      const slump = smooth(2.28, 2.67, t);
+      rig.root.position.set(-2.08, 0.49 - slump * 0.05, 0.4);
+      rig.root.rotation.set(1.48 + slump * 0.065, 0.83, 0);
+      if (rig.head) rig.head.rotation.z = -slump * 0.24;
+      rig.leftArm.rotation.z = -slump * 0.17;
       power = 0.52 * (1 - transfer);
       terminal?.(
         transfer === 1 ? "TRANSFER COMPLETE" : "UPLINK ACTIVE",
@@ -824,19 +849,30 @@ export function buildCinematicStage(scene: Scene, shot: string) {
         view(1.83 - look * 0.18, 1.99, -1.76, 1.07, 1.62, 1.48, 0.57);
       }
     } else if (gateway) {
-      const seal = smooth(0.42, 1.7, t);
-      rig.root.position.set(0, 0.13, 2.85 - seal * 0.88);
-      rig.leftArm.rotation.x = -seal * 0.85;
-      rig.leftArm.rotation.z = seal * 0.48;
+      const focus = smooth(0.18, 0.63, t);
+      const brace = smooth(0.55, 1.18, t);
+      const seal = smooth(0.76, 1.64, t);
+      const recoil = smooth(1.5, 1.69, t) * (1 - smooth(1.69, 1.96, t));
+      rig.root.position.set(0, 0.13, 2.85);
+      rig.root.rotation.y = -brace * 0.17;
+      if (rig.head) rig.head.rotation.y = 0.34 * (1 - focus) + brace * 0.17;
+      rig.leftArm.rotation.x = -seal * 0.92 + recoil * 0.1;
+      rig.leftArm.rotation.z = seal * 0.48 - recoil * 0.08;
       view(2.55 - smooth(0, 4.9, t) * 1.65, 1.52, -6.1, 0, 1.67, 2.02);
     } else if (threshold) {
       const opening = smooth(0.88, 2.55, t);
       doors.forEach((door, index) => {
         door.position.set((index * 2 - 1) * (1.57 + opening * 2.98), 0, 0.25);
       });
-      const approach = smooth(2.6, 5.5, t);
-      rig.root.position.set(0, 0, 5.45 - approach * 1.35);
-      runPose(t * 0.48, Math.sin(approach * Math.PI) * 0.56);
+      const approach = smooth(2.73, 5.2, t);
+      const { z } = thresholdPath(t);
+      const walk = smooth(2.68, 3.26, t) * (1 - smooth(4.77, 5.47, t));
+      const phase = (t - 3.25) * Math.PI / 0.66;
+      rig.root.position.set(0, -walk * (0.049 + Math.cos(2 * phase) * 0.021), z);
+      rig.root.rotation.set(-walk * 0.09, walk * Math.sin(phase) * 0.045, walk * Math.cos(phase) * 0.045);
+      swingArms(phase, walk * 0.29);
+      if (rig.head) rig.head.rotation.x = 0.12 * smooth(5.05, 5.96, t);
+      gait?.(t);
       if (t < 5.5) {
         view(
           -0.46, 1.83, -5.36 + approach * 3.05,
@@ -848,12 +884,20 @@ export function buildCinematicStage(scene: Scene, shot: string) {
       }
       power = 0.22 + smooth(1.95, 2.9, t) * 0.78;
     } else if (surrender) {
-      const standDown = smooth(0.45, 2.2, t);
-      rig.root.position.y = -standDown * 0.22;
-      rig.root.rotation.x = standDown * 0.12;
-      if (rig.head) rig.head.rotation.x = -standDown * 0.4;
-      rig.leftArm.rotation.x = -0.25 * (1 - standDown);
-      rig.rightArm.rotation.x = -0.25 * (1 - standDown);
+      const lowerArms = smooth(0.36, 1.48, t);
+      const release = smooth(0.74, 1.9, t);
+      const listenBack = smooth(2.35, 3.17, t);
+      rig.root.position.y = -release * 0.11 + listenBack * 0.047;
+      rig.root.rotation.x = -release * 0.12 + listenBack * 0.06;
+      if (rig.head) {
+        rig.head.rotation.x = -smooth(1.15, 1.98, t) * 0.31 + listenBack * 0.24;
+        rig.head.rotation.y = listenBack * 0.17;
+      }
+      rig.leftArm.rotation.x = -0.49 * (1 - lowerArms);
+      rig.rightArm.rotation.x = -0.65 * (1 - smooth(0.58, 1.68, t));
+      rig.leftArm.rotation.z -= 0.26 * (1 - lowerArms);
+      rig.rightArm.rotation.z += 0.24 * (1 - lowerArms);
+      gait?.(t);
       const listen = smooth(2.2, 4.9, t);
       view(
         -2.72 + listen * 0.46, 2.24, -4.34 + listen * 0.44,
@@ -867,6 +911,11 @@ export function buildCinematicStage(scene: Scene, shot: string) {
       power = 0.36 * (1 - shutdown);
       key.intensity = 3 - shutdown * 2.65;
       fill.intensity = 0.32 - shutdown * 0.24;
+      rim.intensity = 2.7 - shutdown * 2.28;
+      if (rackLights && rackGlow) {
+        const voltage = 1 - smooth(4.27, 4.54, t);
+        rackLights.emissiveColor.copyFrom(rackGlow).scaleInPlace(voltage);
+      }
       view(2.18 + smooth(0, 6.1, t) * 1.42, 2.33, -3.55, -0.79, 0.64, 1.18, 0.63);
     }
     actorShadow.position.x = rig.root.position.x;

@@ -66,7 +66,7 @@ export function buildEnemyModel(scene: Scene, id: string, scale = 1) {
   const rightArm = new TransformNode("right shoulder pivot", scene);
   let sentinelHead: TransformNode | undefined;
   let echoHead: TransformNode | undefined;
-  let legs: { thigh: TransformNode; shin: TransformNode }[] | undefined;
+  let legs: { thigh: TransformNode; shin: TransformNode; foot: TransformNode }[] | undefined;
   for (const [pivot, side] of [
     [leftArm, -1],
     [rightArm, 1],
@@ -1184,9 +1184,12 @@ export function buildEnemyModel(scene: Scene, id: string, scale = 1) {
     legs = ["left", "right"].map((side) => {
       const thigh = pivots[`${side}-thigh`];
       const shin = pivots[`${side}-shin`];
+      const foot = pivots[`${side}-foot`];
+      foot.parent = shin;
+      foot.position.subtractInPlace(shin.position);
       shin.parent = thigh;
       shin.position.subtractInPlace(thigh.position);
-      return { thigh, shin };
+      return { thigh, shin, foot };
     });
     for (const part of echoMesh.parts) {
       const name =

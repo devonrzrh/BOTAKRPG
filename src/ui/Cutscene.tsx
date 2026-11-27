@@ -2,6 +2,7 @@ import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import { preload } from "react-dom";
 import { ArrowRight, Pause, Play, SkipForward } from "lucide-react";
 import type { Story } from "../content/schema";
+import { cinematicFootfalls } from "../game/cinematicFootfalls";
 import type { RendererPreference } from "../game/contracts";
 import { personalizeText } from "../game/player";
 import type { SfxName } from "../game/soundManager";
@@ -11,20 +12,17 @@ import "./Cutscene.css";
 const CinematicCanvas = lazy(() => import("../world/CinematicCanvas"));
 const shotUrl = (shot: string) =>
   `${import.meta.env.BASE_URL}cutscenes/${shot}.webp`;
+const footsteps = (shot: keyof typeof cinematicFootfalls): [number, SfxName][] =>
+  cinematicFootfalls[shot].map((at) => [at, "pursuit"]);
 
 const effects: Partial<Record<string, [atMs: number, sound: SfxName][]>> = {
   "transit-platform": [
     [1880, "cinematicTrain"],
-    [4170, "pursuit"],
-    [4504, "pursuit"],
-    [4838, "pursuit"],
+    ...footsteps("transit-platform"),
   ],
   "rail-pursuit": [
     [1150, "cinematicTrain"],
-    ...Array.from({ length: 13 }, (_, step): [number, SfxName] => [
-      170 + step * 334,
-      "pursuit",
-    ]),
+    ...footsteps("rail-pursuit"),
   ],
   "abandoned-chassis": [
     [440, "move"],
@@ -37,6 +35,7 @@ const effects: Partial<Record<string, [atMs: number, sound: SfxName][]>> = {
   "echo-threshold": [
     [880, "open"],
     [2520, "connect"],
+    ...footsteps("echo-threshold"),
   ],
   "office-terminal": [
     [300, "click"],
